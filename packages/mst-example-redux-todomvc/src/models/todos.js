@@ -18,13 +18,13 @@ const TodoStore = types
     .model({
         todos: types.optional(types.array(Todo), [])
     })
-    .views(self => ({
+    .views((self) => ({
         // utilities
-        findTodoById: function(id) {
-            return self.todos.find(todo => todo.id === id)
+        findTodoById: function (id) {
+            return self.todos.find((todo) => todo.id === id)
         }
     }))
-    .actions(self => ({
+    .actions((self) => ({
         // actions
         [ADD_TODO]({ text }) {
             const id = self.todos.reduce((maxId, todo) => Math.max(todo.id, maxId), -1) + 1
@@ -45,11 +45,11 @@ const TodoStore = types
             todo.completed = !todo.completed
         },
         [COMPLETE_ALL]() {
-            const areAllMarked = self.todos.every(todo => todo.completed)
-            self.todos.forEach(todo => (todo.completed = !areAllMarked))
+            const areAllMarked = self.todos.every((todo) => todo.completed)
+            self.todos.forEach((todo) => (todo.completed = !areAllMarked))
         },
         [CLEAR_COMPLETED]() {
-            self.todos.replace(self.todos.filter(todo => todo.completed === false))
+            self.todos.replace(self.todos.filter((todo) => todo.completed === false))
         }
     }))
 

@@ -3,7 +3,7 @@ import { ShopStore } from "./ShopStore"
 
 const testEnvironment = {
     fetch: () => Promise.resolve(JSON.parse(fs.readFileSync("./public/books.json"))),
-    alert: m => console.log(m)
+    alert: (m) => console.log(m)
 }
 
 const testBook = {

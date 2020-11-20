@@ -16,7 +16,10 @@ test("it should allow array of pointer objects", () => {
         selected: types.optional(types.array(TodoPointer), [])
     })
     const store = AppStore.create({
-        todos: [{ id: "1", name: "Hello" }, { id: "2", name: "World" }],
+        todos: [
+            { id: "1", name: "Hello" },
+            { id: "2", name: "World" }
+        ],
         selected: []
     })
     unprotect(store)
@@ -31,7 +34,10 @@ test("it should allow array of pointer objects - 2", () => {
         selected: types.optional(types.array(TodoPointer), [])
     })
     const store = AppStore.create({
-        todos: [{ id: "1", name: "Hello" }, { id: "2", name: "World" }],
+        todos: [
+            { id: "1", name: "Hello" },
+            { id: "2", name: "World" }
+        ],
         selected: []
     })
     unprotect(store)
@@ -47,7 +53,10 @@ test("it should allow array of pointer objects - 3", () => {
         selected: types.optional(types.array(TodoPointer), [])
     })
     const store = AppStore.create({
-        todos: [{ id: "1", name: "Hello" }, { id: "2", name: "World" }],
+        todos: [
+            { id: "1", name: "Hello" },
+            { id: "2", name: "World" }
+        ],
         selected: []
     })
     unprotect(store)
@@ -62,7 +71,10 @@ test("it should allow array of pointer objects - 4", () => {
         selected: types.optional(types.array(TodoPointer), [])
     })
     const store = AppStore.create({
-        todos: [{ id: "1", name: "Hello" }, { id: "2", name: "World" }],
+        todos: [
+            { id: "1", name: "Hello" },
+            { id: "2", name: "World" }
+        ],
         selected: []
     })
     unprotect(store)

@@ -18,11 +18,11 @@ App.propTypes = {
     actions: PropTypes.object.isRequired
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
     todos: state.todos
 })
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
     actions: bindActionCreators(TodoActions, dispatch)
 })
 

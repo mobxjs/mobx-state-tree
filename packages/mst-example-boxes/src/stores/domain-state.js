@@ -10,7 +10,7 @@ export const Box = types
         x: 0,
         y: 0
     })
-    .views(self => ({
+    .views((self) => ({
         get width() {
             return self.name.length * 15
         },
@@ -19,7 +19,7 @@ export const Box = types
             return getParent(self, 2).selection === self
         }
     }))
-    .actions(self => ({
+    .actions((self) => ({
         move(dx, dy) {
             self.x += dx
             self.y += dy
@@ -41,7 +41,7 @@ export const Store = types
         arrows: types.array(Arrow),
         selection: types.maybeNull(types.reference(Box))
     })
-    .actions(self => ({
+    .actions((self) => ({
         addBox(name, x, y) {
             const box = Box.create({ name, x, y, id: randomUuid() })
             self.boxes.put(box)
@@ -120,7 +120,7 @@ if (module.hot) {
     if (module.hot.data && module.hot.data.store) {
         applySnapshot(store, module.hot.data.store)
     }
-    module.hot.dispose(data => {
+    module.hot.dispose((data) => {
         data.store = getSnapshot(store)
     })
 }

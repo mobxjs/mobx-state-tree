@@ -1,7 +1,7 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: #2d3e4e
+    background-color: #2d3e4e;
 }
 
 .box {
@@ -35,7 +35,8 @@ body {
     top: 0px;
 }
 
-.canvas svg, .canvas {
+.canvas svg,
+.canvas {
     width: 100%;
     height: 100%;
 }
@@ -70,10 +71,11 @@ body {
 }
 
 .sidebar-open {
-    transform: translate3d(-340px, 0, 0)
+    transform: translate3d(-340px, 0, 0);
 }
 
-input, button {
+input,
+button {
     padding: 4px;
     font-size: 1.2em;
 }

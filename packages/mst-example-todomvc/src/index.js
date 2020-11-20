@@ -41,7 +41,7 @@ function createTodoStore(snapshot) {
     // connect devtools
     connectReduxDevtools(require("remotedev"), store)
     // connect local storage
-    snapshotListener = onSnapshot(store, snapshot =>
+    snapshotListener = onSnapshot(store, (snapshot) =>
         localStorage.setItem(localStorageKey, JSON.stringify(snapshot))
     )
 

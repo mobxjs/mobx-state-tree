@@ -5,13 +5,13 @@ title: Overview & Philosophy
 
 <div id="codefund"></div>
 
-`mobx-state-tree` is a state container that combines the _simplicity and ease of mutable data_ with the _traceability of immutable data_ and the _reactiveness and performance of observable data_.
+`mobx-state-tree` (also known as "MST") is a state container that combines the _simplicity and ease of mutable data_ with the _traceability of immutable data_ and the _reactiveness and performance of observable data_.
 
-Simply put, mobx-state-tree tries to combine the best features of both immutability (transactionality, traceability and composition) and mutability (discoverability, co-location and encapsulation) based approaches to state management; everything to provide the best developer experience possible.
-Unlike MobX itself, mobx-state-tree is very opinionated about how data should be structured and updated.
+Simply put, MST tries to combine the best features of both immutability (transactionality, traceability and composition) and mutability (discoverability, co-location and encapsulation) based approaches to state management; everything to provide the best developer experience possible.
+Unlike MobX itself, MST is very opinionated about how data should be structured and updated.
 This makes it possible to solve many common problems out of the box.
 
-Central in MST (mobx-state-tree) is the concept of a _living tree_. The tree consists of mutable, but strictly protected objects enriched with _runtime type information_. In other words, each tree has a _shape_ (type information) and _state_ (data).
+Central in MST is the concept of a _living tree_. The tree consists of mutable, but strictly protected objects enriched with _runtime type information_. In other words, each tree has a _shape_ (type information) and _state_ (data).
 From this living tree, immutable, structurally shared, snapshots are automatically generated.
 
 ```javascript
@@ -22,7 +22,7 @@ const Todo = types
         title: types.string,
         done: false
     })
-    .actions(self => ({
+    .actions((self) => ({
         toggle() {
             self.done = !self.done
         }
@@ -42,7 +42,7 @@ const store = Store.create({
 })
 
 // listen to new snapshots
-onSnapshot(store, snapshot => {
+onSnapshot(store, (snapshot) => {
     console.dir(snapshot)
 })
 

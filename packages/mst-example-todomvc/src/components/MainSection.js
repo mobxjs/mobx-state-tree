@@ -42,7 +42,9 @@ export default observer(
                 <section className="main">
                     {this.renderToggleAll()}
                     <ul className="todo-list">
-                        {filteredTodos.map(todo => <TodoItem key={todo.id} todo={todo} />)}
+                        {filteredTodos.map((todo) => (
+                            <TodoItem key={todo.id} todo={todo} />
+                        ))}
                     </ul>
                     {this.renderFooter()}
                 </section>

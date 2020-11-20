@@ -6,7 +6,7 @@ const TestModel = types
         a: 1,
         b: 1
     })
-    .actions(self => {
+    .actions((self) => {
         addMiddleware(self, atomic)
         return {
             incA(x: number) {
@@ -23,7 +23,7 @@ const TestModel = types
                 throw "Oops"
             },
 
-            incProcessA: flow(function*(x: number) {
+            incProcessA: flow(function* (x: number) {
                 yield Promise.resolve()
                 self.a += x
                 yield Promise.resolve()
@@ -31,14 +31,14 @@ const TestModel = types
                 yield (self as any).incProcessB(x)
                 return self.a
             }),
-            incProcessB: flow(function*(x: number) {
+            incProcessB: flow(function* (x: number) {
                 yield Promise.resolve()
                 self.b += x
                 yield Promise.resolve()
                 self.b += x
                 return self.a
             }),
-            throwingProcess: flow(function*(x: number) {
+            throwingProcess: flow(function* (x: number) {
                 yield (self as any).incProcessA(x)
                 throw "Oops"
             })
@@ -85,7 +85,7 @@ test("decorate atomic should work", () => {
         .model({
             a: 0
         })
-        .actions(self => ({
+        .actions((self) => ({
             inc(x: number) {
                 self.a += x
             },
@@ -125,12 +125,12 @@ test("#1250", async () => {
             x: 0,
             y: 0
         })
-        .actions(self => ({
+        .actions((self) => ({
             setX: decorate(
                 atomic,
-                flow(function*() {
+                flow(function* () {
                     self.x = 10
-                    yield new Promise(resolve => setTimeout(resolve, 1000))
+                    yield new Promise((resolve) => setTimeout(resolve, 1000))
                     // trigger an undo through atomic
                     throw new Error()
                 })
@@ -149,7 +149,7 @@ test("#1250", async () => {
     expect(model.x).toBe(10)
     expect(model.y).toBe(0)
 
-    await new Promise(r =>
+    await new Promise((r) =>
         setTimeout(() => {
             model.setY()
             r()

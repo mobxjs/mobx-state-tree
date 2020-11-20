@@ -1,14 +1,15 @@
 import {
     _getAdministration,
     action,
-    IArrayChange,
+    IArrayDidChange,
     IArraySplice,
     IArrayWillChange,
     IArrayWillSplice,
     intercept,
     IObservableArray,
     observable,
-    observe
+    observe,
+    makeObservable
 } from "mobx"
 import {
     addHiddenFinalProp,
@@ -93,6 +94,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         hookInitializers: Array<IHooksGetter<IMSTArray<IT>>> = []
     ) {
         super(name)
+        makeObservable(this)
         this.hookInitializers = hookInitializers
     }
 
@@ -129,9 +131,9 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         _getAdministration(instance).dehancer = node.unbox
 
         const type = node.type as this
-        type.hookInitializers.forEach(initializer => {
+        type.hookInitializers.forEach((initializer) => {
             const hooks = initializer(instance)
-            Object.keys(hooks).forEach(name => {
+            Object.keys(hooks).forEach((name) => {
                 const hook = hooks[name as keyof typeof hooks]!
                 const actionInvoker = createActionInvoker(instance as IAnyStateTreeNode, name, hook)
                 ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(
@@ -213,18 +215,18 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     }
 
     getSnapshot(node: this["N"]): this["S"] {
-        return node.getChildren().map(childNode => childNode.snapshot)
+        return node.getChildren().map((childNode) => childNode.snapshot)
     }
 
     processInitialSnapshot(childNodes: IChildNodesMap): this["S"] {
         const processed: this["S"] = []
-        Object.keys(childNodes).forEach(key => {
+        Object.keys(childNodes).forEach((key) => {
             processed.push(childNodes[key].getSnapshot())
         })
         return processed
     }
 
-    didChange(change: IArrayChange<AnyNode> | IArraySplice<AnyNode>): void {
+    didChange(change: IArrayDidChange<AnyNode> | IArraySplice<AnyNode>): void {
         const node = getStateTreeNode(change.object as IAnyStateTreeNode)
         switch (change.type) {
             case "update":

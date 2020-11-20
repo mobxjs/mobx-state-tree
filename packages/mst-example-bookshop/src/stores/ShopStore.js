@@ -13,7 +13,7 @@ export const ShopStore = types
         }),
         view: types.optional(ViewStore, {})
     })
-    .views(self => ({
+    .views((self) => ({
         get fetch() {
             return getEnv(self).fetch
         },
@@ -30,7 +30,7 @@ export const ShopStore = types
             return self.bookStore.sortedAvailableBooks
         }
     }))
-    .actions(self => ({
+    .actions((self) => ({
         afterCreate() {
             self.bookStore.loadBooks()
         }

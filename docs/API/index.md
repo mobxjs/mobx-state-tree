@@ -1,10 +1,10 @@
 ---
 id: "index"
-title: "mobx-state-tree"
+title: "mobx-state-tree - v4.0.2"
 sidebar_label: "Globals"
 ---
 
-[mobx-state-tree](index.md)
+[mobx-state-tree - v4.0.2](index.md)
 
 ## Index
 
@@ -153,6 +153,8 @@ sidebar_label: "Globals"
 * [setLivelinessChecking](index.md#setlivelinesschecking)
 * [snapshotProcessor](index.md#snapshotprocessor)
 * [splitJsonPath](index.md#splitjsonpath)
+* [toGenerator](index.md#togenerator)
+* [toGeneratorFunction](index.md#togeneratorfunction)
 * [tryReference](index.md#tryreference)
 * [tryResolve](index.md#tryresolve)
 * [typecheck](index.md#typecheck)
@@ -171,7 +173,7 @@ sidebar_label: "Globals"
 
 Ƭ **IDisposer**: *function*
 
-*Defined in [utils.ts:33](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/utils.ts#L33)*
+*Defined in [packages/mobx-state-tree/src/utils.ts:33](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/utils.ts#L33)*
 
 A generic disposer.
 
@@ -185,7 +187,7 @@ ___
 
 Ƭ **IHooksGetter**: *function*
 
-*Defined in [core/node/Hook.ts:19](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/node/Hook.ts#L19)*
+*Defined in [packages/mobx-state-tree/src/core/node/Hook.ts:19](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/node/Hook.ts#L19)*
 
 #### Type declaration:
 
@@ -203,7 +205,7 @@ ___
 
 Ƭ **IMiddlewareEventType**: *"action" | "flow_spawn" | "flow_resume" | "flow_resume_error" | "flow_return" | "flow_throw"*
 
-*Defined in [core/action.ts:16](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/action.ts#L16)*
+*Defined in [packages/mobx-state-tree/src/core/action.ts:16](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/action.ts#L16)*
 
 ___
 
@@ -211,7 +213,7 @@ ___
 
 Ƭ **IMiddlewareHandler**: *function*
 
-*Defined in [core/action.ts:49](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/action.ts#L49)*
+*Defined in [packages/mobx-state-tree/src/core/action.ts:49](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/action.ts#L49)*
 
 #### Type declaration:
 
@@ -248,7 +250,7 @@ ___
 
 Ƭ **ITypeDispatcher**: *function*
 
-*Defined in [types/utility-types/union.ts:27](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L27)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:27](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L27)*
 
 #### Type declaration:
 
@@ -266,7 +268,7 @@ ___
 
 Ƭ **IValidationContext**: *[IValidationContextEntry](interfaces/ivalidationcontextentry.md)[]*
 
-*Defined in [core/type/type-checker.ts:23](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/type/type-checker.ts#L23)*
+*Defined in [packages/mobx-state-tree/src/core/type/type-checker.ts:23](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/type/type-checker.ts#L23)*
 
 Array of validation context entries
 
@@ -276,7 +278,7 @@ ___
 
 Ƭ **IValidationResult**: *[IValidationError](interfaces/ivalidationerror.md)[]*
 
-*Defined in [core/type/type-checker.ts:36](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/type/type-checker.ts#L36)*
+*Defined in [packages/mobx-state-tree/src/core/type/type-checker.ts:36](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/type/type-checker.ts#L36)*
 
 Type validation result, which is an array of type validation errors
 
@@ -284,9 +286,9 @@ ___
 
 ###  Instance
 
-Ƭ **Instance**: *Instance<T>*
+Ƭ **Instance**: *T extends object ? T["Type"] : T*
 
-*Defined in [core/type/type.ts:227](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/type/type.ts#L227)*
+*Defined in [packages/mobx-state-tree/src/core/type/type.ts:227](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/type/type.ts#L227)*
 
 The instance representation of a given type.
 
@@ -296,7 +298,7 @@ ___
 
 Ƭ **LivelinessMode**: *"warn" | "error" | "ignore"*
 
-*Defined in [core/node/livelinessChecking.ts:7](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/node/livelinessChecking.ts#L7)*
+*Defined in [packages/mobx-state-tree/src/core/node/livelinessChecking.ts:7](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/node/livelinessChecking.ts#L7)*
 
 Defines what MST should do when running into reads / writes to objects that have died.
 - `"warn"`: Print a warning (default).
@@ -309,7 +311,7 @@ ___
 
 Ƭ **OnReferenceInvalidated**: *function*
 
-*Defined in [types/utility-types/reference.ts:43](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/reference.ts#L43)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/reference.ts:43](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/reference.ts#L43)*
 
 #### Type declaration:
 
@@ -327,7 +329,7 @@ ___
 
 Ƭ **OnReferenceInvalidatedEvent**: *object*
 
-*Defined in [types/utility-types/reference.ts:34](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/reference.ts#L34)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/reference.ts:34](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/reference.ts#L34)*
 
 #### Type declaration:
 
@@ -337,7 +339,7 @@ ___
 
 Ƭ **ReferenceIdentifier**: *string | number*
 
-*Defined in [types/utility-types/identifier.ts:144](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/identifier.ts#L144)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/identifier.ts:142](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/identifier.ts#L142)*
 
 Valid types for identifiers.
 
@@ -347,15 +349,15 @@ ___
 
 Ƭ **ReferenceOptions**: *[ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)‹IT› | [ReferenceOptionsOnInvalidated](interfaces/referenceoptionsoninvalidated.md)‹IT› | [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)‹IT› & [ReferenceOptionsOnInvalidated](interfaces/referenceoptionsoninvalidated.md)‹IT›*
 
-*Defined in [types/utility-types/reference.ts:475](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/reference.ts#L475)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/reference.ts:473](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/reference.ts#L473)*
 
 ___
 
 ###  SnapshotIn
 
-Ƭ **SnapshotIn**: *SnapshotIn<T>*
+Ƭ **SnapshotIn**: *T extends object ? T["CreationType"] : T extends IStateTreeNode<infer IT> ? IT["CreationType"] : T*
 
-*Defined in [core/type/type.ts:232](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/type/type.ts#L232)*
+*Defined in [packages/mobx-state-tree/src/core/type/type.ts:232](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/type/type.ts#L232)*
 
 The input (creation) snapshot representation of a given type.
 
@@ -365,7 +367,7 @@ ___
 
 Ƭ **SnapshotOrInstance**: *[SnapshotIn](index.md#snapshotin)‹T› | [Instance](index.md#instance)‹T›*
 
-*Defined in [core/type/type.ts:273](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/type/type.ts#L273)*
+*Defined in [packages/mobx-state-tree/src/core/type/type.ts:273](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/type/type.ts#L273)*
 
 A type which is equivalent to the union of SnapshotIn and Instance types of a given typeof TYPE or typeof VARIABLE.
 For primitives it defaults to the primitive itself.
@@ -396,9 +398,9 @@ ___
 
 ###  SnapshotOut
 
-Ƭ **SnapshotOut**: *SnapshotOut<T>*
+Ƭ **SnapshotOut**: *T extends object ? T["SnapshotType"] : T extends IStateTreeNode<infer IT> ? IT["SnapshotType"] : T*
 
-*Defined in [core/type/type.ts:241](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/type/type.ts#L241)*
+*Defined in [packages/mobx-state-tree/src/core/type/type.ts:241](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/type/type.ts#L241)*
 
 The output snapshot representation of a given type.
 
@@ -408,7 +410,7 @@ The output snapshot representation of a given type.
 
 • **DatePrimitive**: *[IType](interfaces/itype.md)‹number | Date, number, Date›* =  _DatePrimitive
 
-*Defined in [types/primitives.ts:178](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/primitives.ts#L178)*
+*Defined in [packages/mobx-state-tree/src/types/primitives.ts:178](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/primitives.ts#L178)*
 
 `types.Date` - Creates a type that can only contain a javascript Date value.
 
@@ -428,10 +430,10 @@ ___
 • **boolean**: *[ISimpleType](interfaces/isimpletype.md)‹boolean›* =  new CoreType<boolean, boolean, boolean>(
     "boolean",
     TypeFlags.Boolean,
-    v => typeof v === "boolean"
+    (v) => typeof v === "boolean"
 )
 
-*Defined in [types/primitives.ts:132](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/primitives.ts#L132)*
+*Defined in [packages/mobx-state-tree/src/types/primitives.ts:132](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/primitives.ts#L132)*
 
 `types.boolean` - Creates a type that can only contain a boolean value.
 This type is used for boolean values by default
@@ -450,7 +452,7 @@ ___
 
 • **identifier**: *[ISimpleType](interfaces/isimpletype.md)‹string›* =  new IdentifierType()
 
-*Defined in [types/utility-types/identifier.ts:112](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/identifier.ts#L112)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/identifier.ts:110](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/identifier.ts#L110)*
 
 `types.identifier` - Identifiers are used to make references, lifecycle events and reconciling works.
 Inside a state tree, for each type can exist only one instance for each given identifier.
@@ -474,7 +476,7 @@ ___
 
 • **identifierNumber**: *[ISimpleType](interfaces/isimpletype.md)‹number›* =  new IdentifierNumberType()
 
-*Defined in [types/utility-types/identifier.ts:127](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/identifier.ts#L127)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/identifier.ts:125](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/identifier.ts#L125)*
 
 `types.identifierNumber` - Similar to `types.identifier`. This one will serialize from / to a number when applying snapshots
 
@@ -495,10 +497,10 @@ ___
 • **integer**: *[ISimpleType](interfaces/isimpletype.md)‹number›* =  new CoreType<number, number, number>(
     "integer",
     TypeFlags.Integer,
-    v => isInteger(v)
+    (v) => isInteger(v)
 )
 
-*Defined in [types/primitives.ts:113](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/primitives.ts#L113)*
+*Defined in [packages/mobx-state-tree/src/types/primitives.ts:113](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/primitives.ts#L113)*
 
 `types.integer` - Creates a type that can only contain an integer value.
 This type is used for integer values by default
@@ -518,10 +520,10 @@ ___
 • **nullType**: *[ISimpleType](interfaces/isimpletype.md)‹null›* =  new CoreType<null, null, null>(
     "null",
     TypeFlags.Null,
-    v => v === null
+    (v) => v === null
 )
 
-*Defined in [types/primitives.ts:141](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/primitives.ts#L141)*
+*Defined in [packages/mobx-state-tree/src/types/primitives.ts:141](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/primitives.ts#L141)*
 
 `types.null` - The type of the value `null`
 
@@ -532,10 +534,10 @@ ___
 • **number**: *[ISimpleType](interfaces/isimpletype.md)‹number›* =  new CoreType<number, number, number>(
     "number",
     TypeFlags.Number,
-    v => typeof v === "number"
+    (v) => typeof v === "number"
 )
 
-*Defined in [types/primitives.ts:94](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/primitives.ts#L94)*
+*Defined in [packages/mobx-state-tree/src/types/primitives.ts:94](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/primitives.ts#L94)*
 
 `types.number` - Creates a type that can only contain a numeric value.
 This type is used for numeric values by default
@@ -555,10 +557,10 @@ ___
 • **string**: *[ISimpleType](interfaces/isimpletype.md)‹string›* =  new CoreType<string, string, string>(
     "string",
     TypeFlags.String,
-    v => typeof v === "string"
+    (v) => typeof v === "string"
 )
 
-*Defined in [types/primitives.ts:75](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/primitives.ts#L75)*
+*Defined in [packages/mobx-state-tree/src/types/primitives.ts:75](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/primitives.ts#L75)*
 
 `types.string` - Creates a type that can only contain a string value.
 This type is used for string values by default
@@ -578,10 +580,10 @@ ___
 • **undefinedType**: *[ISimpleType](interfaces/isimpletype.md)‹undefined›* =  new CoreType<undefined, undefined, undefined>(
     "undefined",
     TypeFlags.Undefined,
-    v => v === undefined
+    (v) => v === undefined
 )
 
-*Defined in [types/primitives.ts:150](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/primitives.ts#L150)*
+*Defined in [packages/mobx-state-tree/src/types/primitives.ts:150](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/primitives.ts#L150)*
 
 `types.undefined` - The type of the value `undefined`
 
@@ -591,7 +593,7 @@ ___
 
 ▸ **addDisposer**(`target`: IAnyStateTreeNode, `disposer`: [IDisposer](index.md#idisposer)): *[IDisposer](index.md#idisposer)*
 
-*Defined in [core/mst-operations.ts:753](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L753)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:753](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L753)*
 
 Use this utility to register a function that should be called whenever the
 targeted state tree node is destroyed. This is a useful alternative to managing
@@ -633,7 +635,7 @@ ___
 
 ▸ **addMiddleware**(`target`: IAnyStateTreeNode, `handler`: [IMiddlewareHandler](index.md#imiddlewarehandler), `includeHooks`: boolean): *[IDisposer](index.md#idisposer)*
 
-*Defined in [core/action.ts:157](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/action.ts#L157)*
+*Defined in [packages/mobx-state-tree/src/core/action.ts:157](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/action.ts#L157)*
 
 Middleware can be used to intercept any action is invoked on the subtree where it is attached.
 If a tree is protected (by default), this means that any mutation of the tree will pass through your middleware.
@@ -658,7 +660,7 @@ ___
 
 ▸ **applyAction**(`target`: IAnyStateTreeNode, `actions`: [ISerializedActionCall](interfaces/iserializedactioncall.md) | [ISerializedActionCall](interfaces/iserializedactioncall.md)[]): *void*
 
-*Defined in [middlewares/on-action.ts:87](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/middlewares/on-action.ts#L87)*
+*Defined in [packages/mobx-state-tree/src/middlewares/on-action.ts:89](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/middlewares/on-action.ts#L89)*
 
 Applies an action or a series of actions in a single MobX transaction.
 Does not return any value
@@ -679,7 +681,7 @@ ___
 
 ▸ **applyPatch**(`target`: IAnyStateTreeNode, `patch`: [IJsonPatch](interfaces/ijsonpatch.md) | ReadonlyArray‹[IJsonPatch](interfaces/ijsonpatch.md)›): *void*
 
-*Defined in [core/mst-operations.ts:126](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L126)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:126](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L126)*
 
 Applies a JSON-patch to the given model instance or bails out if the patch couldn't be applied
 See [patches](https://github.com/mobxjs/mobx-state-tree#patches) for more details.
@@ -701,7 +703,7 @@ ___
 
 ▸ **applySnapshot**<**C**>(`target`: IStateTreeNode‹[IType](interfaces/itype.md)‹C, any, any››, `snapshot`: C): *void*
 
-*Defined in [core/mst-operations.ts:323](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L323)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:323](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L323)*
 
 Applies a snapshot to a given model instances. Patch and snapshot listeners will be invoked as usual.
 
@@ -724,7 +726,7 @@ ___
 
 ▸ **array**<**IT**>(`subtype`: IT): *IArrayType‹IT›*
 
-*Defined in [types/complex-types/array.ts:336](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/array.ts#L336)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/array.ts:338](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/array.ts#L338)*
 
 `types.array` - Creates an index based collection type who's children are all of a uniform declared type.
 
@@ -764,7 +766,7 @@ ___
 
 ▸ **cast**<**O**>(`snapshotOrInstance`: O): *O*
 
-*Defined in [core/mst-operations.ts:872](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L872)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:872](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L872)*
 
 Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance.
 Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance,
@@ -807,7 +809,7 @@ The same object casted as an instance
 
 ▸ **cast**<**O**>(`snapshotOrInstance`: TypeOfValue<O>["CreationType"] | TypeOfValue<O>["SnapshotType"] | TypeOfValue<O>["Type"]): *O*
 
-*Defined in [core/mst-operations.ts:875](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L875)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:875](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L875)*
 
 Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance.
 Note that this is just a cast for the type system, this is, it won't actually convert a snapshot to an instance,
@@ -854,7 +856,7 @@ ___
 
 ▸ **castFlowReturn**<**T**>(`val`: T): *T*
 
-*Defined in [core/flow.ts:26](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/flow.ts#L26)*
+*Defined in [packages/mobx-state-tree/src/core/flow.ts:33](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/flow.ts#L33)*
 
 **`deprecated`** Not needed since TS3.6.
 Used for TypeScript to make flows that return a promise return the actual promise result.
@@ -877,7 +879,7 @@ ___
 
 ▸ **castToReferenceSnapshot**<**I**>(`instance`: I): *Extract<I, IAnyStateTreeNode> extends never ? I : ReferenceIdentifier*
 
-*Defined in [core/mst-operations.ts:975](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L975)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:975](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L975)*
 
 Casts a node instance type to a reference snapshot type so it can be assigned to a refernence snapshot (e.g. to be used inside a create call).
 Note that this is just a cast for the type system, this is, it won't actually convert an instance to a refererence snapshot,
@@ -923,7 +925,7 @@ ___
 
 ▸ **castToSnapshot**<**I**>(`snapshotOrInstance`: I): *Extract<I, IAnyStateTreeNode> extends never ? I : TypeOfValue<I>["CreationType"]*
 
-*Defined in [core/mst-operations.ts:941](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L941)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:941](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L941)*
 
 Casts a node instance type to an snapshot type so it can be assigned to a type snapshot (e.g. to be used inside a create call).
 Note that this is just a cast for the type system, this is, it won't actually convert an instance to a snapshot,
@@ -968,7 +970,7 @@ ___
 
 ▸ **clone**<**T**>(`source`: T, `keepEnvironment`: boolean | any): *T*
 
-*Defined in [core/mst-operations.ts:668](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L668)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:668](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L668)*
 
 Returns a deep copy of the given state tree node as new tree.
 Short hand for `snapshot(x) = getType(x).create(getSnapshot(x))`
@@ -994,7 +996,7 @@ ___
 
 ▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**>(`name`: string, `A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›): *[IModelType](interfaces/imodeltype.md)‹PA & PB, OA & OB, _CustomJoin‹FCA, FCB›, _CustomJoin‹FSA, FSB››*
 
-*Defined in [types/complex-types/model.ts:759](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/model.ts#L759)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/model.ts:768](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/model.ts#L768)*
 
 `types.compose` - Composes a new model from one or more existing model types.
 This method can be invoked in two forms:
@@ -1032,7 +1034,7 @@ Name | Type |
 
 ▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**>(`A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›): *[IModelType](interfaces/imodeltype.md)‹PA & PB, OA & OB, _CustomJoin‹FCA, FCB›, _CustomJoin‹FSA, FSB››*
 
-*Defined in [types/complex-types/model.ts:761](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/model.ts#L761)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/model.ts:770](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/model.ts#L770)*
 
 `types.compose` - Composes a new model from one or more existing model types.
 This method can be invoked in two forms:
@@ -1069,7 +1071,7 @@ Name | Type |
 
 ▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**>(`name`: string, `A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›): *[IModelType](interfaces/imodeltype.md)‹PA & PB & PC, OA & OB & OC, _CustomJoin‹FCA, _CustomJoin‹FCB, FCC››, _CustomJoin‹FSA, _CustomJoin‹FSB, FSC›››*
 
-*Defined in [types/complex-types/model.ts:763](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/model.ts#L763)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/model.ts:772](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/model.ts#L772)*
 
 `types.compose` - Composes a new model from one or more existing model types.
 This method can be invoked in two forms:
@@ -1116,7 +1118,7 @@ Name | Type |
 
 ▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**>(`A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›): *[IModelType](interfaces/imodeltype.md)‹PA & PB & PC, OA & OB & OC, _CustomJoin‹FCA, _CustomJoin‹FCB, FCC››, _CustomJoin‹FSA, _CustomJoin‹FSB, FSC›››*
 
-*Defined in [types/complex-types/model.ts:765](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/model.ts#L765)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/model.ts:774](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/model.ts#L774)*
 
 `types.compose` - Composes a new model from one or more existing model types.
 This method can be invoked in two forms:
@@ -1162,7 +1164,7 @@ Name | Type |
 
 ▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**>(`name`: string, `A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›): *[IModelType](interfaces/imodeltype.md)‹PA & PB & PC & PD, OA & OB & OC & OD, _CustomJoin‹FCA, _CustomJoin‹FCB, _CustomJoin‹FCC, FCD›››, _CustomJoin‹FSA, _CustomJoin‹FSB, _CustomJoin‹FSC, FSD››››*
 
-*Defined in [types/complex-types/model.ts:767](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/model.ts#L767)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/model.ts:776](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/model.ts#L776)*
 
 `types.compose` - Composes a new model from one or more existing model types.
 This method can be invoked in two forms:
@@ -1218,7 +1220,7 @@ Name | Type |
 
 ▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**>(`A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›): *[IModelType](interfaces/imodeltype.md)‹PA & PB & PC & PD, OA & OB & OC & OD, _CustomJoin‹FCA, _CustomJoin‹FCB, _CustomJoin‹FCC, FCD›››, _CustomJoin‹FSA, _CustomJoin‹FSB, _CustomJoin‹FSC, FSD››››*
 
-*Defined in [types/complex-types/model.ts:769](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/model.ts#L769)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/model.ts:778](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/model.ts#L778)*
 
 `types.compose` - Composes a new model from one or more existing model types.
 This method can be invoked in two forms:
@@ -1273,7 +1275,7 @@ Name | Type |
 
 ▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**>(`name`: string, `A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›, `E`: [IModelType](interfaces/imodeltype.md)‹PE, OE, FCE, FSE›): *[IModelType](interfaces/imodeltype.md)‹PA & PB & PC & PD & PE, OA & OB & OC & OD & OE, _CustomJoin‹FCA, _CustomJoin‹FCB, _CustomJoin‹FCC, _CustomJoin‹FCD, FCE››››, _CustomJoin‹FSA, _CustomJoin‹FSB, _CustomJoin‹FSC, _CustomJoin‹FSD, FSE›››››*
 
-*Defined in [types/complex-types/model.ts:771](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/model.ts#L771)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/model.ts:780](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/model.ts#L780)*
 
 `types.compose` - Composes a new model from one or more existing model types.
 This method can be invoked in two forms:
@@ -1338,7 +1340,7 @@ Name | Type |
 
 ▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**>(`A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›, `E`: [IModelType](interfaces/imodeltype.md)‹PE, OE, FCE, FSE›): *[IModelType](interfaces/imodeltype.md)‹PA & PB & PC & PD & PE, OA & OB & OC & OD & OE, _CustomJoin‹FCA, _CustomJoin‹FCB, _CustomJoin‹FCC, _CustomJoin‹FCD, FCE››››, _CustomJoin‹FSA, _CustomJoin‹FSB, _CustomJoin‹FSC, _CustomJoin‹FSD, FSE›››››*
 
-*Defined in [types/complex-types/model.ts:773](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/model.ts#L773)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/model.ts:782](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/model.ts#L782)*
 
 `types.compose` - Composes a new model from one or more existing model types.
 This method can be invoked in two forms:
@@ -1402,7 +1404,7 @@ Name | Type |
 
 ▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**>(`name`: string, `A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›, `E`: [IModelType](interfaces/imodeltype.md)‹PE, OE, FCE, FSE›, `F`: [IModelType](interfaces/imodeltype.md)‹PF, OF, FCF, FSF›): *[IModelType](interfaces/imodeltype.md)‹PA & PB & PC & PD & PE & PF, OA & OB & OC & OD & OE & OF, _CustomJoin‹FCA, _CustomJoin‹FCB, _CustomJoin‹FCC, _CustomJoin‹FCD, _CustomJoin‹FCE, FCF›››››, _CustomJoin‹FSA, _CustomJoin‹FSB, _CustomJoin‹FSC, _CustomJoin‹FSD, _CustomJoin‹FSE, FSF››››››*
 
-*Defined in [types/complex-types/model.ts:777](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/model.ts#L777)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/model.ts:786](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/model.ts#L786)*
 
 `types.compose` - Composes a new model from one or more existing model types.
 This method can be invoked in two forms:
@@ -1476,7 +1478,7 @@ Name | Type |
 
 ▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**>(`A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›, `E`: [IModelType](interfaces/imodeltype.md)‹PE, OE, FCE, FSE›, `F`: [IModelType](interfaces/imodeltype.md)‹PF, OF, FCF, FSF›): *[IModelType](interfaces/imodeltype.md)‹PA & PB & PC & PD & PE & PF, OA & OB & OC & OD & OE & OF, _CustomJoin‹FCA, _CustomJoin‹FCB, _CustomJoin‹FCC, _CustomJoin‹FCD, _CustomJoin‹FCE, FCF›››››, _CustomJoin‹FSA, _CustomJoin‹FSB, _CustomJoin‹FSC, _CustomJoin‹FSD, _CustomJoin‹FSE, FSF››››››*
 
-*Defined in [types/complex-types/model.ts:780](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/model.ts#L780)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/model.ts:789](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/model.ts#L789)*
 
 `types.compose` - Composes a new model from one or more existing model types.
 This method can be invoked in two forms:
@@ -1549,7 +1551,7 @@ Name | Type |
 
 ▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**>(`name`: string, `A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›, `E`: [IModelType](interfaces/imodeltype.md)‹PE, OE, FCE, FSE›, `F`: [IModelType](interfaces/imodeltype.md)‹PF, OF, FCF, FSF›, `G`: [IModelType](interfaces/imodeltype.md)‹PG, OG, FCG, FSG›): *[IModelType](interfaces/imodeltype.md)‹PA & PB & PC & PD & PE & PF & PG, OA & OB & OC & OD & OE & OF & OG, _CustomJoin‹FCA, _CustomJoin‹FCB, _CustomJoin‹FCC, _CustomJoin‹FCD, _CustomJoin‹FCE, _CustomJoin‹FCF, FCG››››››, _CustomJoin‹FSA, _CustomJoin‹FSB, _CustomJoin‹FSC, _CustomJoin‹FSD, _CustomJoin‹FSE, _CustomJoin‹FSF, FSG›››››››*
 
-*Defined in [types/complex-types/model.ts:783](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/model.ts#L783)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/model.ts:792](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/model.ts#L792)*
 
 `types.compose` - Composes a new model from one or more existing model types.
 This method can be invoked in two forms:
@@ -1632,7 +1634,7 @@ Name | Type |
 
 ▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**>(`A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›, `E`: [IModelType](interfaces/imodeltype.md)‹PE, OE, FCE, FSE›, `F`: [IModelType](interfaces/imodeltype.md)‹PF, OF, FCF, FSF›, `G`: [IModelType](interfaces/imodeltype.md)‹PG, OG, FCG, FSG›): *[IModelType](interfaces/imodeltype.md)‹PA & PB & PC & PD & PE & PF & PG, OA & OB & OC & OD & OE & OF & OG, _CustomJoin‹FCA, _CustomJoin‹FCB, _CustomJoin‹FCC, _CustomJoin‹FCD, _CustomJoin‹FCE, _CustomJoin‹FCF, FCG››››››, _CustomJoin‹FSA, _CustomJoin‹FSB, _CustomJoin‹FSC, _CustomJoin‹FSD, _CustomJoin‹FSE, _CustomJoin‹FSF, FSG›››››››*
 
-*Defined in [types/complex-types/model.ts:786](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/model.ts#L786)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/model.ts:795](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/model.ts#L795)*
 
 `types.compose` - Composes a new model from one or more existing model types.
 This method can be invoked in two forms:
@@ -1714,7 +1716,7 @@ Name | Type |
 
 ▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**, **PH**, **OH**, **FCH**, **FSH**>(`name`: string, `A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›, `E`: [IModelType](interfaces/imodeltype.md)‹PE, OE, FCE, FSE›, `F`: [IModelType](interfaces/imodeltype.md)‹PF, OF, FCF, FSF›, `G`: [IModelType](interfaces/imodeltype.md)‹PG, OG, FCG, FSG›, `H`: [IModelType](interfaces/imodeltype.md)‹PH, OH, FCH, FSH›): *[IModelType](interfaces/imodeltype.md)‹PA & PB & PC & PD & PE & PF & PG & PH, OA & OB & OC & OD & OE & OF & OG & OH, _CustomJoin‹FCA, _CustomJoin‹FCB, _CustomJoin‹FCC, _CustomJoin‹FCD, _CustomJoin‹FCE, _CustomJoin‹FCF, _CustomJoin‹FCG, FCH›››››››, _CustomJoin‹FSA, _CustomJoin‹FSB, _CustomJoin‹FSC, _CustomJoin‹FSD, _CustomJoin‹FSE, _CustomJoin‹FSF, _CustomJoin‹FSG, FSH››››››››*
 
-*Defined in [types/complex-types/model.ts:789](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/model.ts#L789)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/model.ts:798](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/model.ts#L798)*
 
 `types.compose` - Composes a new model from one or more existing model types.
 This method can be invoked in two forms:
@@ -1806,7 +1808,7 @@ Name | Type |
 
 ▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**, **PH**, **OH**, **FCH**, **FSH**>(`A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›, `E`: [IModelType](interfaces/imodeltype.md)‹PE, OE, FCE, FSE›, `F`: [IModelType](interfaces/imodeltype.md)‹PF, OF, FCF, FSF›, `G`: [IModelType](interfaces/imodeltype.md)‹PG, OG, FCG, FSG›, `H`: [IModelType](interfaces/imodeltype.md)‹PH, OH, FCH, FSH›): *[IModelType](interfaces/imodeltype.md)‹PA & PB & PC & PD & PE & PF & PG & PH, OA & OB & OC & OD & OE & OF & OG & OH, _CustomJoin‹FCA, _CustomJoin‹FCB, _CustomJoin‹FCC, _CustomJoin‹FCD, _CustomJoin‹FCE, _CustomJoin‹FCF, _CustomJoin‹FCG, FCH›››››››, _CustomJoin‹FSA, _CustomJoin‹FSB, _CustomJoin‹FSC, _CustomJoin‹FSD, _CustomJoin‹FSE, _CustomJoin‹FSF, _CustomJoin‹FSG, FSH››››››››*
 
-*Defined in [types/complex-types/model.ts:792](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/model.ts#L792)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/model.ts:801](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/model.ts#L801)*
 
 `types.compose` - Composes a new model from one or more existing model types.
 This method can be invoked in two forms:
@@ -1897,7 +1899,7 @@ Name | Type |
 
 ▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**, **PH**, **OH**, **FCH**, **FSH**, **PI**, **OI**, **FCI**, **FSI**>(`name`: string, `A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›, `E`: [IModelType](interfaces/imodeltype.md)‹PE, OE, FCE, FSE›, `F`: [IModelType](interfaces/imodeltype.md)‹PF, OF, FCF, FSF›, `G`: [IModelType](interfaces/imodeltype.md)‹PG, OG, FCG, FSG›, `H`: [IModelType](interfaces/imodeltype.md)‹PH, OH, FCH, FSH›, `I`: [IModelType](interfaces/imodeltype.md)‹PI, OI, FCI, FSI›): *[IModelType](interfaces/imodeltype.md)‹PA & PB & PC & PD & PE & PF & PG & PH & PI, OA & OB & OC & OD & OE & OF & OG & OH & OI, _CustomJoin‹FCA, _CustomJoin‹FCB, _CustomJoin‹FCC, _CustomJoin‹FCD, _CustomJoin‹FCE, _CustomJoin‹FCF, _CustomJoin‹FCG, _CustomJoin‹FCH, FCI››››››››, _CustomJoin‹FSA, _CustomJoin‹FSB, _CustomJoin‹FSC, _CustomJoin‹FSD, _CustomJoin‹FSE, _CustomJoin‹FSF, _CustomJoin‹FSG, _CustomJoin‹FSH, FSI›››››››››*
 
-*Defined in [types/complex-types/model.ts:795](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/model.ts#L795)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/model.ts:804](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/model.ts#L804)*
 
 `types.compose` - Composes a new model from one or more existing model types.
 This method can be invoked in two forms:
@@ -1998,7 +2000,7 @@ Name | Type |
 
 ▸ **compose**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**, **PH**, **OH**, **FCH**, **FSH**, **PI**, **OI**, **FCI**, **FSI**>(`A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›, `E`: [IModelType](interfaces/imodeltype.md)‹PE, OE, FCE, FSE›, `F`: [IModelType](interfaces/imodeltype.md)‹PF, OF, FCF, FSF›, `G`: [IModelType](interfaces/imodeltype.md)‹PG, OG, FCG, FSG›, `H`: [IModelType](interfaces/imodeltype.md)‹PH, OH, FCH, FSH›, `I`: [IModelType](interfaces/imodeltype.md)‹PI, OI, FCI, FSI›): *[IModelType](interfaces/imodeltype.md)‹PA & PB & PC & PD & PE & PF & PG & PH & PI, OA & OB & OC & OD & OE & OF & OG & OH & OI, _CustomJoin‹FCA, _CustomJoin‹FCB, _CustomJoin‹FCC, _CustomJoin‹FCD, _CustomJoin‹FCE, _CustomJoin‹FCF, _CustomJoin‹FCG, _CustomJoin‹FCH, FCI››››››››, _CustomJoin‹FSA, _CustomJoin‹FSB, _CustomJoin‹FSC, _CustomJoin‹FSD, _CustomJoin‹FSE, _CustomJoin‹FSF, _CustomJoin‹FSG, _CustomJoin‹FSH, FSI›››››››››*
 
-*Defined in [types/complex-types/model.ts:798](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/model.ts#L798)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/model.ts:807](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/model.ts#L807)*
 
 `types.compose` - Composes a new model from one or more existing model types.
 This method can be invoked in two forms:
@@ -2102,7 +2104,7 @@ ___
 
 ▸ **createActionTrackingMiddleware**<**T**>(`hooks`: [IActionTrackingMiddlewareHooks](interfaces/iactiontrackingmiddlewarehooks.md)‹T›): *[IMiddlewareHandler](index.md#imiddlewarehandler)*
 
-*Defined in [middlewares/create-action-tracking-middleware.ts:28](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts#L28)*
+*Defined in [packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts:28](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/middlewares/create-action-tracking-middleware.ts#L28)*
 
 Note: Consider migrating to `createActionTrackingMiddleware2`, it is easier to use.
 
@@ -2132,7 +2134,7 @@ ___
 
 ▸ **createActionTrackingMiddleware2**<**TEnv**>(`middlewareHooks`: [IActionTrackingMiddleware2Hooks](interfaces/iactiontrackingmiddleware2hooks.md)‹TEnv›): *[IMiddlewareHandler](index.md#imiddlewarehandler)*
 
-*Defined in [middlewares/createActionTrackingMiddleware2.ts:74](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/middlewares/createActionTrackingMiddleware2.ts#L74)*
+*Defined in [packages/mobx-state-tree/src/middlewares/createActionTrackingMiddleware2.ts:74](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/middlewares/createActionTrackingMiddleware2.ts#L74)*
 
 Convenience utility to create action based middleware that supports async processes more easily.
 The flow is like this:
@@ -2171,7 +2173,7 @@ ___
 
 ▸ **custom**<**S**, **T**>(`options`: [CustomTypeOptions](interfaces/customtypeoptions.md)‹S, T›): *[IType](interfaces/itype.md)‹S | T, S, T›*
 
-*Defined in [types/utility-types/custom.ts:74](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/custom.ts#L74)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/custom.ts:74](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/custom.ts#L74)*
 
 `types.custom` - Creates a custom type. Custom types can be used for arbitrary immutable values, that have a serializable representation. For example, to create your own Date representation, Decimal type etc.
 
@@ -2235,7 +2237,7 @@ ___
 
 ▸ **decorate**<**T**>(`handler`: [IMiddlewareHandler](index.md#imiddlewarehandler), `fn`: T, `includeHooks`: boolean): *T*
 
-*Defined in [core/action.ts:196](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/action.ts#L196)*
+*Defined in [packages/mobx-state-tree/src/core/action.ts:196](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/action.ts#L196)*
 
 Binds middleware to a specific action.
 
@@ -2276,7 +2278,7 @@ ___
 
 ▸ **destroy**(`target`: IAnyStateTreeNode): *void*
 
-*Defined in [core/mst-operations.ts:700](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L700)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:700](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L700)*
 
 Removes a model element from the state tree, and mark it as end-of-life; the element should not be used anymore
 
@@ -2294,7 +2296,7 @@ ___
 
 ▸ **detach**<**T**>(`target`: T): *T*
 
-*Defined in [core/mst-operations.ts:689](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L689)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:689](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L689)*
 
 Removes a model element from the state tree, and let it live on as a new state tree
 
@@ -2316,7 +2318,7 @@ ___
 
 ▸ **enumeration**<**T**>(`options`: T[]): *[ISimpleType](interfaces/isimpletype.md)‹UnionStringArray‹T[]››*
 
-*Defined in [types/utility-types/enumeration.ts:11](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/enumeration.ts#L11)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/enumeration.ts:11](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/enumeration.ts#L11)*
 
 `types.enumeration` - Can be used to create an string based enumeration.
 (note: this methods is just sugar for a union of string literals)
@@ -2342,7 +2344,7 @@ Name | Type | Description |
 
 ▸ **enumeration**<**T**>(`name`: string, `options`: T[]): *[ISimpleType](interfaces/isimpletype.md)‹UnionStringArray‹T[]››*
 
-*Defined in [types/utility-types/enumeration.ts:12](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/enumeration.ts#L12)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/enumeration.ts:12](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/enumeration.ts#L12)*
 
 `types.enumeration` - Can be used to create an string based enumeration.
 (note: this methods is just sugar for a union of string literals)
@@ -2373,7 +2375,7 @@ ___
 
 ▸ **escapeJsonPath**(`path`: string): *string*
 
-*Defined in [core/json-patch.ts:77](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/json-patch.ts#L77)*
+*Defined in [packages/mobx-state-tree/src/core/json-patch.ts:77](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/json-patch.ts#L77)*
 
 Escape slashes and backslashes.
 
@@ -2393,7 +2395,7 @@ ___
 
 ▸ **flow**<**R**, **Args**>(`generator`: function): *function*
 
-*Defined in [core/flow.ts:13](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/flow.ts#L13)*
+*Defined in [packages/mobx-state-tree/src/core/flow.ts:20](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/flow.ts#L20)*
 
 See [asynchronous actions](concepts/async-actions.md).
 
@@ -2433,7 +2435,7 @@ ___
 
 ▸ **frozen**<**C**>(`subType`: [IType](interfaces/itype.md)‹C, any, any›): *[IType](interfaces/itype.md)‹C, C, C›*
 
-*Defined in [types/utility-types/frozen.ts:58](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/frozen.ts#L58)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/frozen.ts:58](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/frozen.ts#L58)*
 
 `types.frozen` - Frozen can be used to store any value that is serializable in itself (that is valid JSON).
 Frozen values need to be immutable or treated as if immutable. They need be serializable as well.
@@ -2485,7 +2487,7 @@ Name | Type |
 
 ▸ **frozen**<**T**>(`defaultValue`: T): *[IType](interfaces/itype.md)‹T | undefined | null, T, T›*
 
-*Defined in [types/utility-types/frozen.ts:59](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/frozen.ts#L59)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/frozen.ts:59](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/frozen.ts#L59)*
 
 `types.frozen` - Frozen can be used to store any value that is serializable in itself (that is valid JSON).
 Frozen values need to be immutable or treated as if immutable. They need be serializable as well.
@@ -2537,7 +2539,7 @@ Name | Type |
 
 ▸ **frozen**<**T**>(): *[IType](interfaces/itype.md)‹T, T, T›*
 
-*Defined in [types/utility-types/frozen.ts:60](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/frozen.ts#L60)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/frozen.ts:60](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/frozen.ts#L60)*
 
 `types.frozen` - Frozen can be used to store any value that is serializable in itself (that is valid JSON).
 Frozen values need to be immutable or treated as if immutable. They need be serializable as well.
@@ -2587,7 +2589,7 @@ ___
 
 ▸ **getChildType**(`object`: IAnyStateTreeNode, `propertyName?`: undefined | string): *[IAnyType](interfaces/ianytype.md)*
 
-*Defined in [core/mst-operations.ts:70](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L70)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:70](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L70)*
 
 Returns the _declared_ type of the given sub property of an object, array or map.
 In the case of arrays and maps the property name is optional and will be ignored.
@@ -2615,7 +2617,7 @@ ___
 
 ▸ **getEnv**<**T**>(`target`: IAnyStateTreeNode): *T*
 
-*Defined in [core/mst-operations.ts:775](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L775)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:775](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L775)*
 
 Returns the environment of the current state tree. For more info on environments,
 see [Dependency injection](https://github.com/mobxjs/mobx-state-tree#dependency-injection)
@@ -2643,7 +2645,7 @@ ___
 
 ▸ **getIdentifier**(`target`: IAnyStateTreeNode): *string | null*
 
-*Defined in [core/mst-operations.ts:551](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L551)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:551](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L551)*
 
 Returns the identifier of the target node.
 This is the *string normalized* identifier, which might not match the type of the identifier attribute
@@ -2662,7 +2664,7 @@ ___
 
 ▸ **getLivelinessChecking**(): *[LivelinessMode](index.md#livelinessmode)*
 
-*Defined in [core/node/livelinessChecking.ts:27](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/node/livelinessChecking.ts#L27)*
+*Defined in [packages/mobx-state-tree/src/core/node/livelinessChecking.ts:27](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/node/livelinessChecking.ts#L27)*
 
 Returns the current liveliness checking mode.
 
@@ -2676,7 +2678,7 @@ ___
 
 ▸ **getMembers**(`target`: IAnyStateTreeNode): *[IModelReflectionData](interfaces/imodelreflectiondata.md)*
 
-*Defined in [core/mst-operations.ts:846](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L846)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:846](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L846)*
 
 Returns a reflection of the model node, including name, properties, views, volatile and actions.
 
@@ -2694,7 +2696,7 @@ ___
 
 ▸ **getNodeId**(`target`: IAnyStateTreeNode): *number*
 
-*Defined in [core/mst-operations.ts:990](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L990)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:990](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L990)*
 
 Returns the unique node id (not to be confused with the instance identifier) for a
 given instance.
@@ -2716,7 +2718,7 @@ ___
 
 ▸ **getParent**<**IT**>(`target`: IAnyStateTreeNode, `depth`: number): *TypeOrStateTreeNodeToStateTreeNode‹IT›*
 
-*Defined in [core/mst-operations.ts:384](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L384)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:384](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L384)*
 
 Returns the immediate parent of this object, or throws.
 
@@ -2745,7 +2747,7 @@ ___
 
 ▸ **getParentOfType**<**IT**>(`target`: IAnyStateTreeNode, `type`: IT): *IT["Type"]*
 
-*Defined in [core/mst-operations.ts:428](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L428)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:428](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L428)*
 
 Returns the target's parent of a given type, or throws.
 
@@ -2768,7 +2770,7 @@ ___
 
 ▸ **getPath**(`target`: IAnyStateTreeNode): *string*
 
-*Defined in [core/mst-operations.ts:468](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L468)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:468](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L468)*
 
 Returns the path of the given object in the model tree
 
@@ -2786,7 +2788,7 @@ ___
 
 ▸ **getPathParts**(`target`: IAnyStateTreeNode): *string[]*
 
-*Defined in [core/mst-operations.ts:481](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L481)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:481](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L481)*
 
 Returns the path of the given object as unescaped string array.
 
@@ -2804,7 +2806,7 @@ ___
 
 ▸ **getPropertyMembers**(`typeOrNode`: [IAnyModelType](interfaces/ianymodeltype.md) | IAnyStateTreeNode): *[IModelReflectionPropertiesData](interfaces/imodelreflectionpropertiesdata.md)*
 
-*Defined in [core/mst-operations.ts:815](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L815)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:815](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L815)*
 
 Returns a reflection of the model type properties and name for either a model type or model node.
 
@@ -2822,7 +2824,7 @@ ___
 
 ▸ **getRelativePath**(`base`: IAnyStateTreeNode, `target`: IAnyStateTreeNode): *string*
 
-*Defined in [core/mst-operations.ts:650](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L650)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:650](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L650)*
 
 Given two state tree nodes that are part of the same tree,
 returns the shortest jsonpath needed to navigate from the one to the other
@@ -2842,7 +2844,7 @@ ___
 
 ▸ **getRoot**<**IT**>(`target`: IAnyStateTreeNode): *TypeOrStateTreeNodeToStateTreeNode‹IT›*
 
-*Defined in [core/mst-operations.ts:453](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L453)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:453](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L453)*
 
 Given an object in a model tree, returns the root object of that tree.
 
@@ -2867,7 +2869,7 @@ ___
 
 ▸ **getRunningActionContext**(): *[IActionContext](interfaces/iactioncontext.md) | undefined*
 
-*Defined in [core/actionContext.ts:26](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/actionContext.ts#L26)*
+*Defined in [packages/mobx-state-tree/src/core/actionContext.ts:26](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/actionContext.ts#L26)*
 
 Returns the currently executing MST action context, or undefined if none.
 
@@ -2879,7 +2881,7 @@ ___
 
 ▸ **getSnapshot**<**S**>(`target`: IStateTreeNode‹[IType](interfaces/itype.md)‹any, S, any››, `applyPostProcess`: boolean): *S*
 
-*Defined in [core/mst-operations.ts:338](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L338)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:338](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L338)*
 
 Calculates a snapshot from the given model instance. The snapshot will always reflect the latest state but use
 structural sharing where possible. Doesn't require MobX transactions to be completed.
@@ -2903,7 +2905,7 @@ ___
 
 ▸ **getType**(`object`: IAnyStateTreeNode): *[IAnyComplexType](interfaces/ianycomplextype.md)*
 
-*Defined in [core/mst-operations.ts:48](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L48)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:48](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L48)*
 
 Returns the _actual_ type of the given tree node. (Or throws)
 
@@ -2921,7 +2923,7 @@ ___
 
 ▸ **hasParent**(`target`: IAnyStateTreeNode, `depth`: number): *boolean*
 
-*Defined in [core/mst-operations.ts:358](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L358)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:358](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L358)*
 
 Given a model instance, returns `true` if the object has a parent, that is, is part of another object, map or array.
 
@@ -2940,7 +2942,7 @@ ___
 
 ▸ **hasParentOfType**(`target`: IAnyStateTreeNode, `type`: [IAnyComplexType](interfaces/ianycomplextype.md)): *boolean*
 
-*Defined in [core/mst-operations.ts:408](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L408)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:408](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L408)*
 
 Given a model instance, returns `true` if the object has a parent of given type, that is, is part of another object, map or array
 
@@ -2959,7 +2961,7 @@ ___
 
 ▸ **isActionContextChildOf**(`actionContext`: [IActionContext](interfaces/iactioncontext.md), `parent`: number | [IActionContext](interfaces/iactioncontext.md) | [IMiddlewareEvent](interfaces/imiddlewareevent.md)): *boolean*
 
-*Defined in [core/actionContext.ts:56](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/actionContext.ts#L56)*
+*Defined in [packages/mobx-state-tree/src/core/actionContext.ts:56](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/actionContext.ts#L56)*
 
 Returns if the given action context is a parent of this action context.
 
@@ -2978,7 +2980,7 @@ ___
 
 ▸ **isActionContextThisOrChildOf**(`actionContext`: [IActionContext](interfaces/iactioncontext.md), `parentOrThis`: number | [IActionContext](interfaces/iactioncontext.md) | [IMiddlewareEvent](interfaces/imiddlewareevent.md)): *boolean*
 
-*Defined in [core/actionContext.ts:66](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/actionContext.ts#L66)*
+*Defined in [packages/mobx-state-tree/src/core/actionContext.ts:66](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/actionContext.ts#L66)*
 
 Returns if the given action context is this or a parent of this action context.
 
@@ -2997,7 +2999,7 @@ ___
 
 ▸ **isAlive**(`target`: IAnyStateTreeNode): *boolean*
 
-*Defined in [core/mst-operations.ts:718](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L718)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:718](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L718)*
 
 Returns true if the given state tree node is not killed yet.
 This means that the node is still a part of a tree, and that `destroy`
@@ -3016,9 +3018,9 @@ ___
 
 ###  isArrayType
 
-▸ **isArrayType**<**Items**>(`type`: [IAnyType](interfaces/ianytype.md)): *boolean*
+▸ **isArrayType**<**Items**>(`type`: [IAnyType](interfaces/ianytype.md)): *type is IArrayType<Items>*
 
-*Defined in [types/complex-types/array.ts:496](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/array.ts#L496)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/array.ts:498](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/array.ts#L498)*
 
 Returns if a given value represents an array type.
 
@@ -3032,7 +3034,7 @@ Name | Type |
 ------ | ------ |
 `type` | [IAnyType](interfaces/ianytype.md) |
 
-**Returns:** *boolean*
+**Returns:** *type is IArrayType<Items>*
 
 `true` if the type is an array type.
 
@@ -3040,9 +3042,9 @@ ___
 
 ###  isFrozenType
 
-▸ **isFrozenType**<**IT**, **T**>(`type`: IT): *boolean*
+▸ **isFrozenType**<**IT**, **T**>(`type`: IT): *type is IT*
 
-*Defined in [types/utility-types/frozen.ts:113](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/frozen.ts#L113)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/frozen.ts:113](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/frozen.ts#L113)*
 
 Returns if a given value represents a frozen type.
 
@@ -3058,15 +3060,15 @@ Name | Type |
 ------ | ------ |
 `type` | IT |
 
-**Returns:** *boolean*
+**Returns:** *type is IT*
 
 ___
 
 ###  isIdentifierType
 
-▸ **isIdentifierType**<**IT**>(`type`: IT): *boolean*
+▸ **isIdentifierType**<**IT**>(`type`: IT): *type is IT*
 
-*Defined in [types/utility-types/identifier.ts:135](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/identifier.ts#L135)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/identifier.ts:133](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/identifier.ts#L133)*
 
 Returns if a given value represents an identifier type.
 
@@ -3080,15 +3082,15 @@ Name | Type |
 ------ | ------ |
 `type` | IT |
 
-**Returns:** *boolean*
+**Returns:** *type is IT*
 
 ___
 
 ###  isLateType
 
-▸ **isLateType**<**IT**>(`type`: IT): *boolean*
+▸ **isLateType**<**IT**>(`type`: IT): *type is IT*
 
-*Defined in [types/utility-types/late.ts:141](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/late.ts#L141)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/late.ts:141](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/late.ts#L141)*
 
 Returns if a given value represents a late type.
 
@@ -3102,15 +3104,15 @@ Name | Type |
 ------ | ------ |
 `type` | IT |
 
-**Returns:** *boolean*
+**Returns:** *type is IT*
 
 ___
 
 ###  isLiteralType
 
-▸ **isLiteralType**<**IT**>(`type`: IT): *boolean*
+▸ **isLiteralType**<**IT**>(`type`: IT): *type is IT*
 
-*Defined in [types/utility-types/literal.ts:86](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/literal.ts#L86)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/literal.ts:86](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/literal.ts#L86)*
 
 Returns if a given value represents a literal type.
 
@@ -3124,15 +3126,15 @@ Name | Type |
 ------ | ------ |
 `type` | IT |
 
-**Returns:** *boolean*
+**Returns:** *type is IT*
 
 ___
 
 ###  isMapType
 
-▸ **isMapType**<**Items**>(`type`: [IAnyType](interfaces/ianytype.md)): *boolean*
+▸ **isMapType**<**Items**>(`type`: [IAnyType](interfaces/ianytype.md)): *type is IMapType<Items>*
 
-*Defined in [types/complex-types/map.ts:527](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/map.ts#L527)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/map.ts:529](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/map.ts#L529)*
 
 Returns if a given value represents a map type.
 
@@ -3146,7 +3148,7 @@ Name | Type |
 ------ | ------ |
 `type` | [IAnyType](interfaces/ianytype.md) |
 
-**Returns:** *boolean*
+**Returns:** *type is IMapType<Items>*
 
 `true` if it is a map type.
 
@@ -3154,9 +3156,9 @@ ___
 
 ###  isModelType
 
-▸ **isModelType**<**IT**>(`type`: [IAnyType](interfaces/ianytype.md)): *boolean*
+▸ **isModelType**<**IT**>(`type`: [IAnyType](interfaces/ianytype.md)): *type is IT*
 
-*Defined in [types/complex-types/model.ts:844](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/model.ts#L844)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/model.ts:853](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/model.ts#L853)*
 
 Returns if a given value represents a model type.
 
@@ -3170,15 +3172,15 @@ Name | Type |
 ------ | ------ |
 `type` | [IAnyType](interfaces/ianytype.md) |
 
-**Returns:** *boolean*
+**Returns:** *type is IT*
 
 ___
 
 ###  isOptionalType
 
-▸ **isOptionalType**<**IT**>(`type`: IT): *boolean*
+▸ **isOptionalType**<**IT**>(`type`: IT): *type is IT*
 
-*Defined in [types/utility-types/optional.ts:234](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/optional.ts#L234)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/optional.ts:234](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/optional.ts#L234)*
 
 Returns if a value represents an optional type.
 
@@ -3194,15 +3196,15 @@ Name | Type |
 ------ | ------ |
 `type` | IT |
 
-**Returns:** *boolean*
+**Returns:** *type is IT*
 
 ___
 
 ###  isPrimitiveType
 
-▸ **isPrimitiveType**<**IT**>(`type`: IT): *boolean*
+▸ **isPrimitiveType**<**IT**>(`type`: IT): *type is IT*
 
-*Defined in [types/primitives.ts:204](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/primitives.ts#L204)*
+*Defined in [packages/mobx-state-tree/src/types/primitives.ts:204](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/primitives.ts#L204)*
 
 Returns if a given value represents a primitive type.
 
@@ -3216,7 +3218,7 @@ Name | Type |
 ------ | ------ |
 `type` | IT |
 
-**Returns:** *boolean*
+**Returns:** *type is IT*
 
 ___
 
@@ -3224,7 +3226,7 @@ ___
 
 ▸ **isProtected**(`target`: IAnyStateTreeNode): *boolean*
 
-*Defined in [core/mst-operations.ts:312](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L312)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:312](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L312)*
 
 Returns true if the object is in protected mode, @see protect
 
@@ -3240,9 +3242,9 @@ ___
 
 ###  isReferenceType
 
-▸ **isReferenceType**<**IT**>(`type`: IT): *boolean*
+▸ **isReferenceType**<**IT**>(`type`: IT): *type is IT*
 
-*Defined in [types/utility-types/reference.ts:535](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/reference.ts#L535)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/reference.ts:533](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/reference.ts#L533)*
 
 Returns if a given value represents a reference type.
 
@@ -3256,15 +3258,15 @@ Name | Type |
 ------ | ------ |
 `type` | IT |
 
-**Returns:** *boolean*
+**Returns:** *type is IT*
 
 ___
 
 ###  isRefinementType
 
-▸ **isRefinementType**<**IT**>(`type`: IT): *boolean*
+▸ **isRefinementType**<**IT**>(`type`: IT): *type is IT*
 
-*Defined in [types/utility-types/refinement.ts:126](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/refinement.ts#L126)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/refinement.ts:126](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/refinement.ts#L126)*
 
 Returns if a given value is a refinement type.
 
@@ -3278,7 +3280,7 @@ Name | Type |
 ------ | ------ |
 `type` | IT |
 
-**Returns:** *boolean*
+**Returns:** *type is IT*
 
 ___
 
@@ -3286,7 +3288,7 @@ ___
 
 ▸ **isRoot**(`target`: IAnyStateTreeNode): *boolean*
 
-*Defined in [core/mst-operations.ts:494](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L494)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:494](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L494)*
 
 Returns true if the given object is the root of a model tree.
 
@@ -3302,9 +3304,9 @@ ___
 
 ###  isStateTreeNode
 
-▸ **isStateTreeNode**<**IT**>(`value`: any): *boolean*
+▸ **isStateTreeNode**<**IT**>(`value`: any): *value is STNValue<Instance<IT>, IT>*
 
-*Defined in [core/node/node-utils.ts:68](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/node/node-utils.ts#L68)*
+*Defined in [packages/mobx-state-tree/src/core/node/node-utils.ts:68](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/node/node-utils.ts#L68)*
 
 Returns true if the given value is a node in a state tree.
 More precisely, that is, if the value is an instance of a
@@ -3320,7 +3322,7 @@ Name | Type |
 ------ | ------ |
 `value` | any |
 
-**Returns:** *boolean*
+**Returns:** *value is STNValue<Instance<IT>, IT>*
 
 true if the value is a state tree node.
 
@@ -3328,9 +3330,9 @@ ___
 
 ###  isType
 
-▸ **isType**(`value`: any): *boolean*
+▸ **isType**(`value`: any): *value is IAnyType*
 
-*Defined in [core/type/type.ts:529](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/type/type.ts#L529)*
+*Defined in [packages/mobx-state-tree/src/core/type/type.ts:530](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/type/type.ts#L530)*
 
 Returns if a given value represents a type.
 
@@ -3340,7 +3342,7 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `value` | any | Value to check. |
 
-**Returns:** *boolean*
+**Returns:** *value is IAnyType*
 
 `true` if the value is a type.
 
@@ -3348,9 +3350,9 @@ ___
 
 ###  isUnionType
 
-▸ **isUnionType**<**IT**>(`type`: IT): *boolean*
+▸ **isUnionType**<**IT**>(`type`: IT): *type is IT*
 
-*Defined in [types/utility-types/union.ts:280](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L280)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:282](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L282)*
 
 Returns if a given value represents a union type.
 
@@ -3364,7 +3366,7 @@ Name | Type |
 ------ | ------ |
 `type` | IT |
 
-**Returns:** *boolean*
+**Returns:** *type is IT*
 
 ___
 
@@ -3372,7 +3374,7 @@ ___
 
 ▸ **isValidReference**<**N**>(`getter`: function, `checkIfAlive`: boolean): *boolean*
 
-*Defined in [core/mst-operations.ts:598](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L598)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:598](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L598)*
 
 Tests if a reference is valid (pointing to an existing node and optionally if alive) and returns if the check passes or not.
 
@@ -3400,7 +3402,7 @@ ___
 
 ▸ **joinJsonPath**(`path`: string[]): *string*
 
-*Defined in [core/json-patch.ts:98](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/json-patch.ts#L98)*
+*Defined in [packages/mobx-state-tree/src/core/json-patch.ts:98](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/json-patch.ts#L98)*
 
 Generates a json-path compliant json path from path parts.
 
@@ -3418,7 +3420,7 @@ ___
 
 ▸ **late**<**T**>(`type`: function): *T*
 
-*Defined in [types/utility-types/late.ts:103](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/late.ts#L103)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/late.ts:103](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/late.ts#L103)*
 
 `types.late` - Defines a type that gets implemented later. This is useful when you have to deal with circular dependencies.
 Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them.
@@ -3447,7 +3449,7 @@ A function that returns the type that will be defined.
 
 ▸ **late**<**T**>(`name`: string, `type`: function): *T*
 
-*Defined in [types/utility-types/late.ts:104](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/late.ts#L104)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/late.ts:104](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/late.ts#L104)*
 
 `types.late` - Defines a type that gets implemented later. This is useful when you have to deal with circular dependencies.
 Please notice that when defining circular dependencies TypeScript isn't smart enough to inference them.
@@ -3484,7 +3486,7 @@ ___
 
 ▸ **literal**<**S**>(`value`: S): *[ISimpleType](interfaces/isimpletype.md)‹S›*
 
-*Defined in [types/utility-types/literal.ts:73](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/literal.ts#L73)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/literal.ts:73](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/literal.ts#L73)*
 
 `types.literal` - The literal type will return a type that will match only the exact given type.
 The given value must be a primitive, in order to be serialized to a snapshot correctly.
@@ -3516,7 +3518,7 @@ ___
 
 ▸ **map**<**IT**>(`subtype`: IT): *IMapType‹IT›*
 
-*Defined in [types/complex-types/map.ts:517](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/map.ts#L517)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/map.ts:519](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/map.ts#L519)*
 
 `types.map` - Creates a key based collection type who's children are all of a uniform declared type.
 If the type stored in a map has an identifier, it is mandatory to store the child under that identifier in the map.
@@ -3559,7 +3561,7 @@ ___
 
 ▸ **maybe**<**IT**>(`type`: IT): *IMaybe‹IT›*
 
-*Defined in [types/utility-types/maybe.ts:31](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/maybe.ts#L31)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/maybe.ts:31](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/maybe.ts#L31)*
 
 `types.maybe` - Maybe will make a type nullable, and also optional.
 The value `undefined` will be used to represent nullability.
@@ -3582,7 +3584,7 @@ ___
 
 ▸ **maybeNull**<**IT**>(`type`: IT): *IMaybeNull‹IT›*
 
-*Defined in [types/utility-types/maybe.ts:44](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/maybe.ts#L44)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/maybe.ts:44](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/maybe.ts#L44)*
 
 `types.maybeNull` - Maybe will make a type nullable, and also optional.
 The value `null` will be used to represent no value.
@@ -3605,7 +3607,7 @@ ___
 
 ▸ **model**<**P**>(`name`: string, `properties?`: [P](undefined)): *[IModelType](interfaces/imodeltype.md)‹ModelPropertiesDeclarationToProperties‹P›, __type›*
 
-*Defined in [types/complex-types/model.ts:734](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/model.ts#L734)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/model.ts:743](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/model.ts#L743)*
 
 `types.model` - Creates a new model type by providing a name, properties, volatile state and actions.
 
@@ -3626,7 +3628,7 @@ Name | Type |
 
 ▸ **model**<**P**>(`properties?`: [P](undefined)): *[IModelType](interfaces/imodeltype.md)‹ModelPropertiesDeclarationToProperties‹P›, __type›*
 
-*Defined in [types/complex-types/model.ts:738](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/complex-types/model.ts#L738)*
+*Defined in [packages/mobx-state-tree/src/types/complex-types/model.ts:747](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/complex-types/model.ts#L747)*
 
 `types.model` - Creates a new model type by providing a name, properties, volatile state and actions.
 
@@ -3650,7 +3652,7 @@ ___
 
 ▸ **onAction**(`target`: IAnyStateTreeNode, `listener`: function, `attachAfter`: boolean): *[IDisposer](index.md#idisposer)*
 
-*Defined in [middlewares/on-action.ts:224](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/middlewares/on-action.ts#L224)*
+*Defined in [packages/mobx-state-tree/src/middlewares/on-action.ts:226](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/middlewares/on-action.ts#L226)*
 
 Registers a function that will be invoked for each action that is called on the provided model instance, or to any of its children.
 See [actions](https://github.com/mobxjs/mobx-state-tree#actions) for more details. onAction events are emitted only for the outermost called action in the stack.
@@ -3710,7 +3712,7 @@ ___
 
 ▸ **onPatch**(`target`: IAnyStateTreeNode, `callback`: function): *[IDisposer](index.md#idisposer)*
 
-*Defined in [core/mst-operations.ts:85](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L85)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:85](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L85)*
 
 Registers a function that will be invoked for each mutation that is applied to the provided model instance, or to any of its children.
 See [patches](https://github.com/mobxjs/mobx-state-tree#patches) for more details. onPatch events are emitted immediately and will not await the end of a transaction.
@@ -3745,7 +3747,7 @@ ___
 
 ▸ **onSnapshot**<**S**>(`target`: IStateTreeNode‹[IType](interfaces/itype.md)‹any, S, any››, `callback`: function): *[IDisposer](index.md#idisposer)*
 
-*Defined in [core/mst-operations.ts:105](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L105)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:105](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L105)*
 
 Registers a function that is invoked whenever a new snapshot for the given model instance is available.
 The listener will only be fire at the end of the current MobX (trans)action.
@@ -3777,7 +3779,7 @@ ___
 
 ▸ **optional**<**IT**>(`type`: IT, `defaultValueOrFunction`: OptionalDefaultValueOrFunction‹IT›): *IOptionalIType‹IT, [undefined]›*
 
-*Defined in [types/utility-types/optional.ts:160](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/optional.ts#L160)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/optional.ts:160](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/optional.ts#L160)*
 
 `types.optional` - Can be used to create a property with a default value.
 
@@ -3829,7 +3831,7 @@ Name | Type |
 
 ▸ **optional**<**IT**, **OptionalVals**>(`type`: IT, `defaultValueOrFunction`: OptionalDefaultValueOrFunction‹IT›, `optionalValues`: OptionalVals): *IOptionalIType‹IT, OptionalVals›*
 
-*Defined in [types/utility-types/optional.ts:164](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/optional.ts#L164)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/optional.ts:164](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/optional.ts#L164)*
 
 `types.optional` - Can be used to create a property with a default value.
 
@@ -3888,7 +3890,7 @@ ___
 
 ▸ **protect**(`target`: IAnyStateTreeNode): *void*
 
-*Defined in [core/mst-operations.ts:267](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L267)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:267](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L267)*
 
 The inverse of `unprotect`.
 
@@ -3906,7 +3908,7 @@ ___
 
 ▸ **recordActions**(`subject`: IAnyStateTreeNode, `filter?`: undefined | function): *[IActionRecorder](interfaces/iactionrecorder.md)*
 
-*Defined in [middlewares/on-action.ts:146](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/middlewares/on-action.ts#L146)*
+*Defined in [packages/mobx-state-tree/src/middlewares/on-action.ts:148](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/middlewares/on-action.ts#L148)*
 
 Small abstraction around `onAction` and `applyAction`, attaches an action listener to a tree and records all the actions emitted.
 Returns an recorder object with the following signature:
@@ -3944,7 +3946,7 @@ ___
 
 ▸ **recordPatches**(`subject`: IAnyStateTreeNode, `filter?`: undefined | function): *[IPatchRecorder](interfaces/ipatchrecorder.md)*
 
-*Defined in [core/mst-operations.ts:179](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L179)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:179](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L179)*
 
 Small abstraction around `onPatch` and `applyPatch`, attaches a patch listener to a tree and records all the patches.
 Returns an recorder object with the following signature:
@@ -3987,7 +3989,7 @@ ___
 
 ▸ **reference**<**IT**>(`subType`: IT, `options?`: [ReferenceOptions](index.md#referenceoptions)‹IT›): *IReferenceType‹IT›*
 
-*Defined in [types/utility-types/reference.ts:488](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/reference.ts#L488)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/reference.ts:486](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/reference.ts#L486)*
 
 `types.reference` - Creates a reference to another type, which should have defined an identifier.
 See also the [reference and identifiers](https://github.com/mobxjs/mobx-state-tree#references-and-identifiers) section.
@@ -4011,7 +4013,7 @@ ___
 
 ▸ **refinement**<**IT**>(`name`: string, `type`: IT, `predicate`: function, `message?`: string | function): *IT*
 
-*Defined in [types/utility-types/refinement.ts:84](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/refinement.ts#L84)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/refinement.ts:84](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/refinement.ts#L84)*
 
 `types.refinement` - Creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
 
@@ -4041,7 +4043,7 @@ Name | Type |
 
 ▸ **refinement**<**IT**>(`type`: IT, `predicate`: function, `message?`: string | function): *IT*
 
-*Defined in [types/utility-types/refinement.ts:90](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/refinement.ts#L90)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/refinement.ts:90](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/refinement.ts#L90)*
 
 `types.refinement` - Creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer then 5.
 
@@ -4073,7 +4075,7 @@ ___
 
 ▸ **resolveIdentifier**<**IT**>(`type`: IT, `target`: IAnyStateTreeNode, `identifier`: [ReferenceIdentifier](index.md#referenceidentifier)): *IT["Type"] | undefined*
 
-*Defined in [core/mst-operations.ts:527](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L527)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:527](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L527)*
 
 Resolves a model instance given a root target, the type and the identifier you are searching for.
 Returns undefined if no value can be found.
@@ -4098,7 +4100,7 @@ ___
 
 ▸ **resolvePath**(`target`: IAnyStateTreeNode, `path`: string): *any*
 
-*Defined in [core/mst-operations.ts:509](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L509)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:509](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L509)*
 
 Resolves a path relatively to a given object.
 Returns undefined if no value can be found.
@@ -4118,7 +4120,7 @@ ___
 
 ▸ **safeReference**<**IT**>(`subType`: IT, `options`: __type | [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)‹IT› & object): *IReferenceType‹IT›*
 
-*Defined in [types/utility-types/reference.ts:539](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/reference.ts#L539)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/reference.ts:537](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/reference.ts#L537)*
 
 `types.safeReference` - A safe reference is like a standard reference, except that it accepts the undefined value by default
 and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps
@@ -4147,7 +4149,7 @@ Name | Type |
 
 ▸ **safeReference**<**IT**>(`subType`: IT, `options?`: __type | [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)‹IT› & object): *IMaybe‹IReferenceType‹IT››*
 
-*Defined in [types/utility-types/reference.ts:543](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/reference.ts#L543)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/reference.ts:541](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/reference.ts#L541)*
 
 `types.safeReference` - A safe reference is like a standard reference, except that it accepts the undefined value by default
 and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps
@@ -4180,7 +4182,7 @@ ___
 
 ▸ **setLivelinessChecking**(`mode`: [LivelinessMode](index.md#livelinessmode)): *void*
 
-*Defined in [core/node/livelinessChecking.ts:18](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/node/livelinessChecking.ts#L18)*
+*Defined in [packages/mobx-state-tree/src/core/node/livelinessChecking.ts:18](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/node/livelinessChecking.ts#L18)*
 
 Defines what MST should do when running into reads / writes to objects that have died.
 By default it will print a warning.
@@ -4200,7 +4202,7 @@ ___
 
 ▸ **snapshotProcessor**<**IT**, **CustomC**, **CustomS**>(`type`: IT, `processors`: [ISnapshotProcessors](interfaces/isnapshotprocessors.md)‹IT["CreationType"], CustomC, IT["SnapshotType"], CustomS›, `name?`: undefined | string): *[ISnapshotProcessor](interfaces/isnapshotprocessor.md)‹IT, CustomC, CustomS›*
 
-*Defined in [types/utility-types/snapshotProcessor.ts:209](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/snapshotProcessor.ts#L209)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/snapshotProcessor.ts:209](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/snapshotProcessor.ts#L209)*
 
 `types.snapshotProcessor` - Runs a pre/post snapshot processor before/after serializing a given type.
 
@@ -4251,7 +4253,7 @@ ___
 
 ▸ **splitJsonPath**(`path`: string): *string[]*
 
-*Defined in [core/json-patch.ts:118](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/json-patch.ts#L118)*
+*Defined in [packages/mobx-state-tree/src/core/json-patch.ts:118](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/json-patch.ts#L118)*
 
 Splits and decodes a json path into several parts.
 
@@ -4265,11 +4267,100 @@ Name | Type |
 
 ___
 
+###  toGenerator
+
+▸ **toGenerator**<**R**>(`p`: Promise‹R›): *Generator‹Promise‹R›, R, R›*
+
+*Defined in [packages/mobx-state-tree/src/core/flow.ts:86](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/flow.ts#L86)*
+
+**`experimental`** 
+experimental api - might change on minor/patch releases
+
+Convert a promise to a generator yielding that promise
+This is intended to allow for usage of `yield*` in async actions to
+retain the promise return type.
+
+Example:
+```ts
+function getDataAsync(input: string): Promise<number> { ... }
+
+const someModel.actions(self => ({
+  someAction: flow(function*() {
+    // value is typed as number
+    const value = yield* toGenerator(getDataAsync("input value"));
+    ...
+  })
+}))
+```
+
+**Type parameters:**
+
+▪ **R**
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`p` | Promise‹R› |
+
+**Returns:** *Generator‹Promise‹R›, R, R›*
+
+___
+
+###  toGeneratorFunction
+
+▸ **toGeneratorFunction**<**R**, **Args**>(`p`: function): *(Anonymous function)*
+
+*Defined in [packages/mobx-state-tree/src/core/flow.ts:59](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/flow.ts#L59)*
+
+**`experimental`** 
+experimental api - might change on minor/patch releases
+
+Convert a promise-returning function to a generator-returning one.
+This is intended to allow for usage of `yield*` in async actions to
+retain the promise return type.
+
+Example:
+```ts
+function getDataAsync(input: string): Promise<number> { ... }
+const getDataGen = toGeneratorFunction(getDataAsync);
+
+const someModel.actions(self => ({
+  someAction: flow(function*() {
+    // value is typed as number
+    const value = yield* getDataGen("input value");
+    ...
+  })
+}))
+```
+
+**Type parameters:**
+
+▪ **R**
+
+▪ **Args**: *any[]*
+
+**Parameters:**
+
+▪ **p**: *function*
+
+▸ (...`args`: Args): *Promise‹R›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | Args |
+
+**Returns:** *(Anonymous function)*
+
+___
+
 ###  tryReference
 
 ▸ **tryReference**<**N**>(`getter`: function, `checkIfAlive`: boolean): *N | undefined*
 
-*Defined in [core/mst-operations.ts:566](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L566)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:566](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L566)*
 
 Tests if a reference is valid (pointing to an existing node and optionally if alive) and returns such reference if it the check passes,
 else it returns undefined.
@@ -4298,7 +4389,7 @@ ___
 
 ▸ **tryResolve**(`target`: IAnyStateTreeNode, `path`: string): *any*
 
-*Defined in [core/mst-operations.ts:626](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L626)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:626](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L626)*
 
 Try to resolve a given path relative to a given node.
 
@@ -4317,7 +4408,7 @@ ___
 
 ▸ **typecheck**<**IT**>(`type`: IT, `value`: ExtractCSTWithSTN‹IT›): *void*
 
-*Defined in [core/type/type-checker.ts:166](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/type/type-checker.ts#L166)*
+*Defined in [packages/mobx-state-tree/src/core/type/type-checker.ts:166](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/type/type-checker.ts#L166)*
 
 Run's the typechecker for the given type on the given value, which can be a snapshot or an instance.
 Throws if the given value is not according the provided type specification.
@@ -4342,7 +4433,7 @@ ___
 
 ▸ **unescapeJsonPath**(`path`: string): *string*
 
-*Defined in [core/json-patch.ts:88](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/json-patch.ts#L88)*
+*Defined in [packages/mobx-state-tree/src/core/json-patch.ts:88](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/json-patch.ts#L88)*
 
 Unescape slashes and backslashes.
 
@@ -4360,7 +4451,7 @@ ___
 
 ▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**>(`A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›): *ITypeUnion‹ModelCreationType2‹PA, FCA› | ModelCreationType2‹PB, FCB›, ModelSnapshotType2‹PA, FSA› | ModelSnapshotType2‹PB, FSB›, ModelInstanceType‹PA, OA› | ModelInstanceType‹PB, OB››*
 
-*Defined in [types/utility-types/union.ts:157](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L157)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:159](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L159)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -4393,7 +4484,7 @@ Name | Type |
 
 ▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›): *ITypeUnion‹ModelCreationType2‹PA, FCA› | ModelCreationType2‹PB, FCB›, ModelSnapshotType2‹PA, FSA› | ModelSnapshotType2‹PB, FSB›, ModelInstanceType‹PA, OA› | ModelInstanceType‹PB, OB››*
 
-*Defined in [types/utility-types/union.ts:159](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L159)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:161](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L161)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -4427,7 +4518,7 @@ Name | Type |
 
 ▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**>(`A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›): *ITypeUnion‹ModelCreationType2‹PA, FCA› | ModelCreationType2‹PB, FCB› | ModelCreationType2‹PC, FCC›, ModelSnapshotType2‹PA, FSA› | ModelSnapshotType2‹PB, FSB› | ModelSnapshotType2‹PC, FSC›, ModelInstanceType‹PA, OA› | ModelInstanceType‹PB, OB› | ModelInstanceType‹PC, OC››*
 
-*Defined in [types/utility-types/union.ts:162](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L162)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:164](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L164)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -4469,7 +4560,7 @@ Name | Type |
 
 ▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›): *ITypeUnion‹ModelCreationType2‹PA, FCA› | ModelCreationType2‹PB, FCB› | ModelCreationType2‹PC, FCC›, ModelSnapshotType2‹PA, FSA› | ModelSnapshotType2‹PB, FSB› | ModelSnapshotType2‹PC, FSC›, ModelInstanceType‹PA, OA› | ModelInstanceType‹PB, OB› | ModelInstanceType‹PC, OC››*
 
-*Defined in [types/utility-types/union.ts:164](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L164)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:166](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L166)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -4512,7 +4603,7 @@ Name | Type |
 
 ▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**>(`A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›): *ITypeUnion‹ModelCreationType2‹PA, FCA› | ModelCreationType2‹PB, FCB› | ModelCreationType2‹PC, FCC› | ModelCreationType2‹PD, FCD›, ModelSnapshotType2‹PA, FSA› | ModelSnapshotType2‹PB, FSB› | ModelSnapshotType2‹PC, FSC› | ModelSnapshotType2‹PD, FSD›, ModelInstanceType‹PA, OA› | ModelInstanceType‹PB, OB› | ModelInstanceType‹PC, OC› | ModelInstanceType‹PD, OD››*
 
-*Defined in [types/utility-types/union.ts:166](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L166)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:168](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L168)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -4563,7 +4654,7 @@ Name | Type |
 
 ▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›): *ITypeUnion‹ModelCreationType2‹PA, FCA› | ModelCreationType2‹PB, FCB› | ModelCreationType2‹PC, FCC› | ModelCreationType2‹PD, FCD›, ModelSnapshotType2‹PA, FSA› | ModelSnapshotType2‹PB, FSB› | ModelSnapshotType2‹PC, FSC› | ModelSnapshotType2‹PD, FSD›, ModelInstanceType‹PA, OA› | ModelInstanceType‹PB, OB› | ModelInstanceType‹PC, OC› | ModelInstanceType‹PD, OD››*
 
-*Defined in [types/utility-types/union.ts:169](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L169)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:171](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L171)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -4615,7 +4706,7 @@ Name | Type |
 
 ▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**>(`A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›, `E`: [IModelType](interfaces/imodeltype.md)‹PE, OE, FCE, FSE›): *ITypeUnion‹ModelCreationType2‹PA, FCA› | ModelCreationType2‹PB, FCB› | ModelCreationType2‹PC, FCC› | ModelCreationType2‹PD, FCD› | ModelCreationType2‹PE, FCE›, ModelSnapshotType2‹PA, FSA› | ModelSnapshotType2‹PB, FSB› | ModelSnapshotType2‹PC, FSC› | ModelSnapshotType2‹PD, FSD› | ModelSnapshotType2‹PE, FSE›, ModelInstanceType‹PA, OA› | ModelInstanceType‹PB, OB› | ModelInstanceType‹PC, OC› | ModelInstanceType‹PD, OD› | ModelInstanceType‹PE, OE››*
 
-*Defined in [types/utility-types/union.ts:172](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L172)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:174](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L174)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -4675,7 +4766,7 @@ Name | Type |
 
 ▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›, `E`: [IModelType](interfaces/imodeltype.md)‹PE, OE, FCE, FSE›): *ITypeUnion‹ModelCreationType2‹PA, FCA› | ModelCreationType2‹PB, FCB› | ModelCreationType2‹PC, FCC› | ModelCreationType2‹PD, FCD› | ModelCreationType2‹PE, FCE›, ModelSnapshotType2‹PA, FSA› | ModelSnapshotType2‹PB, FSB› | ModelSnapshotType2‹PC, FSC› | ModelSnapshotType2‹PD, FSD› | ModelSnapshotType2‹PE, FSE›, ModelInstanceType‹PA, OA› | ModelInstanceType‹PB, OB› | ModelInstanceType‹PC, OC› | ModelInstanceType‹PD, OD› | ModelInstanceType‹PE, OE››*
 
-*Defined in [types/utility-types/union.ts:175](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L175)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:177](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L177)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -4736,7 +4827,7 @@ Name | Type |
 
 ▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**>(`A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›, `E`: [IModelType](interfaces/imodeltype.md)‹PE, OE, FCE, FSE›, `F`: [IModelType](interfaces/imodeltype.md)‹PF, OF, FCF, FSF›): *ITypeUnion‹ModelCreationType2‹PA, FCA› | ModelCreationType2‹PB, FCB› | ModelCreationType2‹PC, FCC› | ModelCreationType2‹PD, FCD› | ModelCreationType2‹PE, FCE› | ModelCreationType2‹PF, FCF›, ModelSnapshotType2‹PA, FSA› | ModelSnapshotType2‹PB, FSB› | ModelSnapshotType2‹PC, FSC› | ModelSnapshotType2‹PD, FSD› | ModelSnapshotType2‹PE, FSE› | ModelSnapshotType2‹PF, FSF›, ModelInstanceType‹PA, OA› | ModelInstanceType‹PB, OB› | ModelInstanceType‹PC, OC› | ModelInstanceType‹PD, OD› | ModelInstanceType‹PE, OE› | ModelInstanceType‹PF, OF››*
 
-*Defined in [types/utility-types/union.ts:178](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L178)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:180](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L180)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -4805,7 +4896,7 @@ Name | Type |
 
 ▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›, `E`: [IModelType](interfaces/imodeltype.md)‹PE, OE, FCE, FSE›, `F`: [IModelType](interfaces/imodeltype.md)‹PF, OF, FCF, FSF›): *ITypeUnion‹ModelCreationType2‹PA, FCA› | ModelCreationType2‹PB, FCB› | ModelCreationType2‹PC, FCC› | ModelCreationType2‹PD, FCD› | ModelCreationType2‹PE, FCE› | ModelCreationType2‹PF, FCF›, ModelSnapshotType2‹PA, FSA› | ModelSnapshotType2‹PB, FSB› | ModelSnapshotType2‹PC, FSC› | ModelSnapshotType2‹PD, FSD› | ModelSnapshotType2‹PE, FSE› | ModelSnapshotType2‹PF, FSF›, ModelInstanceType‹PA, OA› | ModelInstanceType‹PB, OB› | ModelInstanceType‹PC, OC› | ModelInstanceType‹PD, OD› | ModelInstanceType‹PE, OE› | ModelInstanceType‹PF, OF››*
 
-*Defined in [types/utility-types/union.ts:181](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L181)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:183](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L183)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -4875,7 +4966,7 @@ Name | Type |
 
 ▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**>(`A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›, `E`: [IModelType](interfaces/imodeltype.md)‹PE, OE, FCE, FSE›, `F`: [IModelType](interfaces/imodeltype.md)‹PF, OF, FCF, FSF›, `G`: [IModelType](interfaces/imodeltype.md)‹PG, OG, FCG, FSG›): *ITypeUnion‹ModelCreationType2‹PA, FCA› | ModelCreationType2‹PB, FCB› | ModelCreationType2‹PC, FCC› | ModelCreationType2‹PD, FCD› | ModelCreationType2‹PE, FCE› | ModelCreationType2‹PF, FCF› | ModelCreationType2‹PG, FCG›, ModelSnapshotType2‹PA, FSA› | ModelSnapshotType2‹PB, FSB› | ModelSnapshotType2‹PC, FSC› | ModelSnapshotType2‹PD, FSD› | ModelSnapshotType2‹PE, FSE› | ModelSnapshotType2‹PF, FSF› | ModelSnapshotType2‹PG, FSG›, ModelInstanceType‹PA, OA› | ModelInstanceType‹PB, OB› | ModelInstanceType‹PC, OC› | ModelInstanceType‹PD, OD› | ModelInstanceType‹PE, OE› | ModelInstanceType‹PF, OF› | ModelInstanceType‹PG, OG››*
 
-*Defined in [types/utility-types/union.ts:184](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L184)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:186](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L186)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -4953,7 +5044,7 @@ Name | Type |
 
 ▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›, `E`: [IModelType](interfaces/imodeltype.md)‹PE, OE, FCE, FSE›, `F`: [IModelType](interfaces/imodeltype.md)‹PF, OF, FCF, FSF›, `G`: [IModelType](interfaces/imodeltype.md)‹PG, OG, FCG, FSG›): *ITypeUnion‹ModelCreationType2‹PA, FCA› | ModelCreationType2‹PB, FCB› | ModelCreationType2‹PC, FCC› | ModelCreationType2‹PD, FCD› | ModelCreationType2‹PE, FCE› | ModelCreationType2‹PF, FCF› | ModelCreationType2‹PG, FCG›, ModelSnapshotType2‹PA, FSA› | ModelSnapshotType2‹PB, FSB› | ModelSnapshotType2‹PC, FSC› | ModelSnapshotType2‹PD, FSD› | ModelSnapshotType2‹PE, FSE› | ModelSnapshotType2‹PF, FSF› | ModelSnapshotType2‹PG, FSG›, ModelInstanceType‹PA, OA› | ModelInstanceType‹PB, OB› | ModelInstanceType‹PC, OC› | ModelInstanceType‹PD, OD› | ModelInstanceType‹PE, OE› | ModelInstanceType‹PF, OF› | ModelInstanceType‹PG, OG››*
 
-*Defined in [types/utility-types/union.ts:187](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L187)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:189](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L189)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -5032,7 +5123,7 @@ Name | Type |
 
 ▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**, **PH**, **OH**, **FCH**, **FSH**>(`A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›, `E`: [IModelType](interfaces/imodeltype.md)‹PE, OE, FCE, FSE›, `F`: [IModelType](interfaces/imodeltype.md)‹PF, OF, FCF, FSF›, `G`: [IModelType](interfaces/imodeltype.md)‹PG, OG, FCG, FSG›, `H`: [IModelType](interfaces/imodeltype.md)‹PH, OH, FCH, FSH›): *ITypeUnion‹ModelCreationType2‹PA, FCA› | ModelCreationType2‹PB, FCB› | ModelCreationType2‹PC, FCC› | ModelCreationType2‹PD, FCD› | ModelCreationType2‹PE, FCE› | ModelCreationType2‹PF, FCF› | ModelCreationType2‹PG, FCG› | ModelCreationType2‹PH, FCH›, ModelSnapshotType2‹PA, FSA› | ModelSnapshotType2‹PB, FSB› | ModelSnapshotType2‹PC, FSC› | ModelSnapshotType2‹PD, FSD› | ModelSnapshotType2‹PE, FSE› | ModelSnapshotType2‹PF, FSF› | ModelSnapshotType2‹PG, FSG› | ModelSnapshotType2‹PH, FSH›, ModelInstanceType‹PA, OA› | ModelInstanceType‹PB, OB› | ModelInstanceType‹PC, OC› | ModelInstanceType‹PD, OD› | ModelInstanceType‹PE, OE› | ModelInstanceType‹PF, OF› | ModelInstanceType‹PG, OG› | ModelInstanceType‹PH, OH››*
 
-*Defined in [types/utility-types/union.ts:191](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L191)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:193](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L193)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -5119,7 +5210,7 @@ Name | Type |
 
 ▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**, **PH**, **OH**, **FCH**, **FSH**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›, `E`: [IModelType](interfaces/imodeltype.md)‹PE, OE, FCE, FSE›, `F`: [IModelType](interfaces/imodeltype.md)‹PF, OF, FCF, FSF›, `G`: [IModelType](interfaces/imodeltype.md)‹PG, OG, FCG, FSG›, `H`: [IModelType](interfaces/imodeltype.md)‹PH, OH, FCH, FSH›): *ITypeUnion‹ModelCreationType2‹PA, FCA› | ModelCreationType2‹PB, FCB› | ModelCreationType2‹PC, FCC› | ModelCreationType2‹PD, FCD› | ModelCreationType2‹PE, FCE› | ModelCreationType2‹PF, FCF› | ModelCreationType2‹PG, FCG› | ModelCreationType2‹PH, FCH›, ModelSnapshotType2‹PA, FSA› | ModelSnapshotType2‹PB, FSB› | ModelSnapshotType2‹PC, FSC› | ModelSnapshotType2‹PD, FSD› | ModelSnapshotType2‹PE, FSE› | ModelSnapshotType2‹PF, FSF› | ModelSnapshotType2‹PG, FSG› | ModelSnapshotType2‹PH, FSH›, ModelInstanceType‹PA, OA› | ModelInstanceType‹PB, OB› | ModelInstanceType‹PC, OC› | ModelInstanceType‹PD, OD› | ModelInstanceType‹PE, OE› | ModelInstanceType‹PF, OF› | ModelInstanceType‹PG, OG› | ModelInstanceType‹PH, OH››*
 
-*Defined in [types/utility-types/union.ts:194](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L194)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:196](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L196)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -5207,7 +5298,7 @@ Name | Type |
 
 ▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**, **PH**, **OH**, **FCH**, **FSH**, **PI**, **OI**, **FCI**, **FSI**>(`A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›, `E`: [IModelType](interfaces/imodeltype.md)‹PE, OE, FCE, FSE›, `F`: [IModelType](interfaces/imodeltype.md)‹PF, OF, FCF, FSF›, `G`: [IModelType](interfaces/imodeltype.md)‹PG, OG, FCG, FSG›, `H`: [IModelType](interfaces/imodeltype.md)‹PH, OH, FCH, FSH›, `I`: [IModelType](interfaces/imodeltype.md)‹PI, OI, FCI, FSI›): *ITypeUnion‹ModelCreationType2‹PA, FCA› | ModelCreationType2‹PB, FCB› | ModelCreationType2‹PC, FCC› | ModelCreationType2‹PD, FCD› | ModelCreationType2‹PE, FCE› | ModelCreationType2‹PF, FCF› | ModelCreationType2‹PG, FCG› | ModelCreationType2‹PH, FCH› | ModelCreationType2‹PI, FCI›, ModelSnapshotType2‹PA, FSA› | ModelSnapshotType2‹PB, FSB› | ModelSnapshotType2‹PC, FSC› | ModelSnapshotType2‹PD, FSD› | ModelSnapshotType2‹PE, FSE› | ModelSnapshotType2‹PF, FSF› | ModelSnapshotType2‹PG, FSG› | ModelSnapshotType2‹PH, FSH› | ModelSnapshotType2‹PI, FSI›, ModelInstanceType‹PA, OA› | ModelInstanceType‹PB, OB› | ModelInstanceType‹PC, OC› | ModelInstanceType‹PD, OD› | ModelInstanceType‹PE, OE› | ModelInstanceType‹PF, OF› | ModelInstanceType‹PG, OG› | ModelInstanceType‹PH, OH› | ModelInstanceType‹PI, OI››*
 
-*Defined in [types/utility-types/union.ts:198](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L198)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:200](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L200)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -5303,7 +5394,7 @@ Name | Type |
 
 ▸ **union**<**PA**, **OA**, **FCA**, **FSA**, **PB**, **OB**, **FCB**, **FSB**, **PC**, **OC**, **FCC**, **FSC**, **PD**, **OD**, **FCD**, **FSD**, **PE**, **OE**, **FCE**, **FSE**, **PF**, **OF**, **FCF**, **FSF**, **PG**, **OG**, **FCG**, **FSG**, **PH**, **OH**, **FCH**, **FSH**, **PI**, **OI**, **FCI**, **FSI**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IModelType](interfaces/imodeltype.md)‹PA, OA, FCA, FSA›, `B`: [IModelType](interfaces/imodeltype.md)‹PB, OB, FCB, FSB›, `C`: [IModelType](interfaces/imodeltype.md)‹PC, OC, FCC, FSC›, `D`: [IModelType](interfaces/imodeltype.md)‹PD, OD, FCD, FSD›, `E`: [IModelType](interfaces/imodeltype.md)‹PE, OE, FCE, FSE›, `F`: [IModelType](interfaces/imodeltype.md)‹PF, OF, FCF, FSF›, `G`: [IModelType](interfaces/imodeltype.md)‹PG, OG, FCG, FSG›, `H`: [IModelType](interfaces/imodeltype.md)‹PH, OH, FCH, FSH›, `I`: [IModelType](interfaces/imodeltype.md)‹PI, OI, FCI, FSI›): *ITypeUnion‹ModelCreationType2‹PA, FCA› | ModelCreationType2‹PB, FCB› | ModelCreationType2‹PC, FCC› | ModelCreationType2‹PD, FCD› | ModelCreationType2‹PE, FCE› | ModelCreationType2‹PF, FCF› | ModelCreationType2‹PG, FCG› | ModelCreationType2‹PH, FCH› | ModelCreationType2‹PI, FCI›, ModelSnapshotType2‹PA, FSA› | ModelSnapshotType2‹PB, FSB› | ModelSnapshotType2‹PC, FSC› | ModelSnapshotType2‹PD, FSD› | ModelSnapshotType2‹PE, FSE› | ModelSnapshotType2‹PF, FSF› | ModelSnapshotType2‹PG, FSG› | ModelSnapshotType2‹PH, FSH› | ModelSnapshotType2‹PI, FSI›, ModelInstanceType‹PA, OA› | ModelInstanceType‹PB, OB› | ModelInstanceType‹PC, OC› | ModelInstanceType‹PD, OD› | ModelInstanceType‹PE, OE› | ModelInstanceType‹PF, OF› | ModelInstanceType‹PG, OG› | ModelInstanceType‹PH, OH› | ModelInstanceType‹PI, OI››*
 
-*Defined in [types/utility-types/union.ts:201](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L201)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:203](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L203)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -5400,7 +5491,7 @@ Name | Type |
 
 ▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**>(`A`: [IType](interfaces/itype.md)‹CA, SA, TA›, `B`: [IType](interfaces/itype.md)‹CB, SB, TB›): *ITypeUnion‹CA | CB, SA | SB, TA | TB›*
 
-*Defined in [types/utility-types/union.ts:205](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L205)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:207](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L207)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -5429,7 +5520,7 @@ Name | Type |
 
 ▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IType](interfaces/itype.md)‹CA, SA, TA›, `B`: [IType](interfaces/itype.md)‹CB, SB, TB›): *ITypeUnion‹CA | CB, SA | SB, TA | TB›*
 
-*Defined in [types/utility-types/union.ts:207](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L207)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:209](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L209)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -5459,7 +5550,7 @@ Name | Type |
 
 ▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**>(`A`: [IType](interfaces/itype.md)‹CA, SA, TA›, `B`: [IType](interfaces/itype.md)‹CB, SB, TB›, `C`: [IType](interfaces/itype.md)‹CC, SC, TC›): *ITypeUnion‹CA | CB | CC, SA | SB | SC, TA | TB | TC›*
 
-*Defined in [types/utility-types/union.ts:209](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L209)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:211](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L211)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -5495,7 +5586,7 @@ Name | Type |
 
 ▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IType](interfaces/itype.md)‹CA, SA, TA›, `B`: [IType](interfaces/itype.md)‹CB, SB, TB›, `C`: [IType](interfaces/itype.md)‹CC, SC, TC›): *ITypeUnion‹CA | CB | CC, SA | SB | SC, TA | TB | TC›*
 
-*Defined in [types/utility-types/union.ts:211](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L211)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:213](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L213)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -5532,7 +5623,7 @@ Name | Type |
 
 ▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**>(`A`: [IType](interfaces/itype.md)‹CA, SA, TA›, `B`: [IType](interfaces/itype.md)‹CB, SB, TB›, `C`: [IType](interfaces/itype.md)‹CC, SC, TC›, `D`: [IType](interfaces/itype.md)‹CD, SD, TD›): *ITypeUnion‹CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD›*
 
-*Defined in [types/utility-types/union.ts:213](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L213)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:215](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L215)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -5575,7 +5666,7 @@ Name | Type |
 
 ▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IType](interfaces/itype.md)‹CA, SA, TA›, `B`: [IType](interfaces/itype.md)‹CB, SB, TB›, `C`: [IType](interfaces/itype.md)‹CC, SC, TC›, `D`: [IType](interfaces/itype.md)‹CD, SD, TD›): *ITypeUnion‹CA | CB | CC | CD, SA | SB | SC | SD, TA | TB | TC | TD›*
 
-*Defined in [types/utility-types/union.ts:216](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L216)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:218](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L218)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -5619,7 +5710,7 @@ Name | Type |
 
 ▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**, **CE**, **SE**, **TE**>(`A`: [IType](interfaces/itype.md)‹CA, SA, TA›, `B`: [IType](interfaces/itype.md)‹CB, SB, TB›, `C`: [IType](interfaces/itype.md)‹CC, SC, TC›, `D`: [IType](interfaces/itype.md)‹CD, SD, TD›, `E`: [IType](interfaces/itype.md)‹CE, SE, TE›): *ITypeUnion‹CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE›*
 
-*Defined in [types/utility-types/union.ts:218](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L218)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:220](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L220)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -5669,7 +5760,7 @@ Name | Type |
 
 ▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**, **CE**, **SE**, **TE**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IType](interfaces/itype.md)‹CA, SA, TA›, `B`: [IType](interfaces/itype.md)‹CB, SB, TB›, `C`: [IType](interfaces/itype.md)‹CC, SC, TC›, `D`: [IType](interfaces/itype.md)‹CD, SD, TD›, `E`: [IType](interfaces/itype.md)‹CE, SE, TE›): *ITypeUnion‹CA | CB | CC | CD | CE, SA | SB | SC | SD | SE, TA | TB | TC | TD | TE›*
 
-*Defined in [types/utility-types/union.ts:220](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L220)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:222](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L222)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -5720,7 +5811,7 @@ Name | Type |
 
 ▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**, **CE**, **SE**, **TE**, **CF**, **SF**, **TF**>(`A`: [IType](interfaces/itype.md)‹CA, SA, TA›, `B`: [IType](interfaces/itype.md)‹CB, SB, TB›, `C`: [IType](interfaces/itype.md)‹CC, SC, TC›, `D`: [IType](interfaces/itype.md)‹CD, SD, TD›, `E`: [IType](interfaces/itype.md)‹CE, SE, TE›, `F`: [IType](interfaces/itype.md)‹CF, SF, TF›): *ITypeUnion‹CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF›*
 
-*Defined in [types/utility-types/union.ts:222](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L222)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:224](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L224)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -5777,7 +5868,7 @@ Name | Type |
 
 ▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**, **CE**, **SE**, **TE**, **CF**, **SF**, **TF**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IType](interfaces/itype.md)‹CA, SA, TA›, `B`: [IType](interfaces/itype.md)‹CB, SB, TB›, `C`: [IType](interfaces/itype.md)‹CC, SC, TC›, `D`: [IType](interfaces/itype.md)‹CD, SD, TD›, `E`: [IType](interfaces/itype.md)‹CE, SE, TE›, `F`: [IType](interfaces/itype.md)‹CF, SF, TF›): *ITypeUnion‹CA | CB | CC | CD | CE | CF, SA | SB | SC | SD | SE | SF, TA | TB | TC | TD | TE | TF›*
 
-*Defined in [types/utility-types/union.ts:224](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L224)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:226](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L226)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -5835,7 +5926,7 @@ Name | Type |
 
 ▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**, **CE**, **SE**, **TE**, **CF**, **SF**, **TF**, **CG**, **SG**, **TG**>(`A`: [IType](interfaces/itype.md)‹CA, SA, TA›, `B`: [IType](interfaces/itype.md)‹CB, SB, TB›, `C`: [IType](interfaces/itype.md)‹CC, SC, TC›, `D`: [IType](interfaces/itype.md)‹CD, SD, TD›, `E`: [IType](interfaces/itype.md)‹CE, SE, TE›, `F`: [IType](interfaces/itype.md)‹CF, SF, TF›, `G`: [IType](interfaces/itype.md)‹CG, SG, TG›): *ITypeUnion‹CA | CB | CC | CD | CE | CF | CG, SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG›*
 
-*Defined in [types/utility-types/union.ts:226](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L226)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:228](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L228)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -5899,7 +5990,7 @@ Name | Type |
 
 ▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**, **CE**, **SE**, **TE**, **CF**, **SF**, **TF**, **CG**, **SG**, **TG**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IType](interfaces/itype.md)‹CA, SA, TA›, `B`: [IType](interfaces/itype.md)‹CB, SB, TB›, `C`: [IType](interfaces/itype.md)‹CC, SC, TC›, `D`: [IType](interfaces/itype.md)‹CD, SD, TD›, `E`: [IType](interfaces/itype.md)‹CE, SE, TE›, `F`: [IType](interfaces/itype.md)‹CF, SF, TF›, `G`: [IType](interfaces/itype.md)‹CG, SG, TG›): *ITypeUnion‹CA | CB | CC | CD | CE | CF | CG, SA | SB | SC | SD | SE | SF | SG, TA | TB | TC | TD | TE | TF | TG›*
 
-*Defined in [types/utility-types/union.ts:229](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L229)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:231](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L231)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -5964,7 +6055,7 @@ Name | Type |
 
 ▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**, **CE**, **SE**, **TE**, **CF**, **SF**, **TF**, **CG**, **SG**, **TG**, **CH**, **SH**, **TH**>(`A`: [IType](interfaces/itype.md)‹CA, SA, TA›, `B`: [IType](interfaces/itype.md)‹CB, SB, TB›, `C`: [IType](interfaces/itype.md)‹CC, SC, TC›, `D`: [IType](interfaces/itype.md)‹CD, SD, TD›, `E`: [IType](interfaces/itype.md)‹CE, SE, TE›, `F`: [IType](interfaces/itype.md)‹CF, SF, TF›, `G`: [IType](interfaces/itype.md)‹CG, SG, TG›, `H`: [IType](interfaces/itype.md)‹CH, SH, TH›): *ITypeUnion‹CA | CB | CC | CD | CE | CF | CG | CH, SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH›*
 
-*Defined in [types/utility-types/union.ts:231](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L231)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:233](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L233)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -6035,7 +6126,7 @@ Name | Type |
 
 ▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**, **CE**, **SE**, **TE**, **CF**, **SF**, **TF**, **CG**, **SG**, **TG**, **CH**, **SH**, **TH**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IType](interfaces/itype.md)‹CA, SA, TA›, `B`: [IType](interfaces/itype.md)‹CB, SB, TB›, `C`: [IType](interfaces/itype.md)‹CC, SC, TC›, `D`: [IType](interfaces/itype.md)‹CD, SD, TD›, `E`: [IType](interfaces/itype.md)‹CE, SE, TE›, `F`: [IType](interfaces/itype.md)‹CF, SF, TF›, `G`: [IType](interfaces/itype.md)‹CG, SG, TG›, `H`: [IType](interfaces/itype.md)‹CH, SH, TH›): *ITypeUnion‹CA | CB | CC | CD | CE | CF | CG | CH, SA | SB | SC | SD | SE | SF | SG | SH, TA | TB | TC | TD | TE | TF | TG | TH›*
 
-*Defined in [types/utility-types/union.ts:234](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L234)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:236](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L236)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -6107,7 +6198,7 @@ Name | Type |
 
 ▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**, **CE**, **SE**, **TE**, **CF**, **SF**, **TF**, **CG**, **SG**, **TG**, **CH**, **SH**, **TH**, **CI**, **SI**, **TI**>(`A`: [IType](interfaces/itype.md)‹CA, SA, TA›, `B`: [IType](interfaces/itype.md)‹CB, SB, TB›, `C`: [IType](interfaces/itype.md)‹CC, SC, TC›, `D`: [IType](interfaces/itype.md)‹CD, SD, TD›, `E`: [IType](interfaces/itype.md)‹CE, SE, TE›, `F`: [IType](interfaces/itype.md)‹CF, SF, TF›, `G`: [IType](interfaces/itype.md)‹CG, SG, TG›, `H`: [IType](interfaces/itype.md)‹CH, SH, TH›, `I`: [IType](interfaces/itype.md)‹CI, SI, TI›): *ITypeUnion‹CA | CB | CC | CD | CE | CF | CG | CH | CI, SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI›*
 
-*Defined in [types/utility-types/union.ts:237](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L237)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:239](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L239)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -6185,7 +6276,7 @@ Name | Type |
 
 ▸ **union**<**CA**, **SA**, **TA**, **CB**, **SB**, **TB**, **CC**, **SC**, **TC**, **CD**, **SD**, **TD**, **CE**, **SE**, **TE**, **CF**, **SF**, **TF**, **CG**, **SG**, **TG**, **CH**, **SH**, **TH**, **CI**, **SI**, **TI**>(`options`: [UnionOptions](interfaces/unionoptions.md), `A`: [IType](interfaces/itype.md)‹CA, SA, TA›, `B`: [IType](interfaces/itype.md)‹CB, SB, TB›, `C`: [IType](interfaces/itype.md)‹CC, SC, TC›, `D`: [IType](interfaces/itype.md)‹CD, SD, TD›, `E`: [IType](interfaces/itype.md)‹CE, SE, TE›, `F`: [IType](interfaces/itype.md)‹CF, SF, TF›, `G`: [IType](interfaces/itype.md)‹CG, SG, TG›, `H`: [IType](interfaces/itype.md)‹CH, SH, TH›, `I`: [IType](interfaces/itype.md)‹CI, SI, TI›): *ITypeUnion‹CA | CB | CC | CD | CE | CF | CG | CH | CI, SA | SB | SC | SD | SE | SF | SG | SH | SI, TA | TB | TC | TD | TE | TF | TG | TH | TI›*
 
-*Defined in [types/utility-types/union.ts:240](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L240)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:242](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L242)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -6264,7 +6355,7 @@ Name | Type |
 
 ▸ **union**(...`types`: [IAnyType](interfaces/ianytype.md)[]): *[IAnyType](interfaces/ianytype.md)*
 
-*Defined in [types/utility-types/union.ts:243](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L243)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:245](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L245)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -6278,7 +6369,7 @@ Name | Type |
 
 ▸ **union**(`dispatchOrType`: [UnionOptions](interfaces/unionoptions.md) | [IAnyType](interfaces/ianytype.md), ...`otherTypes`: [IAnyType](interfaces/ianytype.md)[]): *[IAnyType](interfaces/ianytype.md)*
 
-*Defined in [types/utility-types/union.ts:244](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/utility-types/union.ts#L244)*
+*Defined in [packages/mobx-state-tree/src/types/utility-types/union.ts:246](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/utility-types/union.ts#L246)*
 
 `types.union` - Create a union of multiple types. If the correct type cannot be inferred unambiguously from a snapshot, provide a dispatcher function of the form `(snapshot) => Type`.
 
@@ -6297,7 +6388,7 @@ ___
 
 ▸ **unprotect**(`target`: IAnyStateTreeNode): *void*
 
-*Defined in [core/mst-operations.ts:300](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L300)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:300](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L300)*
 
 By default it is not allowed to directly modify a model. Models can only be modified through actions.
 However, in some cases you don't care about the advantages (like replayability, traceability, etc) this yields.
@@ -6336,7 +6427,7 @@ ___
 
 ▸ **walk**(`target`: IAnyStateTreeNode, `processor`: function): *void*
 
-*Defined in [core/mst-operations.ts:788](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/core/mst-operations.ts#L788)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:788](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L788)*
 
 Performs a depth first walk through a tree.
 
@@ -6362,160 +6453,160 @@ Name | Type |
 
 ### ▪ **types**: *object*
 
-*Defined in [types/index.ts:31](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L31)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:31](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L31)*
 
 ###  Date
 
 • **Date**: *[IType](interfaces/itype.md)‹number | Date, number, Date›* =  DatePrimitive
 
-*Defined in [types/index.ts:48](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L48)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:48](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L48)*
 
 ###  array
 
 • **array**: *[array](index.md#array)*
 
-*Defined in [types/index.ts:50](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L50)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:50](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L50)*
 
 ###  boolean
 
 • **boolean**: *[ISimpleType](interfaces/isimpletype.md)‹boolean›*
 
-*Defined in [types/index.ts:45](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L45)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:45](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L45)*
 
 ###  compose
 
 • **compose**: *[compose](index.md#compose)*
 
-*Defined in [types/index.ts:34](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L34)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:34](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L34)*
 
 ###  custom
 
 • **custom**: *[custom](index.md#custom)*
 
-*Defined in [types/index.ts:35](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L35)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:35](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L35)*
 
 ###  enumeration
 
 • **enumeration**: *[enumeration](index.md#enumeration)*
 
-*Defined in [types/index.ts:32](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L32)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:32](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L32)*
 
 ###  frozen
 
 • **frozen**: *[frozen](index.md#frozen)*
 
-*Defined in [types/index.ts:51](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L51)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:51](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L51)*
 
 ###  identifier
 
 • **identifier**: *[ISimpleType](interfaces/isimpletype.md)‹string›*
 
-*Defined in [types/index.ts:52](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L52)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:52](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L52)*
 
 ###  identifierNumber
 
 • **identifierNumber**: *[ISimpleType](interfaces/isimpletype.md)‹number›*
 
-*Defined in [types/index.ts:53](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L53)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:53](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L53)*
 
 ###  integer
 
 • **integer**: *[ISimpleType](interfaces/isimpletype.md)‹number›*
 
-*Defined in [types/index.ts:47](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L47)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:47](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L47)*
 
 ###  late
 
 • **late**: *[late](index.md#late)*
 
-*Defined in [types/index.ts:54](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L54)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:54](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L54)*
 
 ###  literal
 
 • **literal**: *[literal](index.md#literal)*
 
-*Defined in [types/index.ts:40](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L40)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:40](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L40)*
 
 ###  map
 
 • **map**: *[map](index.md#map)*
 
-*Defined in [types/index.ts:49](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L49)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:49](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L49)*
 
 ###  maybe
 
 • **maybe**: *[maybe](index.md#maybe)*
 
-*Defined in [types/index.ts:41](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L41)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:41](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L41)*
 
 ###  maybeNull
 
 • **maybeNull**: *[maybeNull](index.md#maybenull)*
 
-*Defined in [types/index.ts:42](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L42)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:42](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L42)*
 
 ###  model
 
 • **model**: *[model](index.md#model)*
 
-*Defined in [types/index.ts:33](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L33)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:33](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L33)*
 
 ###  null
 
 • **null**: *[ISimpleType](interfaces/isimpletype.md)‹null›* =  nullType
 
-*Defined in [types/index.ts:56](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L56)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:56](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L56)*
 
 ###  number
 
 • **number**: *[ISimpleType](interfaces/isimpletype.md)‹number›*
 
-*Defined in [types/index.ts:46](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L46)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:46](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L46)*
 
 ###  optional
 
 • **optional**: *[optional](index.md#optional)*
 
-*Defined in [types/index.ts:39](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L39)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:39](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L39)*
 
 ###  reference
 
 • **reference**: *[reference](index.md#reference)*
 
-*Defined in [types/index.ts:36](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L36)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:36](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L36)*
 
 ###  refinement
 
 • **refinement**: *[refinement](index.md#refinement)*
 
-*Defined in [types/index.ts:43](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L43)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:43](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L43)*
 
 ###  safeReference
 
 • **safeReference**: *[safeReference](index.md#safereference)*
 
-*Defined in [types/index.ts:37](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L37)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:37](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L37)*
 
 ###  snapshotProcessor
 
 • **snapshotProcessor**: *[snapshotProcessor](index.md#snapshotprocessor)*
 
-*Defined in [types/index.ts:57](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L57)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:57](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L57)*
 
 ###  string
 
 • **string**: *[ISimpleType](interfaces/isimpletype.md)‹string›*
 
-*Defined in [types/index.ts:44](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L44)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:44](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L44)*
 
 ###  undefined
 
 • **undefined**: *[ISimpleType](interfaces/isimpletype.md)‹undefined›* =  undefinedType
 
-*Defined in [types/index.ts:55](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L55)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:55](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L55)*
 
 ###  union
 
 • **union**: *[union](index.md#union)*
 
-*Defined in [types/index.ts:38](https://github.com/mobxjs/mobx-state-tree/blob/19012c2c/packages/mobx-state-tree/src/types/index.ts#L38)*
+*Defined in [packages/mobx-state-tree/src/types/index.ts:38](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/types/index.ts#L38)*

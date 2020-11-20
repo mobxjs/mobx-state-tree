@@ -16,7 +16,7 @@ test("it logs", () => {
         .model({
             title: ""
         })
-        .actions(self => ({
+        .actions((self) => ({
             helper() {},
             setTitle(newTitle: string) {
                 ;(self as any).helper() // should not be logged
@@ -44,13 +44,13 @@ test("it logs flows", async () => {
         .model({
             title: ""
         })
-        .actions(self => ({
+        .actions((self) => ({
             helper() {},
             helper2: flow(function* helper2() {
                 return Promise.resolve(3)
             })
         }))
-        .actions(self => ({
+        .actions((self) => ({
             setTitle: flow(function* setTitle(newTitle: string) {
                 self.helper() // should not be logged
                 yield self.helper2() // should be logged

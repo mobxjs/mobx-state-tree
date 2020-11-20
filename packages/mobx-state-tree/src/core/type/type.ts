@@ -1,4 +1,4 @@
-import { action } from "mobx"
+import { action, makeObservable } from "mobx"
 
 import {
     fail,
@@ -65,7 +65,7 @@ export const cannotDetermineSubtype = "cannotDetermine"
 export type STNValue<T, IT extends IAnyType> = T extends object ? T & IStateTreeNode<IT> : T
 
 /** @hidden */
-declare const $type: unique symbol
+const $type: unique symbol = Symbol("$type")
 
 /**
  * A type, either complex or simple.
@@ -292,6 +292,7 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
     readonly name: string
 
     constructor(name: string) {
+        makeObservable(this)
         this.name = name
     }
 
@@ -315,7 +316,7 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
         initialValue: C | T
     ): N
 
-    abstract flags: TypeFlags
+    declare abstract flags: TypeFlags
     abstract describe(): string
 
     abstract isValidSnapshot(value: C, context: IValidationContext): IValidationResult

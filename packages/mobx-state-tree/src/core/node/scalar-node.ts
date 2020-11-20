@@ -8,7 +8,7 @@ import {
     SimpleType,
     devMode
 } from "../../internal"
-import { action } from "mobx"
+import { action, makeObservable } from "mobx"
 
 /**
  * @internal
@@ -21,7 +21,7 @@ export class ScalarNode<C, S, T> extends BaseNode<C, S, T> {
     // - afterCreationFinalization could be emitted, but there's no need for it right now
     // - beforeDetach is never emitted for scalar nodes, since they cannot be detached
 
-    readonly type!: SimpleType<C, S, T>
+    declare readonly type: SimpleType<C, S, T>
 
     constructor(
         simpleType: SimpleType<C, S, T>,
@@ -31,6 +31,7 @@ export class ScalarNode<C, S, T> extends BaseNode<C, S, T> {
         initialSnapshot: C
     ) {
         super(simpleType, parent, subpath, environment)
+        makeObservable(this)
 
         try {
             this.storedValue = simpleType.createNewInstance(initialSnapshot)

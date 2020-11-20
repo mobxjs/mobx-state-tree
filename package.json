@@ -15,7 +15,7 @@
         "release": "yarn build && lerna publish",
         "tag-new-version": "lerna version",
         "yarn-deduplicate": "yarn-deduplicate -s fewer yarn.lock",
-        "publish-docs": "cd packages/mobx-state-tree && yarn build-docs && cd ../../website && GIT_USER=mweststrate USE_SSH=true yarn run publish-gh-pages",
+        "publish-docs": "cd packages/mobx-state-tree && yarn build-docs && cd ../../website && GIT_USER=jamonholmgren USE_SSH=true yarn run publish-gh-pages",
         "start": "cd website && yarn start"
     },
     "workspaces": [
@@ -24,22 +24,21 @@
     ],
     "lint-staged": {
         "*.{ts,tsx,js,jsx}": [
-            "prettier --write",
-            "git add"
+            "prettier --write"
         ]
     },
     "devDependencies": {
-        "@size-limit/preset-big-lib": "^2.1.6",
-        "cross-env": "^6.0.3",
-        "husky": "^3.0.1",
-        "lerna": "^3.13.1",
-        "lint-staged": "^9.2.0",
-        "prettier": "^1.16.4",
-        "size-limit": "^2.1.6",
-        "tslint": "^5.14.0",
+        "@size-limit/preset-big-lib": "^4.5.2",
+        "cross-env": "^7.0.2",
+        "husky": "^4.2.5",
+        "lerna": "^3.22.1",
+        "lint-staged": "^10.2.11",
+        "prettier": "^2.0.5",
+        "size-limit": "^4.5.2",
+        "tslint": "^6.1.2",
         "tslint-config-prettier": "^1.18.0",
-        "typescript": "^3.5.3",
-        "yarn-deduplicate": "^1.1.1"
+        "typescript": "^3.9.5",
+        "yarn-deduplicate": "^2.0.0"
     },
     "husky": {
         "hooks": {

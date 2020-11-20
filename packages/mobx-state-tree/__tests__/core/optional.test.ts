@@ -44,7 +44,10 @@ if (process.env.NODE_ENV !== "production") {
         })
         const RowList = types.optional(types.array(Row), [])
         const error = expect(() => {
-            RowList.create([{ name: "a", quantity: 1 }, { name: "b", quantity: "x" }] as any)
+            RowList.create([
+                { name: "a", quantity: 1 },
+                { name: "b", quantity: "x" }
+            ] as any)
         }).toThrow()
     })
 }

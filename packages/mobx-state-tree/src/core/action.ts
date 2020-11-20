@@ -116,7 +116,7 @@ export function createActionInvoker<T extends Function>(
     name: string,
     fn: T
 ) {
-    const res = function() {
+    const res = function () {
         const id = getNextActionId()
         const parentContext = currentActionContext
         const parentActionContext = getParentActionContext(parentContext)
@@ -289,16 +289,12 @@ function runMiddleWares(
             if (!nextInvoked && !abortInvoked) {
                 const node2 = getStateTreeNode(call.tree)
                 throw fail(
-                    `Neither the next() nor the abort() callback within the middleware ${
-                        handler.name
-                    } for the action: "${call.name}" on the node: ${node2.type.name} was invoked.`
+                    `Neither the next() nor the abort() callback within the middleware ${handler.name} for the action: "${call.name}" on the node: ${node2.type.name} was invoked.`
                 )
             } else if (nextInvoked && abortInvoked) {
                 const node2 = getStateTreeNode(call.tree)
                 throw fail(
-                    `The next() and abort() callback within the middleware ${
-                        handler.name
-                    } for the action: "${call.name}" on the node: ${node2.type.name} were invoked.`
+                    `The next() and abort() callback within the middleware ${handler.name} for the action: "${call.name}" on the node: ${node2.type.name} were invoked.`
                 )
             }
         }

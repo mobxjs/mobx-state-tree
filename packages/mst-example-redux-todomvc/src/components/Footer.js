@@ -61,7 +61,7 @@ export default class Footer extends Component {
             <footer className="footer">
                 {this.renderTodoCount()}
                 <ul className="filters">
-                    {[SHOW_ALL, SHOW_ACTIVE, SHOW_COMPLETED].map(filter => (
+                    {[SHOW_ALL, SHOW_ACTIVE, SHOW_COMPLETED].map((filter) => (
                         <li key={filter}>{this.renderFilterLink(filter)}</li>
                     ))}
                 </ul>

@@ -3,10 +3,12 @@ version: 2.1
 executors:
     my-executor:
         docker:
-            - image: circleci/node:11
+            - image: circleci/node:12
               environment:
                   CI: true
-        working_directory: ~/mobx-state-tree
+
+orbs:
+    node: circleci/node@4.0.1
 
 jobs:
     # mobx-state-tree and mst-middlewares build
@@ -15,29 +17,8 @@ jobs:
         steps:
             - checkout
 
-            - restore_cache:
-                  name: restore .cache/yarn
-                  keys:
-                      - yarn-cache-{{ arch }}
-            - restore_cache:
-                  name: restore node_modules
-                  keys:
-                      - node-modules-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
-                      - node-modules-{{ arch }}-{{ .Branch }}
-                      - node-modules-{{ arch }}
-
-            - run: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
-
-            - save_cache:
-                  name: cache .cache/yarn
-                  key: yarn-cache-{{ arch }}
-                  paths:
-                      - ~/.cache/yarn
-            - save_cache:
-                  name: cache node_modules
-                  key: node-modules-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
-                  paths:
-                      - node_modules
+            - node/install-packages:
+                pkg-manager: yarn
 
             - run: yarn build
 

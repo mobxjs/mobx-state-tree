@@ -1,3 +1,23 @@
+# 4.0.0
+
+[BREAKING CHANGE] MST 4.0 requires MobX 6
+
+# 3.17.3
+
+Add onValidated support to safeReference [#1540 by @orlovcs](https://github.com/mobxjs/mobx-state-tree/pull/1540)
+
+# 3.17.2
+
+Fix incorrect access to global `fail` symbol [#1549](https://github.com/mobxjs/mobx-state-tree/pull/1549)
+
+# 3.17.1
+
+Re-release 3.17.0
+
+# 3.17.0
+
+* Added experimental helpers toGenerator and toGeneratorFunction. [#1543](https://github.com/mobxjs/mobx-state-tree/pull/1543) by [@fruitraccoon](https://github.com/fruitraccoon)
+
 # 3.16.0
 
 * Added search field to the docs

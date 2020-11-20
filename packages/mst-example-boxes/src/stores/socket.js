@@ -11,11 +11,11 @@ import {
 let subscription
 export default function syncStoreWithBackend(socket, store) {
     // === SYNC PATCHES (recommended)
-    subscription = onPatch(store, data => {
+    subscription = onPatch(store, (data) => {
         socketSend(data)
     })
 
-    onSocketMessage(data => {
+    onSocketMessage((data) => {
         applyPatch(store, data)
     })
 
@@ -43,7 +43,7 @@ export default function syncStoreWithBackend(socket, store) {
     }
 
     function onSocketMessage(handler) {
-        socket.onmessage = event => {
+        socket.onmessage = (event) => {
             isHandlingMessage = true
             handler(JSON.parse(event.data))
             isHandlingMessage = false
@@ -55,7 +55,7 @@ export default function syncStoreWithBackend(socket, store) {
  * Clean up old subscription when switching communication system
  */
 if (module.hot) {
-    module.hot.dispose(data => {
+    module.hot.dispose((data) => {
         subscription()
     })
 }

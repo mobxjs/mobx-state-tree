@@ -3,7 +3,7 @@ import ShallowRenderer from "react-test-renderer/shallow"
 import Footer from "./Footer"
 import { SHOW_ALL, SHOW_ACTIVE } from "../constants/TodoFilters"
 
-const setup = propOverrides => {
+const setup = (propOverrides) => {
     const props = Object.assign(
         {
             completedCount: 0,
@@ -25,7 +25,7 @@ const setup = propOverrides => {
     }
 }
 
-const getTextContent = elem => {
+const getTextContent = (elem) => {
     const children = Array.isArray(elem.props.children)
         ? elem.props.children
         : [elem.props.children]

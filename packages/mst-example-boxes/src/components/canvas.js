@@ -1,7 +1,6 @@
 import React, { Component } from "react"
 import { values } from "mobx"
 import { observer } from "mobx-react"
-import DevTools from "mobx-react-devtools"
 
 import BoxView from "./box-view"
 import ArrowView from "./arrow-view"
@@ -15,20 +14,21 @@ class Canvas extends Component {
             <div className="app">
                 <div className="canvas" onClick={this.onCanvasClick}>
                     <svg>
-                        {store.arrows.map(arrow => <ArrowView arrow={arrow} key={arrow.id} />)}
+                        {store.arrows.map((arrow) => (
+                            <ArrowView arrow={arrow} key={arrow.id} />
+                        ))}
                     </svg>
-                    {values(store.boxes).map(box => (
+                    {values(store.boxes).map((box) => (
                         <BoxView box={box} store={store} key={box.id} />
                     ))}
                 </div>
                 <Sidebar store={store} />
                 <FunStuff />
-                <DevTools />
             </div>
         )
     }
 
-    onCanvasClick = e => {
+    onCanvasClick = (e) => {
         const { store } = this.props
         if (e.ctrlKey === false) {
             store.setSelection(null)

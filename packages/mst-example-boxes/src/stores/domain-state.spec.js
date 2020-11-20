@@ -13,6 +13,9 @@ test("it should be able to move boxes - 1", () => {
 
 test("it should be able to move boxes - 2", () => {
     const box = Box.create({ x: 100, y: 100, id: "1", name: "test" })
-    applyAction(box, [{ name: "move", args: [5, 5] }, { name: "move", args: [3, 2] }])
+    applyAction(box, [
+        { name: "move", args: [5, 5] },
+        { name: "move", args: [3, 2] }
+    ])
     expect(box.toJSON()).toMatchSnapshot()
 })

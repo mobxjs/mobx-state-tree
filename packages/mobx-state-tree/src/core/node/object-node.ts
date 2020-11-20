@@ -1,5 +1,5 @@
 // noinspection ES6UnusedImports
-import { action, computed, reaction, _allowStateChangesInsideComputed } from "mobx"
+import { action, computed, reaction, _allowStateChangesInsideComputed, makeObservable } from "mobx"
 import {
     addHiddenFinalProp,
     ComplexType,
@@ -82,8 +82,8 @@ type InternalEventHandlers<S> = {
  * @hidden
  */
 export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
-    readonly type!: ComplexType<C, S, T>
-    storedValue!: T & IStateTreeNode<IType<C, S, T>>
+    declare readonly type: ComplexType<C, S, T>
+    declare storedValue: T & IStateTreeNode<IType<C, S, T>>
 
     readonly nodeId = ++nextNodeId
     readonly identifierAttribute?: string
@@ -126,6 +126,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         initialValue: C
     ) {
         super(complexType, parent, subpath, environment)
+        makeObservable(this)
 
         this.unbox = this.unbox.bind(this)
 
@@ -501,7 +502,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
             this.storedValue,
             "@APPLY_PATCHES",
             (patches: IJsonPatch[]) => {
-                patches.forEach(patch => {
+                patches.forEach((patch) => {
                     if (!patch.path) {
                         self.type.applySnapshot(self, patch.value)
                         return
@@ -539,7 +540,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
             return
         }
 
-        this.getChildren().forEach(node => {
+        this.getChildren().forEach((node) => {
             node.aboutToDie()
         })
 
@@ -553,7 +554,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
     finalizeDeath(): void {
         // invariant: not called directly but from "die"
-        this.getChildren().forEach(node => {
+        this.getChildren().forEach((node) => {
             node.finalizeDeath()
         })
         this.root.identifierCache!.notifyDied(this)
@@ -641,7 +642,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         if (!this._hasSnapshotReaction) {
             const snapshotDisposer = reaction(
                 () => this.snapshot,
-                snapshot => this.emitSnapshot(snapshot),
+                (snapshot) => this.emitSnapshot(snapshot),
                 snapshotReactionOptions
             )
             this.addDisposer(snapshotDisposer)

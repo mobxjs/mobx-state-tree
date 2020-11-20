@@ -39,9 +39,7 @@ test("it should restore the state from the snapshot", () => {
     const { Factory } = createTestFactories()
     const instance = Factory.create({ hello: { to: "world" } })
     expect(getSnapshot(instance)).toEqual({ hello: { to: "world" } })
-    expect(("" + instance).replace(/@\d+/, "@xx")).toBe(
-        "ObservableMap@xx[{ hello: AnonymousModel@/hello }]"
-    ) // default toString
+    expect(("" + instance).replace(/@\d+/, "@xx")).toBe("[object ObservableMap]") // default toString
 })
 // === SNAPSHOT TESTS ===
 test("it should emit snapshots", () => {
@@ -49,7 +47,7 @@ test("it should emit snapshots", () => {
     const doc = Factory.create()
     unprotect(doc)
     let snapshots: SnapshotOut<typeof doc>[] = []
-    onSnapshot(doc, snapshot => snapshots.push(snapshot))
+    onSnapshot(doc, (snapshot) => snapshots.push(snapshot))
     doc.set("hello", ItemFactory.create())
     expect(snapshots).toEqual([{ hello: { to: "world" } }])
 })
@@ -86,7 +84,7 @@ test("it should emit add patches", () => {
     const doc = Factory.create()
     unprotect(doc)
     let patches: IJsonPatch[] = []
-    onPatch(doc, patch => patches.push(patch))
+    onPatch(doc, (patch) => patches.push(patch))
     doc.set("hello", ItemFactory.create({ to: "universe" }))
     expect(patches).toEqual([{ op: "add", path: "/hello", value: { to: "universe" } }])
 })
@@ -102,7 +100,7 @@ test("it should emit update patches", () => {
     unprotect(doc)
     doc.set("hello", ItemFactory.create())
     let patches: IJsonPatch[] = []
-    onPatch(doc, patch => patches.push(patch))
+    onPatch(doc, (patch) => patches.push(patch))
     doc.set("hello", ItemFactory.create({ to: "universe" }))
     expect(patches).toEqual([{ op: "replace", path: "/hello", value: { to: "universe" } }])
 })
@@ -119,7 +117,7 @@ test("it should emit remove patches", () => {
     unprotect(doc)
     doc.set("hello", ItemFactory.create())
     let patches: IJsonPatch[] = []
-    onPatch(doc, patch => patches.push(patch))
+    onPatch(doc, (patch) => patches.push(patch))
     doc.delete("hello")
     expect(patches).toEqual([{ op: "remove", path: "/hello" }])
 })
@@ -195,7 +193,7 @@ test("#192 - put should not throw when identifier is a number", () => {
         .model("TodoStore", {
             todos: types.optional(types.map(Todo), {})
         })
-        .actions(self => {
+        .actions((self) => {
             function addTodo(todo: typeof Todo.Type | typeof Todo.CreationType) {
                 self.todos.put(todo)
             }
@@ -224,7 +222,7 @@ test("#192 - map should not mess up keys when putting twice", () => {
         .model("TodoStore", {
             todos: types.optional(types.map(Todo), {})
         })
-        .actions(self => {
+        .actions((self) => {
             function addTodo(todo: typeof Todo.Type | typeof Todo.CreationType) {
                 self.todos.put(todo)
             }
@@ -253,7 +251,7 @@ test("#694 - map.put should return new node", () => {
         .model("TodoStore", {
             todos: types.map(Todo)
         })
-        .actions(self => {
+        .actions((self) => {
             function addAndReturnTodo(todo: typeof Todo.Type | typeof Todo.CreationType) {
                 return self.todos.put(todo)
             }
@@ -294,7 +292,7 @@ test("it should not throw when removing a non existing item from a map", () => {
             .model({
                 myMap: types.map(types.number)
             })
-            .actions(self => {
+            .actions((self) => {
                 function something() {
                     return self.myMap.delete("1020")
                 }
@@ -311,7 +309,7 @@ test("it should get map keys from reversePatch when deleted an item from a neste
         .model({
             value: types.map(types.map(types.map(types.number)))
         })
-        .actions(self => ({
+        .actions((self) => ({
             remove(k: string) {
                 self.value.delete(k)
             }
@@ -344,7 +342,7 @@ test("issue #876 - map.put works fine for models with preProcessSnapshot", () =>
             title: types.string,
             notes: types.array(Note)
         })
-        .preProcessSnapshot(snapshot => {
+        .preProcessSnapshot((snapshot) => {
             const result = Object.assign({}, snapshot)
             if (typeof result.title !== "string") result.title = ""
             return result
@@ -354,7 +352,7 @@ test("issue #876 - map.put works fine for models with preProcessSnapshot", () =>
         .model("Store", {
             items: types.optional(types.map(Item), {})
         })
-        .actions(self => ({
+        .actions((self) => ({
             afterCreate() {
                 self.items.put({
                     id: "1",
@@ -405,7 +403,7 @@ test("get should return value when key is a number", () => {
         .model("TodoStore", {
             todos: types.optional(types.map(Todo), {})
         })
-        .actions(self => {
+        .actions((self) => {
             function addTodo(aTodo: typeof Todo.Type | typeof Todo.CreationType) {
                 self.todos.put(aTodo)
             }
@@ -472,7 +470,7 @@ describe("#826, adding stuff twice", () => {
         .model({
             map: types.optional(types.map(types.boolean), {})
         })
-        .actions(self => ({
+        .actions((self) => ({
             toogleMap: (id: string) => {
                 self.map.set(id, !self.map.get(id))
             }
@@ -546,11 +544,7 @@ test("#1173 - detaching a map should not eliminate its children", () => {
 
 test("#1131 - put with optional identifier", () => {
     const Test = types.model({
-        id: types.optional(types.identifier, () =>
-            Math.random()
-                .toString(36)
-                .substr(2)
-        ),
+        id: types.optional(types.identifier, () => Math.random().toString(36).substr(2)),
         value: "hi"
     })
 
