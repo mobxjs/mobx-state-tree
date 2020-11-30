@@ -684,7 +684,7 @@ ___
 *Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:126](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L126)*
 
 Applies a JSON-patch to the given model instance or bails out if the patch couldn't be applied
-See [patches](https://github.com/mobxjs/mobx-state-tree#patches) for more details.
+See [patches](concepts/patches) for more details.
 
 Can apply a single past, or an array of patches.
 
