@@ -66,7 +66,7 @@ interface ITodoSnapshotOut extends SnapshotOut<typeof Todo> {} // => { title: st
 
 Note, it is important to use `interface` and not `type` when constructing those types! Although `type`s will work exactly the same, due to their nature they will be (much more expensive for the compiler to typecheck)[https://github.com/microsoft/TypeScript/wiki/Performance#preferring-interfaces-over-intersections].
 
-For further performace tips, read the (official TypeScript performance wiki)[https://github.com/microsoft/TypeScript/wiki/Performance].
+For further performance tips, read the [official TypeScript performance wiki](https://github.com/microsoft/TypeScript/wiki/Performance).
 
 #### Typing `self` in actions and views
 
