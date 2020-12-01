@@ -64,7 +64,7 @@ interface ITodoSnapshotIn extends SnapshotIn<typeof Todo> {} // => { title?: str
 interface ITodoSnapshotOut extends SnapshotOut<typeof Todo> {} // => { title: string }
 ```
 
-Note, it is important to use `interface` and not `type` when constructing those types! Although `type`s will work exactly the same, due to their nature they will be (much more expensive for the compiler to typecheck)[https://github.com/microsoft/TypeScript/wiki/Performance#preferring-interfaces-over-intersections].
+Note, it is important to use `interface` and not `type` when constructing those types! Although `type`s will work exactly the same, due to their nature they will be [much more expensive for the compiler to typecheck](https://github.com/microsoft/TypeScript/wiki/Performance#preferring-interfaces-over-intersections).
 
 For further performance tips, read the [official TypeScript performance wiki](https://github.com/microsoft/TypeScript/wiki/Performance).
 
