@@ -902,7 +902,7 @@ const ModelB = types.model({
 
 const a = ModelA.create({ id: 'someId', n: 5 });
 // this will allow the compiler to use a model as if it were a reference snapshot
-const b = ModelB.create({ refA: castToReference(a)})
+const b = ModelB.create({ refA: castToReferenceSnapshot(a)})
 ```
 
 **Type parameters:**
