@@ -1,3 +1,4 @@
+import { configure } from "mobx"
 import {
     recordActions,
     types,
@@ -308,6 +309,10 @@ test("volatile state survives reonciliation", () => {
     expect(store.cnt.x).toBe(5) // incrementor was not lost
 })
 test("middleware events are correct", () => {
+    configure({
+        useProxies: "never"
+    })
+
     const A = types.model({}).actions((self) => ({
         a(x: number) {
             return this.b(x * 2)
@@ -353,6 +358,10 @@ test("middleware events are correct", () => {
 })
 
 test("actions are mockable", () => {
+    configure({
+        useProxies: "never"
+    })
+
     const M = types
         .model()
         .actions((self) => ({

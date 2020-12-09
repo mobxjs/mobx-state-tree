@@ -36,6 +36,10 @@ test("it should succeed if not optional and no default provided", () => {
     expect(getSnapshot(Factory.create())).toEqual([])
 })
 test("it should restore the state from the snapshot", () => {
+    configure({
+        useProxies: "never"
+    })
+
     const { Factory } = createTestFactories()
     const instance = Factory.create([{ to: "universe" }])
     expect(getSnapshot(instance)).toEqual([{ to: "universe" }])
@@ -160,6 +164,10 @@ test("paths shoud remain correct when splicing", () => {
     expect(store.todos.map(getPath)).toEqual(["/todos/0", "/todos/1"])
 })
 test("items should be reconciled correctly when splicing - 1", () => {
+    configure({
+        useProxies: "never"
+    })
+
     const Task = types.model("Task", {
         x: types.string
     })

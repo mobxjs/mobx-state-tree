@@ -9,8 +9,7 @@ import {
     IObservableArray,
     observable,
     observe,
-    makeObservable,
-    _getGlobalState
+    makeObservable
 } from "mobx"
 import {
     addHiddenFinalProp,
@@ -125,12 +124,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     }
 
     createNewInstance(childNodes: IChildNodesMap): this["T"] {
-        const useProxies = _getGlobalState().useProxies
-
-        return observable.array(convertChildNodesToArray(childNodes), {
-            ...mobxShallow,
-            proxy: useProxies
-        }) as this["T"]
+        return observable.array(convertChildNodesToArray(childNodes), mobxShallow) as this["T"]
     }
 
     finalizeNewInstance(node: this["N"], instance: this["T"]): void {

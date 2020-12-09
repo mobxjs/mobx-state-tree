@@ -1,4 +1,4 @@
-import { isObservableArray, $mobx, getAtom } from "mobx"
+import { isObservableArray, _getGlobalState, getAtom } from "mobx"
 import { Primitives } from "./core/type/type"
 
 /**
@@ -23,8 +23,9 @@ export const EMPTY_OBJECT: {} = Object.freeze({})
  * @internal
  * @hidden
  */
-export const mobxShallow =
-    typeof $mobx === "string" ? { deep: false } : { deep: false, proxy: false }
+export const mobxShallow = _getGlobalState().useProxies
+    ? { deep: false }
+    : { deep: false, proxy: false }
 Object.freeze(mobxShallow)
 
 /**
