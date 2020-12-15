@@ -21,7 +21,7 @@ import {
     getNodeId
 } from "../../src"
 
-import { autorun } from "mobx"
+import { autorun, configure } from "mobx"
 
 // getParent
 test("it should resolve to the parent instance", () => {
@@ -60,6 +60,10 @@ test("it should check for parent instance (unbound)", () => {
 })
 // getParentOfType
 test("it should resolve to the given parent instance", () => {
+    configure({
+        useProxies: "never"
+    })
+
     const Cell = types.model({})
     const Row = types.model({
         cells: types.optional(types.array(Cell), [])
@@ -197,6 +201,10 @@ test("it should resolve parents", () => {
 })
 // clone
 test("it should clone a node", () => {
+    configure({
+        useProxies: "never"
+    })
+
     const Row = types.model({
         article_id: 0
     })
@@ -212,6 +220,10 @@ test("it should clone a node", () => {
     expect(getSnapshot(doc)).toEqual(getSnapshot(cloned))
 })
 test("it should be possible to clone a dead object", () => {
+    configure({
+        useProxies: "never"
+    })
+
     const Task = types.model("Task", {
         x: types.string
     })

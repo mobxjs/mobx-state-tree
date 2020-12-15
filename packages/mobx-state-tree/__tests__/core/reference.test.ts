@@ -1,4 +1,4 @@
-import { reaction, autorun, isObservable } from "mobx"
+import { reaction, autorun, isObservable, configure } from "mobx"
 import {
     types,
     getSnapshot,
@@ -908,6 +908,10 @@ test("#1052 - Reference returns destroyed model after subtree replacing", () => 
 })
 
 test("#1080 - does not crash trying to resolve a reference to a destroyed+recreated model", () => {
+    configure({
+        useProxies: "never"
+    })
+
     const Branch = types.model("Branch", {
         id: types.identifierNumber,
         name: types.string
