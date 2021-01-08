@@ -32,7 +32,7 @@ sidebar_label: "IPatchRecorder"
 
 • **inversePatches**: *ReadonlyArray‹[IJsonPatch](ijsonpatch.md)›*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:139](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L139)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:139](https://github.com/mobxjs/mobx-state-tree/blob/3e60f786/packages/mobx-state-tree/src/core/mst-operations.ts#L139)*
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 • **patches**: *ReadonlyArray‹[IJsonPatch](ijsonpatch.md)›*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:138](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L138)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:138](https://github.com/mobxjs/mobx-state-tree/blob/3e60f786/packages/mobx-state-tree/src/core/mst-operations.ts#L138)*
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 • **recording**: *boolean*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:141](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L141)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:141](https://github.com/mobxjs/mobx-state-tree/blob/3e60f786/packages/mobx-state-tree/src/core/mst-operations.ts#L141)*
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 • **reversedInversePatches**: *ReadonlyArray‹[IJsonPatch](ijsonpatch.md)›*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:140](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L140)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:140](https://github.com/mobxjs/mobx-state-tree/blob/3e60f786/packages/mobx-state-tree/src/core/mst-operations.ts#L140)*
 
 ## Methods
 
@@ -64,7 +64,7 @@ ___
 
 ▸ **replay**(`target?`: IAnyStateTreeNode): *void*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:144](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L144)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:144](https://github.com/mobxjs/mobx-state-tree/blob/3e60f786/packages/mobx-state-tree/src/core/mst-operations.ts#L144)*
 
 **Parameters:**
 
@@ -80,7 +80,7 @@ ___
 
 ▸ **resume**(): *void*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:143](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L143)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:143](https://github.com/mobxjs/mobx-state-tree/blob/3e60f786/packages/mobx-state-tree/src/core/mst-operations.ts#L143)*
 
 **Returns:** *void*
 
@@ -90,7 +90,7 @@ ___
 
 ▸ **stop**(): *void*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:142](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L142)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:142](https://github.com/mobxjs/mobx-state-tree/blob/3e60f786/packages/mobx-state-tree/src/core/mst-operations.ts#L142)*
 
 **Returns:** *void*
 
@@ -100,7 +100,7 @@ ___
 
 ▸ **undo**(`target?`: IAnyStateTreeNode): *void*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:145](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/mst-operations.ts#L145)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:145](https://github.com/mobxjs/mobx-state-tree/blob/3e60f786/packages/mobx-state-tree/src/core/mst-operations.ts#L145)*
 
 **Parameters:**
 
