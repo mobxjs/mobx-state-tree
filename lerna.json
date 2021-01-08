@@ -1,6 +1,6 @@
 {
     "npmClient": "yarn",
     "useWorkspaces": true,
-    "version": "4.0.3",
+    "version": "5.0.0",
     "hoist": true
 }
