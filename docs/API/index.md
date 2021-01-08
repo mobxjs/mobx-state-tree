@@ -468,7 +468,7 @@ Example:
  })
 ```
 
-**`returns`** 
+**`returns`**
 
 ___
 
@@ -488,7 +488,7 @@ Example:
  })
 ```
 
-**`returns`** 
+**`returns`**
 
 ___
 
@@ -902,7 +902,7 @@ const ModelB = types.model({
 
 const a = ModelA.create({ id: 'someId', n: 5 });
 // this will allow the compiler to use a model as if it were a reference snapshot
-const b = ModelB.create({ refA: castToReference(a)})
+const b = ModelB.create({ refA: castToReferenceSnapshot(a)})
 ```
 
 **Type parameters:**
@@ -2702,7 +2702,7 @@ Returns the unique node id (not to be confused with the instance identifier) for
 given instance.
 This id is a number that is unique for each instance.
 
-**`export`** 
+**`export`**
 
 **Parameters:**
 
@@ -4273,7 +4273,7 @@ ___
 
 *Defined in [packages/mobx-state-tree/src/core/flow.ts:86](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/flow.ts#L86)*
 
-**`experimental`** 
+**`experimental`**
 experimental api - might change on minor/patch releases
 
 Convert a promise to a generator yielding that promise
@@ -4313,7 +4313,7 @@ ___
 
 *Defined in [packages/mobx-state-tree/src/core/flow.ts:59](https://github.com/mobxjs/mobx-state-tree/blob/15f0a9a8/packages/mobx-state-tree/src/core/flow.ts#L59)*
 
-**`experimental`** 
+**`experimental`**
 experimental api - might change on minor/patch releases
 
 Convert a promise-returning function to a generator-returning one.
