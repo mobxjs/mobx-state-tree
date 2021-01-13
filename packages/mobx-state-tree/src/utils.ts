@@ -1,5 +1,7 @@
-import { isObservableArray, $mobx, getAtom } from "mobx"
+import { isObservableArray, _getGlobalState, getAtom } from "mobx"
 import { Primitives } from "./core/type/type"
+
+const plainObjectString = Object.toString()
 
 /**
  * @internal
@@ -23,8 +25,9 @@ export const EMPTY_OBJECT: {} = Object.freeze({})
  * @internal
  * @hidden
  */
-export const mobxShallow =
-    typeof $mobx === "string" ? { deep: false } : { deep: false, proxy: false }
+export const mobxShallow = _getGlobalState().useProxies
+    ? { deep: false }
+    : { deep: false, proxy: false }
 Object.freeze(mobxShallow)
 
 /**
@@ -123,7 +126,8 @@ export function extend(a: any, ...b: any[]) {
 export function isPlainObject(value: any): value is { [k: string]: any } {
     if (value === null || typeof value !== "object") return false
     const proto = Object.getPrototypeOf(value)
-    return proto === Object.prototype || proto === null
+    if (proto == null) return true
+    return proto.constructor?.toString() === plainObjectString
 }
 
 /**

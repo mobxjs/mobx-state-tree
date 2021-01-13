@@ -1,14 +1,15 @@
 import {
     _getAdministration,
     action,
-    IArrayChange,
+    IArrayDidChange,
     IArraySplice,
     IArrayWillChange,
     IArrayWillSplice,
     intercept,
     IObservableArray,
     observable,
-    observe
+    observe,
+    makeObservable
 } from "mobx"
 import {
     addHiddenFinalProp,
@@ -93,6 +94,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         hookInitializers: Array<IHooksGetter<IMSTArray<IT>>> = []
     ) {
         super(name)
+        makeObservable(this)
         this.hookInitializers = hookInitializers
     }
 
@@ -224,7 +226,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         return processed
     }
 
-    didChange(change: IArrayChange<AnyNode> | IArraySplice<AnyNode>): void {
+    didChange(change: IArrayDidChange<AnyNode> | IArraySplice<AnyNode>): void {
         const node = getStateTreeNode(change.object as IAnyStateTreeNode)
         switch (change.type) {
             case "update":

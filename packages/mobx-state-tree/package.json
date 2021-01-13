@@ -1,6 +1,6 @@
 {
     "name": "mobx-state-tree",
-    "version": "3.17.2",
+    "version": "5.0.0",
     "description": "Opinionated, transactional, MobX powered state container",
     "main": "dist/mobx-state-tree.js",
     "umd:main": "dist/mobx-state-tree.umd.js",
@@ -23,9 +23,8 @@
         "test": "yarn test:dev && yarn test:prod && yarn test:others",
         "test:dev": "cross-env NODE_ENV=development JEST_JUNIT_OUTPUT=../../test-results/mobx-state-tree/dev.xml yarn jest",
         "test:prod": "cross-env NODE_ENV=production JEST_JUNIT_OUTPUT=../../test-results/mobx-state-tree/prod.xml yarn jest",
-        "test:others": "yarn test:cyclic && yarn test:mobx4",
+        "test:others": "yarn test:cyclic",
         "test:cyclic": "node -e \"require('.')\"",
-        "test:mobx4": "yarn add -D mobx@4.9.0 && cross-env JEST_JUNIT_OUTPUT=../../test-results/mobx-state-tree/mobx4.xml yarn jest -i && git checkout package.json ../../yarn.lock && yarn install",
         "_prepublish": "yarn build && yarn build-docs",
         "fix-typedoc": "shx rm -rf ../../node_modules/typedoc/node_modules/typescript",
         "build-docs": "yarn run fix-typedoc && shx rm -rf ../../docs/API && typedoc --options ./typedocconfig.js",
@@ -57,7 +56,7 @@
         "jest": "^26.1.0",
         "jest-junit": "^11.0.1",
         "lerna": "^3.13.1",
-        "mobx": "^5.13.0",
+        "mobx": "^6.0.4",
         "rollup": "^2.18.1",
         "rollup-plugin-commonjs": "^10.0.0",
         "rollup-plugin-filesize": "^9.0.1",
@@ -76,7 +75,7 @@
         "typescript": "^3.5.3"
     },
     "peerDependencies": {
-        "mobx": ">=4.8.0 <5.0.0 || >=5.8.0 <6.0.0"
+        "mobx": "^6.0.0"
     },
     "keywords": [
         "mobx",

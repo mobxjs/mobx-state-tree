@@ -136,7 +136,7 @@ test("reflection - property contains type", () => {
     })
     const reflection = getMembers(node)
     expect(reflection.properties.string).toBe(types.string)
-    expect(reflection.properties.optional).toEqual(types.optional(types.boolean, false))
+    expect(reflection.properties.optional).toMatchObject(types.optional(types.boolean, false))
 })
 test("reflection - members chained", () => {
     const ChainedModel = types

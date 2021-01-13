@@ -1,35 +1,41 @@
 {
-    "name": "mst-example-redux-todomvc",
-    "version": "2.2.0",
-    "private": true,
-    "devDependencies": {
-        "enzyme": "^3.9.0",
-        "react-addons-test-utils": "^15.6.2",
-        "react-scripts": "^3.0.1",
-        "react-test-renderer": "^16.8.4"
-    },
-    "dependencies": {
-        "classnames": "^2.2.6",
-        "mobx": "^5.9.0",
-        "mobx-state-tree": "^3.11.0",
-        "mst-middlewares": "^3.11.0",
-        "react": "^16.8.4",
-        "react-dom": "^16.8.4",
-        "react-redux": "^7.1.0",
-        "redux": "^4.0.1",
-        "remotedev": "^0.2.9",
-        "todomvc-app-css": "^2.2.0"
-    },
-    "scripts": {
-        "start": "react-scripts start",
-        "build": "react-scripts build",
-        "eject": "react-scripts eject",
-        "test": "react-scripts test"
-    },
-    "browserslist": [
-        ">0.2%",
-        "not dead",
-        "not ie <= 11",
-        "not op_mini all"
-    ]
+  "name": "mst-example-redux-todomvc",
+  "version": "2.2.0",
+  "private": true,
+  "devDependencies": {
+    "enzyme": "^3.9.0",
+    "react-addons-test-utils": "^15.6.2",
+    "react-scripts": "^3.4.3",
+    "react-test-renderer": "^16.8.4",
+    "relative-deps": "^1.0.4"
+  },
+  "dependencies": {
+    "classnames": "^2.2.6",
+    "mobx": "^6.0.4",
+    "mobx-state-tree": "^3.11.0",
+    "mst-middlewares": "^3.11.0",
+    "react": "^16.8.4",
+    "react-dom": "^16.8.4",
+    "react-redux": "^7.1.0",
+    "redux": "^4.0.1",
+    "remotedev": "^0.2.9",
+    "todomvc-app-css": "^2.2.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "eject": "react-scripts eject",
+    "test": "react-scripts test",
+    "prepare": "relative-deps"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
+  "relativeDependencies": {
+    "mobx-state-tree": "../mobx-state-tree",
+    "mst-middlewares": "../mst-middlewares"
+  }
 }

@@ -3,13 +3,15 @@
     "version": "2.2.0",
     "private": true,
     "devDependencies": {
-        "react-scripts": "^3.4.3"
+        "react-scripts": "^3.4.3",
+        "relative-deps": "^1.0.4"
     },
     "dependencies": {
         "classnames": "^2.2.6",
-        "mobx": "5.15.7",
-        "mobx-react-lite": "2.2.2",
+        "mobx": "^6.0.4",
+        "mobx-react": "^6.0.0",
         "mobx-state-tree": "^3.17.2",
+        "mobx-react-lite": "2.2.2",
         "mst-middlewares": "^3.17.2",
         "react": "^16.13.1",
         "react-dom": "^16.13.1",
@@ -27,5 +29,9 @@
         "not dead",
         "not ie <= 11",
         "not op_mini all"
-    ]
+    ],
+    "relativeDependencies": {
+        "mobx-state-tree": "../mobx-state-tree",
+        "mst-middlewares": "../mst-middlewares"
+    }
 }

@@ -1,5 +1,6 @@
 import { UndoManager } from "../src"
 import { types, clone, getSnapshot, flow, Instance } from "mobx-state-tree"
+import { configure } from "mobx"
 
 let undoManager: any = {}
 const setUndoManagerSameTree = (targetStore: any) => {
@@ -454,6 +455,10 @@ describe("same tree - clean", () => {
 })
 
 test("#1195 - withoutUndo() used inside an action should NOT affect all patches within that action", () => {
+    configure({
+        useProxies: "never"
+    })
+
     let _undoManager: any
 
     const store = types

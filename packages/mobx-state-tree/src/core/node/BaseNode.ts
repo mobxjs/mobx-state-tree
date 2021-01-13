@@ -132,7 +132,7 @@ export abstract class BaseNode<C, S, T> {
 
     abstract setParent(newParent: AnyObjectNode | null, subpath: string | null): void
 
-    snapshot!: S
+    abstract get snapshot(): S
     abstract getSnapshot(): S
 
     get isAlive() {

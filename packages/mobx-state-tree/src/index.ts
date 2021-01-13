@@ -1,5 +1,5 @@
 // tslint:disable-next-line:no_unused-variable
-import { IObservableArray, ObservableMap, IAction } from "mobx"
+import { IObservableArray, ObservableMap } from "mobx"
 
 /* all code is initially loaded through internal, to avoid circular dep issues */
 export {

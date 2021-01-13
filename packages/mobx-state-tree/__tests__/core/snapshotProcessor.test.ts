@@ -410,9 +410,10 @@ describe("snapshotProcessor", () => {
             detach(n)
             expect(s.a.length).toBe(0)
             expect(getSnapshot(n)).toEqual({ x: 1 })
-            if (process.env.NODE_ENV !== "production") {
-                expect(() => s.b.push(n)).toThrow("Error while converting")
-            }
+
+            s.b.push(n)
+            expect(s.b.length).toBe(1)
+            expect(getSnapshot(s.b)).toEqual([{ x: 1 }])
         })
 
         test("moving from b to a", () => {
@@ -424,9 +425,10 @@ describe("snapshotProcessor", () => {
             detach(n)
             expect(s.b.length).toBe(0)
             expect(getSnapshot(n)).toEqual({ x: 1 })
-            if (process.env.NODE_ENV !== "production") {
-                expect(() => s.a.push(n)).toThrow("Error while converting")
-            }
+
+            s.a.push(n)
+            expect(s.a.length).toBe(1)
+            expect(getSnapshot(s.a)).toEqual([{ x: 1 }])
         })
     })
 
@@ -454,9 +456,10 @@ describe("snapshotProcessor", () => {
             detach(n)
             expect(s.a.length).toBe(0)
             expect(getSnapshot(n)).toEqual({ x: "1" })
-            if (process.env.NODE_ENV !== "production") {
-                expect(() => s.b.push(n)).toThrow("Error while converting")
-            }
+
+            s.b.push(n)
+            expect(s.b.length).toBe(1)
+            expect(getSnapshot(s.b)).toEqual([{ x: "1" }])
         })
 
         test("moving from b to a", () => {
@@ -468,9 +471,81 @@ describe("snapshotProcessor", () => {
             detach(n)
             expect(s.b.length).toBe(0)
             expect(getSnapshot(n)).toEqual({ x: 1 })
-            if (process.env.NODE_ENV !== "production") {
-                expect(() => s.a.push(n)).toThrow("Error while converting")
+
+            s.a.push(n)
+            expect(s.a.length).toBe(1)
+            expect(getSnapshot(s.a)).toEqual([{ x: "1" }])
+        })
+    })
+
+    describe("assigning instances works", () => {
+        const Todo = types.model("Todo", {
+            id: types.identifier
+        })
+
+        const TodoWithProcessor = types.snapshotProcessor(Todo, {
+            preProcessor(snapshot: { id: string }) {
+                return snapshot
             }
+        })
+
+        const Store = types
+            .model("TodoStore", {
+                todos: types.map(TodoWithProcessor),
+                instance: types.optional(TodoWithProcessor, { id: "new" })
+            })
+            .actions((self) => ({
+                addTodo(todo: { id: string }) {
+                    self.todos.put(todo)
+                },
+                setInstance(next: { id: string }) {
+                    self.instance = next
+                }
+            }))
+
+        test("using instances in maps work", () => {
+            const store = Store.create()
+            const todo = TodoWithProcessor.create({ id: "map" })
+
+            store.addTodo(todo)
+
+            expect(store.todos.size).toBe(1)
+            expect(getSnapshot(store.todos)).toEqual({ map: { id: "map" } })
+        })
+
+        test("using instances as values works", () => {
+            const store = Store.create()
+            const todo = TodoWithProcessor.create({ id: "map" })
+
+            store.setInstance(todo)
+
+            expect(store.instance).toBe(todo)
+        })
+
+        test("using the non processed type in place of the processed one works", () => {
+            const store = Store.create()
+            const todo = Todo.create({ id: "map" })
+
+            store.setInstance(todo)
+
+            expect(store.instance).toBe(todo)
+        })
+
+        test("using the processed type in place of the non processed one works", () => {
+            const store = types
+                .model("Store", { instance: Todo })
+                .actions((self) => ({
+                    setInstance(next: { id: string }) {
+                        self.instance = next
+                    }
+                }))
+                .create({ instance: { id: "new" } })
+
+            const todo = TodoWithProcessor.create({ id: "map" })
+
+            store.setInstance(todo)
+
+            expect(store.instance).toBe(todo)
         })
     })
 
