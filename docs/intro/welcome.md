@@ -1,117 +1,84 @@
 ---
 id: welcome
-title: Welcome
+title: Welcome to MobX-State-Tree!
 ---
 
 <div id="codefund"></div>
 
-`mobx-state-tree` (also known as "MST") is a state container that combines the _simplicity and ease of mutable data_ with the _traceability of immutable data_ and the _reactiveness and performance of observable data_.
+**_Full-featured reactive state management without the boilerplate._**
 
-Simply put, MST tries to combine the best features of both immutability (transactionality, traceability and composition) and mutability (discoverability, co-location and encapsulation) based approaches to state management; everything to provide the best developer experience possible.
-Unlike MobX itself, MST is very opinionated about how data should be structured and updated.
-This makes it possible to solve many common problems out of the box.
+## What is MobX-State-Tree?
 
-Central in MST is the concept of a _living tree_. The tree consists of mutable, but strictly protected objects enriched with _runtime type information_. In other words, each tree has a _shape_ (type information) and _state_ (data).
-From this living tree, immutable, structurally shared, snapshots are automatically generated.
+Technically speaking, MobX-State-Tree (also known as MST) is a state container system built on [MobX](https://github.com/mobxjs/mobx), a functional reactive state library.
+
+This may not mean much to you, and that’s okay. I’ll explain it like this: **MobX is a state management "engine", and MobX-State-Tree gives it structure and common tools you need for your app.** MST is valuable in a large team but also useful in smaller applications when you expect your code to scale rapidly. And if we compare it to Redux, MST offers better performance and much less boilerplate code than Redux!
+
+MobX is [one of the most popular Redux alternatives](https://2019.stateofjs.com/data-layer/mobx/) and is used (along with MobX-State-Tree) by companies all over the world, including Netflix, Grow, IBM, DAZN, Baidu, and more.
+
+It supports a full set of features for a modern state management system -- all in a package with _zero dependencies_ other than MobX itself.
+
+_Note: you don't need to know how to use MobX in order to use MST._
+
+### Ten reasons you should use MobX-State-Tree:
+
+1. **MST works great** in React, React Native, Vue, Angular, Svelte, and even barebones JavaScript apps
+2. Instead of being scattered throughout your app, MST provides **centralized stores** for your data
+3. Your data is **mutable**, but can only be mutated in "actions", so it's _easy to use_ but also _protected_
+4. Via **runtime type checking**, you can't accidentally assign the wrong data type to a property
+5. TypeScript can infer **static types** from your runtime types automatically
+6. Every update to your data is traced and you can quickly **generate snapshots** of your state at any time
+7. MST has built-in support for references so you can **normalize your data** across your whole app
+8. **Side effects** can be managed via async flows, which are basically long-running actions
+9. Using snapshots, you can do **time-travel debugging** or logging of state changes over time
+10. MST has a **robust community** and a large, active core team
+
+## Basic example
+
+_You can play with it in [this CodeSandbox playground](https://codesandbox.io/s/boring-pond-cmooq?file=/src/index.js)._
 
 ```javascript
 import { types, onSnapshot } from "mobx-state-tree"
 
-const Todo = types
-    .model("Todo", {
-        title: types.string,
-        done: false
+// A tweet has a body (which is text) and whether it's read or not
+const Tweet = types
+    .model("Tweet", {
+        body: types.string,
+        read: false // automatically inferred as type "boolean" with default "false"
     })
-    .actions((self) => ({
+    .actions((tweet) => ({
         toggle() {
-            self.done = !self.done
+            tweet.read = !tweet.read
         }
     }))
 
-const Store = types.model("Store", {
-    todos: types.array(Todo)
+// Define the Twitter "store" as having an array of tweets
+const TwitterStore = types.model("TwitterStore", {
+    tweets: types.array(Tweet)
 })
 
-// create an instance from a snapshot
-const store = Store.create({
-    todos: [
+// create your new Twitter store instance with some initial data
+const twitterStore = TwitterStore.create({
+    tweets: [
         {
-            title: "Get coffee"
+            body: "Anyone tried MST?"
         }
     ]
 })
 
-// listen to new snapshots
-onSnapshot(store, (snapshot) => {
-    console.dir(snapshot)
+// Listen to new snapshots, which are created anytime something changes
+onSnapshot(twitterStore, (snapshot) => {
+    console.log(snapshot)
 })
 
-// invoke action that modifies the tree
-store.todos[0].toggle()
-// prints: `{ todos: [{ title: "Get coffee", done: true }]}`
+// Let's mark the first tweet as "read" by invoking the "toggle" action
+twitterStore.tweets[0].toggle()
+
+// In the console, you should see the result: `{ tweets: [{ body: "Anyone tried MST?", read: true }]}`
 ```
 
-By using the type information available, snapshots can be converted to living trees, and vice versa, with zero effort.
-Because of this, [time travelling](https://github.com/mobxjs/mobx-state-tree/blob/master/packages/mst-example-boxes/src/stores/time.js) is supported out of the box, and tools like HMR are trivial to support [example](https://github.com/mobxjs/mobx-state-tree/blob/4c2b19ec4a6a8d74064e4b8a87c0f8b46e97e621/examples/boxes/src/stores/domain-state.js#L94).
+## Next Steps
 
-The type information is designed in such a way that it is used both at design- and run-time to verify type correctness (Design time type checking works in TypeScript only at the moment; Flow PR's are welcome!)
-
-```
-[mobx-state-tree] Value '{\"todos\":[{\"turtle\":\"Get tea\"}]}' is not assignable to type: Store, expected an instance of Store or a snapshot like '{ todos: { title: string; done: boolean }[] }' instead.
-```
-
-_Runtime type error_
-
-![typescript error](/img/tserror.png)
-
-_Designtime type error_
-
-Because state trees are living, mutable models, actions are straight-forward to write; just modify local instance properties where appropriate. See `toggleTodo()` above or the examples below. It is not necessary to produce a new state tree yourself, MST's snapshot functionality will derive one for you automatically.
-
-Although mutable sounds scary to some, fear not, actions have many interesting properties.
-By default trees can only be modified by using an action that belongs to the same subtree.
-Furthermore, actions are replayable and can be used to distribute changes ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/packages/mst-example-boxes/src/stores/socket.js)).
-
-Moreover, because changes can be detected on a fine grained level, JSON patches are supported out of the box.
-Simply subscribing to the patch stream of a tree is another way to sync diffs with, for example, back-end servers or other clients ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/packages/mst-example-boxes/src/stores/socket.js)).
-
-![patches](/img/patches.png)
-
-Since MST uses MobX behind the scenes, it integrates seamlessly with [mobx](https://mobx.js.org) and [mobx-react](https://github.com/mobxjs/mobx-react). See also this [egghead.io lesson: Render mobx-state-tree Models in React](https://egghead.io/lessons/react-render-mobx-state-tree-models-in-react).
-Even cooler, because it supports snapshots, middleware and replayable actions out of the box, it is possible to replace a Redux store and reducer with a MobX state tree.
-This makes it possible to connect the Redux devtools to MST. See the [Redux / MST TodoMVC example](https://github.com/mobxjs/mobx-state-tree/blob/1906a394906d2e8f2cc1c778e1e3228307c1b112/packages/mst-example-redux-todomvc/src/index.js#L6).
-
----
-
-For futher reading: the conceptual difference between snapshots, patches and actions in relation to distributing state changes is extensively discussed in this [blog post](https://medium.com/@mweststrate/distributing-state-changes-using-snapshots-patches-and-actions-part-1-2811a2fcd65f)
-
-![devtools](/img/reduxdevtools.png)
-
-Finally, MST has built-in support for references, identifiers, dependency injection, change recording and circular type definitions (even across files).
-Even fancier, it analyses liveliness of objects, failing early when you try to access accidentally cached information! (More on that later)
-
-A unique feature of MST is that it offers liveliness guarantees. MST will throw when reading or writing from objects that are no longer part of a state tree. This protects you against accidental stale reads of objects still referred by, for example, a closure.
-
-```javascript
-const oldTodo = store.todos[0]
-store.removeTodo(0)
-
-function logTodo(todo) {
-    setTimeout(() => console.log(todo.title), 1000)
-}
-
-logTodo(store.todos[0])
-store.removeTodo(0)
-// throws exception in one second for using an stale object!
-```
-
-Despite all that, you will see that in practice the API is quite straightforward!
-
----
-
-Another way to look at mobx-state-tree is to consider it, as argued by Daniel Earwicker, to be ["React, but for data"](http://danielearwicker.github.io/json_mobx_Like_React_but_for_Data_Part_2.html).
-Like React, MST consists of composable components, called _models_, which captures a small piece of state. They are instantiated from props (snapshots) and after that manage and protect their own internal state (using actions). Moreover, when applying snapshots, tree nodes are reconciled as much as possible. There is even a context-like mechanism, called environments, to pass information to deep descendants.
-
-An introduction to the philosophy can be watched [here](https://youtu.be/ta8QKmNRXZM?t=21m52s). [Slides](https://immer-mutable-state.surge.sh/). Or, as [markdown](https://github.com/mweststrate/reactive2016-slides/blob/master/slides.md) to read it quickly.
-
-mobx-state-tree "immutable trees" and "graph model" features talk, ["Next Generation State Management"](https://www.youtube.com/watch?v=rwqwwn_46kA) at React Europe 2017. [Slides](http://tree.surge.sh/#1).
+-   Learn how to [install MobX-State-Tree](./installation.md) or jump straight to our [Getting Started](./getting-started.md) guide!
+-   View [examples](./examples.md) here.
+-   If you're interested in the philosophy behind MobX-State-Tree and a lot more explanation of features and benefits, check out the [Philosophy](./philosophy.md) page.
+-   Or check out a talk or two on our [Resources](./../tips/resources.md) page

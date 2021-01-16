@@ -170,10 +170,10 @@
         "title": "Installation"
       },
       "intro/philosophy": {
-        "title": "Philosophy"
+        "title": "Overview & Philosophy"
       },
       "intro/welcome": {
-        "title": "Welcome"
+        "title": "Welcome to MobX-State-Tree!"
       },
       "overview/hooks": {
         "title": "Lifecycle hooks overview"
