@@ -5,7 +5,7 @@ module.exports = {
     mode: "development",
     devtool: "cheap-module-source-map",
     entry: [
-        "webpack-dev-server/client?http://localhost:4000",
+        "webpack-dev-server/client?http://localhost:5000",
         "webpack/hot/only-dev-server",
         "./src/index"
     ],

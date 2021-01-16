@@ -27,21 +27,21 @@ const initialState = localStorage.getItem(localStorageKey)
       }
 
 let store
-let snapshotListener
+let snapshotListenerDestroyer
 
 function createTodoStore(snapshot) {
     // clean up snapshot listener
-    if (snapshotListener) snapshotListener()
+    if (snapshotListenerDestroyer) snapshotListenerDestroyer()
     // kill old store to prevent accidental use and run clean up hooks
     if (store) destroy(store)
 
     // create new one
-    store = TodoStore.create(snapshot)
+    window.store = store = TodoStore.create(snapshot)
 
     // connect devtools
     connectReduxDevtools(require("remotedev"), store)
     // connect local storage
-    snapshotListener = onSnapshot(store, (snapshot) =>
+    snapshotListenerDestroyer = onSnapshot(store, (snapshot) =>
         localStorage.setItem(localStorageKey, JSON.stringify(snapshot))
     )
 
