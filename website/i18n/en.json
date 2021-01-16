@@ -9,7 +9,7 @@
         "title": "API_header"
       },
       "API/index": {
-        "title": "mobx-state-tree - v4.0.2",
+        "title": "mobx-state-tree - v5.0.0",
         "sidebar_label": "Globals"
       },
       "API/interfaces/customtypeoptions": {
