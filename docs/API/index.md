@@ -3992,7 +3992,7 @@ ___
 *Defined in [packages/mobx-state-tree/src/types/utility-types/reference.ts:486](https://github.com/mobxjs/mobx-state-tree/blob/41030753/packages/mobx-state-tree/src/types/utility-types/reference.ts#L486)*
 
 `types.reference` - Creates a reference to another type, which should have defined an identifier.
-See also the [reference and identifiers](https://mobx-state-tree.js.org/concepts/references) section.
+See also the [reference and identifiers](https://mobx-state-tree.js.org/concepts/references) section. 
 
 **Type parameters:**
 
