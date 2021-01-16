@@ -5,7 +5,7 @@
 [![npm version](https://badge.fury.io/js/mobx-state-tree.svg)](https://badge.fury.io/js/mobx-state-tree)
 [![CircleCI](https://circleci.com/gh/mobxjs/mobx-state-tree.svg?style=svg)](https://circleci.com/gh/mobxjs/mobx-state-tree)
 [![Coverage Status](https://coveralls.io/repos/github/mobxjs/mobx-state-tree/badge.svg?branch=master)](https://coveralls.io/github/mobxjs/mobx-state-tree?branch=master)
-[![Join the community on Github Discussions](https://img.shields.io/badge/GitHub-Discussions-lightgrey)](https://github.com/mobxjs/mobx-state-tree/discussions)
+[![Have a question? Ask on Spectrum!](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/mobx-state-tree)
 
 ## What is mobx-state-tree?
 
