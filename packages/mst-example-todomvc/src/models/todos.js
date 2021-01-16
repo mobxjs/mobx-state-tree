@@ -19,9 +19,10 @@ const Todo = types
             getRoot(self).removeTodo(self)
         },
         edit(text) {
-            self.text = text
+            if (!text.length) self.remove()
+            else self.text = text
         },
-        complete() {
+        toggle() {
             self.completed = !self.completed
         }
     }))
@@ -33,7 +34,7 @@ const TodoStore = types
     })
     .views((self) => ({
         get completedCount() {
-            return self.todos.reduce((count, todo) => (todo.completed ? count + 1 : count), 0)
+            return self.todos.filter((todo) => todo.completed).length
         },
         get activeCount() {
             return self.todos.length - self.completedCount
@@ -43,13 +44,9 @@ const TodoStore = types
         }
     }))
     .actions((self) => ({
-        // actions
         addTodo(text) {
             const id = self.todos.reduce((maxId, todo) => Math.max(todo.id, maxId), -1) + 1
-            self.todos.unshift({
-                id,
-                text
-            })
+            self.todos.unshift({ id, text })
         },
         removeTodo(todo) {
             destroy(todo)
@@ -59,7 +56,7 @@ const TodoStore = types
             self.todos.forEach((todo) => (todo.completed = !areAllMarked))
         },
         clearCompleted() {
-            self.todos.replace(self.todos.filter((todo) => todo.completed === false))
+            self.todos.replace(self.todos.filter((todo) => !todo.completed))
         },
         setFilter(filter) {
             self.filter = filter

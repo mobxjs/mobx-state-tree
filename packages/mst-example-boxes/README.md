@@ -16,7 +16,7 @@ To interact with the application:
 ### Run the example
 
 ```
-npm install
-npm start
-open http://localhost:4000
+yarn
+yarn start
+open http://localhost:5000
 ```
