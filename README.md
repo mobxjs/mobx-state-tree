@@ -72,10 +72,10 @@ const rootStore = RootStore.create({
 // Ready to use in a React component, if that's your target.
 import { observer } from "mobx-react-lite"
 const MyComponent = observer((props) => {
-    return <div>Hello, {rootStore.author.firstName}!</div>
+    return <div>Hello, {rootStore.authors[0].firstName}!</div>
 })
 
-// Note: since this component is "observed", any changes to rootStore.author.firstName
+// Note: since this component is "observed", any changes to rootStore.authors[0].firstName
 // will result in a re-render! If you're not using React, you can also "listen" to changes
 // using `onSnapshot`: https://mobx-state-tree.js.org/concepts/snapshots
 ```
