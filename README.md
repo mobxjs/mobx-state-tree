@@ -70,14 +70,20 @@ const rootStore = RootStore.create({
     tweets: [tweet]
 })
 
-// Ready to use in a React component or anywhere:
-const MyComponent = (props) => {
+// Ready to use in a React component, if that's your target.
+import { observer } from "mobx-react-lite"
+const MyComponent = observer((props) => {
     return <div>Hello, {rootStore.author.firstName}!</div>
-}
+})
+
+// Note: since this component is "observed", any changes to rootStore.author.firstName
+// will result in a re-render! If you're not using React, you can also "listen" to changes
+// using `onSnapshot`: https://mobx-state-tree.js.org/concepts/snapshots
 ```
 
 ## Thanks!
 
+-   [Michel Weststrate](https://twitter.com/mweststrate) for creating MobX, MobX-State-Tree, and MobX-React.
 -   [Infinite Red](https://infinite.red) for supporting ongoing maintenance on MST.
 -   [Mendix](https://mendix.com) for sponsoring and providing the opportunity to work on exploratory projects like MST.
 -   [Dan Abramov](https://twitter.com/dan_abramov)'s work on [Redux](http://redux.js.org) has strongly influenced the idea of snapshots and transactional actions in MST.
