@@ -36,10 +36,9 @@ const Author = types.model({
     firstName: types.string,
     lastName: types.string
 })
-
 const Tweet = types.model({
     id: types.identifier,
-    author: types.reference(Author),
+    author: types.reference(Author), // stores just the `id` reference!
     body: types.string,
     timestamp: types.number
 })
@@ -59,14 +58,14 @@ const jamon = Author.create({
 
 const tweet = Tweet.create({
     id: "1",
-    author: jamon.id,
+    author: jamon.id, // just the ID needed here
     body: "Hello world!",
     timestamp: Date.now()
 })
 
 // Now instantiate the store!
 const rootStore = RootStore.create({
-    author: jamon,
+    authors: [jamon],
     tweets: [tweet]
 })
 
