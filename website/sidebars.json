@@ -1,10 +1,11 @@
 {
   "docs": {
     "Introduction": [
-      "intro/philosophy",
+      "intro/welcome",
       "intro/installation",
       "intro/getting-started",
-      "intro/examples"
+      "intro/examples",
+      "intro/philosophy"
     ],
     "Basic Concepts": [
       "concepts/trees",
