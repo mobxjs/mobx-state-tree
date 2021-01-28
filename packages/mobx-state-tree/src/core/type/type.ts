@@ -1,4 +1,4 @@
-import { action, makeObservable } from "mobx"
+import { action } from "mobx"
 
 import {
     fail,
@@ -292,11 +292,9 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
     readonly name: string
 
     constructor(name: string) {
-        makeObservable(this)
         this.name = name
     }
 
-    @action
     create(snapshot?: C, environment?: any) {
         typecheckInternal(this, snapshot)
         return this.instantiate(null, "", environment, snapshot!).value
@@ -396,7 +394,6 @@ export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<
         super(name)
     }
 
-    @action
     create(snapshot: C = this.getDefaultSnapshot(), environment?: any) {
         return super.create(snapshot, environment)
     }
@@ -476,6 +473,7 @@ export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<
         return null
     }
 }
+ComplexType.prototype.create = action(ComplexType.prototype.create)
 
 /**
  * @internal
@@ -520,6 +518,7 @@ export abstract class SimpleType<C, S, T> extends BaseType<C, S, T, ScalarNode<C
         return null
     }
 }
+BaseType.prototype.create = action(BaseType.prototype.create)
 
 /**
  * Returns if a given value represents a type.

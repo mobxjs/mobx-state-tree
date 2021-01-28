@@ -1,5 +1,5 @@
 // noinspection ES6UnusedImports
-import { action, computed, reaction, _allowStateChangesInsideComputed, makeObservable } from "mobx"
+import { action, computed, IComputedValue, reaction, _allowStateChangesInsideComputed } from "mobx"
 import {
     addHiddenFinalProp,
     ComplexType,
@@ -15,7 +15,6 @@ import {
     IJsonPatch,
     IMiddleware,
     IMiddlewareHandler,
-    invalidateComputed,
     IReversibleJsonPatch,
     NodeLifeCycle,
     resolveNodeByPathParts,
@@ -117,6 +116,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     private _initialSnapshot: C
     private _cachedInitialSnapshot?: S
     private _cachedInitialSnapshotCreated = false
+    private _snapshotComputed: IComputedValue<S>
 
     constructor(
         complexType: ComplexType<C, S, T>,
@@ -126,7 +126,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         initialValue: C
     ) {
         super(complexType, parent, subpath, environment)
-        makeObservable(this)
+        this._snapshotComputed = computed<S>(() => freeze(this.getSnapshot()))
 
         this.unbox = this.unbox.bind(this)
 
@@ -177,7 +177,6 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         }
     }
 
-    @action
     createObservableInstance(): void {
         if (devMode()) {
             if (this.state !== NodeLifeCycle.INITIALIZING) {
@@ -232,7 +231,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
         // NOTE: we need to touch snapshot, because non-observable
         // "_observableInstanceState" field was touched
-        invalidateComputed(this, "snapshot")
+        ;(this._snapshotComputed as any).trackAndCompute()
 
         if (this.isRoot) this._addSnapshotReaction()
 
@@ -344,9 +343,8 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     private _snapshotUponDeath?: S
 
     // advantage of using computed for a snapshot is that nicely respects transactions etc.
-    @computed
     get snapshot(): S {
-        return freeze(this.getSnapshot())
+        return this._snapshotComputed.get()
     }
 
     // NOTE: we use this method to get snapshot without creating @computed overhead
@@ -489,7 +487,6 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         })
     }
 
-    @action
     detach(): void {
         if (!this.isAlive) throw fail(`Error while detaching, node is not alive.`)
 
@@ -528,7 +525,6 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         addHiddenFinalProp(this.storedValue, "toJSON", toJSON)
     }
 
-    @action
     die(): void {
         if (!this.isAlive || this.state === NodeLifeCycle.DETACHING) return
         this.aboutToDie()
@@ -710,6 +706,11 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
     // #endregion
 }
+ObjectNode.prototype.createObservableInstance = action(
+    ObjectNode.prototype.createObservableInstance
+)
+ObjectNode.prototype.detach = action(ObjectNode.prototype.detach)
+ObjectNode.prototype.die = action(ObjectNode.prototype.die)
 
 /**
  * @internal

@@ -11,8 +11,7 @@ import {
     observe,
     set,
     IObjectDidChange,
-    makeObservable,
-    extendObservable
+    makeObservable
 } from "mobx"
 import {
     addHiddenFinalProp,
@@ -345,7 +344,6 @@ export class ModelType<
 
     constructor(opts: ModelTypeConfig) {
         super(opts.name || defaultObjectOptions.name)
-        makeObservable(this)
         Object.assign(this, defaultObjectOptions, opts)
         // ensures that any default value gets converted to its related type
         this.properties = toPropertiesObject(this.properties) as PROPS
@@ -673,7 +671,6 @@ export class ModelType<
         ;(node.storedValue as any)[subpath] = patch.value
     }
 
-    @action
     applySnapshot(node: this["N"], snapshot: this["C"]): void {
         const preProcessedSnapshot = this.applySnapshotPreProcessor(snapshot)
         typecheckInternal(this, preProcessedSnapshot)
@@ -739,6 +736,7 @@ export class ModelType<
         ;(node.storedValue as any)[subpath] = undefined
     }
 }
+ModelType.prototype.applySnapshot = action(ModelType.prototype.applySnapshot)
 
 export function model<P extends ModelPropertiesDeclaration = {}>(
     name: string,

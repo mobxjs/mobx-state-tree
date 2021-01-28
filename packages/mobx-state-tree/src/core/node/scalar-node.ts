@@ -8,7 +8,7 @@ import {
     SimpleType,
     devMode
 } from "../../internal"
-import { action, makeObservable } from "mobx"
+import { action } from "mobx"
 
 /**
  * @internal
@@ -31,8 +31,6 @@ export class ScalarNode<C, S, T> extends BaseNode<C, S, T> {
         initialSnapshot: C
     ) {
         super(simpleType, parent, subpath, environment)
-        makeObservable(this)
-
         try {
             this.storedValue = simpleType.createNewInstance(initialSnapshot)
         } catch (e) {
@@ -95,7 +93,6 @@ export class ScalarNode<C, S, T> extends BaseNode<C, S, T> {
         return `${this.type.name}@${path}${this.isAlive ? "" : " [dead]"}`
     }
 
-    @action
     die(): void {
         if (!this.isAlive || this.state === NodeLifeCycle.DETACHING) return
         this.aboutToDie()
@@ -118,3 +115,4 @@ export class ScalarNode<C, S, T> extends BaseNode<C, S, T> {
         this.fireInternalHook(name)
     }
 }
+ScalarNode.prototype.die = action(ScalarNode.prototype.die)

@@ -353,15 +353,6 @@ export function argsToArray(args: IArguments): any[] {
  * @internal
  * @hidden
  */
-export function invalidateComputed(target: any, propName: string) {
-    const atom = getAtom(target, propName) as any
-    atom.trackAndCompute()
-}
-
-/**
- * @internal
- * @hidden
- */
 export function stringStartsWith(str: string, beginning: string) {
     return str.indexOf(beginning) === 0
 }

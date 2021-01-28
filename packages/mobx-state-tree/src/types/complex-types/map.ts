@@ -10,8 +10,7 @@ import {
     observable,
     ObservableMap,
     observe,
-    values,
-    makeObservable
+    values
 } from "mobx"
 import {
     ComplexType,
@@ -236,7 +235,6 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         super(name)
         this._determineIdentifierMode()
         this.hookInitializers = hookInitializers
-        makeObservable(this)
     }
 
     hooks(hooks: IHooksGetter<IMSTMap<IT>>) {
@@ -444,7 +442,6 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         }
     }
 
-    @action
     applySnapshot(node: this["N"], snapshot: this["C"]): void {
         typecheckInternal(this, snapshot)
         const target = node.storedValue
@@ -488,6 +485,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         node.storedValue.delete(subpath)
     }
 }
+MapType.prototype.applySnapshot = action(MapType.prototype.applySnapshot)
 
 /**
  * `types.map` - Creates a key based collection type who's children are all of a uniform declared type.
