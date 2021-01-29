@@ -366,6 +366,7 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
 
     abstract getSubTypes(): IAnyType[] | IAnyType | null | typeof cannotDetermineSubtype
 }
+BaseType.prototype.create = action(BaseType.prototype.create)
 
 /**
  * @internal
@@ -518,7 +519,6 @@ export abstract class SimpleType<C, S, T> extends BaseType<C, S, T, ScalarNode<C
         return null
     }
 }
-BaseType.prototype.create = action(BaseType.prototype.create)
 
 /**
  * Returns if a given value represents a type.
