@@ -8,8 +8,7 @@ import {
     intercept,
     IObservableArray,
     observable,
-    observe,
-    makeObservable
+    observe
 } from "mobx"
 import {
     addHiddenFinalProp,
@@ -94,7 +93,6 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         hookInitializers: Array<IHooksGetter<IMSTArray<IT>>> = []
     ) {
         super(name)
-        makeObservable(this)
         this.hookInitializers = hookInitializers
     }
 
@@ -279,7 +277,6 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         }
     }
 
-    @action
     applySnapshot(node: this["N"], snapshot: this["C"]): void {
         typecheckInternal(this, snapshot)
         const target = node.storedValue
@@ -310,6 +307,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         node.storedValue.splice(Number(subpath), 1)
     }
 }
+ArrayType.prototype.applySnapshot = action(ArrayType.prototype.applySnapshot)
 
 /**
  * `types.array` - Creates an index based collection type who's children are all of a uniform declared type.
