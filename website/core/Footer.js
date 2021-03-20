@@ -53,11 +53,11 @@ class Footer extends React.Component {
                     <div>
                         <h5>Community</h5>
                         <a
-                            href="https://spectrum.chat/mobx-state-tree"
+                            href="https://github.com/mobxjs/mobx-state-tree/discussions"
                             target="_blank"
                             rel="noreferrer noopener"
                         >
-                            Spectrum community
+                            GitHub Discussions
                         </a>
 
                         <a
