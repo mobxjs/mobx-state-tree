@@ -730,7 +730,7 @@ ___
 
 `types.array` - Creates an index based collection type who's children are all of a uniform declared type.
 
-This type will always produce [observable arrays](https://mobx.js.org/refguide/array.html)
+This type will always produce [observable arrays](https://mobx.js.org/api.html#observablearray)
 
 Example:
 ```ts
@@ -3523,7 +3523,7 @@ ___
 `types.map` - Creates a key based collection type who's children are all of a uniform declared type.
 If the type stored in a map has an identifier, it is mandatory to store the child under that identifier in the map.
 
-This type will always produce [observable maps](https://mobx.js.org/refguide/map.html)
+This type will always produce [observable maps](https://mobx.js.org/api.html#observablemap)
 
 Example:
 ```ts
