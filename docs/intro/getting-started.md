@@ -34,7 +34,7 @@ npx create-react-app mst-todo
 Next install `mobx`, `mobx-react-lite` and `mobx-state-tree` dependencies.
 
 ```
-yarn add mobx@5.15.7 mobx-react-lite@2.2.2 mobx-state-tree
+yarn add mobx mobx-react-lite mobx-state-tree
 ```
 
 Now you can run `npm run start` and a basic React page will show up. You're all set up and can begin editing the project files!
