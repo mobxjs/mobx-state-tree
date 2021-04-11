@@ -464,7 +464,7 @@ const RootStore = types
 
 [View sample in the playground](https://codesandbox.io/s/x293k4q95o)
 
-Notice that the `getTodosWhereDoneIs` view can also be used outside of its model, for example it can be used inside views.
+Notice that other views and View components may call `getTodosWhereDoneIs` outside of the store definition.
 
 ## Going further: References
 
