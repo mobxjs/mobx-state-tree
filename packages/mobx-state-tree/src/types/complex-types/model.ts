@@ -3,10 +3,10 @@ import {
     _interceptReads,
     action,
     computed,
+    defineProperty,
     intercept,
     getAtom,
     IObjectWillChange,
-    isComputedProp,
     observable,
     observe,
     set,
@@ -493,21 +493,8 @@ export class ModelType<
             // is this a computed property?
             const descriptor = Object.getOwnPropertyDescriptor(views, key)!
             if ("get" in descriptor) {
-                if (isComputedProp(self, key)) {
-                    const computedValue = _getAdministration(self, key)
-                    // TODO: mobx currently does not allow redefining computes yet, pending #1121
-                    // FIXME: this binds to the internals of mobx!
-                    computedValue.derivation = descriptor.get
-                    computedValue.scope = self
-                    if (descriptor.set)
-                        computedValue.setter = action(
-                            computedValue.name + "-setter",
-                            descriptor.set
-                        )
-                } else {
-                    Object.defineProperty(self, key, descriptor)
-                    makeObservable(self, { [key]: computed } as any)
-                }
+                defineProperty(self, key, descriptor)
+                makeObservable(self, { [key]: computed } as any)
             } else if (typeof descriptor.value === "function") {
                 // this is a view function, merge as is!
                 // See #646, allow models to be mocked
