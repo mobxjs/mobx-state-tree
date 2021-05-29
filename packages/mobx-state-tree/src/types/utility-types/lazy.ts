@@ -17,7 +17,8 @@ import {
 
 interface LazyOptions<T> {
     loadType: () => Promise<IType<T, T, T>>
-    shouldLoadPredicate: (parent: Instance<this>) => boolean
+    // todo: type this any?
+    shouldLoadPredicate: (parent: any) => boolean
 }
 
 export class Lazy<T> extends SimpleType<T, T, T> {
