@@ -1,18 +1,15 @@
 import { action, IObservableArray, observable, when } from "mobx"
 import { AnyNode } from "../../core/node/BaseNode"
-import { Instance, IType } from "../../core/type/type"
+import { IType, SimpleType, TypeFlags } from "../../core/type/type"
 import {
     IValidationContext,
     IValidationResult,
-    TypeFlags,
-    IAnyType,
     typeCheckSuccess,
-    AnyObjectNode,
-    SimpleType,
     createScalarNode,
     deepFreeze,
     isSerializable,
-    typeCheckFailure
+    typeCheckFailure,
+    AnyObjectNode
 } from "../../internal"
 
 interface LazyOptions<T> {
@@ -22,7 +19,7 @@ interface LazyOptions<T> {
 }
 
 export class Lazy<T> extends SimpleType<T, T, T> {
-    flags = TypeFlags.Frozen
+    flags = TypeFlags.Lazy
 
     private loadedType: IType<T, T, T> | null = null
     private pendingNodeList: IObservableArray<AnyNode> = observable.array()
