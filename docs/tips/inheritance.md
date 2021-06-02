@@ -17,6 +17,7 @@ const Square = types
         }
     )
     .views(self => ({
+        // note: this is not a getter! this is just a function that is evaluated
         surface() {
             return self.width * self.width
         }
@@ -26,7 +27,9 @@ const Square = types
 const Box = Square
     .named("Box")
     .views(self => {
-        // save the base implementation of surface
+        // save the base implementation of surface, again, this is a function.
+        // if it was a getter, the getter would be evaluated only once here
+        // instead of being able to evaluate dynamically at time-of-use
         const superSurface = self.surface
 
         return {
