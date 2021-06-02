@@ -6,7 +6,6 @@ title: Simulate inheritance by using type composition
 
 <div id="codefund"></div>
 
-
 There is no notion of inheritance in MST. The recommended approach is to keep references to the original configuration of a model in order to compose it into a new one, for example by using `types.compose` (which combines two types) or producing fresh types using `.props|.views|.actions`. An example of classical inheritance could be expressed using composition as follows:
 
 ```javascript
@@ -36,19 +35,24 @@ const Box = Square
                 return superSurface() * 1
             },
             volume() {
-                return self.surface * self.width
+                return self.surface() * self.width
             }
         }
     }))
 
 // no inheritance, but, union types and code reuse
 const Shape = types.union(Box, Square)
+
+const instance = Shape.create({type:"Box",width:4})
+console.log(instance.width)
+console.log(instance.surface()) // calls Box.surface()
+console.log(instance.volume()) // calls Box.volume()
 ```
 
 Similarly, compose can be used to simply mix in types:
 
 ```javascript
-const CreationLogger = types.model().actions(self => ({
+const CreationLogger = types.model().actions((self) => ({
     afterCreate() {
         console.log("Instantiated " + getType(self).name)
     }
@@ -58,7 +62,7 @@ const BaseSquare = types
     .model({
         width: types.number
     })
-    .views(self => ({
+    .views((self) => ({
         surface() {
             return self.width * self.width
         }
