@@ -14,24 +14,25 @@ import {
     typeCheckFailure
 } from "../../internal"
 
-interface LazyOptions<T> {
-    loadType: () => Promise<IType<T, T, T>>
-    // todo: type this any?
+interface LazyOptions<T extends IType<any, any, any>> {
+    loadType: () => Promise<T>
+    // TODO: type this any to reference the parent model
     shouldLoadPredicate: (parent: any) => boolean
 }
 
-export function lazy<T>(name: string, options: LazyOptions<T>): IType<T, T, T> {
-    return new Lazy(name, options)
+export function lazy<T extends IType<any, any, any>>(name: string, options: LazyOptions<T>): T {
+    // TODO: fix this unknown casting to be stricter
+    return (new Lazy(name, options) as unknown) as T
 }
 
 /**
  * @internal
  * @hidden
  */
-export class Lazy<T> extends SimpleType<T, T, T> {
+export class Lazy<T extends IType<any, any, any>> extends SimpleType<T, T, T> {
     flags = TypeFlags.Lazy
 
-    private loadedType: IType<T, T, T> | null = null
+    private loadedType: T | null = null
     private pendingNodeList: IObservableArray<AnyNode> = observable.array()
 
     constructor(name: string, private readonly options: LazyOptions<T>) {

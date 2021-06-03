@@ -17,7 +17,6 @@ test("it should load the correct type", async () => {
         .model("TestModel", {
             shouldLoad: types.optional(types.boolean, false),
             lazyModel: types.lazy<typeof LazyModel>("lazy", {
-                // @ts-ignore todo fix this type issue
                 loadType: () => Promise.resolve(LazyModel),
                 shouldLoadPredicate: (self) => self.shouldLoad == true
             })
@@ -39,9 +38,9 @@ test("it should load the correct type", async () => {
     expect(store.lazyModel.height).toBe(2)
     expect(store.lazyModel.area).toBeUndefined()
     store.load()
-    const promise = new Promise<void>((resolve, reject) => {
+    const promise = new Promise<number>((resolve, reject) => {
         when(
-            () => store.lazyModel && store.lazyModel.area,
+            () => store.lazyModel && store.lazyModel.area !== undefined,
             () => resolve(store.lazyModel.area)
         )
 
