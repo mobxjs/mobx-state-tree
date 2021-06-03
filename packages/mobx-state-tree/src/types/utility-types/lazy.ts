@@ -40,7 +40,6 @@ export class Lazy<T extends IType<any, any, any>> extends SimpleType<T, T, T> {
 
         when(
             () =>
-                // any of the pending node has decided that the time has come
                 this.pendingNodeList.length > 0 &&
                 this.pendingNodeList.some(
                     (node) =>
@@ -48,13 +47,9 @@ export class Lazy<T extends IType<any, any, any>> extends SimpleType<T, T, T> {
                         this.options.shouldLoadPredicate(node.parent ? node.parent.value : null)
                 ),
             () => {
-                // load the real type
                 this.options.loadType().then(
-                    action((type) => {
-                        // stores the loaded type
+                    action((type: T) => {
                         this.loadedType = type
-
-                        // replace the replacement nodes with the correct one
                         this.pendingNodeList.forEach((node) => {
                             if (!node.parent) return
                             if (!this.loadedType) return
