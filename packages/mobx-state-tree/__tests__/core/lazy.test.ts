@@ -1,5 +1,5 @@
 import { when } from "mobx"
-import { types } from "../../src"
+import { getRoot, types } from "../../src"
 
 test("it should load the correct type", async () => {
     const LazyModel = types
@@ -50,7 +50,7 @@ test("it should load the correct type", async () => {
     await expect(promise).resolves.toBe(6)
 })
 
-test("it should load the correct type", async () => {
+test("maintains the tree structure when loaded", async () => {
     const LazyModel = types
         .model("LazyModel", {
             width: types.number,
@@ -58,25 +58,31 @@ test("it should load the correct type", async () => {
         })
         .views((self) => ({
             get area() {
-                return self.height * self.width
+                const root = getRoot<{ rootValue: number }>(self)
+                return self.height * self.width * root.rootValue
             }
         }))
 
-    const TestModel = types
-        .model("TestModel", {
+    const Root = types
+        .model("Root", {
             shouldLoad: types.optional(types.boolean, false),
             lazyModel: types.lazy("lazy", {
                 loadType: () => Promise.resolve(LazyModel),
                 shouldLoadPredicate: (self) => self.shouldLoad == true
             })
         })
+        .views(() => ({
+            get rootValue() {
+                return 5
+            }
+        }))
         .actions((self) => ({
             load: () => {
                 self.shouldLoad = true
             }
         }))
 
-    const store = TestModel.create({
+    const store = Root.create({
         lazyModel: {
             width: 3,
             height: 2
@@ -85,6 +91,7 @@ test("it should load the correct type", async () => {
 
     expect(store.lazyModel.width).toBe(3)
     expect(store.lazyModel.height).toBe(2)
+    expect(store.rootValue).toEqual(5)
     expect(store.lazyModel.area).toBeUndefined()
     store.load()
     const promise = new Promise<number>((resolve, reject) => {
@@ -96,5 +103,5 @@ test("it should load the correct type", async () => {
         setTimeout(reject, 2000)
     })
 
-    await expect(promise).resolves.toBe(6)
+    await expect(promise).resolves.toBe(30)
 })
