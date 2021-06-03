@@ -1,6 +1,10 @@
 import { when } from "mobx"
 import { getRoot, types } from "../../src"
 
+interface IRootModel {
+    shouldLoad: boolean
+}
+
 test("it should load the correct type", async () => {
     const LazyModel = types
         .model("LazyModel", {
@@ -13,12 +17,12 @@ test("it should load the correct type", async () => {
             }
         }))
 
-    const TestModel = types
-        .model("TestModel", {
+    const Root = types
+        .model("Root", {
             shouldLoad: types.optional(types.boolean, false),
-            lazyModel: types.lazy<typeof LazyModel>("lazy", {
+            lazyModel: types.lazy<typeof LazyModel, IRootModel>("lazy", {
                 loadType: () => Promise.resolve(LazyModel),
-                shouldLoadPredicate: (self) => self.shouldLoad == true
+                shouldLoadPredicate: (parent) => parent.shouldLoad == true
             })
         })
         .actions((self) => ({
@@ -27,7 +31,7 @@ test("it should load the correct type", async () => {
             }
         }))
 
-    const store = TestModel.create({
+    const store = Root.create({
         lazyModel: {
             width: 3,
             height: 2
@@ -66,9 +70,9 @@ test("maintains the tree structure when loaded", async () => {
     const Root = types
         .model("Root", {
             shouldLoad: types.optional(types.boolean, false),
-            lazyModel: types.lazy("lazy", {
+            lazyModel: types.lazy<typeof LazyModel, IRootModel>("lazy", {
                 loadType: () => Promise.resolve(LazyModel),
-                shouldLoadPredicate: (self) => self.shouldLoad == true
+                shouldLoadPredicate: (parent) => parent.shouldLoad == true
             })
         })
         .views(() => ({

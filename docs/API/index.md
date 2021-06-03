@@ -3484,7 +3484,7 @@ ___
 
 ###  lazy
 
-▸ **lazy**<**T**>(`type`: function): *T*
+▸ **lazy**<**T**, **U**>({`loadType`: function, `shouldLoadPredicate`: function}): *T*
 
 *Defined in [packages/mobx-state-tree/src/types/utility-types/lazy.ts:103](https://github.com/mobxjs/mobx-state-tree/blob/126ab41a/packages/mobx-state-tree/src/types/utility-types/lazy.ts#L103)*
 
@@ -3492,12 +3492,28 @@ ___
 
 Example:
 ```ts
-    const TestModel = types
-        .model("TestModel", {
+
+interface IRootModel {
+    shouldLoad: boolean
+}
+
+const LazyModel = types
+        .model("LazyModel", {
+            width: types.number,
+            height: types.number
+        })
+        .views((self) => ({
+            get area() {
+                return self.height * self.width
+            }
+        }))
+
+ const Root = types
+        .model("Root", {
             shouldLoad: types.optional(types.boolean, false),
-            lazyModel: types.lazy("lazy", {
+            lazyModel: types.lazy<typeof LazyModel, IRootModel>("lazy", {
                 loadType: () => Promise.resolve(LazyModel),
-                shouldLoadPredicate: (self) => self.shouldLoad == true
+                shouldLoadPredicate: (parent) => parent.shouldLoad == true
             })
         })
 ```
@@ -3506,13 +3522,21 @@ Example:
 
 ▪ **T**: *[IAnyType](interfaces/ianytype.md)*
 
+▪ **U**: Generic interface for the properties of the parent model
+
 **Parameters:**
 
-▪ **type**: *function*
+▪ **loadType**: *function*
 
-A function that returns the type that will be defined.
+A function that returns a promise, which resolves to the **T** type.
 
-▸ (): *T*
+▸ (): Promise<*T*>
+
+▪ **shouldLoadPredicate**: *function*
+
+This is a function that when its resolution is **true** will invoke the **loadType** function.
+
+▸ (): boolean
 
 **Returns:** *T*
 
