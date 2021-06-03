@@ -20,6 +20,14 @@ interface LazyOptions<T> {
     shouldLoadPredicate: (parent: any) => boolean
 }
 
+export function lazy<T>(name: string, options: LazyOptions<T>): IType<T, T, T> {
+    return new Lazy(name, options)
+}
+
+/**
+ * @internal
+ * @hidden
+ */
 export class Lazy<T> extends SimpleType<T, T, T> {
     flags = TypeFlags.Lazy
 
@@ -111,8 +119,4 @@ export class Lazy<T> extends SimpleType<T, T, T> {
         }
         return super.reconcile(current, value, parent, subpath)
     }
-}
-
-export function lazy<T>(name: string, options: LazyOptions<T>) {
-    return new Lazy(name, options)
 }
