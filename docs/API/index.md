@@ -3482,6 +3482,41 @@ A function that returns the type that will be defined.
 
 ___
 
+###  lazy
+
+▸ **lazy**<**T**>(`type`: function): *T*
+
+*Defined in [packages/mobx-state-tree/src/types/utility-types/lazy.ts:103](https://github.com/mobxjs/mobx-state-tree/blob/126ab41a/packages/mobx-state-tree/src/types/utility-types/lazy.ts#L103)*
+
+`types.lazy` - Defines a type that is loaded at a later date, this can be done as a promise and can be useful when trying to code split your stores.
+
+Example:
+```ts
+    const TestModel = types
+        .model("TestModel", {
+            shouldLoad: types.optional(types.boolean, false),
+            lazyModel: types.lazy("lazy", {
+                loadType: () => Promise.resolve(LazyModel),
+                shouldLoadPredicate: (self) => self.shouldLoad == true
+            })
+        })
+```
+
+**Type parameters:**
+
+▪ **T**: *[IAnyType](interfaces/ianytype.md)*
+
+**Parameters:**
+
+▪ **type**: *function*
+
+A function that returns the type that will be defined.
+
+▸ (): *T*
+
+**Returns:** *T*
+
+___
 ###  literal
 
 ▸ **literal**<**S**>(`value`: S): *[ISimpleType](interfaces/isimpletype.md)‹S›*
