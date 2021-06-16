@@ -1,4 +1,9 @@
-import { isObservableArray, _getGlobalState, getAtom } from "mobx"
+import {
+    isObservableArray,
+    isObservableObject,
+    _getGlobalState,
+    defineProperty as mobxDefineProperty
+} from "mobx"
 import { Primitives } from "./core/type/type"
 
 const plainObjectString = Object.toString()
@@ -204,8 +209,18 @@ export function isSerializable(value: any) {
  * @internal
  * @hidden
  */
+export function defineProperty(object: any, key: PropertyKey, descriptor: PropertyDescriptor) {
+    isObservableObject(object)
+        ? mobxDefineProperty(object, key, descriptor)
+        : Object.defineProperty(object, key, descriptor)
+}
+
+/**
+ * @internal
+ * @hidden
+ */
 export function addHiddenFinalProp(object: any, propName: string, value: any) {
-    Object.defineProperty(object, propName, {
+    defineProperty(object, propName, {
         enumerable: false,
         writable: false,
         configurable: true,
@@ -218,7 +233,7 @@ export function addHiddenFinalProp(object: any, propName: string, value: any) {
  * @hidden
  */
 export function addHiddenWritableProp(object: any, propName: string, value: any) {
-    Object.defineProperty(object, propName, {
+    defineProperty(object, propName, {
         enumerable: false,
         writable: true,
         configurable: true,

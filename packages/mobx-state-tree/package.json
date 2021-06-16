@@ -56,7 +56,7 @@
         "jest": "^26.1.0",
         "jest-junit": "^11.0.1",
         "lerna": "^3.13.1",
-        "mobx": "^6.1.0",
+        "mobx": "^6.3.0",
         "rollup": "^2.18.1",
         "rollup-plugin-commonjs": "^10.0.0",
         "rollup-plugin-filesize": "^9.0.1",
@@ -75,7 +75,7 @@
         "typescript": "^3.5.3"
     },
     "peerDependencies": {
-        "mobx": "^6.1.0"
+        "mobx": "^6.3.0"
     },
     "keywords": [
         "mobx",

@@ -20,7 +20,7 @@ import {
     resolveIdentifier
 } from "../../src"
 
-import { autorun, reaction, observable } from "mobx"
+import { autorun, reaction, observable, configure } from "mobx"
 
 const createTestFactories = () => {
     const Factory = types
@@ -1158,4 +1158,20 @@ test("#1173 - detaching a model should not screw it", () => {
     expect(s.item).toBe(undefined)
     expect(detachedItem.x).toBe(6)
     expect(detachedItem).toBe(n0)
+})
+
+test("#1702 - should not throw with useProxies: 'ifavailable'", () => {
+    configure({
+        useProxies: "ifavailable"
+    })
+
+    const M = types.model({ x: 5 }).views((self) => ({
+        get y() {
+            return self.x
+        }
+    }))
+
+    expect(() => {
+        M.create({})
+    }).not.toThrow()
 })
