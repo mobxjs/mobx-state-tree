@@ -491,7 +491,7 @@ MapType.prototype.applySnapshot = action(MapType.prototype.applySnapshot)
  * `types.map` - Creates a key based collection type who's children are all of a uniform declared type.
  * If the type stored in a map has an identifier, it is mandatory to store the child under that identifier in the map.
  *
- * This type will always produce [observable maps](https://mobx.js.org/refguide/map.html)
+ * This type will always produce [observable maps](https://mobx.js.org/api.html#observablemap)
  *
  * Example:
  * ```ts

@@ -15,9 +15,9 @@ title: Derived values
 </details>
 
 Any fact that can be derived from your state is called a "view" or "derivation".
-See the [Mobx concepts & principles](https://mobx.js.org/intro/concepts.html) for some background.
+See [The gist of MobX](https://mobx.js.org/the-gist-of-mobx.html) for some background.
 
-Views come in two flavors: views with arguments and views without arguments. The latter are called computed values, based on the [computed](https://mobx.js.org/refguide/computed-decorator.html) concept in MobX. The main difference between the two is that computed properties create an explicit caching point, but later they work the same and any other computed value or MobX based reaction like [`@observer`](https://mobx.js.org/refguide/observer-component.html) components can react to them. Computed values are defined using _getter_ functions.
+Views come in two flavors: views with arguments and views without arguments. The latter are called computed values, based on the [computed](https://mobx.js.org/computeds.html) concept in MobX. The main difference between the two is that computed properties create an explicit caching point, but later they work the same and any other computed value or MobX based reaction like [`@observer`](https://mobx.js.org/react-integration.html) components can react to them. Computed values are defined using _getter_ functions.
 
 Example:
 
