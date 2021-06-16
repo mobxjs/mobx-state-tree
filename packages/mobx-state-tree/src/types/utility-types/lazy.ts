@@ -16,7 +16,6 @@ import {
 
 interface LazyOptions<T extends IType<any, any, any>, U> {
     loadType: () => Promise<T>
-    // TODO: type this any to reference the parent model
     shouldLoadPredicate: (parent: U) => boolean
 }
 
