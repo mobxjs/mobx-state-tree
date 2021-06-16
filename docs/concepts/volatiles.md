@@ -52,7 +52,7 @@ const Store = types
 Some tips:
 
 1.  Note that multiple `actions` calls can be chained. This makes it possible to create multiple closures with their own protected volatile state.
-2.  Although in the above example the `pendingRequest` could be initialized directly in the action initializer, it is recommended to do this in the `afterCreate` hook, which will only once the entire instance has been set up (there might be many action and property initializers for a single type).
+2.  Although in the above example the `pendingRequest` could be initialized directly in the action initializer, it is recommended to do this in the `afterCreate` hook, which will only be called once the entire instance has been set up (there might be many action and property initializers for a single type).
 
 3.  The above example doesn't actually use the promise. For how to work with promises / asynchronous flows, see the [asynchronous actions](async-actions) section.
 
