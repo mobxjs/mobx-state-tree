@@ -84,7 +84,7 @@
     .model(<span class="hljs-string">"Todo"</span>, { <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span> })
     .preProcessSnapshot(<span class="hljs-function"><span class="hljs-params">snapshot</span> =&gt;</span> ({
         <span class="hljs-comment">// auto convert strings to booleans as part of preprocessing</span>
-        done: snapshot.done === <span class="hljs-string">"true"</span> ? <span class="hljs-literal">true</span> : snapshot.done === <span class="hljs-string">"false"</span> ? <span class="hljs-literal">false</span> : snapshot.done
+        <span class="hljs-attr">done</span>: snapshot.done === <span class="hljs-string">"true"</span> ? <span class="hljs-literal">true</span> : snapshot.done === <span class="hljs-string">"false"</span> ? <span class="hljs-literal">false</span> : snapshot.done
     }))
     .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
         afterCreate() {

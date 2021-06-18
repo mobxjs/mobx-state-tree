@@ -72,6 +72,7 @@
         }
     )
     .views(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
+        <span class="hljs-comment">// note: this is not a getter! this is just a function that is evaluated</span>
         surface() {
             <span class="hljs-keyword">return</span> self.width * self.width
         }
@@ -81,7 +82,9 @@
 <span class="hljs-keyword">const</span> Box = Square
     .named(<span class="hljs-string">"Box"</span>)
     .views(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> {
-        <span class="hljs-comment">// save the base implementation of surface</span>
+        <span class="hljs-comment">// save the base implementation of surface, again, this is a function.</span>
+        <span class="hljs-comment">// if it was a getter, the getter would be evaluated only once here</span>
+        <span class="hljs-comment">// instead of being able to evaluate dynamically at time-of-use</span>
         <span class="hljs-keyword">const</span> superSurface = self.surface
 
         <span class="hljs-keyword">return</span> {
@@ -90,16 +93,21 @@
                 <span class="hljs-keyword">return</span> superSurface() * <span class="hljs-number">1</span>
             },
             volume() {
-                <span class="hljs-keyword">return</span> self.surface * self.width
+                <span class="hljs-keyword">return</span> self.surface() * self.width
             }
         }
     }))
 
 <span class="hljs-comment">// no inheritance, but, union types and code reuse</span>
 <span class="hljs-keyword">const</span> Shape = types.union(Box, Square)
+
+<span class="hljs-keyword">const</span> instance = Shape.create({<span class="hljs-attr">type</span>:<span class="hljs-string">"Box"</span>,<span class="hljs-attr">width</span>:<span class="hljs-number">4</span>})
+<span class="hljs-built_in">console</span>.log(instance.width)
+<span class="hljs-built_in">console</span>.log(instance.surface()) <span class="hljs-comment">// calls Box.surface()</span>
+<span class="hljs-built_in">console</span>.log(instance.volume()) <span class="hljs-comment">// calls Box.volume()</span>
 </code></pre>
 <p>Similarly, compose can be used to simply mix in types:</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> CreationLogger = types.model().actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> CreationLogger = types.model().actions(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
     afterCreate() {
         <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Instantiated "</span> + getType(self).name)
     }
@@ -109,7 +117,7 @@
     .model({
         <span class="hljs-attr">width</span>: types.number
     })
-    .views(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
+    .views(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
         surface() {
             <span class="hljs-keyword">return</span> self.width * self.width
         }

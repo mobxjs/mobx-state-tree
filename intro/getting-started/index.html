@@ -77,7 +77,7 @@
 <pre><code class="hljs"><span class="hljs-string">npx </span><span class="hljs-built_in">create-react-app</span> <span class="hljs-string">mst-todo
 </span></code></pre>
 <p>Next install <code>mobx</code>, <code>mobx-react-lite</code> and <code>mobx-state-tree</code> dependencies.</p>
-<pre><code class="hljs">yarn add <span class="hljs-symbol">mobx@</span><span class="hljs-number">5.15</span><span class="hljs-number">.7</span> mobx-react-<span class="hljs-symbol">lite@</span><span class="hljs-number">2.2</span><span class="hljs-number">.2</span> mobx-state-tree
+<pre><code class="hljs">yarn <span class="hljs-keyword">add</span><span class="bash"> mobx mobx-react-lite mobx-state-tree</span>
 </code></pre>
 <p>Now you can run <code>npm run start</code> and a basic React page will show up. You're all set up and can begin editing the project files!</p>
 <h2><a class="anchor" aria-hidden="true" id="overview"></a><a href="#overview" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Overview</h2>
@@ -301,15 +301,15 @@ onSnapshot(store, snapshot =&gt; {
 <span class="hljs-keyword">import</span> { values } <span class="hljs-keyword">from</span> <span class="hljs-string">'mobx'</span>
 
 <span class="hljs-keyword">const</span> App = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
-    &lt;div&gt;
-        &lt;button onClick={e =&gt; props.store.addTodo(randomId(), "New Task")}&gt;Add Task&lt;/button&gt;
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{e</span> =&gt;</span> props.store.addTodo(randomId(), "New Task")}&gt;Add Task<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
         {values(props.store.todos).map(todo =&gt; (
-            &lt;div&gt;
-                &lt;input type="checkbox" checked={todo.done} onChange={e =&gt; todo.toggle()} /&gt;
-                &lt;input type="text" value={todo.name} onChange={e =&gt; todo.setName(e.target.value)} /&gt;
-            &lt;/div&gt;
+            <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"checkbox"</span> <span class="hljs-attr">checked</span>=<span class="hljs-string">{todo.done}</span> <span class="hljs-attr">onChange</span>=<span class="hljs-string">{e</span> =&gt;</span> todo.toggle()} /&gt;
+                <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text"</span> <span class="hljs-attr">value</span>=<span class="hljs-string">{todo.name}</span> <span class="hljs-attr">onChange</span>=<span class="hljs-string">{e</span> =&gt;</span> todo.setName(e.target.value)} /&gt;
+            <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
         ))}
-    &lt;/div&gt;
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
 ))
 </code></pre>
 <p><a href="https://codesandbox.io/s/310ol795x6">View sample in the playground</a></p>
@@ -317,23 +317,23 @@ onSnapshot(store, snapshot =&gt; {
 <p>If you have the React DevTools installed, enable the &quot;Highlight Updates&quot; check and you will see that the entire application will re-render whenever a <code>Todo</code> is toggled or a <code>name</code> is changed. That's a shame, as this can cause performance issues if there's a lot of <code>Todo</code>'s in our list!</p>
 <p>Thanks to the ability of MobX to emit granular updates, fixing that becomes pretty easy! You just need to split the rendering of a <code>Todo</code> into another component to only re-render that component whenever the <code>Todo</code> data changes.</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> TodoView = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
-    &lt;div&gt;
-        &lt;input type="checkbox" checked={props.todo.done} onChange={e =&gt; props.todo.toggle()} /&gt;
-        &lt;input
-            type="text"
-            value={props.todo.name}
-            onChange={e =&gt; props.todo.setName(e.target.value)}
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"checkbox"</span> <span class="hljs-attr">checked</span>=<span class="hljs-string">{props.todo.done}</span> <span class="hljs-attr">onChange</span>=<span class="hljs-string">{e</span> =&gt;</span> props.todo.toggle()} /&gt;
+        <span class="hljs-tag">&lt;<span class="hljs-name">input</span>
+            <span class="hljs-attr">type</span>=<span class="hljs-string">"text"</span>
+            <span class="hljs-attr">value</span>=<span class="hljs-string">{props.todo.name}</span>
+            <span class="hljs-attr">onChange</span>=<span class="hljs-string">{e</span> =&gt;</span> props.todo.setName(e.target.value)}
         /&gt;
-    &lt;/div&gt;
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
 ))
 
-const AppView = observer(props =&gt; (
-    &lt;div&gt;
-        &lt;button onClick={e =&gt; props.store.addTodo(randomId(), "New Task")}&gt;Add Task&lt;/button&gt;
+<span class="hljs-keyword">const</span> AppView = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{e</span> =&gt;</span> props.store.addTodo(randomId(), "New Task")}&gt;Add Task<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
         {values(props.store.todos).map(todo =&gt; (
-            &lt;TodoView todo={todo} /&gt;
+            <span class="hljs-tag">&lt;<span class="hljs-name">TodoView</span> <span class="hljs-attr">todo</span>=<span class="hljs-string">{todo}</span> /&gt;</span>
         ))}
-    &lt;/div&gt;
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
 ))
 </code></pre>
 <p><a href="https://codesandbox.io/s/jvmw9oxyxv">View sample in the playground</a></p>
@@ -370,13 +370,13 @@ const AppView = observer(props =&gt; (
 ))
 
 <span class="hljs-keyword">const</span> AppView = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
-    &lt;div&gt;
-        &lt;button onClick={e =&gt; props.store.addTodo(randomId(), "New Task")}&gt;Add Task&lt;/button&gt;
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{e</span> =&gt;</span> props.store.addTodo(randomId(), "New Task")}&gt;Add Task<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
         {values(props.store.todos).map(todo =&gt; (
-            &lt;TodoView todo={todo} /&gt;
+            <span class="hljs-tag">&lt;<span class="hljs-name">TodoView</span> <span class="hljs-attr">todo</span>=<span class="hljs-string">{todo}</span> /&gt;</span>
         ))}
-        &lt;TodoCounterView store={props.store} /&gt;
-    &lt;/div&gt;
+        <span class="hljs-tag">&lt;<span class="hljs-name">TodoCounterView</span> <span class="hljs-attr">store</span>=<span class="hljs-string">{props.store}</span> /&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
 ))
 </code></pre>
 <p><a href="https://codesandbox.io/s/k21ol780xr">View sample in the playground</a></p>
@@ -407,7 +407,7 @@ const AppView = observer(props =&gt; (
     }))
 </code></pre>
 <p><a href="https://codesandbox.io/s/x293k4q95o">View sample in the playground</a></p>
-<p>Notice that the <code>getTodosWhereDoneIs</code> view can also be used outside of its model, for example it can be used inside views.</p>
+<p>Notice that other views and View components may call <code>getTodosWhereDoneIs</code> outside of the store definition.</p>
 <h2><a class="anchor" aria-hidden="true" id="going-further-references"></a><a href="#going-further-references" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Going further: References</h2>
 <p>Ok, the basics of our TODO application are done! But as I said when starting this tutorial, we want to be able to provide assignees for each of our TODOs!</p>
 <p>We will focus on this feature; to do that let's assume that the list of users comes from an XHR request or another data source. Feel free to either implement it or add to the TODO application a user management feature.</p>
@@ -529,41 +529,41 @@ at path <span class="hljs-string">"/users/3/id"</span> value `undefined` is <spa
 ))
 
 <span class="hljs-keyword">const</span> TodoView = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
-    &lt;div&gt;
-        &lt;input type="checkbox" checked={props.todo.done} onChange={e =&gt; props.todo.toggle()} /&gt;
-        &lt;input
-            type="text"
-            value={props.todo.name}
-            onChange={e =&gt; props.todo.setName(e.target.value)}
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"checkbox"</span> <span class="hljs-attr">checked</span>=<span class="hljs-string">{props.todo.done}</span> <span class="hljs-attr">onChange</span>=<span class="hljs-string">{e</span> =&gt;</span> props.todo.toggle()} /&gt;
+        <span class="hljs-tag">&lt;<span class="hljs-name">input</span>
+            <span class="hljs-attr">type</span>=<span class="hljs-string">"text"</span>
+            <span class="hljs-attr">value</span>=<span class="hljs-string">{props.todo.name}</span>
+            <span class="hljs-attr">onChange</span>=<span class="hljs-string">{e</span> =&gt;</span> props.todo.setName(e.target.value)}
         /&gt;
-        &lt;UserPickerView
-            user={props.todo.user}
-            store={props.store}
-            onChange={userId =&gt; props.todo.setUser(userId)}
+        <span class="hljs-tag">&lt;<span class="hljs-name">UserPickerView</span>
+            <span class="hljs-attr">user</span>=<span class="hljs-string">{props.todo.user}</span>
+            <span class="hljs-attr">store</span>=<span class="hljs-string">{props.store}</span>
+            <span class="hljs-attr">onChange</span>=<span class="hljs-string">{userId</span> =&gt;</span> props.todo.setUser(userId)}
         /&gt;
-    &lt;/div&gt;
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
 ))
 
-const TodoCounterView = observer(props =&gt; (
-    &lt;div&gt;
+<span class="hljs-keyword">const</span> TodoCounterView = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
         {props.store.pendingCount} pending, {props.store.completedCount} completed
-    &lt;/div&gt;
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
 ))
 
-const AppView = observer(props =&gt; (
-    &lt;div&gt;
-        &lt;button onClick={e =&gt; props.store.addTodo(randomId(), "New Task")}&gt;Add Task&lt;/button&gt;
+<span class="hljs-keyword">const</span> AppView = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{e</span> =&gt;</span> props.store.addTodo(randomId(), "New Task")}&gt;Add Task<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
         {values(props.store.todos).map(todo =&gt; (
-            &lt;TodoView store={props.store} todo={todo} /&gt;
+            <span class="hljs-tag">&lt;<span class="hljs-name">TodoView</span> <span class="hljs-attr">store</span>=<span class="hljs-string">{props.store}</span> <span class="hljs-attr">todo</span>=<span class="hljs-string">{todo}</span> /&gt;</span>
         ))}
-        &lt;TodoCounterView store={props.store} /&gt;
-    &lt;/div&gt;
+        <span class="hljs-tag">&lt;<span class="hljs-name">TodoCounterView</span> <span class="hljs-attr">store</span>=<span class="hljs-string">{props.store}</span> /&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
 ))
 </code></pre>
 <p><a href="https://codesandbox.io/s/6j3qy74kpw">View sample in the playground</a></p>
 <h2><a class="anchor" aria-hidden="true" id="references-are-safe"></a><a href="#references-are-safe" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>References are safe!</h2>
 <p>One neat feature of references, is that they will throw an error if you accidentally remove a model that is required by a computed property! If you try to remove a user that's used by a reference, you'll get something like this:</p>
-<pre><code class="hljs">[mobx-state-tree] Failed <span class="hljs-keyword">to</span> resolve reference <span class="hljs-keyword">of</span> <span class="hljs-class"><span class="hljs-keyword">type</span> &lt;late&gt;: '1' </span>(<span class="hljs-keyword">in</span>: /todos/<span class="hljs-number">1</span>/user)
+<pre><code class="hljs">[mobx-state-tree] Failed <span class="hljs-keyword">to</span> resolve reference of<span class="hljs-built_in"> type </span>&lt;late&gt;: <span class="hljs-string">'1'</span> (<span class="hljs-keyword">in</span>: /todos/1/user)
 </code></pre>
 </span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/intro/installation"><span class="arrow-prev">← </span><span>Installation</span></a><a class="docs-next button" href="/intro/examples"><span>Examples</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#prerequisites">Prerequisites</a><ul class="toc-headings"><li><a href="#do-i-need-to-learn-mobx">Do I need to learn MobX?</a></li></ul></li><li><a href="#how-to-follow-this-tutorial">How to follow this tutorial</a><ul class="toc-headings"><li><a href="#writing-code-in-the-browser">Writing code in the browser</a></li><li><a href="#writing-code-in-the-editor">Writing code in the editor</a></li></ul></li><li><a href="#overview">Overview</a></li><li><a href="#getting-started">Getting Started</a></li><li><a href="#creating-our-first-model">Creating our first model</a></li><li><a href="#creating-model-instances-tree-nodes">Creating model instances (tree nodes)</a></li><li><a href="#meeting-types">Meeting types</a></li><li><a href="#modifying-data">Modifying data</a></li><li><a href="#snapshots-are-awesome">Snapshots are awesome!</a></li><li><a href="#from-snapshot-to-model">From snapshot to model</a></li><li><a href="#time-travel">Time travel</a></li><li><a href="#getting-to-the-ui">Getting to the UI</a></li><li><a href="#improving-render-performance">Improving render performance</a></li><li><a href="#computed-properties">Computed properties</a></li><li><a href="#model-views">Model views</a></li><li><a href="#going-further-references">Going further: References</a><ul class="toc-headings"><li><a href="#identifiers">Identifiers</a></li><li><a href="#how-to-define-the-reference">How to define the reference</a></li><li><a href="#setting-a-reference-value">Setting a reference value</a></li></ul></li><li><a href="#references-are-safe">References are safe!</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="MobX-state-tree" width="66" height="58"/></a><div><h5>Docs</h5><a href="/intro/getting-started">Getting Started</a><a href="/concepts/trees">Basic concepts</a><a href="/concepts/patches">Advanced concepts</a><a href="/overview/types">API Reference</a></div><div><h5>Community</h5><a href="https://github.com/mobxjs/mobx-state-tree/discussions" target="_blank" rel="noreferrer noopener">GitHub Discussions</a><a href="https://stackoverflow.com/questions/tagged/mobx-state-tree" target="_blank" rel="noreferrer noopener">Stack Overflow</a></div><div><h5>More</h5><a href="/blog">Blog</a><a href="https://github.com/mobxjs/mobx-state-tree">GitHub</a><a class="github-button" href="https://github.com/mobxjs/mobx-state-tree" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2021 Michel Weststrate</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {

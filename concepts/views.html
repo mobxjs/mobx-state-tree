@@ -72,8 +72,8 @@
 <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-derive-information-from-models-using-views">Hosted on egghead.io</a>
 </details></p>
 <p>Any fact that can be derived from your state is called a &quot;view&quot; or &quot;derivation&quot;.
-See the <a href="https://mobx.js.org/intro/concepts.html">Mobx concepts &amp; principles</a> for some background.</p>
-<p>Views come in two flavors: views with arguments and views without arguments. The latter are called computed values, based on the <a href="https://mobx.js.org/refguide/computed-decorator.html">computed</a> concept in MobX. The main difference between the two is that computed properties create an explicit caching point, but later they work the same and any other computed value or MobX based reaction like <a href="https://mobx.js.org/refguide/observer-component.html"><code>@observer</code></a> components can react to them. Computed values are defined using <em>getter</em> functions.</p>
+See <a href="https://mobx.js.org/the-gist-of-mobx.html">The gist of MobX</a> for some background.</p>
+<p>Views come in two flavors: views with arguments and views without arguments. The latter are called computed values, based on the <a href="https://mobx.js.org/computeds.html">computed</a> concept in MobX. The main difference between the two is that computed properties create an explicit caching point, but later they work the same and any other computed value or MobX based reaction like <a href="https://mobx.js.org/react-integration.html"><code>@observer</code></a> components can react to them. Computed values are defined using <em>getter</em> functions.</p>
 <p>Example:</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { autorun } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
 

@@ -103,7 +103,7 @@ However, sometimes you need to keep track of temporary, non-persistable state. T
 <p>Some tips:</p>
 <ol>
 <li><p>Note that multiple <code>actions</code> calls can be chained. This makes it possible to create multiple closures with their own protected volatile state.</p></li>
-<li><p>Although in the above example the <code>pendingRequest</code> could be initialized directly in the action initializer, it is recommended to do this in the <code>afterCreate</code> hook, which will only once the entire instance has been set up (there might be many action and property initializers for a single type).</p></li>
+<li><p>Although in the above example the <code>pendingRequest</code> could be initialized directly in the action initializer, it is recommended to do this in the <code>afterCreate</code> hook, which will only be called once the entire instance has been set up (there might be many action and property initializers for a single type).</p></li>
 <li><p>The above example doesn't actually use the promise. For how to work with promises / asynchronous flows, see the <a href="async-actions">asynchronous actions</a> section.</p></li>
 <li><p>It is possible to share volatile state between views and actions by using <code>extend</code>. <code>.extend</code> works like a combination of <code>.actions</code> and <code>.views</code> and should return an object with a <code>actions</code> and <code>views</code> field:</p></li>
 </ol>
@@ -167,7 +167,7 @@ However, sometimes you need to keep track of temporary, non-persistable state. T
 <p>The object that is returned from the <code>volatile</code> initializer function can contain any piece of data and will result in an instance property with the same name. Volatile properties have the following characteristics:</p>
 <ol>
 <li>They can be read from outside the model (if you want hidden volatile state, keep the state in your closure as shown in the previous section, and <em>only</em> if it is not used on a view consider not making it observable)</li>
-<li>The volatile properties will be only observable, see <a href="https://mobx.js.org/refguide/modifiers.html">observable <em>references</em></a>. Values assigned to them will be unmodified and not automatically converted to deep observable structures.</li>
+<li>The volatile properties will be only observable, see <a href="https://mobx.js.org/api.html#observableref">observable <em>references</em></a>. Values assigned to them will be unmodified and not automatically converted to deep observable structures.</li>
 <li>Like normal properties, they can only be modified through actions</li>
 <li>Volatile props will not show up in snapshots, and cannot be updated by applying snapshots</li>
 <li>Volatile props are preserved during the lifecycle of an instance. See also <a href="reconciliation">reconciliation</a></li>

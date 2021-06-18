@@ -95,9 +95,9 @@ An example:</p>
     <span class="hljs-comment">// 1</span>
     .model(<span class="hljs-string">"TodoStore"</span>, {
         <span class="hljs-attr">loaded</span>: types.boolean, <span class="hljs-comment">// 2</span>
-        endpoint: <span class="hljs-string">"http://localhost"</span>, <span class="hljs-comment">// 3</span>
-        todos: types.array(Todo), <span class="hljs-comment">// 4</span>
-        selectedTodo: types.reference(Todo) <span class="hljs-comment">// 5</span>
+        <span class="hljs-attr">endpoint</span>: <span class="hljs-string">"http://localhost"</span>, <span class="hljs-comment">// 3</span>
+        <span class="hljs-attr">todos</span>: types.array(Todo), <span class="hljs-comment">// 4</span>
+        <span class="hljs-attr">selectedTodo</span>: types.reference(Todo) <span class="hljs-comment">// 5</span>
     })
     .views(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> {
         <span class="hljs-keyword">return</span> {
@@ -128,7 +128,7 @@ A model takes additionally object argument defining the properties.</p>
 <ol>
 <li>A type. This can be a simple primitive type like <code>types.boolean</code>, see <code>// 2</code>, or a complex, possibly pre-defined type (<code>// 4</code>)</li>
 <li>A primitive. Using a primitive as type is syntactic sugar for introducing a property with a default value. See <code>// 3</code>, <code>endpoint: &quot;http://localhost&quot;</code> is the same as <code>endpoint: types.optional(types.string, &quot;http://localhost&quot;)</code>. The primitive type is inferred from the default value. Properties with a default value can be omitted in snapshots.</li>
-<li>A <a href="https://mobx.js.org/refguide/computed-decorator.html">computed property</a>, see <code>// 6</code>. Computed properties are tracked and memoized by MobX. Computed properties will not be stored in snapshots or emit patch events. It is possible to provide a setter for a computed property as well. A setter should always invoke an action.</li>
+<li>A <a href="https://mobx.js.org/computeds.html">computed property</a>, see <code>// 6</code>. Computed properties are tracked and memoized by MobX. Computed properties will not be stored in snapshots or emit patch events. It is possible to provide a setter for a computed property as well. A setter should always invoke an action.</li>
 <li>A view function (see <code>// 7</code>). A view function can, unlike computed properties, take arbitrary arguments. It won't be memoized, but its value can be tracked by MobX nonetheless. View functions are not allowed to change the model, but should rather be used to retrieve information from the model.</li>
 </ol>
 <p><em>Tip: <code>(self) =&gt; ({ action1() { }, action2() { }})</code> is ES6 syntax for <code>function (self) { return { action1: function() { }, action2: function() { } }}</code>. In other words, it's short way of directly returning an object literal.
