@@ -28,7 +28,7 @@ sidebar_label: "IModelReflectionData"
 
 • **actions**: *string[]*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:835](https://github.com/mobxjs/mobx-state-tree/blob/f8ff671a/packages/mobx-state-tree/src/core/mst-operations.ts#L835)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:835](https://github.com/mobxjs/mobx-state-tree/blob/b7697505/packages/mobx-state-tree/src/core/mst-operations.ts#L835)*
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 *Inherited from [IModelReflectionPropertiesData](imodelreflectionpropertiesdata.md).[name](imodelreflectionpropertiesdata.md#name)*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:805](https://github.com/mobxjs/mobx-state-tree/blob/f8ff671a/packages/mobx-state-tree/src/core/mst-operations.ts#L805)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:805](https://github.com/mobxjs/mobx-state-tree/blob/b7697505/packages/mobx-state-tree/src/core/mst-operations.ts#L805)*
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 *Inherited from [IModelReflectionPropertiesData](imodelreflectionpropertiesdata.md).[properties](imodelreflectionpropertiesdata.md#properties)*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:806](https://github.com/mobxjs/mobx-state-tree/blob/f8ff671a/packages/mobx-state-tree/src/core/mst-operations.ts#L806)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:806](https://github.com/mobxjs/mobx-state-tree/blob/b7697505/packages/mobx-state-tree/src/core/mst-operations.ts#L806)*
 
 #### Type declaration:
 
@@ -60,7 +60,7 @@ ___
 
 • **views**: *string[]*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:836](https://github.com/mobxjs/mobx-state-tree/blob/f8ff671a/packages/mobx-state-tree/src/core/mst-operations.ts#L836)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:836](https://github.com/mobxjs/mobx-state-tree/blob/b7697505/packages/mobx-state-tree/src/core/mst-operations.ts#L836)*
 
 ___
 
@@ -68,4 +68,4 @@ ___
 
 • **volatile**: *string[]*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:837](https://github.com/mobxjs/mobx-state-tree/blob/f8ff671a/packages/mobx-state-tree/src/core/mst-operations.ts#L837)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:837](https://github.com/mobxjs/mobx-state-tree/blob/b7697505/packages/mobx-state-tree/src/core/mst-operations.ts#L837)*
