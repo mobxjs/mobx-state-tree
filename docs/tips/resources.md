@@ -40,4 +40,4 @@ title: Talks & Blogs
 
 ## Addons, libraries and tools
 
-- [mst-query](https://github.com/ConrabOpto/mst-query/)
+- [mst-query](https://github.com/ConrabOpto/mst-query/) - Query library for MST with support for auto normalization, garbage collection, infinite scroll & pagination, and more
