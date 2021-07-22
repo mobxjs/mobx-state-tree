@@ -93,19 +93,7 @@ export interface IMSTMap<IT extends IAnyType> {
             | any
     ): this
 
-    /**
-     * Returns a plain object that represents this map.
-     * Note that all the keys being stringified.
-     * If there are duplicating keys after converting them to strings, behaviour is undetermined.
-     */
-    toPOJO(): IKeyValueMap<IT["SnapshotType"]>
     toJSON(): IKeyValueMap<IT["SnapshotType"]>
-
-    /**
-     * Returns a shallow non observable object clone of this map.
-     * Note that the values might still be observable. For a deep clone use mobx.toJS.
-     */
-    toJS(): Map<string, IT["Type"]>
 
     toString(): string
     [Symbol.toStringTag]: "Map"
