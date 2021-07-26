@@ -599,7 +599,7 @@ Use this utility to register a function that should be called whenever the
 targeted state tree node is destroyed. This is a useful alternative to managing
 cleanup methods yourself using the `beforeDestroy` hook.
 
-This methods returns the same disposer that was passed as argument.
+This method returns the same disposer that was passed as argument.
 
 Example:
 ```ts
@@ -2321,7 +2321,7 @@ ___
 *Defined in [packages/mobx-state-tree/src/types/utility-types/enumeration.ts:11](https://github.com/mobxjs/mobx-state-tree/blob/e6025cc3/packages/mobx-state-tree/src/types/utility-types/enumeration.ts#L11)*
 
 `types.enumeration` - Can be used to create an string based enumeration.
-(note: this methods is just sugar for a union of string literals)
+(note: this method is just sugar for a union of string literals)
 
 Example:
 ```ts
@@ -2347,7 +2347,7 @@ Name | Type | Description |
 *Defined in [packages/mobx-state-tree/src/types/utility-types/enumeration.ts:12](https://github.com/mobxjs/mobx-state-tree/blob/e6025cc3/packages/mobx-state-tree/src/types/utility-types/enumeration.ts#L12)*
 
 `types.enumeration` - Can be used to create an string based enumeration.
-(note: this methods is just sugar for a union of string literals)
+(note: this method is just sugar for a union of string literals)
 
 Example:
 ```ts
