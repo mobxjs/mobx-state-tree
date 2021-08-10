@@ -53,4 +53,4 @@ MST doesn't offer an any type because it can't reason about it. For example, giv
 
 1.  Use `types.frozen()`. Frozen values need to be immutable and serializable (so MST can treat them verbatim)
 2.  Use volatile state. Volatile state can store anything, but won't appear in snapshots, patches etc.
-3.  If your type is regular, and you just are too lazy to type the model, you could also consider generating the type at runtime once (after all, MST types are just JS...). However, you will loose static typing, and any confusion it causes is up to you to handle :-).
+3.  If your type is regular, and you just are too lazy to type the model, you could also consider generating the type at runtime once (after all, MST types are just JS...). However, you will lose static typing, and any confusion it causes is up to you to handle :-).
