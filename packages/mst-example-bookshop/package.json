@@ -24,6 +24,11 @@
     "test": "react-scripts test",
     "prepare": "relative-deps"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mobxjs/mobx-state-tree.git",
+    "directory": "packages/mst-example-bookshop"
+  },
   "browserslist": [
     ">0.2%",
     "not dead",

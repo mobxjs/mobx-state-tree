@@ -29,6 +29,11 @@
         "type": "opencollective",
         "url": "https://opencollective.com/immer"
     },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mobxjs/mobx-state-tree.git",
+        "directory": "packages/mst-middlewares"
+    },
     "devDependencies": {
         "@types/jest": "^26.0.3",
         "@types/node": "^12.0.2",
