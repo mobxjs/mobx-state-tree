@@ -1,4 +1,4 @@
-import { types, getSnapshot, unprotect, cast, detach, clone } from "../../src"
+import { types, getSnapshot, unprotect, cast, detach, clone, SnapshotIn, getNodeId } from "../../src"
 
 describe("snapshotProcessor", () => {
     describe("over a model type", () => {
@@ -587,5 +587,56 @@ describe("snapshotProcessor", () => {
         expect(ProcessedModel.is(processedModel)).toBe(true)
         expect(ProcessedModel.is({ y: 1 })).toBe(true)
         expect(ProcessedModel.is(Model)).toBe(false)
+    })
+
+    describe("1776 - reconciliation in an array", () => {
+        test("model with transformed property is reconciled", () => {
+            const SP = types.snapshotProcessor(
+                types.model({
+                    id: types.identifier,
+                    x: types.number,
+                }),
+                {
+                    preProcessor(sn: {id: string, y: number}) {
+                        return { id: sn.id, x: sn.y }
+                    }
+                }
+            )
+            const Store = types
+                .model({items: types.array(SP)})
+                .actions((self) => ({
+                    setItems(items: SnapshotIn<typeof SP>[]) {
+                        self.items = cast(items)
+                    }
+                }))
+            const store = Store.create({items: [{id: "1", y: 0}]});
+            const oldNodeId = getNodeId(store.items[0]);
+            store.setItems([{id: "1", y: 1}]);
+            expect(getNodeId(store.items[0])).toBe(oldNodeId);
+        });
+
+        test("model with transformed identifier attribute is reconciled", () => {
+            const SP = types.snapshotProcessor(
+                types.model({
+                    id: types.identifier,
+                }),
+                {
+                    preProcessor(sn: {foo: string}) {
+                        return { id: sn.foo }
+                    }
+                }
+            )
+            const Store = types
+                .model({items: types.array(SP)})
+                .actions((self) => ({
+                    setItems(items: SnapshotIn<typeof SP>[]) {
+                        self.items = cast(items)
+                    }
+                }))
+            const store = Store.create({items: [{foo: "1"}]});
+            const oldNodeId = getNodeId(store.items[0]);
+            store.setItems([{foo: "1"}]);
+            expect(getNodeId(store.items[0])).toBe(oldNodeId);
+        });
     })
 })
