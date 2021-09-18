@@ -1,5 +1,5 @@
 module.exports = {
-    src: ["src/index.ts"],
+    inputFiles: ["src/index.ts"],
     module: "commonjs",
     excludeNotExported: true,
     excludePrivate: true,
@@ -9,6 +9,6 @@ module.exports = {
     out: "../../docs/API",
     theme: "docusaurus",
     tsconfig: "tsconfig.json",
-    listInvalidSymbolLinks: true,
-    mdHideSources: true
+    listInvalidSymbolLinks: true
+    // mdHideSources: true
 }
