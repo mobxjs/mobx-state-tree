@@ -70,8 +70,8 @@
         "ts-node": "^8.10.2",
         "tslib": "^2.0.0",
         "tslint": "^6.1.2",
-        "typedoc": "0.19.2",
-        "typedoc-plugin-markdown": "2.4.2",
+        "typedoc": "0.15.0",
+        "typedoc-plugin-markdown": "2.0.10",
         "typescript": "^3.5.3"
     },
     "peerDependencies": {
