@@ -24,6 +24,11 @@
         "eject": "react-scripts eject",
         "test": "react-scripts test"
     },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mobxjs/mobx-state-tree.git",
+        "directory": "packages/mst-example-todomvc"
+    },
     "browserslist": [
         ">0.2%",
         "not dead",
