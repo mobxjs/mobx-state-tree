@@ -35,7 +35,9 @@ const createStore = (
     }
 
     if (!customRef) {
+        // @ts-ignore
         delete refOptions.get
+        // @ts-ignore
         delete refOptions.set
     }
 

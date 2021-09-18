@@ -216,7 +216,7 @@ test("#1250", async () => {
     ])
     calls.length = 0
 
-    await new Promise((r) =>
+    await new Promise<void>((r) =>
         setTimeout(() => {
             model.setY()
             r()
