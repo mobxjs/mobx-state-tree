@@ -11,7 +11,8 @@ import {
     assertIsType,
     isType,
     getSnapshot,
-    devMode
+    devMode,
+    ComplexType
 } from "../../internal"
 
 /** @hidden */
@@ -69,7 +70,7 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
 
     private _fixNode(node: this["N"]): void {
         // the node has to use these methods rather than the original type ones
-        proxyNodeTypeMethods(node.type, this, "create")
+        proxyNodeTypeMethods(node.type, this, "create", "is", "isMatchingSnapshotId")
 
         const oldGetSnapshot = node.getSnapshot
         node.getSnapshot = () => {
@@ -139,6 +140,14 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
 
     isAssignableFrom(type: IAnyType): boolean {
         return this._subtype.isAssignableFrom(type)
+    }
+
+    isMatchingSnapshotId(current: this["N"], snapshot: this["C"]): boolean {
+        if (!(this._subtype instanceof ComplexType)) {
+            return false
+        }
+        const processedSn = this.preProcessSnapshot(snapshot)
+        return ComplexType.prototype.isMatchingSnapshotId.call(this._subtype, current as any, processedSn)
     }
 }
 

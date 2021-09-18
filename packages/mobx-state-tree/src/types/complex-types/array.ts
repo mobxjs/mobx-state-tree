@@ -482,7 +482,7 @@ function areSame(oldNode: AnyNode, newValue: any) {
         oldNode.identifier !== null &&
         oldNode.identifierAttribute &&
         isPlainObject(newValue) &&
-        oldNode.identifier === normalizeIdentifier(newValue[oldNode.identifierAttribute]) &&
+        oldNode.type.isMatchingSnapshotId(oldNode, newValue) &&
         oldNode.type.is(newValue)
     )
 }
