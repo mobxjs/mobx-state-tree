@@ -3,20 +3,20 @@
     "version": "2.2.0",
     "private": true,
     "devDependencies": {
-        "react-scripts": "^3.4.3",
-        "relative-deps": "^1.0.4"
+        "react-scripts": "4.0.3",
+        "relative-deps": "^1.0.7"
     },
     "dependencies": {
-        "classnames": "^2.2.6",
-        "mobx": "^6.0.4",
-        "mobx-react": "^6.0.0",
-        "mobx-state-tree": "^5.0.0",
-        "mobx-react-lite": "^3.1.6",
-        "mst-middlewares": "^3.17.2",
-        "react": "^16.13.1",
-        "react-dom": "^16.13.1",
+        "classnames": "^2.3.1",
+        "mobx": "^6.3.3",
+        "mobx-react": "^7.2.0",
+        "mobx-react-lite": "^3.2.1",
+        "mobx-state-tree": "^5.0.2",
+        "mst-middlewares": "^5.0.2",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2",
         "remotedev": "^0.2.9",
-        "todomvc-app-css": "^2.3.0"
+        "todomvc-app-css": "^2.4.1"
     },
     "scripts": {
         "start": "react-scripts start",

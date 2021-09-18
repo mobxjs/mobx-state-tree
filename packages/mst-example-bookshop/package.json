@@ -3,19 +3,19 @@
   "version": "2.2.0",
   "private": true,
   "devDependencies": {
-    "react-scripts": "^3.4.3",
-    "relative-deps": "^1.0.4"
+    "react-scripts": "4.0.3",
+    "relative-deps": "^1.0.7"
   },
   "dependencies": {
-    "mobx": "^6.0.4",
-    "mobx-react": "^6.0.0",
-    "mobx-state-tree": "^3.11.0",
-    "mobx-utils": "^5.2.0",
+    "mobx": "^6.3.3",
+    "mobx-react": "^7.2.0",
+    "mobx-state-tree": "^5.0.2",
+    "mobx-utils": "^6.0.4",
     "path-match": "^1.2.4",
-    "react": "^16.8.4",
-    "react-dom": "^16.8.4",
-    "react-tabs": "^3.0.0",
-    "react-test-renderer": "^16.8.4"
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-tabs": "^3.2.2",
+    "react-test-renderer": "^17.0.2"
   },
   "scripts": {
     "start": "react-scripts start",

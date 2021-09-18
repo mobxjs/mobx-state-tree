@@ -3,23 +3,23 @@
   "version": "2.2.0",
   "private": true,
   "devDependencies": {
-    "enzyme": "^3.9.0",
+    "enzyme": "^3.11.0",
     "react-addons-test-utils": "^15.6.2",
-    "react-scripts": "^3.4.3",
-    "react-test-renderer": "^16.8.4",
-    "relative-deps": "^1.0.4"
+    "react-scripts": "4.0.3",
+    "react-test-renderer": "^17.0.2",
+    "relative-deps": "^1.0.7"
   },
   "dependencies": {
-    "classnames": "^2.2.6",
-    "mobx": "^6.0.4",
-    "mobx-state-tree": "^3.11.0",
-    "mst-middlewares": "^3.11.0",
-    "react": "^16.8.4",
-    "react-dom": "^16.8.4",
-    "react-redux": "^7.1.0",
-    "redux": "^4.0.1",
+    "classnames": "^2.3.1",
+    "mobx": "^6.3.3",
+    "mobx-state-tree": "^5.0.2",
+    "mst-middlewares": "^5.0.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-redux": "^7.2.5",
+    "redux": "^4.1.1",
     "remotedev": "^0.2.9",
-    "todomvc-app-css": "^2.2.0"
+    "todomvc-app-css": "^2.4.1"
   },
   "scripts": {
     "start": "react-scripts start",

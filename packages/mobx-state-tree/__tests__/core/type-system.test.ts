@@ -368,7 +368,7 @@ test("it should type compose correctly", () => {
             wheels: 3
         })
         .actions((self) => {
-            let connection = (null as any) as Promise<any>
+            let connection = null as any as Promise<any>
             function drive() {}
             function afterCreate() {
                 connection = Promise.resolve(true)
@@ -838,9 +838,8 @@ test("castToSnapshot", () => {
         brew2: { outside: { brew1: { inner: 222 } } }
     }
     const storeInstance = secondModel.create(storeSnapshot)
-    const storeSnapshotOrInstance1: SnapshotOrInstance<typeof secondModel> = secondModel.create(
-        storeSnapshot
-    )
+    const storeSnapshotOrInstance1: SnapshotOrInstance<typeof secondModel> =
+        secondModel.create(storeSnapshot)
     const storeSnapshotOrInstance2: SnapshotOrInstance<typeof secondModel> = storeSnapshot
 
     appMod.create({ aaa: castToSnapshot(storeInstance) })
@@ -930,13 +929,13 @@ test("#1117", () => {
                 try {
                     return t.create(snapshot) // this should compile
                 } catch (e) {
-                    handleProblem(snapshot, e)
+                    handleProblem(snapshot, e as any)
                     return null
                 }
             },
             toSnapshot(x) {
                 if (isStateTreeNode(x)) return getSnapshot(x)
-                return (x as any) as C
+                return x as any as C
             },
             isTargetType(v): v is T | null {
                 if (isFrozenType(t)) {
