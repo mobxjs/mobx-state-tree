@@ -142,7 +142,7 @@ workflows:
                   requires:
                       - build
 
-            - upload-coveralls:
-                  requires:
-                      - test-mst-dev
-                      - test-mst-middlewares-dev
+            #- upload-coveralls:
+            #      requires:
+            #          - test-mst-dev
+            #          - test-mst-middlewares-dev
