@@ -85,7 +85,7 @@ export class Union extends BaseType<any, any, any> {
         parent: AnyObjectNode,
         subpath: string
     ): this["N"] {
-        const type = this.determineType(newValue, current.type)
+        const type = this.determineType(newValue, current.getReconciliationType())
         if (!type) throw fail("No matching type for union " + this.describe()) // can happen in prod builds
         return type.reconcile(current, newValue, parent, subpath)
     }
