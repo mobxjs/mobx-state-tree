@@ -664,8 +664,8 @@ describe("snapshotProcessor", () => {
                 setItem(item: SnapshotIn<typeof SP>) {
                     self.item = cast(item)
                 }
-            }));
-            const store = Store.create({ item: { id: "1", y: 0 } });
+            }))
+            const store = Store.create({ item: { id: "1", y: 0 } })
             const oldNodeId = getNodeId(store.item)
             store.setItem({ id: "1", y: 1 })
             expect(getNodeId(store.item)).toBe(oldNodeId)
@@ -688,8 +688,8 @@ describe("snapshotProcessor", () => {
                 setItem(item: SnapshotIn<typeof SP>) {
                     self.item = cast(item)
                 }
-            }));
-            const store = Store.create({ item: { id: "1", y: 0 } });
+            }))
+            const store = Store.create({ item: { id: "1", y: 0 } })
             const oldNodeId = getNodeId(store.item!)
             store.setItem({ id: "1", y: 1 })
             expect(getNodeId(store.item!)).toBe(oldNodeId)
@@ -708,12 +708,14 @@ describe("snapshotProcessor", () => {
                     }
                 }
             )
-            const Store = types.model({ item: types.optional(SP, { id: "1", y: 0 }) }).actions((self) => ({
-                setItem(item?: SnapshotIn<typeof SP>) {
-                    self.item = cast(item)
-                }
-            }));
-            const store = Store.create();
+            const Store = types
+                .model({ item: types.optional(SP, { id: "1", y: 0 }) })
+                .actions((self) => ({
+                    setItem(item?: SnapshotIn<typeof SP>) {
+                        self.item = cast(item)
+                    }
+                }))
+            const store = Store.create()
             const oldNodeId = getNodeId(store.item!)
             expect(store.item?.x).toBe(0)
             store.setItem({ id: "1", y: 1 })
@@ -741,12 +743,12 @@ describe("snapshotProcessor", () => {
             setItem(item?: SnapshotIn<typeof SP>) {
                 self.item = cast(item)
             }
-        }));
-        const store = Store.create();
-        expect(store.item).toBeUndefined();
-        store.setItem({ id: "1", y: 1 });
-        expect(store.item?.x).toBe(1);
-        store.setItem(undefined);
-        expect(store.item).toBeUndefined();
+        }))
+        const store = Store.create()
+        expect(store.item).toBeUndefined()
+        store.setItem({ id: "1", y: 1 })
+        expect(store.item?.x).toBe(1)
+        store.setItem(undefined)
+        expect(store.item).toBeUndefined()
     })
 })

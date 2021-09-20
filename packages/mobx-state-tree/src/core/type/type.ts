@@ -279,7 +279,8 @@ export type SnapshotOrInstance<T> = SnapshotIn<T> | Instance<T>
  * @hidden
  */
 export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = BaseNode<C, S, T>>
-    implements IType<C, S, T> {
+    implements IType<C, S, T>
+{
     [$type]!: undefined
 
     // these are just to make inner types avaialable to inherited classes
@@ -423,7 +424,7 @@ export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<
         return (
             !current.identifierAttribute ||
             current.identifier ===
-            normalizeIdentifier((snapshot as any)[current.identifierAttribute])
+                normalizeIdentifier((snapshot as any)[current.identifierAttribute])
         )
     }
 

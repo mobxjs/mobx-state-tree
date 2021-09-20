@@ -93,7 +93,7 @@ export abstract class BaseNode<C, S, T> {
     }
 
     getReconciliationType() {
-        return this.type;
+        return this.type
     }
 
     private pathAtom?: IAtom

@@ -67,9 +67,9 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
 
     private preProcessSnapshotSafe(sn: this["C"]): IT["CreationType"] | typeof $preProcessorFailed {
         try {
-            return this.preProcessSnapshot(sn);
+            return this.preProcessSnapshot(sn)
         } catch (e) {
-            return $preProcessorFailed;
+            return $preProcessorFailed
         }
     }
 
@@ -90,7 +90,7 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
         }
 
         node.getReconciliationType = () => {
-            return this;
+            return this
         }
     }
 
@@ -137,13 +137,9 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
     }
 
     isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
-        const processedSn = this.preProcessSnapshotSafe(value);
+        const processedSn = this.preProcessSnapshotSafe(value)
         if (processedSn === $preProcessorFailed) {
-            return typeCheckFailure(
-                context,
-                value,
-                "Failed to preprocess value"
-            )
+            return typeCheckFailure(context, value, "Failed to preprocess value")
         }
         return this._subtype.validate(processedSn, context)
     }
@@ -173,7 +169,11 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
             return false
         }
         const processedSn = this.preProcessSnapshot(snapshot)
-        return ComplexType.prototype.isMatchingSnapshotId.call(this._subtype, current as any, processedSn)
+        return ComplexType.prototype.isMatchingSnapshotId.call(
+            this._subtype,
+            current as any,
+            processedSn
+        )
     }
 }
 

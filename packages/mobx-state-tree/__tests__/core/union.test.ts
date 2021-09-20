@@ -184,7 +184,12 @@ test("961 - apply snapshot to union should not throw when union keeps models wit
 })
 
 describe("1045 - secondary union types with applySnapshot and ids", () => {
-    function initTest(useSnapshot: boolean, useCreate: boolean, submodel1First: boolean, type: number) {
+    function initTest(
+        useSnapshot: boolean,
+        useCreate: boolean,
+        submodel1First: boolean,
+        type: number
+    ) {
         setLivelinessChecking("error")
 
         const Submodel1NoSP = types.model("Submodel1", {
@@ -199,7 +204,7 @@ describe("1045 - secondary union types with applySnapshot and ids", () => {
                 return {
                     id,
                     extraField1: extraField1.toUpperCase(),
-                    extraField2: extraField2?.toUpperCase(),
+                    extraField2: extraField2?.toUpperCase()
                 }
             }
         })
@@ -216,13 +221,13 @@ describe("1045 - secondary union types with applySnapshot and ids", () => {
                 return {
                     id,
                     extraField1: extraField1?.toUpperCase(),
-                    extraField2: extraField2.toUpperCase(),
+                    extraField2: extraField2.toUpperCase()
                 }
             }
         })
 
-        const Submodel1 = useSnapshot ? Submodel1SP : Submodel1NoSP;
-        const Submodel2 = useSnapshot ? Submodel2SP : Submodel2NoSP;
+        const Submodel1 = useSnapshot ? Submodel1SP : Submodel1NoSP
+        const Submodel2 = useSnapshot ? Submodel2SP : Submodel2NoSP
 
         const Submodel = submodel1First
             ? types.union(Submodel1, Submodel2)
@@ -247,8 +252,13 @@ describe("1045 - secondary union types with applySnapshot and ids", () => {
                 }
                 const sn = type === 1 ? sn1 : sn2
                 const submodel = type === 1 ? Submodel1 : Submodel2
-                const expected =
-                    useSnapshot ? { id: sn.id, extraField1: sn.extraField1?.toUpperCase(), extraField2: sn.extraField2?.toUpperCase() } : sn;
+                const expected = useSnapshot
+                    ? {
+                          id: sn.id,
+                          extraField1: sn.extraField1?.toUpperCase(),
+                          extraField2: sn.extraField2?.toUpperCase()
+                      }
+                    : sn
 
                 applySnapshot(store, [useCreate ? (submodel as any).create(sn) : sn])
 
@@ -272,7 +282,12 @@ describe("1045 - secondary union types with applySnapshot and ids", () => {
                                             useProxies: "never"
                                         })
 
-                                        const t = initTest(useSnapshot, useCreate, submodel1First, type)
+                                        const t = initTest(
+                                            useSnapshot,
+                                            useCreate,
+                                            submodel1First,
+                                            type
+                                        )
                                         t.applySn()
                                     })
 
@@ -281,7 +296,12 @@ describe("1045 - secondary union types with applySnapshot and ids", () => {
                                             useProxies: "never"
                                         })
 
-                                        const t = initTest(useSnapshot, useCreate, submodel1First, type)
+                                        const t = initTest(
+                                            useSnapshot,
+                                            useCreate,
+                                            submodel1First,
+                                            type
+                                        )
                                         // tslint:disable-next-line:no-unused-expression
                                         t.store[0]
                                         t.applySn()
