@@ -248,7 +248,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
 
         const modelTypes: IAnyModelType[] = []
         if (tryCollectModelTypes(this._subType, modelTypes)) {
-            const identifierAttribute: string | undefined = modelTypes.reduce((current, type) => {
+            const identifierAttribute: string | undefined = modelTypes.reduce((current: IAnyModelType["identifierAttribute"], type) => {
                 if (type.identifierAttribute) {
                     if (current && current !== type.identifierAttribute) {
                         throw fail(
@@ -257,7 +257,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
                     }
                     return type.identifierAttribute
                 }
-            }, undefined)
+            }, undefined as IAnyModelType["identifierAttribute"])
 
             if (identifierAttribute) {
                 this.identifierMode = MapIdentifierMode.YES
