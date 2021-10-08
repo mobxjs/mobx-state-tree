@@ -54,7 +54,7 @@
         "typescript": "3.9.4"
     },
     "peerDependencies": {
-        "mobx-state-tree": "^3.11.0"
+        "mobx-state-tree": "^5.0.3"
     },
     "files": [
         "dist/"
