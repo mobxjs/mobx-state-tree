@@ -6,8 +6,11 @@ import {
     getSnapshot,
     applySnapshot,
     getType,
-    setLivelinessChecking
+    setLivelinessChecking,
+    SnapshotIn,
+    Instance
 } from "../../src"
+import { snapshotProcessor } from "../../src/internal"
 
 const createTestFactories = () => {
     const Box = types.model("Box", {
@@ -181,20 +184,50 @@ test("961 - apply snapshot to union should not throw when union keeps models wit
 })
 
 describe("1045 - secondary union types with applySnapshot and ids", () => {
-    function initTest(useCreate: boolean, submodel1First: boolean, type: number) {
+    function initTest(
+        useSnapshot: boolean,
+        useCreate: boolean,
+        submodel1First: boolean,
+        type: number
+    ) {
         setLivelinessChecking("error")
 
-        const Submodel1 = types.model("Submodel1", {
+        const Submodel1NoSP = types.model("Submodel1", {
             id: types.identifier,
             extraField1: types.string,
             extraField2: types.maybe(types.string)
         })
 
-        const Submodel2 = types.model("Submodel2", {
+        const Submodel1SP = types.snapshotProcessor(Submodel1NoSP, {
+            preProcessor(sn: SnapshotIn<Instance<typeof Submodel1NoSP>>) {
+                const { id, extraField1, extraField2 } = sn
+                return {
+                    id,
+                    extraField1: extraField1.toUpperCase(),
+                    extraField2: extraField2?.toUpperCase()
+                }
+            }
+        })
+
+        const Submodel2NoSP = types.model("Submodel2", {
             id: types.identifier,
             extraField1: types.maybe(types.string),
             extraField2: types.string
         })
+
+        const Submodel2SP = types.snapshotProcessor(Submodel2NoSP, {
+            preProcessor(sn: SnapshotIn<Instance<typeof Submodel2NoSP>>) {
+                const { id, extraField1, extraField2 } = sn
+                return {
+                    id,
+                    extraField1: extraField1?.toUpperCase(),
+                    extraField2: extraField2.toUpperCase()
+                }
+            }
+        })
+
+        const Submodel1 = useSnapshot ? Submodel1SP : Submodel1NoSP
+        const Submodel2 = useSnapshot ? Submodel2SP : Submodel2NoSP
 
         const Submodel = submodel1First
             ? types.union(Submodel1, Submodel2)
@@ -219,41 +252,62 @@ describe("1045 - secondary union types with applySnapshot and ids", () => {
                 }
                 const sn = type === 1 ? sn1 : sn2
                 const submodel = type === 1 ? Submodel1 : Submodel2
+                const expected = useSnapshot
+                    ? {
+                          id: sn.id,
+                          extraField1: sn.extraField1?.toUpperCase(),
+                          extraField2: sn.extraField2?.toUpperCase()
+                      }
+                    : sn
 
                 applySnapshot(store, [useCreate ? (submodel as any).create(sn) : sn])
 
                 expect(store.length).toBe(1)
-                expect(store[0]).toEqual(sn)
-                expect(getType(store[0])).toBe(submodel)
+                expect(store[0]).toEqual(expected)
+                expect(getType(store[0])).toBe(useSnapshot ? submodel.getSubTypes() : submodel)
             }
         }
     }
 
-    for (const submodel1First of [true, false]) {
-        describe(submodel1First ? "submodel1 first" : "submodel2 first", () => {
-            for (const useCreate of [false, true]) {
-                describe(useCreate ? "using create" : "not using create", () => {
-                    for (const type of [2, 1]) {
-                        describe(`snapshot is of type Submodel${type}`, () => {
-                            it(`apply snapshot works when the node is not touched`, () => {
-                                configure({
-                                    useProxies: "never"
+    for (const useSnapshot of [false, true]) {
+        describe(useSnapshot ? "with snapshotProcessor" : "without snapshotProcessor", () => {
+            for (const submodel1First of [true, false]) {
+                describe(submodel1First ? "submodel1 first" : "submodel2 first", () => {
+                    for (const useCreate of [false, true]) {
+                        describe(useCreate ? "using create" : "not using create", () => {
+                            for (const type of [2, 1]) {
+                                describe(`snapshot is of type Submodel${type}`, () => {
+                                    it(`apply snapshot works when the node is not touched`, () => {
+                                        configure({
+                                            useProxies: "never"
+                                        })
+
+                                        const t = initTest(
+                                            useSnapshot,
+                                            useCreate,
+                                            submodel1First,
+                                            type
+                                        )
+                                        t.applySn()
+                                    })
+
+                                    it(`apply snapshot works when the node is touched`, () => {
+                                        configure({
+                                            useProxies: "never"
+                                        })
+
+                                        const t = initTest(
+                                            useSnapshot,
+                                            useCreate,
+                                            submodel1First,
+                                            type
+                                        )
+                                        // tslint:disable-next-line:no-unused-expression
+                                        t.store[0]
+                                        t.applySn()
+                                    })
                                 })
-
-                                const t = initTest(useCreate, submodel1First, type)
-                                t.applySn()
-                            })
-
-                            it(`apply snapshot works when the node is touched`, () => {
-                                configure({
-                                    useProxies: "never"
-                                })
-
-                                const t = initTest(useCreate, submodel1First, type)
-                                // tslint:disable-next-line:no-unused-expression
-                                t.store[0]
-                                t.applySn()
-                            })
+                            }
                         })
                     }
                 })

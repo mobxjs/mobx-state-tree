@@ -482,8 +482,8 @@ function areSame(oldNode: AnyNode, newValue: any) {
         oldNode.identifier !== null &&
         oldNode.identifierAttribute &&
         isPlainObject(newValue) &&
-        oldNode.type.isMatchingSnapshotId(oldNode, newValue) &&
-        oldNode.type.is(newValue)
+        oldNode.type.is(newValue) &&
+        oldNode.type.isMatchingSnapshotId(oldNode, newValue)
     )
 }
 
