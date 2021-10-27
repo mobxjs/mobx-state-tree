@@ -386,7 +386,7 @@ function reconcileArrayChildren<TT>(
             nothingChanged = false
             const newNode = valueAsNode(childType, parent, newPath, newValue)
             oldNodes.splice(i, 0, newNode)
-        } else if (areSame(oldNode, newValue)) {
+        } else if (areSame(childType, oldNode, newValue)) {
             // both are the same, reconcile
             oldNodes[i] = valueAsNode(childType, parent, newPath, newValue, oldNode)
         } else {
@@ -395,7 +395,7 @@ function reconcileArrayChildren<TT>(
 
             // find a possible candidate to reuse
             for (let j = i; j < oldNodes.length; j++) {
-                if (areSame(oldNodes[j], newValue)) {
+                if (areSame(childType, oldNodes[j], newValue)) {
                     oldMatch = oldNodes.splice(j, 1)[0]
                     break
                 }
@@ -459,7 +459,7 @@ function valueAsNode(
 /**
  * Check if a node holds a value.
  */
-function areSame(oldNode: AnyNode, newValue: any) {
+function areSame(childType: IAnyType, oldNode: AnyNode, newValue: any) {
     // never consider dead old nodes for reconciliation
     if (!oldNode.isAlive) {
         return false
@@ -482,8 +482,8 @@ function areSame(oldNode: AnyNode, newValue: any) {
         oldNode.identifier !== null &&
         oldNode.identifierAttribute &&
         isPlainObject(newValue) &&
-        oldNode.type.is(newValue) &&
-        oldNode.type.isMatchingSnapshotId(oldNode, newValue)
+        childType.is(newValue) &&
+        (childType as any).isMatchingSnapshotId(oldNode, newValue)
     )
 }
 
