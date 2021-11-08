@@ -82,7 +82,7 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
 
     private _fixNode(node: this["N"]): void {
         // the node has to use these methods rather than the original type ones
-        proxyNodeTypeMethods(node.type, this, "create", "is", "isMatchingSnapshotId")
+        proxyNodeTypeMethods(node.type, this, "create")
 
         const oldGetSnapshot = node.getSnapshot
         node.getSnapshot = () => {
@@ -169,11 +169,7 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
             return false
         }
         const processedSn = this.preProcessSnapshot(snapshot)
-        return ComplexType.prototype.isMatchingSnapshotId.call(
-            this._subtype,
-            current as any,
-            processedSn
-        )
+        return this._subtype.isMatchingSnapshotId(current as any, processedSn)
     }
 }
 
