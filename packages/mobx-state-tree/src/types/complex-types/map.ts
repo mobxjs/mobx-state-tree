@@ -248,17 +248,16 @@ export class MapType<IT extends IAnyType> extends ComplexType<
 
         const modelTypes: IAnyModelType[] = []
         if (tryCollectModelTypes(this._subType, modelTypes)) {
-            let identifierAttribute: string | undefined = undefined
-            modelTypes.forEach((type) => {
-                if (type.identifierAttribute) {
-                    if (identifierAttribute && identifierAttribute !== type.identifierAttribute) {
-                        throw fail(
-                            `The objects in a map should all have the same identifier attribute, expected '${identifierAttribute}', but child of type '${type.name}' declared attribute '${type.identifierAttribute}' as identifier`
-                        )
-                    }
-                    identifierAttribute = type.identifierAttribute
+            const identifierAttribute: string | undefined = modelTypes.reduce((current: IAnyModelType["identifierAttribute"], type) => {
+                if (!type.identifierAttribute) return current
+                if (current && current !== type.identifierAttribute) {
+                    throw fail(
+                        `The objects in a map should all have the same identifier attribute, expected '${current}', but child of type '${type.name}' declared attribute '${type.identifierAttribute}' as identifier`
+                    )
                 }
-            })
+                return type.identifierAttribute
+            }, undefined as IAnyModelType["identifierAttribute"])
+
             if (identifierAttribute) {
                 this.identifierMode = MapIdentifierMode.YES
                 this.mapIdentifierAttribute = identifierAttribute
