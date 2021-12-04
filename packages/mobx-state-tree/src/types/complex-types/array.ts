@@ -476,14 +476,19 @@ function areSame(oldNode: AnyNode, newValue: any) {
         return true
     }
 
+    // Non object nodes don't get reconciled
+    if (!(oldNode instanceof ObjectNode)) {
+        return false
+    }
+
+    const oldNodeType = oldNode.getReconciliationType()
     // new value is a snapshot with the correct identifier
     return (
-        oldNode instanceof ObjectNode &&
         oldNode.identifier !== null &&
         oldNode.identifierAttribute &&
         isPlainObject(newValue) &&
-        oldNode.type.isMatchingSnapshotId(oldNode, newValue) &&
-        oldNode.type.is(newValue)
+        oldNodeType.is(newValue) &&
+        (oldNodeType as any).isMatchingSnapshotId(oldNode, newValue)
     )
 }
 

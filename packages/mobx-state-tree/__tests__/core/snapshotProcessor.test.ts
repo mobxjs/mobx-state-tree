@@ -609,6 +609,10 @@ describe("snapshotProcessor", () => {
                 }),
                 {
                     preProcessor(sn: { id: string; y: number }) {
+                        if ("x" in sn) {
+                            // Ensure snapshot don't run through preprocessor twice
+                            throw new Error("sn has already been preprocessed")
+                        }
                         return { id: sn.id, x: sn.y }
                     }
                 }
@@ -645,5 +649,137 @@ describe("snapshotProcessor", () => {
             store.setItems([{ foo: "1" }])
             expect(getNodeId(store.items[0])).toBe(oldNodeId)
         })
+    })
+
+    describe("single node reconcilication", () => {
+        test("model with transformed property is reconciled", () => {
+            const SP = types.snapshotProcessor(
+                types.model({
+                    id: types.identifier,
+                    x: types.number
+                }),
+                {
+                    preProcessor(sn: { id: string; y: number }) {
+                        if ("x" in sn) {
+                            // Ensure snapshot don't run through preprocessor twice
+                            throw new Error("sn has already been preprocessed")
+                        }
+                        return { id: sn.id, x: sn.y }
+                    }
+                }
+            )
+            const Store = types.model({ item: SP }).actions((self) => ({
+                setItem(item: SnapshotIn<typeof SP>) {
+                    self.item = cast(item)
+                }
+            }))
+            const store = Store.create({ item: { id: "1", y: 0 } })
+            const oldNodeId = getNodeId(store.item)
+            store.setItem({ id: "1", y: 1 })
+            expect(getNodeId(store.item)).toBe(oldNodeId)
+            expect(store.item.x).toBe(1)
+        })
+
+        test("model with transformed identifier property is reconciled", () => {
+            const SP = types.snapshotProcessor(
+                types.model({
+                    id: types.identifier
+                }),
+                {
+                    preProcessor(sn: { foo: string }) {
+                        return { id: sn.foo }
+                    }
+                }
+            )
+            const Store = types.model({ item: SP }).actions((self) => ({
+                setItem(item: SnapshotIn<typeof SP>) {
+                    self.item = cast(item)
+                }
+            }))
+            const store = Store.create({ item: { foo: "1" } })
+            const oldNodeId = getNodeId(store.item)
+            store.setItem({ foo: "1" })
+            expect(getNodeId(store.item)).toBe(oldNodeId)
+            expect(store.item.id).toBe("1")
+        })
+
+        test("1791 - model wrapped with maybe is reconciled", () => {
+            const SP = types.snapshotProcessor(
+                types.model({
+                    id: types.identifier,
+                    x: types.number
+                }),
+                {
+                    preProcessor(sn: { id: string; y: number }) {
+                        return { id: sn.id, x: sn.y }
+                    }
+                }
+            )
+            const Store = types.model({ item: types.maybe(SP) }).actions((self) => ({
+                setItem(item: SnapshotIn<typeof SP>) {
+                    self.item = cast(item)
+                }
+            }))
+            const store = Store.create({ item: { id: "1", y: 0 } })
+            const oldNodeId = getNodeId(store.item!)
+            store.setItem({ id: "1", y: 1 })
+            expect(getNodeId(store.item!)).toBe(oldNodeId)
+            expect(store.item?.x).toBe(1)
+        })
+
+        test("model wrapped with optional is reconciled", () => {
+            const SP = types.snapshotProcessor(
+                types.model({
+                    id: types.identifier,
+                    x: types.number
+                }),
+                {
+                    preProcessor(sn: { id: string; y: number }) {
+                        return { id: sn.id, x: sn.y }
+                    }
+                }
+            )
+            const Store = types
+                .model({ item: types.optional(SP, { id: "1", y: 0 }) })
+                .actions((self) => ({
+                    setItem(item?: SnapshotIn<typeof SP>) {
+                        self.item = cast(item)
+                    }
+                }))
+            const store = Store.create()
+            const oldNodeId = getNodeId(store.item!)
+            expect(store.item?.x).toBe(0)
+            store.setItem({ id: "1", y: 1 })
+            expect(getNodeId(store.item!)).toBe(oldNodeId)
+            expect(store.item?.x).toBe(1)
+            store.setItem(undefined)
+            expect(getNodeId(store.item!)).toBe(oldNodeId)
+            expect(store.item?.x).toBe(0)
+        })
+    })
+
+    test("1777 - preProcessor wrapped in maybe accepts undefined", () => {
+        const SP = types.snapshotProcessor(
+            types.model({
+                id: types.identifier,
+                x: types.number
+            }),
+            {
+                preProcessor(sn: { id: string; y: number }) {
+                    return { id: sn.id, x: sn.y }
+                }
+            }
+        )
+        const Store = types.model({ item: types.maybe(SP) }).actions((self) => ({
+            setItem(item?: SnapshotIn<typeof SP>) {
+                self.item = cast(item)
+            }
+        }))
+        const store = Store.create()
+        expect(store.item).toBeUndefined()
+        store.setItem({ id: "1", y: 1 })
+        expect(store.item?.x).toBe(1)
+        store.setItem(undefined)
+        expect(store.item).toBeUndefined()
     })
 })
