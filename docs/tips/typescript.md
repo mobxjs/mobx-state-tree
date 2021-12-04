@@ -49,6 +49,8 @@ There are four kinds of types available, plus one helper type:
 -   `TypeOfValue<typeof VARIABLE>` gets the original type for the given instance. Note that this only works for complex values (models, arrays, maps...) but not for simple values (number, string, boolean, string, undefined).
 
 ```typescript
+import { types, Instance, SnapshotIn, SnapshotOut } from "mobx-state-tree";
+
 const Todo = types
     .model({
         title: "hello"
