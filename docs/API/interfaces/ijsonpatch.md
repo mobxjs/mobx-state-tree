@@ -29,7 +29,7 @@ http://jsonpatch.com/
 
 • **op**: *"replace" | "add" | "remove"*
 
-*Defined in [packages/mobx-state-tree/src/core/json-patch.ts:8](https://github.com/mobxjs/mobx-state-tree/blob/7b52c9ca/packages/mobx-state-tree/src/core/json-patch.ts#L8)*
+*Defined in [packages/mobx-state-tree/src/core/json-patch.ts:8](https://github.com/mobxjs/mobx-state-tree/blob/d57812c6/packages/mobx-state-tree/src/core/json-patch.ts#L8)*
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 • **path**: *string*
 
-*Defined in [packages/mobx-state-tree/src/core/json-patch.ts:9](https://github.com/mobxjs/mobx-state-tree/blob/7b52c9ca/packages/mobx-state-tree/src/core/json-patch.ts#L9)*
+*Defined in [packages/mobx-state-tree/src/core/json-patch.ts:9](https://github.com/mobxjs/mobx-state-tree/blob/d57812c6/packages/mobx-state-tree/src/core/json-patch.ts#L9)*
 
 ___
 
@@ -45,4 +45,4 @@ ___
 
 • **value**? : *any*
 
-*Defined in [packages/mobx-state-tree/src/core/json-patch.ts:10](https://github.com/mobxjs/mobx-state-tree/blob/7b52c9ca/packages/mobx-state-tree/src/core/json-patch.ts#L10)*
+*Defined in [packages/mobx-state-tree/src/core/json-patch.ts:10](https://github.com/mobxjs/mobx-state-tree/blob/d57812c6/packages/mobx-state-tree/src/core/json-patch.ts#L10)*
