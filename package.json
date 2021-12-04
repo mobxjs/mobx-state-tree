@@ -32,6 +32,7 @@
     },
     "devDependencies": {
         "@size-limit/preset-big-lib": "^5.0.3",
+        "codecov": "^3.8.3",
         "cross-env": "^7.0.3",
         "husky": "^7.0.0",
         "lerna": "^4.0.0",
