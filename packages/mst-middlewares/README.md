@@ -296,6 +296,35 @@ export const setUndoManager = (targetStore) => {
 }
 ```
 
+If you want to record changes in lifecycle hooks as well, you must provide an `includeHooks` flag:
+
+```js
+import { UndoManager } from "mst-middlewares"
+
+export const Store = types
+    .model({
+        todos: types.array(Todo)
+    })
+    .actions((self) => {
+        setUndoManager(self)
+
+        return {
+            afterCreate() {
+                self.todos.push({ title: 'New Todo' })
+            },
+            addTodo(todo) {
+                self.todos.push(todo)
+            }
+        }
+    })
+
+export let undoManager = {}
+export const setUndoManager = (targetStore) => {
+    undoManager = UndoManager.create({}, { targetStore, includeHooks: true })
+}
+const store = Store.create()
+```
+
 Undo/ Redo:
 
 ```js

@@ -6,8 +6,8 @@ let undoManager: any = {}
 const setUndoManagerSameTree = (targetStore: any) => {
     undoManager = targetStore.history
 }
-const setUndoManagerDifferentTree = (targetStore: any) => {
-    undoManager = UndoManager.create({}, { targetStore })
+const setUndoManagerDifferentTree = (targetStore: any, includeHooks?: boolean) => {
+    undoManager = UndoManager.create({}, { targetStore, includeHooks })
 }
 
 const canTimeTravel = (store: any) => {
@@ -503,4 +503,68 @@ test("#1195 - withoutUndo() used inside an action should NOT affect all patches 
     // only age should be undone
     expect(person.name).toBe("Bob")
     expect(person.age).toBe(20)
+})
+
+describe("includeHooks flag", () => {
+    test("does not record hooks by default", () => {
+        const HistoryDifferentTreeStoreModel = types
+            .model({
+                x: 1,
+                y: 1
+            })
+            .actions((self) => {
+                setUndoManagerDifferentTree(self)
+                return {
+                    afterCreate() {
+                        self.y = 2
+                    },
+                    inc() {
+                        self.x += 1
+                    }
+                }
+            })
+
+        const store = HistoryDifferentTreeStoreModel.create()
+        store.inc()
+
+        expect(undoManager.history).toHaveLength(1)
+        expect(undoManager.history[0]).toEqual({
+            inversePatches: [{ op: "replace", path: "/x", value: 1 }],
+            patches: [{ op: "replace", path: "/x", value: 2 }]
+        })
+    })
+
+    test("record hooks in the root store", () => {
+        const HistoryDifferentTreeStoreModel = types
+            .model({
+                x: 1,
+                y: 1
+            })
+            .actions((self) => {
+                setUndoManagerDifferentTree(self, true)
+                return {
+                    afterCreate() {
+                        self.y = 2
+                    },
+                    inc() {
+                        self.x += 1
+                    }
+                }
+            })
+
+        const store = HistoryDifferentTreeStoreModel.create()
+        store.inc()
+
+        expect(undoManager.history).toHaveLength(2)
+        expect(undoManager.history).toEqual([
+            {
+                inversePatches: [{ op: "replace", path: "/y", value: 1 }],
+                patches: [{ op: "replace", path: "/y", value: 2 }]
+            },
+            {
+                inversePatches: [{ op: "replace", path: "/x", value: 1 }],
+                patches: [{ op: "replace", path: "/x", value: 2 }]
+            }
+        ])
+    })
 })
