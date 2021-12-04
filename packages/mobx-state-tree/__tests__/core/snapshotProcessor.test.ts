@@ -609,6 +609,10 @@ describe("snapshotProcessor", () => {
                 }),
                 {
                     preProcessor(sn: { id: string; y: number }) {
+                        if ("x" in sn) {
+                            // Ensure snapshot don't run through preprocessor twice
+                            throw new Error("sn has already been preprocessed")
+                        }
                         return { id: sn.id, x: sn.y }
                     }
                 }
@@ -656,6 +660,10 @@ describe("snapshotProcessor", () => {
                 }),
                 {
                     preProcessor(sn: { id: string; y: number }) {
+                        if ("x" in sn) {
+                            // Ensure snapshot don't run through preprocessor twice
+                            throw new Error("sn has already been preprocessed")
+                        }
                         return { id: sn.id, x: sn.y }
                     }
                 }
@@ -670,6 +678,29 @@ describe("snapshotProcessor", () => {
             store.setItem({ id: "1", y: 1 })
             expect(getNodeId(store.item)).toBe(oldNodeId)
             expect(store.item.x).toBe(1)
+        })
+
+        test("model with transformed identifier property is reconciled", () => {
+            const SP = types.snapshotProcessor(
+                types.model({
+                    id: types.identifier
+                }),
+                {
+                    preProcessor(sn: { foo: string }) {
+                        return { id: sn.foo }
+                    }
+                }
+            )
+            const Store = types.model({ item: SP }).actions((self) => ({
+                setItem(item: SnapshotIn<typeof SP>) {
+                    self.item = cast(item)
+                }
+            }))
+            const store = Store.create({ item: { foo: "1" } })
+            const oldNodeId = getNodeId(store.item)
+            store.setItem({ foo: "1" })
+            expect(getNodeId(store.item)).toBe(oldNodeId)
+            expect(store.item.id).toBe("1")
         })
 
         test("1791 - model wrapped with maybe is reconciled", () => {
