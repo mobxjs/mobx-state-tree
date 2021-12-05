@@ -3,12 +3,12 @@ version: 2.1
 executors:
     my-executor:
         docker:
-            - image: circleci/node:12
+            - image: cimg/node:14.18.1
               environment:
                   CI: true
 
 orbs:
-    node: circleci/node@4.0.1
+    node: circleci/node@4.7.0
 
 jobs:
     # mobx-state-tree and mst-middlewares build
@@ -98,22 +98,21 @@ jobs:
             - run: yarn size
 
     # upload coverage
-    # upload-coveralls:
-    #     executor: my-executor
-    #     steps:
-    #         - attach_workspace:
-    #               at: .
-    #         # only run coveralls if the token is present (it is not present for fork PRs for security reasons)
-    #         - run:
-    #               name: upload coveralls
-    #               command: |
-    #                   if [[ -v COVERALLS_REPO_TOKEN ]]
-    #                   then
-    #                       cat ./packages/mobx-state-tree/coverage/lcov.info ./packages/mst-middlewares/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
-    #                       echo "Coveralls info uploaded"
-    #                   else
-    #                       echo "Warning - Coveralls info could NOT be uploaded since the COVERALLS_REPO_TOKEN was not available"
-    #                   fi
+    upload-codecov:
+        executor: my-executor
+        steps:
+            - attach_workspace:
+                  at: .
+            # only run codecov if the token is present (it is not present for fork PRs for security reasons)
+            - run:
+                  name: upload codecov
+                  command: |
+                      if [[ -v CODECOV_TOKEN ]]
+                      then
+                          ./node_modules/.bin/codecov
+                      else
+                          echo "Warning - Codecov info could NOT be uploaded since the CODECOV_TOKEN was not available"
+                      fi
 
 workflows:
     version: 2
@@ -142,7 +141,7 @@ workflows:
                   requires:
                       - build
 
-            #- upload-coveralls:
-            #      requires:
-            #          - test-mst-dev
-            #          - test-mst-middlewares-dev
+            - upload-codecov:
+                 requires:
+                     - test-mst-dev
+                     - test-mst-middlewares-dev

@@ -538,7 +538,7 @@ export function resolveIdentifier<IT extends IAnyModelType>(
         type,
         normalizeIdentifier(identifier)
     )
-    return node ? node.value : undefined
+    return node?.value
 }
 
 /**

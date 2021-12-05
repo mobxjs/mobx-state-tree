@@ -153,15 +153,14 @@ export function isMutable(value: any) {
  * @hidden
  */
 export function isPrimitive(value: any, includeDate = true): value is Primitives {
-    if (value === null || value === undefined) return true
-    if (
+    return (
+        value === null ||
+        value === undefined ||
         typeof value === "string" ||
         typeof value === "number" ||
         typeof value === "boolean" ||
         (includeDate && value instanceof Date)
     )
-        return true
-    return false
 }
 
 /**
