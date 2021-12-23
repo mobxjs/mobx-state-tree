@@ -135,4 +135,4 @@ The object that is returned from the `volatile` initializer function can contain
 5.  Volatile props are preserved during the lifecycle of an instance. See also [reconciliation](reconciliation)
 6.  Changes in volatile props won't show up in the patch or snapshot stream
 7.  It is currently not supported to define getters / setters in the object returned by `volatile`
-8.  volatile expects real variables, (a real string, a real array, etc). Calling `create` on the types, will generate real variables.
+8.  Volatile props expect real variables, (a real string, a real array, etc). Calling `create` on the types, will generate real variables.
