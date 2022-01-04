@@ -1,18 +1,18 @@
+import { configure, reaction } from "mobx"
 import {
-    types,
     addMiddleware,
-    recordActions,
-    flow,
     decorate,
     destroy,
-    IMiddlewareHandler,
+    flow,
     IMiddlewareEvent,
     IMiddlewareEventType,
-    toGeneratorFunction,
-    toGenerator
+    IMiddlewareHandler,
+    recordActions,
+    toGenerator,
     // TODO: export IRawActionCall
+    toGeneratorFunction,
+    types
 } from "../../src"
-import { reaction, configure } from "mobx"
 
 function delay<TV>(time: number, value: TV, shouldThrow = false): Promise<TV> {
     return new Promise((resolve, reject) => {
@@ -27,7 +27,7 @@ function testCoffeeTodo(
     done: () => void,
     generator: (
         self: any
-    ) => (str: string) => Generator<Promise<any>, string | void | undefined, undefined>,
+    ) => (str: string) => Generator<PromiseLike<any>, string | void | undefined, undefined>,
     shouldError: boolean,
     resultValue: string | undefined,
     producedCoffees: any[]
