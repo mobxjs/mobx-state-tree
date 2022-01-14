@@ -37,6 +37,11 @@ export interface IMiddlewareEvent extends IActionContext {
     readonly allParentIds: number[]
 }
 
+export interface FunctionWithFlag extends Function {
+    _isMSTAction?: boolean
+    _isFlowAction?: boolean
+}
+
 /**
  * @internal
  * @hidden
@@ -111,7 +116,7 @@ export function getParentActionContext(parentContext: IMiddlewareEvent | undefin
  * @internal
  * @hidden
  */
-export function createActionInvoker<T extends Function>(
+export function createActionInvoker<T extends FunctionWithFlag>(
     target: IAnyStateTreeNode,
     name: string,
     fn: T
@@ -140,7 +145,8 @@ export function createActionInvoker<T extends Function>(
             fn
         )
     }
-    ;(res as any)._isMSTAction = true
+    ;(res as FunctionWithFlag)._isMSTAction = true
+    ;(res as FunctionWithFlag)._isFlowAction = fn._isFlowAction
     return res
 }
 
