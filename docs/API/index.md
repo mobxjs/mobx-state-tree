@@ -3310,7 +3310,7 @@ ___
 
 Returns true if the given value is a node in a state tree.
 More precisely, that is, if the value is an instance of a
-`types.model`, `types.array` or `types.map`.
+`types.model`, `types.array`, `types.dynamicObject` or `types.map`.
 
 **Type parameters:**
 
@@ -3554,6 +3554,29 @@ Name | Type |
 `subtype` | IT |
 
 **Returns:** *IMapType‹IT›*
+
+___
+
+###  dynamicObject
+
+▸ **dynamicObject**<**IT**>(`subtype`: IT): *IDynamicObjectType‹IT›*
+
+
+`types.dynamicObject` - Creates a key based collection type who's children are all of a uniform declared type.
+very like types.map, the only difference is that it returns object instead of map.
+
+
+**Type parameters:**
+
+▪ **IT**: *[IAnyType](interfaces/ianytype.md)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`subtype` | IT |
+
+**Returns:** *IDynamicObjectType‹IT›*
 
 ___
 

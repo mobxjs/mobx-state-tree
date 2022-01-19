@@ -112,6 +112,7 @@ const TYPES = stringToArray(`
     Date,
     map,
     array,
+    dynamicObject,
     frozen,
     identifier,
     identifierNumber,

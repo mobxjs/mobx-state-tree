@@ -53,7 +53,8 @@ import {
     Instance,
     devMode,
     assertIsString,
-    assertArg
+    assertArg,
+    DynamicObjectType
 } from "../../internal"
 import { ComputedValue } from "mobx/dist/internal"
 
@@ -78,23 +79,22 @@ export interface ModelPropertiesDeclaration {
  *
  * @hidden
  */
-export type ModelPropertiesDeclarationToProperties<
-    T extends ModelPropertiesDeclaration
-> = T extends { [k: string]: IAnyType } // optimization to reduce nesting
-    ? T
-    : {
-          [K in keyof T]: T[K] extends IAnyType // keep IAnyType check on the top to reduce nesting
-              ? T[K]
-              : T[K] extends string
-              ? IType<string | undefined, string, string>
-              : T[K] extends number
-              ? IType<number | undefined, number, number>
-              : T[K] extends boolean
-              ? IType<boolean | undefined, boolean, boolean>
-              : T[K] extends Date
-              ? IType<number | Date | undefined, number, Date>
-              : never
-      }
+export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDeclaration> =
+    T extends { [k: string]: IAnyType } // optimization to reduce nesting
+        ? T
+        : {
+              [K in keyof T]: T[K] extends IAnyType // keep IAnyType check on the top to reduce nesting
+                  ? T[K]
+                  : T[K] extends string
+                  ? IType<string | undefined, string, string>
+                  : T[K] extends number
+                  ? IType<number | undefined, number, number>
+                  : T[K] extends boolean
+                  ? IType<boolean | undefined, boolean, boolean>
+                  : T[K] extends Date
+                  ? IType<number | Date | undefined, number, Date>
+                  : never
+          }
 
 /**
  * Checks if a value is optional (undefined, any or unknown).
@@ -135,8 +135,7 @@ export interface NonEmptyObject {
 export type ExtractCFromProps<P extends ModelProperties> = { [k in keyof P]: P[k]["CreationType"] }
 
 /** @hidden */
-export type ModelCreationType<PC> = { [P in DefinablePropsNames<PC>]: PC[P] } &
-    Partial<PC> &
+export type ModelCreationType<PC> = { [P in DefinablePropsNames<PC>]: PC[P] } & Partial<PC> &
     NonEmptyObject
 
 /** @hidden */
@@ -148,8 +147,7 @@ export type ModelCreationType2<P extends ModelProperties, CustomC> = _CustomOrOt
 /** @hidden */
 export type ModelSnapshotType<P extends ModelProperties> = {
     [K in keyof P]: P[K]["SnapshotType"]
-} &
-    NonEmptyObject
+} & NonEmptyObject
 
 /** @hidden */
 export type ModelSnapshotType2<P extends ModelProperties, CustomS> = _CustomOrOther<
@@ -161,8 +159,9 @@ export type ModelSnapshotType2<P extends ModelProperties, CustomS> = _CustomOrOt
  * @hidden
  * we keep this separate from ModelInstanceType to shorten model instance types generated declarations
  */
-export type ModelInstanceTypeProps<P extends ModelProperties> = { [K in keyof P]: P[K]["Type"] } &
-    NonEmptyObject
+export type ModelInstanceTypeProps<P extends ModelProperties> = {
+    [K in keyof P]: P[K]["Type"]
+} & NonEmptyObject
 
 /**
  * @hidden
@@ -180,8 +179,7 @@ export interface IModelType<
     OTHERS,
     CustomC = _NotCustomized,
     CustomS = _NotCustomized
->
-    extends IType<
+> extends IType<
         ModelCreationType2<PROPS, CustomC>,
         ModelSnapshotType2<PROPS, CustomS>,
         ModelInstanceType<PROPS, OTHERS>
@@ -285,7 +283,7 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
                 [key]: optional(getPrimitiveFactoryFromValue(value), value)
             })
             // map defaults to empty object automatically for models
-        } else if (value instanceof MapType) {
+        } else if (value instanceof MapType || value instanceof DynamicObjectType) {
             return Object.assign({}, props, {
                 [key]: optional(value, {})
             })
@@ -318,18 +316,19 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
  * @hidden
  */
 export class ModelType<
-    PROPS extends ModelProperties,
-    OTHERS,
-    CustomC,
-    CustomS,
-    MT extends IModelType<PROPS, OTHERS, CustomC, CustomS>
->
+        PROPS extends ModelProperties,
+        OTHERS,
+        CustomC,
+        CustomS,
+        MT extends IModelType<PROPS, OTHERS, CustomC, CustomS>
+    >
     extends ComplexType<
         ModelCreationType2<PROPS, CustomC>,
         ModelSnapshotType2<PROPS, CustomS>,
         ModelInstanceType<PROPS, OTHERS>
     >
-    implements IModelType<PROPS, OTHERS, CustomC, CustomS> {
+    implements IModelType<PROPS, OTHERS, CustomC, CustomS>
+{
     readonly flags = TypeFlags.Object
 
     /*
