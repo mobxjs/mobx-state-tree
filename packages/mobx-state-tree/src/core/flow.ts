@@ -1,3 +1,4 @@
+import { argsToArray, fail, setImmediateWithFallback } from "../utils"
 import {
     getCurrentActionContext,
     getNextActionId,
@@ -5,12 +6,11 @@ import {
     IMiddlewareEventType,
     runWithActionContext
 } from "./action"
-import { argsToArray, setImmediateWithFallback, fail } from "../utils"
 
 /**
  * @hidden
  */
-export type FlowReturn<R> = R extends Promise<infer T> ? T : R
+export type FlowReturn<R> = R extends PromiseLike<infer T> ? T : R
 
 /**
  * See [asynchronous actions](concepts/async-actions.md).
@@ -18,8 +18,8 @@ export type FlowReturn<R> = R extends Promise<infer T> ? T : R
  * @returns The flow as a promise.
  */
 export function flow<R, Args extends any[]>(
-    generator: (...args: Args) => Generator<Promise<any>, R, any>
-): (...args: Args) => Promise<FlowReturn<R>> {
+    generator: (...args: Args) => Generator<PromiseLike<any>, R, any>
+): (...args: Args) => PromiseLike<FlowReturn<R>> {
     return createFlowSpawner(generator.name, generator) as any
 }
 
@@ -56,7 +56,7 @@ export function castFlowReturn<T>(val: T): T {
  * }))
  * ```
  */
-export function toGeneratorFunction<R, Args extends any[]>(p: (...args: Args) => Promise<R>) {
+export function toGeneratorFunction<R, Args extends any[]>(p: (...args: Args) => PromiseLike<R>) {
     return function* (...args: Args) {
         return (yield p(...args)) as R
     }
