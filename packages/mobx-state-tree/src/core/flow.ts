@@ -10,7 +10,7 @@ import {
 /**
  * @hidden
  */
-export type FlowReturn<R> = R extends PromiseLike<infer T> ? T : R
+export type FlowReturn<R> = R extends Promise<infer T> ? T : R
 
 /**
  * See [asynchronous actions](concepts/async-actions.md).
@@ -19,7 +19,7 @@ export type FlowReturn<R> = R extends PromiseLike<infer T> ? T : R
  */
 export function flow<R, Args extends any[]>(
     generator: (...args: Args) => Generator<PromiseLike<any>, R, any>
-): (...args: Args) => PromiseLike<FlowReturn<R>> {
+): (...args: Args) => Promise<FlowReturn<R>> {
     return createFlowSpawner(generator.name, generator) as any
 }
 
@@ -56,7 +56,7 @@ export function castFlowReturn<T>(val: T): T {
  * }))
  * ```
  */
-export function toGeneratorFunction<R, Args extends any[]>(p: (...args: Args) => PromiseLike<R>) {
+export function toGeneratorFunction<R, Args extends any[]>(p: (...args: Args) => Promise<R>) {
     return function* (...args: Args) {
         return (yield p(...args)) as R
     }

@@ -27,7 +27,7 @@ function testCoffeeTodo(
     done: () => void,
     generator: (
         self: any
-    ) => (str: string) => Generator<PromiseLike<any>, string | void | undefined, undefined>,
+    ) => (str: string) => Generator<Promise<any>, string | void | undefined, undefined>,
     shouldError: boolean,
     resultValue: string | undefined,
     producedCoffees: any[]
