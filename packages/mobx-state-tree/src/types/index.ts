@@ -53,8 +53,8 @@ export const types = {
     identifier,
     identifierNumber,
     late,
+    lazy,
     undefined: undefinedType,
     null: nullType,
-    snapshotProcessor,
-    lazy
+    snapshotProcessor
 }
