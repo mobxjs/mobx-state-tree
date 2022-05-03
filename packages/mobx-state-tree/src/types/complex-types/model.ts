@@ -489,7 +489,7 @@ export class ModelType<
         // check views return
         if (!isPlainObject(views))
             throw fail(`views initializer should return a plain object containing views`)
-        Object.keys(views).forEach((key) => {
+        Object.getOwnPropertyNames(views).forEach((key) => {
             // is this a computed property?
             const descriptor = Object.getOwnPropertyDescriptor(views, key)!
             if ("get" in descriptor) {
