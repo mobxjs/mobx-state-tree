@@ -13,7 +13,8 @@ import {
     getSnapshot,
     devMode,
     ComplexType,
-    typeCheckFailure
+    typeCheckFailure,
+    isUnionType
 } from "../../internal"
 
 /** @hidden */
@@ -89,8 +90,10 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
             return this.postProcessSnapshot(oldGetSnapshot.call(node)) as any
         }
 
-        node.getReconciliationType = () => {
-            return this
+        if (!isUnionType(this._subtype)) {
+            node.getReconciliationType = () => {
+                return this
+            }
         }
     }
 

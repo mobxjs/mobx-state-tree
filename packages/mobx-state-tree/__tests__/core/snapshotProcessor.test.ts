@@ -782,4 +782,27 @@ describe("snapshotProcessor", () => {
         store.setItem(undefined)
         expect(store.item).toBeUndefined()
     })
+
+    test("1849 - Wrapped unions don't cause infinite recursion", () => {
+        const Store = types
+            .model({
+                prop: types.optional(
+                    types.snapshotProcessor(
+                        types.union(types.literal("a"), types.literal("b")),
+                        {}
+                    ),
+                    "a"
+                )
+            })
+            .actions((self) => ({
+                setProp(prop: typeof self.prop) {
+                    self.prop = prop
+                }
+            }))
+
+        const store = Store.create()
+        expect(store.prop).toBe("a")
+        expect(() => store.setProp("b")).not.toThrow()
+        expect(store.prop).toBe("b")
+    })
 })
