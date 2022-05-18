@@ -7,6 +7,7 @@ title: Installation
 
 -   NPM: `npm install mobx mobx-state-tree --save`
 -   Yarn: `yarn add mobx mobx-state-tree`
+-   pnpm: `pnpm add mobx mobx-state-tree`
 -   CDN: https://unpkg.com/mobx-state-tree/dist/mobx-state-tree.umd.js (exposed as `window.mobxStateTree`)
 -   CodeSandbox [TodoList demo](https://codesandbox.io/s/y64pzxj01) fork for testing and bug reporting
 
