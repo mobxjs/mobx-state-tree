@@ -128,6 +128,7 @@ export {
     isLiteralType,
     isMapType,
     isModelType,
+    isObjectType,
     isOptionalType,
     isPrimitiveType,
     isReferenceType,

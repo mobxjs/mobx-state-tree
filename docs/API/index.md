@@ -121,6 +121,7 @@ sidebar_label: "Globals"
 * [isLiteralType](index.md#isliteraltype)
 * [isMapType](index.md#ismaptype)
 * [isModelType](index.md#ismodeltype)
+* [isObjectType](index.md#isobjecttype)
 * [isOptionalType](index.md#isoptionaltype)
 * [isPrimitiveType](index.md#isprimitivetype)
 * [isProtected](index.md#isprotected)
@@ -3176,6 +3177,28 @@ Name | Type |
 
 ___
 
+###  isObjectType
+
+▸ **isObjectType**<**IT**>(`type`: [IAnyType](interfaces/ianytype.md)): *type is IObjectType*
+
+*Defined in [packages/mobx-state-tree/src/types/complex-types/object.ts:477](https://github.com/mobxjs/mobx-state-tree/blob/d57812c6/packages/mobx-state-tree/src/types/complex-types/object.ts#L477)*
+
+Returns if a given value represents a object type.
+
+**Type parameters:**
+
+▪ **IT**: *[IAnyType](interfaces/ianytype.md)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`type` | [IAnyType](interfaces/ianytype.md) |
+
+**Returns:** *type is IObjectType*
+
+___
+
 ###  isOptionalType
 
 ▸ **isOptionalType**<**IT**>(`type`: IT): *type is IT*
@@ -3310,7 +3333,7 @@ ___
 
 Returns true if the given value is a node in a state tree.
 More precisely, that is, if the value is an instance of a
-`types.model`, `types.array`, `types.dynamicObject` or `types.map`.
+`types.model`, `types.array`, `types.object` or `types.map`.
 
 **Type parameters:**
 
@@ -3557,14 +3580,43 @@ Name | Type |
 
 ___
 
-###  dynamicObject
+###  object
 
-▸ **dynamicObject**<**IT**>(`subtype`: IT): *IDynamicObjectType‹IT›*
+▸ **object**<**IT**>(`subtype`: IT): *IObjectType‹IT›*
 
+`types.object` - Creates a key based collection type who's children are all of a uniform declared type.
+as a supplyment to `types.model`, it offers a support to fconsume object without specifing definite keys.
+it is also very similar to `types.map`,the main difference is that it returns an object instead of a map.
 
-`types.dynamicObject` - Creates a key based collection type who's children are all of a uniform declared type.
-very like types.map, the only difference is that it returns object instead of map.
+Example:
+```ts
+interface StudentInfo {
+  age:number;
+  height:number;
+}
 
+const ClassList = types.model({
+  students: types.object(types.frozen<StudentInfo>()).actions((students)=>({
+    update(name:string,value:StudentInfo){
+      students[name]=value
+    }
+  }))
+})
+
+const class_1 = ClassList.create(
+  { students: 
+    { Tom:
+        {age:6,height:120},
+      Jerry:
+        {age:4,height:30}
+    } 
+  })
+
+class_1.students.update('Tom', { age: 7, height: 125 })
+console.log(class_1.students.Tom.height) // prints: 123
+class_1.students.update('Susie', { age: 2, height: 110 })
+console.log(class_1.students.Susie.age) // prints: 2
+```
 
 **Type parameters:**
 
@@ -3576,7 +3628,7 @@ Name | Type |
 ------ | ------ |
 `subtype` | IT |
 
-**Returns:** *IDynamicObjectType‹IT›*
+**Returns:** *IObjectType‹IT›*
 
 ___
 

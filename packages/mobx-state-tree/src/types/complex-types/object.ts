@@ -55,23 +55,23 @@ const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
 const POST_PROCESS_SNAPSHOT = "postProcessSnapshot"
 
 /** @hidden */
-export interface IDynamicObjectType<IT extends IAnyType,OTHERS={}>
+export interface IObjectType<IT extends IAnyType,OTHERS={}>
     extends IType<
         IKeyValueMap<IT["CreationType"]> | undefined,
         IKeyValueMap<IT["SnapshotType"]>,
-        IMSTDynamicObject<IT,OTHERS>
+        IMSTObject<IT,OTHERS>
     > {
-    hooks(hooks: IHooksGetter<IMSTDynamicObject<IT>>): IDynamicObjectType<IT>,
+    hooks(hooks: IHooksGetter<IMSTObject<IT>>): IObjectType<IT>,
     actions<A extends ModelActions>(
         fn: (self: Instance<this>) => A
-    ): IDynamicObjectType<IT,OTHERS&A>
+    ): IObjectType<IT,OTHERS&A>
     views<V extends Object>(
         fn: (self: Instance<this>) => V
-    ): IDynamicObjectType<IT,OTHERS&V>
+    ): IObjectType<IT,OTHERS&V>
 }
 
 /** @hidden */
-export type IMSTDynamicObject<IT extends IAnyType,OTHERS={}> = {
+export type IMSTObject<IT extends IAnyType,OTHERS={}> = {
     [key: string]: IT["Type"]
 }& OTHERS
 
@@ -96,7 +96,7 @@ function tryCollectModelTypes(type: IAnyType, modelTypes: Array<IAnyModelType>):
  * @internal
  * @hidden
  */
-export enum DynamicObjectIdentifierMode {
+export enum ObjectIdentifierMode {
     UNKNOWN,
     YES,
     NO
@@ -106,22 +106,22 @@ export enum DynamicObjectIdentifierMode {
  * @internal
  * @hidden
  */
-export class DynamicObjectType<IT extends IAnyType,OTHERS={}> extends ComplexType<
+export class ObjectType<IT extends IAnyType,OTHERS={}> extends ComplexType<
     IKeyValueMap<IT["CreationType"]> | undefined,
     IKeyValueMap<IT["SnapshotType"]>,
-    IMSTDynamicObject<IT,OTHERS>
+    IMSTObject<IT,OTHERS>
 > {
-    identifierMode: DynamicObjectIdentifierMode = DynamicObjectIdentifierMode.UNKNOWN
+    identifierMode: ObjectIdentifierMode = ObjectIdentifierMode.UNKNOWN
     objectIdentifierAttribute: string | undefined = undefined
-    readonly flags = TypeFlags.DynamicObject
+    readonly flags = TypeFlags.Object
 
-    private readonly hookInitializers: Array<IHooksGetter<IMSTDynamicObject<IT>>> = []
+    private readonly hookInitializers: Array<IHooksGetter<IMSTObject<IT>>> = []
     private readonly initializers: ((instance: any) => any)[] = []
 
     constructor(
         name: string,
         private readonly _subType: IAnyType,
-        hookInitializers: Array<IHooksGetter<IMSTDynamicObject<IT>>> = [],
+        hookInitializers: Array<IHooksGetter<IMSTObject<IT>>> = [],
         initializers: ((instance: any) => any)[]=[],
     ) {
         super(name)
@@ -130,10 +130,10 @@ export class DynamicObjectType<IT extends IAnyType,OTHERS={}> extends ComplexTyp
         this.initializers = initializers
     }
 
-    hooks(hooks: IHooksGetter<IMSTDynamicObject<IT>>) {
+    hooks(hooks: IHooksGetter<IMSTObject<IT>>) {
         const hookInitializers =
             this.hookInitializers.length > 0 ? this.hookInitializers.concat(hooks) : [hooks]
-        return new DynamicObjectType(this.name, this._subType, hookInitializers,this.initializers)
+        return new ObjectType(this.name, this._subType, hookInitializers,this.initializers)
     }
 
     actions<A extends ModelActions>(fn: (self: Instance<this>) => A) {
@@ -143,7 +143,7 @@ export class DynamicObjectType<IT extends IAnyType,OTHERS={}> extends ComplexTyp
         }
         const initializers = this.initializers.concat([actionInitializers])
 
-        return new DynamicObjectType(this.name, this._subType, this.hookInitializers,initializers)
+        return new ObjectType(this.name, this._subType, this.hookInitializers,initializers)
     }
 
     views<V extends Object>(fn: (self: Instance<this>) => V) {
@@ -153,7 +153,7 @@ export class DynamicObjectType<IT extends IAnyType,OTHERS={}> extends ComplexTyp
         }
         const initializers = this.initializers.concat([viewInitializer])
 
-        return new DynamicObjectType(this.name, this._subType, this.hookInitializers,initializers)
+        return new ObjectType(this.name, this._subType, this.hookInitializers,initializers)
     }
 
     private instantiateActions(self: this["T"], actions: ModelActions): void {
@@ -234,7 +234,7 @@ export class DynamicObjectType<IT extends IAnyType,OTHERS={}> extends ComplexTyp
     }
 
     private _determineIdentifierMode() {
-        if (this.identifierMode !== DynamicObjectIdentifierMode.UNKNOWN) {
+        if (this.identifierMode !== ObjectIdentifierMode.UNKNOWN) {
             return
         }
 
@@ -252,10 +252,10 @@ export class DynamicObjectType<IT extends IAnyType,OTHERS={}> extends ComplexTyp
                 }
             })
             if (identifierAttribute) {
-                this.identifierMode = DynamicObjectIdentifierMode.YES
+                this.identifierMode = ObjectIdentifierMode.YES
                 this.objectIdentifierAttribute = identifierAttribute
             } else {
-                this.identifierMode = DynamicObjectIdentifierMode.NO
+                this.identifierMode = ObjectIdentifierMode.NO
             }
         }
     }
@@ -279,7 +279,7 @@ export class DynamicObjectType<IT extends IAnyType,OTHERS={}> extends ComplexTyp
         })
         const type = node.type as this
         type.hookInitializers.forEach((initializer) => {
-            const hooks = initializer(instance as unknown as IMSTDynamicObject<IT>)
+            const hooks = initializer(instance as unknown as IMSTObject<IT>)
             Object.keys(hooks).forEach((name) => {
                 const hook = hooks[name as keyof typeof hooks]!
                 const actionInvoker = createActionInvoker(instance as IAnyStateTreeNode, name, hook)
@@ -315,8 +315,8 @@ export class DynamicObjectType<IT extends IAnyType,OTHERS={}> extends ComplexTyp
         const node = getStateTreeNode(change.object as IAnyStateTreeNode)
         const key = change.name as string
         node.assertWritable({ subpath: key })
-        const dynamicObjectType = node.type as this
-        const subType = dynamicObjectType._subType
+        const objectType = node.type as this
+        const subType = objectType._subType
 
         switch (change.type) {
             case "update":
@@ -329,19 +329,19 @@ export class DynamicObjectType<IT extends IAnyType,OTHERS={}> extends ComplexTyp
                     node,
                     key
                 )
-                dynamicObjectType.processIdentifier(key, change.newValue)
+                objectType.processIdentifier(key, change.newValue)
                 break
             case "add":
                 typecheckInternal(subType, change.newValue)
                 change.newValue = subType.instantiate(node, key, undefined, change.newValue)
-                dynamicObjectType.processIdentifier(key, change.newValue)
+                objectType.processIdentifier(key, change.newValue)
                 break
         }
         return change
     }
 
     private processIdentifier(expected: string, node: AnyNode): void {
-        if (this.identifierMode === DynamicObjectIdentifierMode.YES && node instanceof ObjectNode) {
+        if (this.identifierMode === ObjectIdentifierMode.YES && node instanceof ObjectNode) {
             const identifier = node.identifier!
             if (identifier !== expected)
                 throw fail(
@@ -462,10 +462,10 @@ export class DynamicObjectType<IT extends IAnyType,OTHERS={}> extends ComplexTyp
         delete node.storedValue[subpath]
     }
 }
-DynamicObjectType.prototype.applySnapshot = action(DynamicObjectType.prototype.applySnapshot)
+ObjectType.prototype.applySnapshot = action(ObjectType.prototype.applySnapshot)
 
-export function dynamicObject<IT extends IAnyType>(subtype: IT): IDynamicObjectType<IT> {
-    return new DynamicObjectType<IT>(`{[key:string] ${subtype.name}}`, subtype) as any
+export function object<IT extends IAnyType>(subtype: IT): IObjectType<IT> {
+    return new ObjectType<IT>(`{[key:string] ${subtype.name}}`, subtype) as any
 }
 
 /**
@@ -474,8 +474,8 @@ export function dynamicObject<IT extends IAnyType>(subtype: IT): IDynamicObjectT
  * @param type
  * @returns `true` if it is a dynameic object type.
  */
-export function isDynamicObjectType<Items extends IAnyType = IAnyType>(
+export function isObjectType<Items extends IAnyType = IAnyType>(
     type: IAnyType
-): type is IDynamicObjectType<Items> {
-    return isType(type) && (type.flags & TypeFlags.DynamicObject) > 0
+): type is IObjectType<Items> {
+    return isType(type) && (type.flags & TypeFlags.Object) > 0
 }

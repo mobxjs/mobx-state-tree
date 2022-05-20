@@ -30,8 +30,9 @@ These are the types available in MST. All types can be found in the `types` name
 -   [`types.model(properties, actions)`](/API/#model) Defines a "class like" type with properties and actions to operate on the object.
 -   [`types.array(type)`](/API/#array) Declares an array of the specified type.
 -   [`types.map(type)`](/API/#map) Declares a map of the specified type.
+-   [`types.object(type)`](/API/#object) Declares a object of the specified type with arbitrary keys.
 
-Note that since MST v3 `types.array` and `types.map` are wrapped in `types.optional` by default, with `[]` and `{}` set as their default values, respectively.
+Note that since MST v3 `types.array` `types.map` and `types.object` are wrapped in `types.optional` by default, with `[]` and `{}` set as their default values, respectively.
 
 ## Primitive types
 

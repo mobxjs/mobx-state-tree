@@ -37,7 +37,7 @@ export enum TypeFlags {
     Literal = 1 << 4,
     Array = 1 << 5,
     Map = 1 << 6,
-    Object = 1 << 7,
+    Model = 1 << 7,
     Frozen = 1 << 8,
     Optional = 1 << 9,
     Reference = 1 << 10,
@@ -50,7 +50,7 @@ export enum TypeFlags {
     Integer = 1 << 17,
     Custom = 1 << 18,
     SnapshotProcessor = 1 << 19,
-    DynamicObject = 1 << 20
+    Object = 1 << 20
 }
 
 /**

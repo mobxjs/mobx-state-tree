@@ -54,7 +54,7 @@ import {
     devMode,
     assertIsString,
     assertArg,
-    DynamicObjectType
+    ObjectType
 } from "../../internal"
 import { ComputedValue } from "mobx/dist/internal"
 
@@ -283,7 +283,7 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
                 [key]: optional(getPrimitiveFactoryFromValue(value), value)
             })
             // map defaults to empty object automatically for models
-        } else if (value instanceof MapType || value instanceof DynamicObjectType) {
+        } else if (value instanceof MapType || value instanceof ObjectType) {
             return Object.assign({}, props, {
                 [key]: optional(value, {})
             })
@@ -329,7 +329,7 @@ export class ModelType<
     >
     implements IModelType<PROPS, OTHERS, CustomC, CustomS>
 {
-    readonly flags = TypeFlags.Object
+    readonly flags = TypeFlags.Model
 
     /*
      * The original object definition
@@ -835,5 +835,5 @@ export function compose(...args: any[]): any {
  * @returns
  */
 export function isModelType<IT extends IAnyModelType = IAnyModelType>(type: IAnyType): type is IT {
-    return isType(type) && (type.flags & TypeFlags.Object) > 0
+    return isType(type) && (type.flags & TypeFlags.Model) > 0
 }
