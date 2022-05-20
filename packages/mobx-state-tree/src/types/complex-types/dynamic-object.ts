@@ -1,6 +1,9 @@
 import {
     _interceptReads,
     action,
+    computed,
+    defineProperty,
+    makeObservable,
     IKeyValueMap,
     IObjectWillChange,
     IObjectDidChange,
@@ -42,23 +45,35 @@ import {
     createActionInvoker,
     addHiddenFinalProp,
     addHiddenWritableProp,
-    IHooksGetter
+    IHooksGetter,
+    ModelActions,
+    Instance,
+    Hook
 } from "../../internal"
 
+const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
+const POST_PROCESS_SNAPSHOT = "postProcessSnapshot"
+
 /** @hidden */
-export interface IDynamicObjectType<IT extends IAnyType>
+export interface IDynamicObjectType<IT extends IAnyType,OTHERS={}>
     extends IType<
         IKeyValueMap<IT["CreationType"]> | undefined,
         IKeyValueMap<IT["SnapshotType"]>,
-        IMSTDynamicObject<IT>
+        IMSTDynamicObject<IT,OTHERS>
     > {
-    hooks(hooks: IHooksGetter<IMSTDynamicObject<IT>>): IDynamicObjectType<IT>
+    hooks(hooks: IHooksGetter<IMSTDynamicObject<IT>>): IDynamicObjectType<IT>,
+    actions<A extends ModelActions>(
+        fn: (self: Instance<this>) => A
+    ): IDynamicObjectType<IT,OTHERS&A>
+    views<V extends Object>(
+        fn: (self: Instance<this>) => V
+    ): IDynamicObjectType<IT,OTHERS&V>
 }
 
 /** @hidden */
-export type IMSTDynamicObject<IT extends IAnyType> = {
+export type IMSTDynamicObject<IT extends IAnyType,OTHERS={}> = {
     [key: string]: IT["Type"]
-}
+}& OTHERS
 
 function tryCollectModelTypes(type: IAnyType, modelTypes: Array<IAnyModelType>): boolean {
     const subtypes = type.getSubTypes()
@@ -91,31 +106,121 @@ export enum DynamicObjectIdentifierMode {
  * @internal
  * @hidden
  */
-export class DynamicObjectType<IT extends IAnyType> extends ComplexType<
+export class DynamicObjectType<IT extends IAnyType,OTHERS={}> extends ComplexType<
     IKeyValueMap<IT["CreationType"]> | undefined,
     IKeyValueMap<IT["SnapshotType"]>,
-    IMSTDynamicObject<IT>
+    IMSTDynamicObject<IT,OTHERS>
 > {
     identifierMode: DynamicObjectIdentifierMode = DynamicObjectIdentifierMode.UNKNOWN
     objectIdentifierAttribute: string | undefined = undefined
     readonly flags = TypeFlags.DynamicObject
 
     private readonly hookInitializers: Array<IHooksGetter<IMSTDynamicObject<IT>>> = []
+    private readonly initializers: ((instance: any) => any)[] = []
 
     constructor(
         name: string,
         private readonly _subType: IAnyType,
-        hookInitializers: Array<IHooksGetter<IMSTDynamicObject<IT>>> = []
+        hookInitializers: Array<IHooksGetter<IMSTDynamicObject<IT>>> = [],
+        initializers: ((instance: any) => any)[]=[],
     ) {
         super(name)
         this._determineIdentifierMode()
         this.hookInitializers = hookInitializers
+        this.initializers = initializers
     }
 
     hooks(hooks: IHooksGetter<IMSTDynamicObject<IT>>) {
         const hookInitializers =
             this.hookInitializers.length > 0 ? this.hookInitializers.concat(hooks) : [hooks]
-        return new DynamicObjectType(this.name, this._subType, hookInitializers)
+        return new DynamicObjectType(this.name, this._subType, hookInitializers,this.initializers)
+    }
+
+    actions<A extends ModelActions>(fn: (self: Instance<this>) => A) {
+        const actionInitializers = (self: Instance<this>) => {
+            this.instantiateActions(self, fn(self))
+            return self
+        }
+        const initializers = this.initializers.concat([actionInitializers])
+
+        return new DynamicObjectType(this.name, this._subType, this.hookInitializers,initializers)
+    }
+
+    views<V extends Object>(fn: (self: Instance<this>) => V) {
+        const viewInitializer = (self: Instance<this>) => {
+            this.instantiateViews(self, fn(self))
+            return self
+        }
+        const initializers = this.initializers.concat([viewInitializer])
+
+        return new DynamicObjectType(this.name, this._subType, this.hookInitializers,initializers)
+    }
+
+    private instantiateActions(self: this["T"], actions: ModelActions): void {
+        // check if return is correct
+        if (!isPlainObject(actions))
+            throw fail(`actions initializer should return a plain object containing actions`)
+
+        // bind actions to the object created
+        Object.keys(actions).forEach((name) => {
+            // warn if preprocessor was given
+            if (name === PRE_PROCESS_SNAPSHOT)
+                throw fail(
+                    `Cannot define action '${PRE_PROCESS_SNAPSHOT}', it should be defined using 'type.preProcessSnapshot(fn)' instead`
+                )
+            // warn if postprocessor was given
+            if (name === POST_PROCESS_SNAPSHOT)
+                throw fail(
+                    `Cannot define action '${POST_PROCESS_SNAPSHOT}', it should be defined using 'type.postProcessSnapshot(fn)' instead`
+                )
+
+            let action2 = actions[name]
+
+            // apply hook composition
+            let baseAction = (self as any)[name]
+            if (name in Hook && baseAction) {
+                let specializedAction = action2
+                action2 = function () {
+                    baseAction.apply(null, arguments)
+                    specializedAction.apply(null, arguments)
+                }
+            }
+
+            // the goal of this is to make sure actions using "this" can call themselves,
+            // while still allowing the middlewares to register them
+            const middlewares = (action2 as any).$mst_middleware // make sure middlewares are not lost
+            let boundAction = action2.bind(actions)
+            boundAction.$mst_middleware = middlewares
+            const actionInvoker = createActionInvoker(self as any, name, boundAction)
+            actions[name] = actionInvoker
+
+            // See #646, allow models to be mocked
+            ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(self, name, actionInvoker)
+        })
+    }
+
+    private instantiateViews(self: this["T"], views: Object): void {
+        // check views return
+        if (!isPlainObject(views))
+            throw fail(`views initializer should return a plain object containing views`)
+        Object.keys(views).forEach((key) => {
+            // is this a computed property?
+            const descriptor = Object.getOwnPropertyDescriptor(views, key)!
+            if ("get" in descriptor) {
+                defineProperty(self, key, descriptor)
+                makeObservable(self, { [key]: computed } as any)
+            } else if (typeof descriptor.value === "function") {
+                // this is a view function, merge as is!
+                // See #646, allow models to be mocked
+                ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(
+                    self,
+                    key,
+                    descriptor.value
+                )
+            } else {
+                throw fail(`A view member should either be a function or getter based property`)
+            }
+        })
     }
 
     instantiate(
@@ -165,7 +270,7 @@ export class DynamicObjectType<IT extends IAnyType> extends ComplexType<
     }
 
     createNewInstance(childNodes: IChildNodesMap): this["T"] {
-        return observable(childNodes, undefined, { deep: false })
+        return observable(childNodes, undefined, { deep: false }) as any
     }
 
     finalizeNewInstance(node: this["N"], instance: this["T"]): void {
@@ -185,6 +290,7 @@ export class DynamicObjectType<IT extends IAnyType> extends ComplexType<
                 )
             })
         })
+        type.initializers.reduce((self,fn) => fn(self), instance)
         intercept(instance, this.willChange)
         observe(instance, this.didChange)
     }
@@ -194,7 +300,7 @@ export class DynamicObjectType<IT extends IAnyType> extends ComplexType<
     }
 
     getChildren(node: this["N"]): ReadonlyArray<AnyNode> {
-        return values(node.storedValue) as any
+        return values(node.storedValue)
     }
 
     getChildNode(node: this["N"], key: string): AnyNode {
@@ -263,8 +369,8 @@ export class DynamicObjectType<IT extends IAnyType> extends ComplexType<
     didChange(chg: IObjectDidChange<IKeyValueMap<AnyNode>>): void {
         const node = getStateTreeNode(chg.object as IAnyStateTreeNode)
         const change = chg as IObjectWillChange & { newValue?: any; oldValue?: any }
-        const value = change.newValue.snapshot
-        const oldValue = change.oldValue ? change.oldValue.snapshot : undefined
+        const value = change.newValue?.snapshot
+        const oldValue = change.oldValue?.snapshot
 
         switch (change.type) {
             case "update":
@@ -278,6 +384,7 @@ export class DynamicObjectType<IT extends IAnyType> extends ComplexType<
                     node
                 )
             case "add":
+                _interceptReads(change.object, change.name as string, node.unbox)
                 return node.emitPatch(
                     {
                         op: "add",
@@ -301,7 +408,7 @@ export class DynamicObjectType<IT extends IAnyType> extends ComplexType<
     }
 
     applyPatchLocally(node: this["N"], subpath: string, patch: IJsonPatch): void {
-        const target = node.storedValue
+        const target = node.storedValue as any
         switch (patch.op) {
             case "add":
             case "replace":
@@ -358,7 +465,7 @@ export class DynamicObjectType<IT extends IAnyType> extends ComplexType<
 DynamicObjectType.prototype.applySnapshot = action(DynamicObjectType.prototype.applySnapshot)
 
 export function dynamicObject<IT extends IAnyType>(subtype: IT): IDynamicObjectType<IT> {
-    return new DynamicObjectType<IT>(`{[key:string] ${subtype.name}}`, subtype)
+    return new DynamicObjectType<IT>(`{[key:string] ${subtype.name}}`, subtype) as any
 }
 
 /**
