@@ -50,7 +50,7 @@ Note that since MST v3 `types.array` and `types.map` are wrapped in `types.optio
 -   [`types.enumeration(name?, options: string[])`](/API/#enumeration) creates an enumeration. This method is a shorthand for a union of string literals. If you are using typescript and want to create a type based on an string enum (e.g. `enum Color { ... }`) then use `types.enumeration<Color>("Color", Object.values(Color))`, where the `"Color"` name argument is optional.
 -   [`types.refinement(name?, baseType, (snapshot) => boolean)`](/API/#refinement) creates a type that is more specific than the base type, e.g. `types.refinement(types.string, value => value.length > 5)` to create a type of strings that can only be longer than 5.
 -   [`types.maybe(type)`](/API/#maybe) makes a type optional and nullable. The value `undefined` will be used to represent nullability. Shorthand for `types.optional(types.union(type, types.literal(undefined)), undefined)`.
--   [`types.maybeNull(type)`](/API/#maybeNull) like `maybe`, but uses `null` to represent the absence of a value.
+-   [`types.maybeNull(type)`](/API/#maybenull) like `maybe`, but uses `null` to represent the absence of a value.
 -   [`types.null`](/API/#const-nulltype) the type of `null`.
 -   [`types.undefined`](/API/#const-undefinedtype) the type of `undefined`.
 -   [`types.late(() => type)`](/API/#late) can be used to create recursive or circular types, or types that are spread over files in such a way that circular dependencies between files would be an issue otherwise.
