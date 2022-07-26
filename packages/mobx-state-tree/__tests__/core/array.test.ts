@@ -561,7 +561,7 @@ test("assigning filtered instances works", () => {
     expect(notDone.every((t) => isAlive(t))).toBe(true)
 })
 
-test("#1676 should accept read-only arrays", () => {
+test("#1676 - should accept read-only arrays", () => {
     const ArrayType = types.array(types.string)
     const data = ["foo", "bar"] as const
     const instance = ArrayType.create(data)
