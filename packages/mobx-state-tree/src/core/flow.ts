@@ -7,8 +7,6 @@ import {
     IMiddlewareEventType,
     runWithActionContext
 } from "./action"
-import { argsToArray, setImmediateWithFallback, fail } from "../utils"
-import { spawn } from "child_process"
 
 /**
  * @hidden
