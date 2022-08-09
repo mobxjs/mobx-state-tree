@@ -72,7 +72,7 @@ export interface IMSTArray<IT extends IAnyType> extends IObservableArray<IT["Typ
 
 /** @hidden */
 export interface IArrayType<IT extends IAnyType>
-    extends IType<IT["CreationType"][] | undefined, IT["SnapshotType"][], IMSTArray<IT>> {
+    extends IType<readonly IT["CreationType"][] | undefined, IT["SnapshotType"][], IMSTArray<IT>> {
     hooks(hooks: IHooksGetter<IMSTArray<IAnyType>>): IArrayType<IT>
 }
 
@@ -81,7 +81,7 @@ export interface IArrayType<IT extends IAnyType>
  * @hidden
  */
 export class ArrayType<IT extends IAnyType> extends ComplexType<
-    IT["CreationType"][] | undefined,
+    readonly IT["CreationType"][] | undefined,
     IT["SnapshotType"][],
     IMSTArray<IT>
 > {
