@@ -1,3 +1,4 @@
+import { argsToArray, fail, setImmediateWithFallback } from "../utils"
 import {
     FunctionWithFlag,
     getCurrentActionContext,
@@ -20,7 +21,7 @@ export type FlowReturn<R> = R extends Promise<infer T> ? T : R
  * @returns The flow as a promise.
  */
 export function flow<R, Args extends any[]>(
-    generator: (...args: Args) => Generator<Promise<any>, R, any>
+    generator: (...args: Args) => Generator<PromiseLike<any>, R, any>
 ): (...args: Args) => Promise<FlowReturn<R>> {
     return createFlowSpawner(generator.name, generator) as any
 }
