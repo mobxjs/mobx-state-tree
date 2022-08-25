@@ -918,7 +918,7 @@ test("#993-1 - after attach should have a parent when accesing a reference direc
     }
 })
 
-test("#993-2 - references should have a parent event when the parent has not been accesed before", () => {
+test("#993-2 - references should have a parent even when the parent has not been accessed before", () => {
     const events: string[] = []
 
     const L4 = types
@@ -995,6 +995,7 @@ test("#993-2 - references should have a parent event when the parent has not bee
         "l4-ac",
         "l4-at",
         "onSnapshot",
+        "-",
         "onSnapshot"
     ]
 
@@ -1006,11 +1007,26 @@ test("#993-2 - references should have a parent event when the parent has not bee
         })
 
         l1.l2.l3.l4.toggle()
+        events.push("-")
         l1.selected.toggle()
         expect(events).toEqual(expectedEvents)
     }
 
+    const expectedEvents2 = [
+        "l1-ac",
+        "l4-ac",
+        "l3-ac",
+        "l2-ac",
+        "l2-at",
+        "l3-at",
+        "l4-at",
+        "onSnapshot",
+        "-",
+        "onSnapshot"
+    ]
+
     // test 2, reference first
+    // the order of hooks is different but they are all called
     events.length = 0
     {
         const l1 = createL1()
@@ -1019,8 +1035,9 @@ test("#993-2 - references should have a parent event when the parent has not bee
         })
 
         l1.selected.toggle()
+        events.push("-")
         l1.l2.l3.l4.toggle()
-        expect(events).toEqual(expectedEvents)
+        expect(events).toEqual(expectedEvents2)
     }
 
     // test 3, reference get parent should be available from the beginning and all the way to the root
