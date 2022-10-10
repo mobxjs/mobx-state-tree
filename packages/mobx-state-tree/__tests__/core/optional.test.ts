@@ -1,4 +1,4 @@
-import { getSnapshot, types, unprotect, applySnapshot, cast } from "../../src"
+import { getSnapshot, types, unprotect, applySnapshot, cast, Instance } from "../../src"
 
 test("it should provide a default value, if no snapshot is provided", () => {
     const Row = types.model({
@@ -145,4 +145,13 @@ test("undefined can work as a missing value", () => {
     expect(m2.x).toBe(undefined)
     const m3 = M.create({}) // is ok as well (even in TS)
     expect(m3.x).toBe(undefined)
+
+    // can omit optional values in inferred types
+    type MType = Instance<typeof M>
+    const m4: MType = { x: 5 }
+    expect(m4.x).toBe(5)
+    const m5: MType = { x: undefined }
+    expect(m5.x).toBe(undefined)
+    const m6: MType = {} // should be okay in typescript too
+    expect(m6.x).toBe(undefined)
 })
