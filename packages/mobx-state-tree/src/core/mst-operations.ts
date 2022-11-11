@@ -1,4 +1,4 @@
-import { isComputedProp, isObservableProp } from "mobx"
+import { isComputedProp, isObservableProp } from "../legend-mobx/legend-mobx"
 import {
     IAnyStateTreeNode,
     IType,
@@ -35,9 +35,8 @@ import {
 } from "../internal"
 
 /** @hidden */
-export type TypeOrStateTreeNodeToStateTreeNode<
-    T extends IAnyType | IAnyStateTreeNode
-> = T extends IType<any, any, infer TT> ? TT & IStateTreeNode<T> : T
+export type TypeOrStateTreeNodeToStateTreeNode<T extends IAnyType | IAnyStateTreeNode> =
+    T extends IType<any, any, infer TT> ? TT & IStateTreeNode<T> : T
 
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
@@ -844,7 +843,7 @@ export interface IModelReflectionData extends IModelReflectionPropertiesData {
  * @returns
  */
 export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
-    const type = (getStateTreeNode(target).type as unknown) as IAnyModelType
+    const type = getStateTreeNode(target).type as unknown as IAnyModelType
 
     const reflected: IModelReflectionData = {
         ...getPropertyMembers(type),

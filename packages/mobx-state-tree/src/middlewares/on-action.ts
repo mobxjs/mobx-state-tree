@@ -1,4 +1,4 @@
-import { runInAction } from "mobx"
+import { runInAction } from "../legend-mobx/legend-mobx"
 
 import {
     getStateTreeNode,

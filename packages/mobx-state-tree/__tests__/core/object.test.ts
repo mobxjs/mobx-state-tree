@@ -833,6 +833,7 @@ test("#967 - changing values in afterCreate/afterAttach when node is instantiate
             get selectedAnswers() {
                 const result = []
                 for (const question of self.questions) {
+                    // @ts-ignore
                     result.push(question.answers.find((a) => a.selected))
                 }
                 return result

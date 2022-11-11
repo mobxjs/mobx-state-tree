@@ -8,7 +8,8 @@ import {
     IDisposer,
     devMode
 } from "../../internal"
-import { createAtom, IAtom } from "mobx"
+import type { IAtom } from "mobx"
+import { createAtom } from "../../legend-mobx/legend-mobx"
 
 type HookSubscribers = {
     [Hook.afterAttach]: (node: AnyNode, hook: Hook) => void
@@ -118,7 +119,7 @@ export abstract class BaseNode<C, S, T> {
             if (!this.pathAtom) {
                 this.pathAtom = createAtom(`path`)
             }
-            this.pathAtom.reportObserved()
+            this.pathAtom!.reportObserved()
         }
         if (!this.parent) return ""
         // regenerate escaped subpath if needed
@@ -151,7 +152,7 @@ export abstract class BaseNode<C, S, T> {
         if (!this.aliveAtom) {
             this.aliveAtom = createAtom(`alive`)
         }
-        this.aliveAtom.reportObserved()
+        this.aliveAtom!.reportObserved()
         return this.isAlive
     }
 

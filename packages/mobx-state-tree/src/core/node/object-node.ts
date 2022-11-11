@@ -1,5 +1,8 @@
 // noinspection ES6UnusedImports
-import { action, computed, IComputedValue, reaction, _allowStateChangesInsideComputed } from "mobx"
+import { IComputedValue, _allowStateChangesInsideComputed } from "mobx"
+
+import { action, computed, reaction } from "../../legend-mobx/legend-mobx"
+
 import {
     addHiddenFinalProp,
     ComplexType,
@@ -202,19 +205,21 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
             parent &&
             parent._observableInstanceState === ObservableInstanceLifecycle.UNINITIALIZED
         ) {
+            // @ts-ignore
             parentChain.unshift(parent)
             parent = parent.parent
         }
 
         // initialize the uninitialized parent chain from parent to child
         for (const p of parentChain) {
+            // @ts-ignore
             p.createObservableInstanceIfNeeded()
         }
 
         const type = this.type
 
         try {
-            this.storedValue = type.createNewInstance(this._childNodes)
+            this.storedValue = type.createNewInstance(this._childNodes) as any
             this.preboot()
 
             this._isRunningAction = true

@@ -1,9 +1,11 @@
+import { _getGlobalState } from "mobx"
+
 import {
-    isObservableArray,
     isObservableObject,
-    _getGlobalState,
-    defineProperty as mobxDefineProperty
-} from "mobx"
+    isObservableArray,
+    mobxDefineProperty
+} from "./legend-mobx/legend-mobx"
+
 import { Primitives } from "./core/type/type"
 
 const plainObjectString = Object.toString()
@@ -87,7 +89,7 @@ export function isArray(val: any): val is any[] {
  * @hidden
  */
 export function asArray<T>(val: undefined | null | T | T[] | ReadonlyArray<T>): T[] {
-    if (!val) return (EMPTY_ARRAY as any) as T[]
+    if (!val) return EMPTY_ARRAY as any as T[]
     if (isArray(val)) return val as T[]
     return [val] as T[]
 }

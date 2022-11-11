@@ -8,7 +8,7 @@ import {
     SimpleType,
     devMode
 } from "../../internal"
-import { action } from "mobx"
+import { action } from "../../legend-mobx/legend-mobx"
 
 /**
  * @internal

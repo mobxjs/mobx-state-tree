@@ -1,4 +1,4 @@
-import { action as mobxAction } from "mobx"
+import { mobxAction } from "../legend-mobx/legend-mobx"
 import {
     getStateTreeNode,
     fail,

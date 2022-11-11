@@ -1,4 +1,4 @@
-import { action } from "mobx"
+import { action } from "../../legend-mobx/legend-mobx"
 
 import {
     fail,

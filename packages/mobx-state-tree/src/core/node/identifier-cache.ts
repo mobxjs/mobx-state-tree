@@ -1,4 +1,7 @@
-import { IObservableArray, values, observable, entries } from "mobx"
+import type { IObservableArray } from "mobx"
+
+import { values, observable, entries } from "../../legend-mobx/legend-mobx"
+
 import { fail, ObjectNode, mobxShallow, AnyObjectNode, IAnyComplexType } from "../../internal"
 
 let identifierCacheId = 0
@@ -11,11 +14,11 @@ export class IdentifierCache {
     private cacheId = identifierCacheId++
 
     // n.b. in cache all identifiers are normalized to strings
-    private cache = observable.map<string, IObservableArray<AnyObjectNode>>()
+    private cache = new Map<string, any>()
 
     // last time the cache (array) for a given time changed
     // n.b. it is not really the time, but just an integer that gets increased after each modification to the array
-    private lastCacheModificationPerId = observable.map<string, number>()
+    private lastCacheModificationPerId = new Map<string, number>()
 
     constructor() {}
 
@@ -34,7 +37,7 @@ export class IdentifierCache {
         if (node.identifierAttribute) {
             const identifier = node.identifier!
             if (!this.cache.has(identifier)) {
-                this.cache.set(identifier, observable.array<AnyObjectNode>([], mobxShallow))
+                this.cache.set(identifier, observable.array([]))
             }
             const set = this.cache.get(identifier)!
             if (set.indexOf(node) !== -1) throw fail(`Already registered`)
@@ -46,8 +49,8 @@ export class IdentifierCache {
     }
 
     mergeCache(node: AnyObjectNode) {
-        values(node.identifierCache!.cache).forEach((nodes) =>
-            nodes.forEach((child) => {
+        values(node.identifierCache!.cache).forEach((nodes: any) =>
+            nodes.forEach((child: any) => {
                 this.addNodeToCache(child)
             })
         )
@@ -90,7 +93,7 @@ export class IdentifierCache {
     has(type: IAnyComplexType, identifier: string): boolean {
         const set = this.cache.get(identifier)
         if (!set) return false
-        return set.some((candidate) => type.isAssignableFrom(candidate.type))
+        return set.some((candidate: any) => type.isAssignableFrom(candidate.type))
     }
 
     resolve<IT extends IAnyComplexType>(
@@ -99,7 +102,7 @@ export class IdentifierCache {
     ): ObjectNode<IT["CreationType"], IT["SnapshotType"], IT["TypeWithoutSTN"]> | null {
         const set = this.cache.get(identifier)
         if (!set) return null
-        const matches = set.filter((candidate) => type.isAssignableFrom(candidate.type))
+        const matches = set.filter((candidate: any) => type.isAssignableFrom(candidate.type))
         switch (matches.length) {
             case 0:
                 return null
@@ -110,7 +113,7 @@ export class IdentifierCache {
                     `Cannot resolve a reference to type '${
                         type.name
                     }' with id: '${identifier}' unambigously, there are multiple candidates: ${matches
-                        .map((n) => n.path)
+                        .map((n: any) => n.path)
                         .join(", ")}`
                 )
         }

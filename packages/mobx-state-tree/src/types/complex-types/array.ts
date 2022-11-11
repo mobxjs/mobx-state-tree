@@ -1,15 +1,14 @@
 import {
     _getAdministration,
-    action,
     IArrayDidChange,
     IArraySplice,
     IArrayWillChange,
     IArrayWillSplice,
-    intercept,
-    IObservableArray,
-    observable,
-    observe
+    IObservableArray
 } from "mobx"
+
+import { action, intercept, observable, observe } from "../../legend-mobx/legend-mobx"
+
 import {
     addHiddenFinalProp,
     addHiddenWritableProp,
@@ -122,6 +121,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     }
 
     createNewInstance(childNodes: IChildNodesMap): this["T"] {
+        // This type error probably means I screwed up somewhere
         return observable.array(convertChildNodesToArray(childNodes), mobxShallow) as this["T"]
     }
 
@@ -142,7 +142,9 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
             })
         })
 
-        intercept(instance as IObservableArray<AnyNode>, this.willChange)
+        // intercept(instance as IObservableArray<AnyNode>, this.willChange)
+        // willChange NOT implemented in MST-legend
+
         observe(instance as IObservableArray<AnyNode>, this.didChange)
     }
 
@@ -396,6 +398,7 @@ function reconcileArrayChildren<TT>(
             // find a possible candidate to reuse
             for (let j = i; j < oldNodes.length; j++) {
                 if (areSame(oldNodes[j], newValue)) {
+                    // @ts-ignore
                     oldMatch = oldNodes.splice(j, 1)[0]
                     break
                 }

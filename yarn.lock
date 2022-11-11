@@ -555,6 +555,11 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
+"@legendapp/state@^0.21.0":
+  version "0.21.12"
+  resolved "https://registry.yarnpkg.com/@legendapp/state/-/state-0.21.12.tgz#fe6a06632a8e2687535e899415c7ee9b56d423aa"
+  integrity sha512-TvXN8/ssYOxvCIzeevsSO5hxfBFzZjLiS5UuEvnEh0yjratLHyhTcMfKoMTJZ0vzv95R/91sNZN8nV3TjIuXdw==
+
 "@lerna/add@3.21.0":
   version "3.21.0"
   resolved "https://registry.yarnpkg.com/@lerna/add/-/add-3.21.0.tgz#27007bde71cc7b0a2969ab3c2f0ae41578b4577b"
