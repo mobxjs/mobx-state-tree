@@ -157,7 +157,7 @@ const User = types.model({
 
 The `types` namespace provided in the MST package provides a lot of useful types and utility types like array, map, maybe, refinements and unions. If you are interested in them, feel free to check out the [types overview](/overview/types) for the whole list and their parameters.
 
-We can now use this knowledge to combine models and define the root model of our store that will hold `Todo` and `User` instances in the `todos` and `users` maps.
+We can now use this knowledge to combine models and define the root model of our store that will hold `Todo` and `User` instances in the `todos` array and `users` map.
 
 ```typescript
 import { types } from "mobx-state-tree"
@@ -193,48 +193,52 @@ For example, the following actions will be defined on the `Todo` model, and will
 
 ```typescript
 const Todo = types
-    .model({
-        name: types.optional(types.string, ""),
-        done: types.optional(types.boolean, false)
-    })
-    .actions(self => ({
-        setName(newName) {
-            self.name = newName
-        },
+  .model({
+    name: types.optional(types.string, ""),
+    done: types.optional(types.boolean, false)
+  })
+  .actions(self => {
+    function setName(newName: string) {
+      self.name = newName;
+    }
 
-        toggle() {
-            self.done = !self.done
-        }
-    }))
+    function toggle() {
+      self.done = !self.done;
+    }
+
+    return { setName, toggle };
+  });
 
 const User = types.model({
-    name: types.optional(types.string, "")
-})
+  name: types.optional(types.string, "")
+});
 
 const RootStore = types
-    .model({
-        users: types.map(User),
-        todos: types.map(Todo)
-    })
-    .actions(self => ({
-        addTodo(id, name) {
-            self.todos.set(id, Todo.create({ name }))
-        }
-    }))
+  .model({
+    users: types.map(User),
+    todos: types.optional(types.array(Todo), [])
+  })
+  .actions(self => {
+    function addTodo(name: string) {
+      self.todos.push(Todo.create({ name }));
+    }
+
+    return { addTodo };
+  });
 ```
 
-[View sample in the playground](https://codesandbox.io/s/3xw9x060mp)
+[View sample in the playground](https://codesandbox.io/s/mobx-state-tree-getting-started-6-o5jvmz)
 
 Please notice the use of `self`. `self` is the object being constructed when an instance of your model is created. Thanks to the `self` object, instance actions are "this-free", allowing you to be sure that they are correctly bound.
 
 Calling the actions is as simple as what you would do with plain JavaScript classes, you simply call them on a model instance!
 
 ```typescript
-store.addTodo(1, "Eat a cake")
-store.todos.get(1).toggle()
+store.addTodo("Eat a cake");
+store.todos[0]?.toggle();
 ```
 
-[View sample in the playground](https://codesandbox.io/s/r673zxw4p)
+[View sample in the playground](https://codesandbox.io/s/mobx-state-tree-getting-started-6-o5jvmz)
 
 ## Snapshots are awesome!
 
