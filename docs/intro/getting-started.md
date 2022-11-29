@@ -55,12 +55,12 @@ So far our entities and their attributes look like this:
 
 `Todo`
 
--   name
--   done
+-  name
+-  done
 
 `User`
 
--   name
+-  name
 
 ## Creating our first model
 
@@ -74,12 +74,12 @@ The simplest way to define a model for an entity in MST is to provide sample dat
 import { types } from "mobx-state-tree"
 
 const Todo = types.model({
-    name: "",
-    done: false
+  name: "",
+  done: false
 })
 
 const User = types.model({
-    name: ""
+  name: ""
 })
 ```
 
@@ -95,12 +95,12 @@ This can be easily done by calling `.create()` on the `Todo` and `User` models w
 import { types, getSnapshot } from "mobx-state-tree"
 
 const Todo = types.model({
-    name: "",
-    done: false
+  name: "",
+  done: false
 })
 
 const User = types.model({
-    name: ""
+  name: ""
 })
 
 const john = User.create()
@@ -144,12 +144,12 @@ What does this mean? As I said before, MST nodes are type-enriched. This means t
 
 ```javascript
 const Todo = types.model({
-    name: types.optional(types.string, ""),
-    done: types.optional(types.boolean, false)
+  name: types.optional(types.string, ""),
+  done: types.optional(types.boolean, false)
 })
 
 const User = types.model({
-    name: types.optional(types.string, "")
+  name: types.optional(types.string, "")
 })
 ```
 
