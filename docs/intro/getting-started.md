@@ -163,25 +163,25 @@ We can now use this knowledge to combine models and define the root model of our
 import { types } from "mobx-state-tree"
 
 const Todo = types.model({
-    name: types.optional(types.string, ""),
-    done: types.optional(types.boolean, false)
-})
+  name: types.optional(types.string, ""),
+  done: types.optional(types.boolean, false)
+});
 
 const User = types.model({
-    name: types.optional(types.string, "")
-})
+  name: types.optional(types.string, "")
+});
 
 const RootStore = types.model({
-    users: types.map(User),
-    todos: types.optional(types.map(Todo), {})
-})
+  users: types.map(User),
+  todos: types.optional(types.array(Todo), [])
+});
 
 const store = RootStore.create({
-    users: {} // users is not required really since arrays and maps are optional by default since MST3
-})
+  users: {} // users is required here because it's not marked as optional
+});
 ```
 
-[View sample in the playground](https://codesandbox.io/s/kk63vox225)
+[View sample in the playground](https://codesandbox.io/s/mobx-state-tree-getting-started-5-lx90yu)
 
 Notice that the `types.optional` second argument is required as long you don't pass a value in the `.create` function of the model. If you want, for example, to make the `name` or `todos` attribute required when calling `.create`, remove the `types.optional` function call and pass the `types.*` included inside.
 
