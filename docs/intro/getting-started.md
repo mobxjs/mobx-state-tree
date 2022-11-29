@@ -83,7 +83,7 @@ const User = types.model({
 })
 ```
 
-[View sample in the playground](https://codesandbox.io/s/235jykjp90)
+[View sample in the playground](https://codesandbox.io/s/mobx-state-tree-getting-started-1-o315kb)
 
 The above code will create two models, a `Todo` and a `User` model, but as we said before, a tree model in MST consists of type information (and we just saw how to define them) and state (the instance data). So how do we create instances of the `Todo` and `User` models?
 
@@ -110,7 +110,7 @@ console.log("John:", getSnapshot(john))
 console.log("Eat TODO:", getSnapshot(eat))
 ```
 
-[View sample in the playground](https://codesandbox.io/s/kkl8kn4pq5)
+[View sample in the playground](https://codesandbox.io/s/mobx-state-tree-getting-started-2-zpdzcm)
 
 As you will see, using models ensures that all the attributes defined will always be present and defaulted to the predefined values. If you want to change those values when creating the model instance, you can simply pass an object with the values to use into the `.create` function.
 
@@ -120,7 +120,7 @@ const eat = Todo.create({ name: "eat" })
 console.log("Eat TODO:", getSnapshot(eat)) // => will print {name: "eat", done: false}
 ```
 
-[View sample in the playground](https://codesandbox.io/s/jpmpyj7pm3)
+[View sample in the playground](https://codesandbox.io/s/mobx-state-tree-getting-started-3-43hjtm)
 
 ## Meeting types
 
@@ -133,6 +133,11 @@ const eat = Todo.create({ name: "eat", done: 1 })
 ```
 Error: [mobx-state-tree] Error while converting `{"name":"eat","done":1}` to `AnonymousModel`:
 at path "/done" value `1` is not assignable to type: `boolean`.
+```
+
+Typescript will complain too:
+```
+Type 'number' is not assignable to type 'boolean | undefined'.
 ```
 
 What does this mean? As I said before, MST nodes are type-enriched. This means that providing a value (number) of the wrong type (expected boolean) will make MST throw an error. This is very helpful when building applications, as it will keep your state consistent and avoid entering illegal states due to data of the wrong type. To be honest with you, I lied when I told you how to define models. The syntax you used was only a shortcut for the following syntax:
@@ -148,7 +153,7 @@ const User = types.model({
 })
 ```
 
-[View sample in the playground](https://codesandbox.io/s/kx9x4973z3)
+[View sample in the playground](https://codesandbox.io/s/mobx-state-tree-getting-started-4-l3gqpx)
 
 The `types` namespace provided in the MST package provides a lot of useful types and utility types like array, map, maybe, refinements and unions. If you are interested in them, feel free to check out the [types overview](/overview/types) for the whole list and their parameters.
 
