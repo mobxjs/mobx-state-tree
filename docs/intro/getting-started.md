@@ -28,7 +28,7 @@ For each example you'll find a CodeSandbox playground link. You can start from t
 Setting up the whole environment for a React project involves transpilers, bundlers, linters, etc., and setting them up may become very tedious and not fun. Thanks to `create-react-app` setting up all those tools becomes as easy as typing a couple of lines in your terminal.
 
 ```
-npx create-react-app --template typescript mst-todo
+npx create-react-app mst-todo
 ```
 
 Next install `mobx`, `mobx-react-lite` and `mobx-state-tree` dependencies.
@@ -55,12 +55,12 @@ So far our entities and their attributes look like this:
 
 `Todo`
 
--  name
--  done
+-   name
+-   done
 
 `User`
 
--  name
+-   name
 
 ## Creating our first model
 
@@ -70,20 +70,20 @@ This means that in order to make our application work, we need to describe to MS
 
 The simplest way to define a model for an entity in MST is to provide sample data that will be used as defaults for it, and pass it to the `types.model` function.
 
-```typescript
+```javascript
 import { types } from "mobx-state-tree"
 
 const Todo = types.model({
-  name: "",
-  done: false
+    name: "",
+    done: false
 })
 
 const User = types.model({
-  name: ""
+    name: ""
 })
 ```
 
-[View sample in the playground](https://codesandbox.io/s/mobx-state-tree-getting-started-1-o315kb)
+[View sample in the playground](https://codesandbox.io/s/235jykjp90)
 
 The above code will create two models, a `Todo` and a `User` model, but as we said before, a tree model in MST consists of type information (and we just saw how to define them) and state (the instance data). So how do we create instances of the `Todo` and `User` models?
 
@@ -91,16 +91,16 @@ The above code will create two models, a `Todo` and a `User` model, but as we sa
 
 This can be easily done by calling `.create()` on the `Todo` and `User` models we just defined.
 
-```typescript
+```javascript
 import { types, getSnapshot } from "mobx-state-tree"
 
 const Todo = types.model({
-  name: "",
-  done: false
+    name: "",
+    done: false
 })
 
 const User = types.model({
-  name: ""
+    name: ""
 })
 
 const john = User.create()
@@ -110,23 +110,23 @@ console.log("John:", getSnapshot(john))
 console.log("Eat TODO:", getSnapshot(eat))
 ```
 
-[View sample in the playground](https://codesandbox.io/s/mobx-state-tree-getting-started-2-zpdzcm)
+[View sample in the playground](https://codesandbox.io/s/kkl8kn4pq5)
 
 As you will see, using models ensures that all the attributes defined will always be present and defaulted to the predefined values. If you want to change those values when creating the model instance, you can simply pass an object with the values to use into the `.create` function.
 
-```typescript
+```javascript
 const eat = Todo.create({ name: "eat" })
 
 console.log("Eat TODO:", getSnapshot(eat)) // => will print {name: "eat", done: false}
 ```
 
-[View sample in the playground](https://codesandbox.io/s/mobx-state-tree-getting-started-3-43hjtm)
+[View sample in the playground](https://codesandbox.io/s/jpmpyj7pm3)
 
 ## Meeting types
 
 When playing with this feature and passing in values to the `.create` function, you may encounter an error like this:
 
-```typescript
+```javascript
 const eat = Todo.create({ name: "eat", done: 1 })
 ```
 
@@ -135,53 +135,48 @@ Error: [mobx-state-tree] Error while converting `{"name":"eat","done":1}` to `An
 at path "/done" value `1` is not assignable to type: `boolean`.
 ```
 
-Typescript will complain too:
-```
-Type 'number' is not assignable to type 'boolean | undefined'.
-```
-
 What does this mean? As I said before, MST nodes are type-enriched. This means that providing a value (number) of the wrong type (expected boolean) will make MST throw an error. This is very helpful when building applications, as it will keep your state consistent and avoid entering illegal states due to data of the wrong type. To be honest with you, I lied when I told you how to define models. The syntax you used was only a shortcut for the following syntax:
 
-```typescript
+```javascript
 const Todo = types.model({
-  name: types.optional(types.string, ""),
-  done: types.optional(types.boolean, false)
+    name: types.optional(types.string, ""),
+    done: types.optional(types.boolean, false)
 })
 
 const User = types.model({
-  name: types.optional(types.string, "")
+    name: types.optional(types.string, "")
 })
 ```
 
-[View sample in the playground](https://codesandbox.io/s/mobx-state-tree-getting-started-4-l3gqpx)
+[View sample in the playground](https://codesandbox.io/s/kx9x4973z3)
 
 The `types` namespace provided in the MST package provides a lot of useful types and utility types like array, map, maybe, refinements and unions. If you are interested in them, feel free to check out the [types overview](/overview/types) for the whole list and their parameters.
 
-We can now use this knowledge to combine models and define the root model of our store that will hold `Todo` and `User` instances in the `todos` array and `users` map.
+We can now use this knowledge to combine models and define the root model of our store that will hold `Todo` and `User` instances in the `todos` and `users` maps.
 
-```typescript
+```javascript
 import { types } from "mobx-state-tree"
 
 const Todo = types.model({
-  name: types.optional(types.string, ""),
-  done: types.optional(types.boolean, false)
-});
+    name: types.optional(types.string, ""),
+    done: types.optional(types.boolean, false)
+})
 
 const User = types.model({
-  name: types.optional(types.string, "")
-});
+    name: types.optional(types.string, "")
+})
 
 const RootStore = types.model({
-  users: types.map(User),
-  todos: types.optional(types.array(Todo), [])
-});
+    users: types.map(User),
+    todos: types.optional(types.map(Todo), {})
+})
 
 const store = RootStore.create({
-  users: {} // users is required here because it's not marked as optional
-});
+    users: {} // users is not required really since arrays and maps are optional by default since MST3
+})
 ```
 
-[View sample in the playground](https://codesandbox.io/s/mobx-state-tree-getting-started-5-lx90yu)
+[View sample in the playground](https://codesandbox.io/s/kk63vox225)
 
 Notice that the `types.optional` second argument is required as long you don't pass a value in the `.create` function of the model. If you want, for example, to make the `name` or `todos` attribute required when calling `.create`, remove the `types.optional` function call and pass the `types.*` included inside.
 
@@ -191,54 +186,50 @@ MST tree nodes (model instances) can be modified using actions. Actions are coll
 
 For example, the following actions will be defined on the `Todo` model, and will allow you to toggle the `done` and set the `name` attribute of the provided `Todo` instance.
 
-```typescript
+```javascript
 const Todo = types
-  .model({
-    name: types.optional(types.string, ""),
-    done: types.optional(types.boolean, false)
-  })
-  .actions(self => {
-    function setName(newName: string) {
-      self.name = newName;
-    }
+    .model({
+        name: types.optional(types.string, ""),
+        done: types.optional(types.boolean, false)
+    })
+    .actions(self => ({
+        setName(newName) {
+            self.name = newName
+        },
 
-    function toggle() {
-      self.done = !self.done;
-    }
-
-    return { setName, toggle };
-  });
+        toggle() {
+            self.done = !self.done
+        }
+    }))
 
 const User = types.model({
-  name: types.optional(types.string, "")
-});
+    name: types.optional(types.string, "")
+})
 
 const RootStore = types
-  .model({
-    users: types.map(User),
-    todos: types.optional(types.array(Todo), [])
-  })
-  .actions(self => {
-    function addTodo(name: string) {
-      self.todos.push(Todo.create({ name }));
-    }
-
-    return { addTodo };
-  });
+    .model({
+        users: types.map(User),
+        todos: types.map(Todo)
+    })
+    .actions(self => ({
+        addTodo(id, name) {
+            self.todos.set(id, Todo.create({ name }))
+        }
+    }))
 ```
 
-[View sample in the playground](https://codesandbox.io/s/mobx-state-tree-getting-started-6-o5jvmz)
+[View sample in the playground](https://codesandbox.io/s/3xw9x060mp)
 
 Please notice the use of `self`. `self` is the object being constructed when an instance of your model is created. Thanks to the `self` object, instance actions are "this-free", allowing you to be sure that they are correctly bound.
 
 Calling the actions is as simple as what you would do with plain JavaScript classes, you simply call them on a model instance!
 
-```typescript
-store.addTodo("Eat a cake");
-store.todos[0]?.toggle();
+```javascript
+store.addTodo(1, "Eat a cake")
+store.todos.get(1).toggle()
 ```
 
-[View sample in the playground](https://codesandbox.io/s/mobx-state-tree-getting-started-6-o5jvmz)
+[View sample in the playground](https://codesandbox.io/s/r673zxw4p)
 
 ## Snapshots are awesome!
 
@@ -246,7 +237,7 @@ Dealing with mutable data and objects makes it easy to change data on the fly, b
 
 Thanks to MST's knowledge of models and relative property types, MST is able to generate serializable snapshots of our store! You can easily get a snapshot of the store by using the `getSnapshot` function exported by the MST package.
 
-```typescript
+```javascript
 console.log(getSnapshot(store))
 /*
 {
@@ -273,7 +264,7 @@ That basically means that you can restore your objects with your custom methods 
 
 2. Avoiding this reference problem by applying the snapshot to an existing model instance. Properties will be updated, but the store reference will remain the same. This will trigger an operation called "reconciliation". We will talk about this phase later.
 
-```typescript
+```javascript
 // 1st
 const store = RootStore.create({
     users: {},
@@ -305,7 +296,7 @@ The ability of getting snapshots and applying them makes implementing time trave
 
 A sample implementation would look like this:
 
-```typescript
+```javascript
 import { applySnapshot, onSnapshot } from "mobx-state-tree"
 
 var states = []
@@ -335,7 +326,7 @@ export function nextState() {
 
 MST loves MobX, and is fully compatible with it's `autorun`, `reaction`, `observe` and other parts of the API. You can use the `mobx-react-lite` package to connect a MST store to a React component. More details can be found in the `mobx-react-lite` package documentation, but keep in mind that any view engine could be easily integrated with MST, just listen to `onSnapshot` and update accordingly!
 
-```typescript
+```javascript
 import { observer } from 'mobx-react-lite'
 
 const App = observer(props => (
@@ -359,7 +350,7 @@ If you have the React DevTools installed, enable the "Highlight Updates" check a
 
 Thanks to the ability of MobX to emit granular updates, fixing that becomes pretty easy! You just need to split the rendering of a `Todo` into another component to only re-render that component whenever the `Todo` data changes.
 
-```typescript
+```javascript
 const TodoView = observer(props => (
     <div>
         <input type="checkbox" checked={props.todo.done} onChange={e => props.todo.toggle()} />
@@ -391,7 +382,7 @@ Now that we have split the rendering logic out into a separate observer, the `To
 
 We now want to display the count of TODOs to be done in our application, to help users know how many TODOs are left. That means that we need to count the number of TODOs with `done` set to `false`. To do this, we need to modify the `RootStore` declaration and add a getter property over our model by calling `.views` that will count how many TODOs are left.
 
-```typescript
+```javascript
 const RootStore = types
     .model({
         users: types.map(User),
@@ -418,7 +409,7 @@ These properties are called "computed" because they keep track of the changes to
 
 We can easily see that by creating an additional component in our application that observes the store and renders those counters. Using the React DevTools and tracing updates, you'll see that changing the `name` of a TODO won't re-render the counters, while checking completed or uncompleted will re-render the `TodoView` and `TodoCounterView`.
 
-```typescript
+```javascript
 const TodoCounterView = observer(props => (
     <div>
         {props.store.pendingCount} pending, {props.store.completedCount} completed
@@ -446,7 +437,7 @@ You may need to use the list of `todos` filtered by completion in various locati
 
 MST solves that by providing the ability to declare model views. A model's `.views` is declared as a function over the properties (first argument) of the model declaration. Model views can accept parameters and only read data from our store. If you try to change your store from a model view, MST will throw an error and prevent you from doing so.
 
-```typescript
+```javascript
 const RootStore = types
     .model({
         users: types.map(User),
@@ -482,7 +473,7 @@ We will focus on this feature; to do that let's assume that the list of users co
 
 First, we need to populate the `users` map. To do so, we will simply pass in some users when creating the `users` map.
 
-```typescript
+```javascript
 const store = RootStore.create({
     users: {
         "1": {
@@ -518,7 +509,7 @@ The identifier attribute cannot be mutated once the model instance has been crea
 
 To define an identifier, you will need to define a property using the `types.identifier` type composer. For example, we want the identifier to be a string.
 
-```typescript
+```javascript
 const User = types.model({
     id: types.identifier,
     name: types.optional(types.string, "")
@@ -536,7 +527,7 @@ at path "/users/3/id" value `undefined` is not assignable to type: `identifier(s
 
 We can easily fix that by providing a correct snapshot.
 
-```typescript
+```javascript
 const store = RootStore.create({
     users: {
         "1": {
@@ -567,7 +558,7 @@ const store = RootStore.create({
 
 The reference we are looking for can be easily defined as `types.reference(User)`. Sometimes this can lead to circular references that may use a model before it's declared. To postpone the resolution of the model, you can use `types.late(() => User)` instead of just `User` and that will hoist the model and defer its evaluation. The `user` assignee for the `Todo` could also be omitted, so we will use `types.maybe(...)` to allow the `user` property to be `null` and be initialized as `null`.
 
-```typescript
+```javascript
 const Todo = types
     .model({
         name: types.optional(types.string, ""),
@@ -590,7 +581,7 @@ const Todo = types
 
 The reference value can be set by providing either the identifier or a model instance. First of all, we need to define an action that will allow you to change the `user` of the `Todo`.
 
-```typescript
+```javascript
 const Todo = types
     .model({
         name: types.optional(types.string, ""),
@@ -617,7 +608,7 @@ const Todo = types
 
 Now we need to edit our views to display a select along with each `TodoView`, where the user can choose the assignee for that task. To do so, we will create a separate component `UserPickerView` and use it inside the `TodoView` component to trigger the `setUser` call. That's it!
 
-```typescript
+```javascript
 const UserPickerView = observer(props => (
     <select value={props.user ? props.user.id : ""} onChange={e => props.onChange(e.target.value)}>
         <option value="">-none-</option>
