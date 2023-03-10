@@ -26,7 +26,10 @@ test("Monster computed fields", () => {
         hp: 1,
         warning: "boo!",
         createdAt: new Date(),
-        treasures: [{ gold: 2, trapped: true }, { gold: 3, trapped: true }],
+        treasures: [
+            { gold: 2, trapped: true },
+            { gold: 3, trapped: true }
+        ],
         eatenHeroes: [SAMPLE_HERO],
         hasFangs: true,
         hasClaws: true,

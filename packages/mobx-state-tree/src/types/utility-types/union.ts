@@ -42,7 +42,7 @@ export class Union extends BaseType<any, any, any> {
     get flags() {
         let result: TypeFlags = TypeFlags.Union
 
-        this._types.forEach(type => {
+        this._types.forEach((type) => {
             result |= type.flags
         })
 
@@ -61,11 +61,11 @@ export class Union extends BaseType<any, any, any> {
     }
 
     isAssignableFrom(type: IAnyType) {
-        return this._types.some(subType => subType.isAssignableFrom(type))
+        return this._types.some((subType) => subType.isAssignableFrom(type))
     }
 
     describe() {
-        return "(" + this._types.map(factory => factory.describe()).join(" | ") + ")"
+        return "(" + this._types.map((factory) => factory.describe()).join(" | ") + ")"
     }
 
     instantiate(
@@ -85,7 +85,7 @@ export class Union extends BaseType<any, any, any> {
         parent: AnyObjectNode,
         subpath: string
     ): this["N"] {
-        const type = this.determineType(newValue, current.type)
+        const type = this.determineType(newValue, current.getReconciliationType())
         if (!type) throw fail("No matching type for union " + this.describe()) // can happen in prod builds
         return type.reconcile(current, newValue, parent, subpath)
     }
@@ -105,9 +105,11 @@ export class Union extends BaseType<any, any, any> {
             if (reconcileCurrentType.is(value)) {
                 return reconcileCurrentType
             }
-            return this._types.filter(t => t !== reconcileCurrentType).find(type => type.is(value))
+            return this._types
+                .filter((t) => t !== reconcileCurrentType)
+                .find((type) => type.is(value))
         } else {
-            return this._types.find(type => type.is(value))
+            return this._types.find((type) => type.is(value))
         }
     }
 
@@ -252,14 +254,14 @@ export function union(dispatchOrType: UnionOptions | IAnyType, ...otherTypes: IA
 export function union(optionsOrType: UnionOptions | IAnyType, ...otherTypes: IAnyType[]): IAnyType {
     const options = isType(optionsOrType) ? undefined : optionsOrType
     const types = isType(optionsOrType) ? [optionsOrType, ...otherTypes] : otherTypes
-    const name = "(" + types.map(type => type.name).join(" | ") + ")"
+    const name = "(" + types.map((type) => type.name).join(" | ") + ")"
 
     // check all options
     if (devMode()) {
         if (options) {
             assertArg(
                 options,
-                o => isPlainObject(o),
+                (o) => isPlainObject(o),
                 "object { eager?: boolean, dispatcher?: Function }",
                 1
             )

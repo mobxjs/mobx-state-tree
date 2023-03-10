@@ -26,7 +26,7 @@ const UndoManager = types
         history: types.array(Entry),
         undoIdx: 0
     })
-    .views(self => ({
+    .views((self) => ({
         get undoLevels() {
             return self.undoIdx
         },
@@ -40,7 +40,8 @@ const UndoManager = types
             return this.redoLevels > 0
         }
     }))
-    .actions(self => {
+    .actions((self) => {
+        let includeHooks = false
         let targetStore: IAnyStateTreeNode
         let recordingDisabled = 0
 
@@ -137,7 +138,12 @@ const UndoManager = types
                         "UndoManager should be created as part of a tree, or with `targetStore` in it's environment"
                     )
                 }
-                addDisposer(self, addMiddleware(targetStore, undoRedoMiddleware, false))
+
+                if (typeof getEnv(self).includeHooks === "boolean") {
+                    includeHooks = getEnv(self).includeHooks
+                }
+
+                addDisposer(self, addMiddleware(targetStore, undoRedoMiddleware, includeHooks))
             },
             undo: decorate(atomic, () => {
                 skipRecording(() => {

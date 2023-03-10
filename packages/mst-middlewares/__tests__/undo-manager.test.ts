@@ -1,12 +1,13 @@
 import { UndoManager } from "../src"
 import { types, clone, getSnapshot, flow, Instance } from "mobx-state-tree"
+import { configure } from "mobx"
 
 let undoManager: any = {}
 const setUndoManagerSameTree = (targetStore: any) => {
     undoManager = targetStore.history
 }
-const setUndoManagerDifferentTree = (targetStore: any) => {
-    undoManager = UndoManager.create({}, { targetStore })
+const setUndoManagerDifferentTree = (targetStore: any, includeHooks?: boolean) => {
+    undoManager = UndoManager.create({}, { targetStore, includeHooks })
 }
 
 const canTimeTravel = (store: any) => {
@@ -52,7 +53,7 @@ test("same tree - can time travel", () => {
             x: 1,
             history: types.optional(UndoManager, {})
         })
-        .actions(self => {
+        .actions((self) => {
             setUndoManagerSameTree(self)
             return {
                 inc() {
@@ -69,7 +70,7 @@ test("different tree - can time travel", () => {
         .model({
             x: 1
         })
-        .actions(self => {
+        .actions((self) => {
             setUndoManagerDifferentTree(self)
             return {
                 inc() {
@@ -87,7 +88,7 @@ test("same tree - can time travel and persist state", () => {
             x: 1,
             history: types.optional(UndoManager, {})
         })
-        .actions(self => {
+        .actions((self) => {
             setUndoManagerSameTree(self)
             return {
                 inc() {
@@ -149,7 +150,7 @@ test("can time travel with Mutable object", () => {
         .model({
             mutable: MutableUnion
         })
-        .actions(self => {
+        .actions((self) => {
             setUndoManagerDifferentTree(self)
             return {
                 setProp(k: string, v: any) {
@@ -207,7 +208,7 @@ test("same tree - withoutUndo", () => {
             x: 1,
             history: types.optional(UndoManager, {})
         })
-        .actions(self => {
+        .actions((self) => {
             setUndoManagerSameTree(self)
             return {
                 inc() {
@@ -224,7 +225,7 @@ test("different tree - withoutUndo", () => {
         .model({
             x: 1
         })
-        .actions(self => {
+        .actions((self) => {
             setUndoManagerDifferentTree(self)
             return {
                 inc() {
@@ -242,7 +243,7 @@ test("same tree - withoutUndo declaratively", () => {
             x: 1,
             history: types.optional(UndoManager, {})
         })
-        .actions(self => {
+        .actions((self) => {
             setUndoManagerSameTree(self)
             return {
                 inc: () =>
@@ -262,7 +263,7 @@ test("same tree - maxHistoryLength", async () => {
             x: 1,
             history: types.optional(UndoManager, {})
         })
-        .actions(self => {
+        .actions((self) => {
             setUndoManagerSameTree(self)
             return {
                 inc() {
@@ -305,15 +306,15 @@ test("same tree - withoutUndoFlow declaratively", async () => {
             y: 1,
             history: types.optional(UndoManager, {})
         })
-        .actions(self => {
+        .actions((self) => {
             _setUndoManagerSameTree(self)
 
             return {
-                loadPosition2: flow(function*(n: number) {
+                loadPosition2: flow(function* (n: number) {
                     yield Promise.resolve()
                     self.y = n
                 }),
-                loadPosition: _undoManager.withoutUndoFlow(function*() {
+                loadPosition: _undoManager.withoutUndoFlow(function* () {
                     yield Promise.resolve()
                     self.x = 4
                     yield (self as any).loadPosition2(2)
@@ -345,7 +346,7 @@ test("same tree - group", () => {
             numbers: types.optional(types.array(types.number), []),
             history: types.optional(UndoManager, {})
         })
-        .actions(self => {
+        .actions((self) => {
             setUndoManagerSameTree(self)
             return {
                 inc() {
@@ -415,7 +416,7 @@ describe("same tree - clean", () => {
             x: 1,
             history: types.optional(UndoManager, {})
         })
-        .actions(self => {
+        .actions((self) => {
             setUndoManagerSameTree(self)
             return {
                 inc() {
@@ -454,6 +455,10 @@ describe("same tree - clean", () => {
 })
 
 test("#1195 - withoutUndo() used inside an action should NOT affect all patches within that action", () => {
+    configure({
+        useProxies: "never"
+    })
+
     let _undoManager: any
 
     const store = types
@@ -461,7 +466,7 @@ test("#1195 - withoutUndo() used inside an action should NOT affect all patches 
             name: types.string,
             age: types.number
         })
-        .actions(self => {
+        .actions((self) => {
             _undoManager = UndoManager.create({}, { targetStore: self })
 
             return {
@@ -498,4 +503,68 @@ test("#1195 - withoutUndo() used inside an action should NOT affect all patches 
     // only age should be undone
     expect(person.name).toBe("Bob")
     expect(person.age).toBe(20)
+})
+
+describe("includeHooks flag", () => {
+    test("does not record hooks by default", () => {
+        const HistoryDifferentTreeStoreModel = types
+            .model({
+                x: 1,
+                y: 1
+            })
+            .actions((self) => {
+                setUndoManagerDifferentTree(self)
+                return {
+                    afterCreate() {
+                        self.y = 2
+                    },
+                    inc() {
+                        self.x += 1
+                    }
+                }
+            })
+
+        const store = HistoryDifferentTreeStoreModel.create()
+        store.inc()
+
+        expect(undoManager.history).toHaveLength(1)
+        expect(undoManager.history[0]).toEqual({
+            inversePatches: [{ op: "replace", path: "/x", value: 1 }],
+            patches: [{ op: "replace", path: "/x", value: 2 }]
+        })
+    })
+
+    test("record hooks in the root store", () => {
+        const HistoryDifferentTreeStoreModel = types
+            .model({
+                x: 1,
+                y: 1
+            })
+            .actions((self) => {
+                setUndoManagerDifferentTree(self, true)
+                return {
+                    afterCreate() {
+                        self.y = 2
+                    },
+                    inc() {
+                        self.x += 1
+                    }
+                }
+            })
+
+        const store = HistoryDifferentTreeStoreModel.create()
+        store.inc()
+
+        expect(undoManager.history).toHaveLength(2)
+        expect(undoManager.history).toEqual([
+            {
+                inversePatches: [{ op: "replace", path: "/y", value: 1 }],
+                patches: [{ op: "replace", path: "/y", value: 2 }]
+            },
+            {
+                inversePatches: [{ op: "replace", path: "/x", value: 1 }],
+                patches: [{ op: "replace", path: "/x", value: 2 }]
+            }
+        ])
+    })
 })

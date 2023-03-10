@@ -9,7 +9,7 @@ import { ShopStore } from "../stores/ShopStore"
 
 const bookFetcher = () => Promise.resolve(JSON.parse(fs.readFileSync("./public/books.json")))
 
-it("matches snapshot before and after loading", done => {
+it("matches snapshot before and after loading", (done) => {
     const shop = ShopStore.create({}, { fetch: bookFetcher })
 
     const app = renderer.create(

@@ -65,7 +65,7 @@ export const cannotDetermineSubtype = "cannotDetermine"
 export type STNValue<T, IT extends IAnyType> = T extends object ? T & IStateTreeNode<IT> : T
 
 /** @hidden */
-declare const $type: unique symbol
+const $type: unique symbol = Symbol("$type")
 
 /**
  * A type, either complex or simple.
@@ -279,7 +279,8 @@ export type SnapshotOrInstance<T> = SnapshotIn<T> | Instance<T>
  * @hidden
  */
 export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = BaseNode<C, S, T>>
-    implements IType<C, S, T> {
+    implements IType<C, S, T>
+{
     [$type]!: undefined
 
     // these are just to make inner types avaialable to inherited classes
@@ -295,7 +296,6 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
         this.name = name
     }
 
-    @action
     create(snapshot?: C, environment?: any) {
         typecheckInternal(this, snapshot)
         return this.instantiate(null, "", environment, snapshot!).value
@@ -315,7 +315,7 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
         initialValue: C | T
     ): N
 
-    abstract flags: TypeFlags
+    declare abstract flags: TypeFlags
     abstract describe(): string
 
     abstract isValidSnapshot(value: C, context: IValidationContext): IValidationResult
@@ -367,6 +367,7 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
 
     abstract getSubTypes(): IAnyType[] | IAnyType | null | typeof cannotDetermineSubtype
 }
+BaseType.prototype.create = action(BaseType.prototype.create)
 
 /**
  * @internal
@@ -395,7 +396,6 @@ export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<
         super(name)
     }
 
-    @action
     create(snapshot: C = this.getDefaultSnapshot(), environment?: any) {
         return super.create(snapshot, environment)
     }
@@ -420,6 +420,14 @@ export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<
     abstract initializeChildNodes(node: this["N"], snapshot: any): IChildNodesMap
     abstract removeChild(node: this["N"], subpath: string): void
 
+    isMatchingSnapshotId(current: this["N"], snapshot: C): boolean {
+        return (
+            !current.identifierAttribute ||
+            current.identifier ===
+                normalizeIdentifier((snapshot as any)[current.identifierAttribute])
+        )
+    }
+
     private tryToReconcileNode(current: this["N"], newValue: C | T) {
         if (current.isDetaching) return false
         if ((current.snapshot as any) === newValue) {
@@ -434,9 +442,7 @@ export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<
             current.type === this &&
             isMutable(newValue) &&
             !isStateTreeNode(newValue) &&
-            (!current.identifierAttribute ||
-                current.identifier ===
-                    normalizeIdentifier((newValue as any)[current.identifierAttribute]))
+            this.isMatchingSnapshotId(current, newValue as any)
         ) {
             // the newValue has no node, so can be treated like a snapshot
             // we can reconcile
@@ -475,6 +481,7 @@ export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<
         return null
     }
 }
+ComplexType.prototype.create = action(ComplexType.prototype.create)
 
 /**
  * @internal

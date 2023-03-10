@@ -3,10 +3,12 @@ version: 2.1
 executors:
     my-executor:
         docker:
-            - image: circleci/node:11
+            - image: cimg/node:14.18.1
               environment:
                   CI: true
-        working_directory: ~/mobx-state-tree
+
+orbs:
+    node: circleci/node@4.7.0
 
 jobs:
     # mobx-state-tree and mst-middlewares build
@@ -15,29 +17,8 @@ jobs:
         steps:
             - checkout
 
-            - restore_cache:
-                  name: restore .cache/yarn
-                  keys:
-                      - yarn-cache-{{ arch }}
-            - restore_cache:
-                  name: restore node_modules
-                  keys:
-                      - node-modules-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
-                      - node-modules-{{ arch }}-{{ .Branch }}
-                      - node-modules-{{ arch }}
-
-            - run: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
-
-            - save_cache:
-                  name: cache .cache/yarn
-                  key: yarn-cache-{{ arch }}
-                  paths:
-                      - ~/.cache/yarn
-            - save_cache:
-                  name: cache node_modules
-                  key: node-modules-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
-                  paths:
-                      - node_modules
+            - node/install-packages:
+                  pkg-manager: yarn
 
             - run: yarn build
 
@@ -117,22 +98,20 @@ jobs:
             - run: yarn size
 
     # upload coverage
-    upload-coveralls:
+    upload-codecov:
         executor: my-executor
         steps:
             - attach_workspace:
                   at: .
-
-            # only run coveralls if the token is present (it is not present for fork PRs for security reasons)
+            # only run codecov if the token is present (it is not present for fork PRs for security reasons)
             - run:
-                  name: upload coveralls
+                  name: upload codecov
                   command: |
-                      if [[ -v COVERALLS_REPO_TOKEN ]]
+                      if [[ -v CODECOV_TOKEN ]]
                       then
-                          cat ./packages/mobx-state-tree/coverage/lcov.info ./packages/mst-middlewares/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
-                          echo "Coveralls info uploaded"
+                          ./node_modules/.bin/codecov
                       else
-                          echo "Warning - Coveralls info could NOT be uploaded since the COVERALLS_REPO_TOKEN was not available"
+                          echo "Warning - Codecov info could NOT be uploaded since the CODECOV_TOKEN was not available"
                       fi
 
 workflows:
@@ -162,7 +141,7 @@ workflows:
                   requires:
                       - build
 
-            - upload-coveralls:
-                  requires:
-                      - test-mst-dev
-                      - test-mst-middlewares-dev
+            - upload-codecov:
+                 requires:
+                     - test-mst-dev
+                     - test-mst-middlewares-dev

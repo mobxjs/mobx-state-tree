@@ -18,7 +18,7 @@ export const BookStore = types
         isLoading: true,
         books: types.map(Book)
     })
-    .views(self => ({
+    .views((self) => ({
         get shop() {
             return getParent(self)
         },
@@ -26,14 +26,14 @@ export const BookStore = types
             return sortBooks(values(self.books))
         }
     }))
-    .actions(self => {
+    .actions((self) => {
         function markLoading(loading) {
             self.isLoading = loading
         }
 
         function updateBooks(json) {
-            values(self.books).forEach(book => (book.isAvailable = false))
-            json.forEach(bookJson => {
+            values(self.books).forEach((book) => (book.isAvailable = false))
+            json.forEach((bookJson) => {
                 self.books.put(bookJson)
                 self.books.get(bookJson.id).isAvailable = true
             })
@@ -57,6 +57,6 @@ export const BookStore = types
 
 function sortBooks(books) {
     return books
-        .filter(b => b.isAvailable)
+        .filter((b) => b.isAvailable)
         .sort((a, b) => (a.name > b.name ? 1 : a.name === b.name ? 0 : -1))
 }

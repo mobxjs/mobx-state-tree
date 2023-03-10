@@ -1,23 +1,19 @@
-import React, { Component } from "react"
+import React from "react"
 import TodoTextInput from "./TodoTextInput"
 
-export default class Header extends Component {
-    handleSave = text => {
-        if (text.length !== 0) {
-            this.props.addTodo(text)
+function Header({ addTodo }) {
+    const handleSave = (text) => {
+        if (text?.length !== 0) {
+            addTodo(text)
         }
     }
 
-    render() {
-        return (
-            <header className="header">
-                <h1>todos</h1>
-                <TodoTextInput
-                    newTodo
-                    onSave={this.handleSave}
-                    placeholder="What needs to be done?"
-                />
-            </header>
-        )
-    }
+    return (
+        <header className="header">
+            <h1>todos</h1>
+            <TodoTextInput newTodo onSave={handleSave} placeholder="What needs to be done?" />
+        </header>
+    )
 }
+
+export default Header

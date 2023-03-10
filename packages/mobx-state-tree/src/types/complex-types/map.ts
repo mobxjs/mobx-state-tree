@@ -93,19 +93,7 @@ export interface IMSTMap<IT extends IAnyType> {
             | any
     ): this
 
-    /**
-     * Returns a plain object that represents this map.
-     * Note that all the keys being stringified.
-     * If there are duplicating keys after converting them to strings, behaviour is undetermined.
-     */
-    toPOJO(): IKeyValueMap<IT["SnapshotType"]>
     toJSON(): IKeyValueMap<IT["SnapshotType"]>
-
-    /**
-     * Returns a shallow non observable object clone of this map.
-     * Note that the values might still be observable. For a deep clone use mobx.toJS.
-     */
-    toJS(): Map<string, IT["Type"]>
 
     toString(): string
     [Symbol.toStringTag]: "Map"
@@ -153,7 +141,7 @@ export enum MapIdentifierMode {
 
 class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
     constructor(initialData?: [string, any][] | IKeyValueMap<any> | Map<string, any> | undefined) {
-        super(initialData, observable.ref.enhancer)
+        super(initialData, (observable.ref as any).enhancer)
     }
 
     get(key: string): IT["Type"] | undefined {
@@ -260,17 +248,16 @@ export class MapType<IT extends IAnyType> extends ComplexType<
 
         const modelTypes: IAnyModelType[] = []
         if (tryCollectModelTypes(this._subType, modelTypes)) {
-            let identifierAttribute: string | undefined = undefined
-            modelTypes.forEach(type => {
-                if (type.identifierAttribute) {
-                    if (identifierAttribute && identifierAttribute !== type.identifierAttribute) {
-                        throw fail(
-                            `The objects in a map should all have the same identifier attribute, expected '${identifierAttribute}', but child of type '${type.name}' declared attribute '${type.identifierAttribute}' as identifier`
-                        )
-                    }
-                    identifierAttribute = type.identifierAttribute
+            const identifierAttribute: string | undefined = modelTypes.reduce((current: IAnyModelType["identifierAttribute"], type) => {
+                if (!type.identifierAttribute) return current
+                if (current && current !== type.identifierAttribute) {
+                    throw fail(
+                        `The objects in a map should all have the same identifier attribute, expected '${current}', but child of type '${type.name}' declared attribute '${type.identifierAttribute}' as identifier`
+                    )
                 }
-            })
+                return type.identifierAttribute
+            }, undefined as IAnyModelType["identifierAttribute"])
+
             if (identifierAttribute) {
                 this.identifierMode = MapIdentifierMode.YES
                 this.mapIdentifierAttribute = identifierAttribute
@@ -283,7 +270,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     initializeChildNodes(objNode: this["N"], initialSnapshot: this["C"] = {}): IChildNodesMap {
         const subType = (objNode.type as this)._subType
         const result: IChildNodesMap = {}
-        Object.keys(initialSnapshot!).forEach(name => {
+        Object.keys(initialSnapshot!).forEach((name) => {
             result[name] = subType.instantiate(objNode, name, undefined, initialSnapshot[name])
         })
 
@@ -298,9 +285,9 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         _interceptReads(instance, node.unbox)
 
         const type = node.type as this
-        type.hookInitializers.forEach(initializer => {
+        type.hookInitializers.forEach((initializer) => {
             const hooks = initializer((instance as unknown) as IMSTMap<IT>)
-            Object.keys(hooks).forEach(name => {
+            Object.keys(hooks).forEach((name) => {
                 const hook = hooks[name as keyof typeof hooks]!
                 const actionInvoker = createActionInvoker(instance as IAnyStateTreeNode, name, hook)
                 ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(
@@ -376,7 +363,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
 
     getSnapshot(node: this["N"]): this["S"] {
         const res: any = {}
-        node.getChildren().forEach(childNode => {
+        node.getChildren().forEach((childNode) => {
             res[childNode.subpath] = childNode.snapshot
         })
         return res
@@ -384,7 +371,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
 
     processInitialSnapshot(childNodes: IChildNodesMap): this["S"] {
         const processed: any = {}
-        Object.keys(childNodes).forEach(key => {
+        Object.keys(childNodes).forEach((key) => {
             processed[key] = childNodes[key].getSnapshot()
         })
         return processed
@@ -442,12 +429,11 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         }
     }
 
-    @action
     applySnapshot(node: this["N"], snapshot: this["C"]): void {
         typecheckInternal(this, snapshot)
         const target = node.storedValue
         const currentKeys: { [key: string]: boolean } = {}
-        Array.from(target.keys()).forEach(key => {
+        Array.from(target.keys()).forEach((key) => {
             currentKeys[key] = false
         })
         if (snapshot) {
@@ -457,7 +443,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
                 currentKeys["" + key] = true
             }
         }
-        Object.keys(currentKeys).forEach(key => {
+        Object.keys(currentKeys).forEach((key) => {
             if (currentKeys[key] === false) target.delete(key)
         })
     }
@@ -472,7 +458,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         }
 
         return flattenTypeErrors(
-            Object.keys(value).map(path =>
+            Object.keys(value).map((path) =>
                 this._subType.validate(value[path], getContextForPath(context, path, this._subType))
             )
         )
@@ -486,12 +472,13 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         node.storedValue.delete(subpath)
     }
 }
+MapType.prototype.applySnapshot = action(MapType.prototype.applySnapshot)
 
 /**
  * `types.map` - Creates a key based collection type who's children are all of a uniform declared type.
  * If the type stored in a map has an identifier, it is mandatory to store the child under that identifier in the map.
  *
- * This type will always produce [observable maps](https://mobx.js.org/refguide/map.html)
+ * This type will always produce [observable maps](https://mobx.js.org/api.html#observablemap)
  *
  * Example:
  * ```ts

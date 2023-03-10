@@ -21,7 +21,7 @@ export class ScalarNode<C, S, T> extends BaseNode<C, S, T> {
     // - afterCreationFinalization could be emitted, but there's no need for it right now
     // - beforeDetach is never emitted for scalar nodes, since they cannot be detached
 
-    readonly type!: SimpleType<C, S, T>
+    declare readonly type: SimpleType<C, S, T>
 
     constructor(
         simpleType: SimpleType<C, S, T>,
@@ -31,7 +31,6 @@ export class ScalarNode<C, S, T> extends BaseNode<C, S, T> {
         initialSnapshot: C
     ) {
         super(simpleType, parent, subpath, environment)
-
         try {
             this.storedValue = simpleType.createNewInstance(initialSnapshot)
         } catch (e) {
@@ -94,7 +93,6 @@ export class ScalarNode<C, S, T> extends BaseNode<C, S, T> {
         return `${this.type.name}@${path}${this.isAlive ? "" : " [dead]"}`
     }
 
-    @action
     die(): void {
         if (!this.isAlive || this.state === NodeLifeCycle.DETACHING) return
         this.aboutToDie()
@@ -117,3 +115,4 @@ export class ScalarNode<C, S, T> extends BaseNode<C, S, T> {
         this.fireInternalHook(name)
     }
 }
+ScalarNode.prototype.die = action(ScalarNode.prototype.die)

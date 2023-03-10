@@ -2,7 +2,7 @@ I have:
 
 * [ ] A conceptual question. 
   * [ ] I've checked documentation and searched for existing issues
-  * [ ] I tried the [spectrum channel](https://spectrum.chat/mobx-state-tree) first
+  * [ ] I tried [GitHub Discussions](https://github.com/mobxjs/mobx-state-tree/discussions) first
 * [ ] I think something is not working as it should.
   * [ ] I've checked documentation and searched for existing issues
   * [ ] I've made sure your project is based on the latest MST version

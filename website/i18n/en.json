@@ -9,7 +9,7 @@
         "title": "API_header"
       },
       "API/index": {
-        "title": "mobx-state-tree",
+        "title": "mobx-state-tree - v5.0.5",
         "sidebar_label": "Globals"
       },
       "API/interfaces/customtypeoptions": {
@@ -171,6 +171,9 @@
       },
       "intro/philosophy": {
         "title": "Overview & Philosophy"
+      },
+      "intro/welcome": {
+        "title": "Welcome to MobX-State-Tree!"
       },
       "overview/hooks": {
         "title": "Lifecycle hooks overview"

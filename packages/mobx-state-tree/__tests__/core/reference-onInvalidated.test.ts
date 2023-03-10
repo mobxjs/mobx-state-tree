@@ -27,7 +27,7 @@ const createStore = (
     const refOptions = {
         onInvalidated,
         get(identifier: ReferenceIdentifier, parent: IAnyStateTreeNode | null) {
-            return (parent as Instance<typeof Store>).todos.find(t => t.id === identifier)
+            return (parent as Instance<typeof Store>).todos.find((t) => t.id === identifier)
         },
         set(value: Instance<typeof Todo>): ReferenceIdentifier {
             return value.id
@@ -35,7 +35,9 @@ const createStore = (
     }
 
     if (!customRef) {
+        // @ts-ignore
         delete refOptions.get
+        // @ts-ignore
         delete refOptions.set
     }
 
@@ -64,7 +66,7 @@ for (const customRef of [false, true]) {
             let ev: OnReferenceInvalidatedEvent<Instance<typeof Todo>> | undefined
             let oldRefId!: string
             let calls = 0
-            const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = ev1 => {
+            const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = (ev1) => {
                 calls++
                 oldRefId = ev1.invalidTarget!.id
                 expect(ev1.invalidId).toBe(oldRefId)
@@ -99,7 +101,7 @@ for (const customRef of [false, true]) {
             let ev: OnReferenceInvalidatedEvent<Instance<typeof Todo>> | undefined
             let oldRefId!: string
             let calls = 0
-            const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = ev1 => {
+            const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = (ev1) => {
                 calls++
                 oldRefId = ev1.invalidTarget!.id
                 expect(ev1.invalidId).toBe(oldRefId)
@@ -135,7 +137,7 @@ for (const customRef of [false, true]) {
             let ev: OnReferenceInvalidatedEvent<Instance<typeof Todo>> | undefined
             let oldRefId!: string
             let calls = 0
-            const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = ev1 => {
+            const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = (ev1) => {
                 calls++
                 oldRefId = ev1.invalidTarget!.id
                 expect(ev1.invalidId).toBe(oldRefId)
@@ -174,7 +176,7 @@ for (const customRef of [false, true]) {
             let ev: OnReferenceInvalidatedEvent<Instance<typeof Todo>> | undefined
             let oldRefId!: string
             let calls = 0
-            const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = ev1 => {
+            const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = (ev1) => {
                 calls++
                 oldRefId = ev1.invalidTarget!.id
                 expect(ev1.invalidId).toBe(oldRefId)
@@ -200,7 +202,7 @@ for (const customRef of [false, true]) {
             let ev: OnReferenceInvalidatedEvent<Instance<typeof Todo>> | undefined
             let oldRefId!: string
             let calls = 0
-            const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = ev1 => {
+            const onInv: OnReferenceInvalidated<Instance<typeof Todo>> = (ev1) => {
                 calls++
                 oldRefId = ev1.invalidTarget!.id
                 expect(ev1.invalidId).toBe(oldRefId)
@@ -319,7 +321,7 @@ test("#1115 - safe reference doesn't become invalidated when the reference has n
             mapOfRef: types.map(MyRefModel),
             arrayOfSafeRef: types.array(SafeRef)
         })
-        .actions(self => ({
+        .actions((self) => ({
             deleteSqr(id: string) {
                 self.mapOfRef.delete(id)
             }

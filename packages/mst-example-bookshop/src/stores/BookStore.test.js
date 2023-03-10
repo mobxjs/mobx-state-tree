@@ -4,7 +4,7 @@ import { ShopStore } from "./ShopStore"
 
 const bookFetcher = () => Promise.resolve(JSON.parse(fs.readFileSync("./public/books.json")))
 
-it("bookstore fetches data", done => {
+it("bookstore fetches data", (done) => {
     const store = ShopStore.create({}, { fetch: bookFetcher })
     when(
         () => store.isLoading === false,
@@ -16,12 +16,12 @@ it("bookstore fetches data", done => {
     )
 })
 
-it("bookstore sorts data", done => {
+it("bookstore sorts data", (done) => {
     const store = ShopStore.create({}, { fetch: bookFetcher })
     when(
         () => store.isLoading === false,
         () => {
-            expect(store.sortedAvailableBooks.map(book => book.name)).toEqual([
+            expect(store.sortedAvailableBooks.map((book) => book.name)).toEqual([
                 "Lucene in Action, Second Edition",
                 "Sophie's World : The Greek Philosophers",
                 "The Lightning Thief",

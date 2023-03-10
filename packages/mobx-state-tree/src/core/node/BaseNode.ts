@@ -92,6 +92,10 @@ export abstract class BaseNode<C, S, T> {
         this.baseSetParent(parent, subpath)
     }
 
+    getReconciliationType() {
+        return this.type
+    }
+
     private pathAtom?: IAtom
     protected baseSetParent(parent: AnyObjectNode | null, subpath: string) {
         this._parent = parent
@@ -132,7 +136,7 @@ export abstract class BaseNode<C, S, T> {
 
     abstract setParent(newParent: AnyObjectNode | null, subpath: string | null): void
 
-    snapshot!: S
+    abstract get snapshot(): S
     abstract getSnapshot(): S
 
     get isAlive() {

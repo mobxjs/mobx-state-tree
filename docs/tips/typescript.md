@@ -49,6 +49,8 @@ There are four kinds of types available, plus one helper type:
 -   `TypeOfValue<typeof VARIABLE>` gets the original type for the given instance. Note that this only works for complex values (models, arrays, maps...) but not for simple values (number, string, boolean, string, undefined).
 
 ```typescript
+import { types, Instance, SnapshotIn, SnapshotOut } from "mobx-state-tree";
+
 const Todo = types
     .model({
         title: "hello"
@@ -64,7 +66,9 @@ interface ITodoSnapshotIn extends SnapshotIn<typeof Todo> {} // => { title?: str
 interface ITodoSnapshotOut extends SnapshotOut<typeof Todo> {} // => { title: string }
 ```
 
-Note, it is important to use `interface` and not `type` when constructing those types! Although `type`s will work exactly the same, due to their nature they will be much more expensive for the compiler to typecheck.
+Note, it is important to use `interface` and not `type` when constructing those types! Although `type`s will work exactly the same, due to their nature they will be [much more expensive for the compiler to typecheck](https://github.com/microsoft/TypeScript/wiki/Performance#preferring-interfaces-over-intersections).
+
+For further performance tips, read the [official TypeScript performance wiki](https://github.com/microsoft/TypeScript/wiki/Performance).
 
 #### Typing `self` in actions and views
 

@@ -31,10 +31,10 @@ Setting up the whole environment for a React project involves transpilers, bundl
 npx create-react-app mst-todo
 ```
 
-Next install `mobx`, `mobx-react` and `mobx-state-tree` dependencies.
+Next install `mobx`, `mobx-react-lite` and `mobx-state-tree` dependencies.
 
 ```
-yarn add mobx mobx-react mobx-state-tree
+yarn add mobx mobx-react-lite mobx-state-tree
 ```
 
 Now you can run `npm run start` and a basic React page will show up. You're all set up and can begin editing the project files!
@@ -324,13 +324,15 @@ export function nextState() {
 
 ## Getting to the UI
 
-MST loves MobX, and is fully compatible with it's `autorun`, `reaction`, `observe` and other parts of the API. You can use the `mobx-react` package to connect a MST store to a React component. More details can be found in the `mobx-react` package documentation, but keep in mind that any view engine could be easily integrated with MST, just listen to `onSnapshot` and update accordingly!
+MST loves MobX, and is fully compatible with it's `autorun`, `reaction`, `observe` and other parts of the API. You can use the `mobx-react-lite` package to connect a MST store to a React component. More details can be found in the `mobx-react-lite` package documentation, but keep in mind that any view engine could be easily integrated with MST, just listen to `onSnapshot` and update accordingly!
 
 ```javascript
+import { observer } from 'mobx-react-lite'
+
 const App = observer(props => (
     <div>
         <button onClick={e => props.store.addTodo(randomId(), "New Task")}>Add Task</button>
-        {values(props.store.todos).map(todo => (
+        {Array.from(props.store.todos.values()).map(todo => (
             <div>
                 <input type="checkbox" checked={todo.done} onChange={e => todo.toggle()} />
                 <input type="text" value={todo.name} onChange={e => todo.setName(e.target.value)} />
@@ -363,7 +365,7 @@ const TodoView = observer(props => (
 const AppView = observer(props => (
     <div>
         <button onClick={e => props.store.addTodo(randomId(), "New Task")}>Add Task</button>
-        {values(props.store.todos).map(todo => (
+        {Array.from(props.store.todos.values()).map(todo => (
             <TodoView todo={todo} />
         ))}
     </div>
@@ -388,10 +390,10 @@ const RootStore = types
     })
     .views(self => ({
         get pendingCount() {
-            return values(self.todos).filter(todo => !todo.done).length
+            return Array.from(self.todos.values()).filter(todo => !todo.done).length
         },
         get completedCount() {
-            return values(self.todos).filter(todo => todo.done).length
+            return Array.from(self.todos.values()).filter(todo => todo.done).length
         }
     }))
     .actions(self => ({
@@ -417,7 +419,7 @@ const TodoCounterView = observer(props => (
 const AppView = observer(props => (
     <div>
         <button onClick={e => props.store.addTodo(randomId(), "New Task")}>Add Task</button>
-        {values(props.store.todos).map(todo => (
+        {Array.from(props.store.todos.values()).map(todo => (
             <TodoView todo={todo} />
         ))}
         <TodoCounterView store={props.store} />
@@ -443,13 +445,13 @@ const RootStore = types
     })
     .views(self => ({
         get pendingCount() {
-            return values(self.todos).filter(todo => !todo.done).length
+            return Array.from(self.todos.values()).filter(todo => !todo.done).length
         },
         get completedCount() {
-            return values(self.todos).filter(todo => todo.done).length
+            return Array.from(self.todos.values()).filter(todo => todo.done).length
         },
         getTodosWhereDoneIs(done) {
-            return values(self.todos).filter(todo => todo.done === done)
+            return Array.from(self.todos.values()).filter(todo => todo.done === done)
         }
     }))
     .actions(self => ({
@@ -461,7 +463,7 @@ const RootStore = types
 
 [View sample in the playground](https://codesandbox.io/s/x293k4q95o)
 
-Notice that the `getTodosWhereDoneIs` view can also be used outside of its model, for example it can be used inside views.
+Notice that other views and View components may call `getTodosWhereDoneIs` outside of the store definition.
 
 ## Going further: References
 
@@ -610,7 +612,7 @@ Now we need to edit our views to display a select along with each `TodoView`, wh
 const UserPickerView = observer(props => (
     <select value={props.user ? props.user.id : ""} onChange={e => props.onChange(e.target.value)}>
         <option value="">-none-</option>
-        {values(props.store.users).map(user => (
+        {Array.from(props.store.users.values()).map(user => (
             <option value={user.id}>{user.name}</option>
         ))}
     </select>
@@ -641,7 +643,7 @@ const TodoCounterView = observer(props => (
 const AppView = observer(props => (
     <div>
         <button onClick={e => props.store.addTodo(randomId(), "New Task")}>Add Task</button>
-        {values(props.store.todos).map(todo => (
+        {Array.from(props.store.todos.values()).map(todo => (
             <TodoView store={props.store} todo={todo} />
         ))}
         <TodoCounterView store={props.store} />

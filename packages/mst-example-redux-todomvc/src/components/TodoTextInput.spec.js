@@ -2,7 +2,7 @@ import React from "react"
 import ShallowRenderer from "react-test-renderer/shallow"
 import TodoTextInput from "./TodoTextInput"
 
-const setup = propOverrides => {
+const setup = (propOverrides) => {
     const props = Object.assign(
         {
             onSave: jest.fn(),

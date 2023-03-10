@@ -21,7 +21,7 @@ import {
     getNodeId
 } from "../../src"
 
-import { autorun } from "mobx"
+import { autorun, configure } from "mobx"
 
 // getParent
 test("it should resolve to the parent instance", () => {
@@ -60,6 +60,10 @@ test("it should check for parent instance (unbound)", () => {
 })
 // getParentOfType
 test("it should resolve to the given parent instance", () => {
+    configure({
+        useProxies: "never"
+    })
+
     const Cell = types.model({})
     const Row = types.model({
         cells: types.optional(types.array(Cell), [])
@@ -197,6 +201,10 @@ test("it should resolve parents", () => {
 })
 // clone
 test("it should clone a node", () => {
+    configure({
+        useProxies: "never"
+    })
+
     const Row = types.model({
         article_id: 0
     })
@@ -212,6 +220,10 @@ test("it should clone a node", () => {
     expect(getSnapshot(doc)).toEqual(getSnapshot(cloned))
 })
 test("it should be possible to clone a dead object", () => {
+    configure({
+        useProxies: "never"
+    })
+
     const Task = types.model("Task", {
         x: types.string
     })
@@ -278,9 +290,9 @@ test("make sure array filter works properly", () => {
         .model({
             rows: types.optional(types.array(Row), [])
         })
-        .actions(self => {
+        .actions((self) => {
             function clearDone() {
-                self.rows.filter(row => row.done === true).forEach(destroy)
+                self.rows.filter((row) => row.done === true).forEach(destroy)
             }
             return {
                 clearDone
@@ -319,7 +331,7 @@ test("it can record and replay actions", () => {
         .model({
             article_id: 0
         })
-        .actions(self => {
+        .actions((self) => {
             function setArticle(article_id: number) {
                 self.article_id = article_id
             }
@@ -332,7 +344,7 @@ test("it can record and replay actions", () => {
             customer_id: 0,
             rows: types.optional(types.array(Row), [])
         })
-        .actions(self => {
+        .actions((self) => {
             function setCustomer(customer_id: number) {
                 self.customer_id = customer_id
             }
@@ -361,7 +373,7 @@ test("Liveliness issue #683", () => {
         .model({
             list: types.map(User)
         })
-        .actions(self => ({
+        .actions((self) => ({
             put(aUser: typeof User.CreationType | typeof User.Type) {
                 // if (self.has(user.id)) detach(self.get(user.id));
                 self.list.put(aUser)
@@ -395,7 +407,7 @@ test("triggers on changing paths - 1", () => {
         .model({
             todos: types.array(Todo)
         })
-        .actions(self => ({
+        .actions((self) => ({
             do(fn: () => void) {
                 fn()
             }

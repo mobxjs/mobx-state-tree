@@ -19,8 +19,8 @@ autorun(() => {
 Because MST keeps immutable snapshots in the background, it is also possible to be notified when a new snapshot of the tree is available. This is similar to `.subscribe` on a redux store:
 
 ```javascript
-onSnapshot(storeInstance, newSnapshot => {
-    console.dir("Got new state: ", newSnapshot)
+onSnapshot(storeInstance, (newSnapshot) => {
+    console.info("Got new snapshot:", newSnapshot)
 })
 ```
 
@@ -29,7 +29,7 @@ For that, MST supports json-patches out of the box.
 
 ```javascript
 onPatch(storeInstance, patch => {
-    console.dir("Got change: ", patch)
+    console.info("Got change: ", patch)
 })
 
 storeInstance.todos[0].setTitle("Add milk")
@@ -45,7 +45,7 @@ Similarly, you can be notified whenever an action is invoked by using `onAction`
 
 ```javascript
 onAction(storeInstance, call => {
-    console.dir("Action was called: ", call)
+    console.info("Action was called:", call)
 })
 
 storeInstance.todos[0].setTitle("Add milk")
@@ -66,7 +66,7 @@ addMiddleware(storeInstance, (call, next) => {
 })
 ```
 
-A more extensive middleware example can be found in this [code sandbox](https://codesandbox.io/s/mQrqy8j73).
+A more extensive middleware example can be found in this [code sandbox](https://codesandbox.io/s/0yt72).
 For more details on creating middleware and the exact specification of middleware events, see the [docs](middleware).
 
 Finally, it is not only possible to be notified about snapshots, patches or actions. It is also possible to re-apply them by using `applySnapshot`, `applyPatch` or `applyAction`!

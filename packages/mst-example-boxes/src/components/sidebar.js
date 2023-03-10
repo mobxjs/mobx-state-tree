@@ -16,7 +16,7 @@ class Sidebar extends Component {
         )
     }
 
-    onChange = e => {
+    onChange = (e) => {
         this.props.store.selection.setName(e.target.value)
     }
 }

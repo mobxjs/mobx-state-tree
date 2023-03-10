@@ -5,10 +5,10 @@ const Todo = types
     .model({
         done: false
     })
-    .volatile(self => ({
+    .volatile((self) => ({
         state: Promise.resolve(1)
     }))
-    .actions(self => ({
+    .actions((self) => ({
         toggle() {
             self.done = !self.done
         },
@@ -40,7 +40,10 @@ test("VS should not show up in patches", () => {
 test("VS be observable", () => {
     const promises: Promise<number>[] = []
     const i = Todo.create()
-    const d = reaction(() => i.state, p => promises.push(p))
+    const d = reaction(
+        () => i.state,
+        (p) => promises.push(p)
+    )
     i.reload()
     i.reload()
     expect(promises.length).toBe(2)
@@ -50,7 +53,7 @@ test("VS be observable", () => {
 test("VS should not be deeply observable", () => {
     const i = types
         .model({})
-        .volatile(self => ({
+        .volatile((self) => ({
             x: { a: 1 }
         }))
         .create()
@@ -79,6 +82,18 @@ test("VS should not be modifiable without action", () => {
     }).toThrowError(/the object is protected and can only be modified by using an action/)
 })
 
+test("VS should expect a function as an argument", () => {
+    expect(() => {
+        const t = types
+            .model({})
+            // @ts-ignore
+            .volatile({ state: 1 })
+            .create()
+    }).toThrowError(
+        `You passed an object to volatile state as an argument, when function is expected`
+    )
+})
+
 test("VS should not be modifiable when unprotected", () => {
     const i = Todo.create()
     unprotect(i)
@@ -90,7 +105,7 @@ test("VS should not be modifiable when unprotected", () => {
 })
 
 test("VS sample from the docs should work (1)", () => {
-    const T = types.model({}).extend(self => {
+    const T = types.model({}).extend((self) => {
         const localState = observable.box(3)
 
         return {
@@ -125,7 +140,7 @@ test("VS sample from the docs should work (1)", () => {
 })
 
 test("VS sample from the docs should work (2)", () => {
-    const T = types.model({}).extend(self => {
+    const T = types.model({}).extend((self) => {
         let localState = 3
 
         return {

@@ -17,10 +17,10 @@ if (process.env.NODE_ENV !== "production") {
                 id: types.refinement(
                     "id",
                     types.string,
-                    identifier => identifier.indexOf("Model_") === 0
+                    (identifier) => identifier.indexOf("Model_") === 0
                 )
             })
-            .actions(self => ({
+            .actions((self) => ({
                 setId(id: string) {
                     self.id = id
                 }
@@ -29,7 +29,7 @@ if (process.env.NODE_ENV !== "production") {
             .model("ParentModel", {
                 models: types.array(Model)
             })
-            .actions(self => ({
+            .actions((self) => ({
                 addModel(model: SnapshotOrInstance<typeof Model>) {
                     self.models.push(model)
                 }
@@ -56,7 +56,7 @@ test("#158 - #88 - Identifiers should accept any string character", () => {
         title: types.string
     })
     expect(() => {
-        ;["coffee", "cof$fee", "cof|fee", "cof/fee"].forEach(id => {
+        ;["coffee", "cof$fee", "cof|fee", "cof/fee"].forEach((id) => {
             Todo.create({
                 id: id,
                 title: "Get coffee"
@@ -211,7 +211,7 @@ test("#1019", () => {
     function randomUuid() {
         calls++
         let pattern = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
-        return pattern.replace(/[xy]/g, function(cc) {
+        return pattern.replace(/[xy]/g, function (cc) {
             const r = (Math.random() * 16) | 0,
                 v = cc === "x" ? r : (r & 0x3) | 0x8
             return v.toString(16)
@@ -219,7 +219,7 @@ test("#1019", () => {
     }
 
     const TOptionalId = types.optional(
-        types.refinement(types.identifier, identifier =>
+        types.refinement(types.identifier, (identifier) =>
             /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/.test(identifier)
         ),
         randomUuid
@@ -233,7 +233,7 @@ test("#1019", () => {
         .model("CommentStore", {
             items: types.array(CommentModel)
         })
-        .actions(self => ({
+        .actions((self) => ({
             test1() {
                 expect(calls).toBe(0)
                 const comment = CommentModel.create({})
@@ -241,7 +241,7 @@ test("#1019", () => {
 
                 self.items.push(comment)
                 const item = resolveIdentifier(CommentModel, self.items, comment.uid)
-                const item2 = self.items.find(i => i.uid === comment.uid)
+                const item2 = self.items.find((i) => i.uid === comment.uid)
                 expect(item).toBe(item2)
             }
         }))

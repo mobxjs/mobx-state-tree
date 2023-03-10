@@ -15,7 +15,7 @@ test("it logs", () => {
         .model({
             title: ""
         })
-        .actions(self => ({
+        .actions((self) => ({
             helper() {},
             setTitle(newTitle: string) {
                 ;(self as any).helper() // should not be logged

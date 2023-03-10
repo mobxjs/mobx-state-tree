@@ -1,49 +1,53 @@
 {
-    "name": "mst-example-boxes",
-    "private": true,
-    "version": "2.2.0",
-    "description": "Runnable source code of the #GoReactive #mobservable talk",
-    "scripts": {
-        "start": "node server.js",
-        "test": "jest"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/mobxjs/mobx-reactive2015-demo.git"
-    },
-    "keywords": [
-        "react",
-        "reactjs",
-        "reactive-programming",
-        "mobservable",
-        "mobx"
-    ],
-    "author": "Michel Weststrate <mweststrate@gmail.com> (http://github.com/mweststrate)",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/mobxjs/mobx-reactive2015-demo/issues"
-    },
-    "homepage": "http://mobxjs.github.com/mobx",
-    "devDependencies": {
-        "@babel/core": "^7.3.4",
-        "@babel/plugin-proposal-class-properties": "^7.3.4",
-        "@babel/preset-env": "^7.3.4",
-        "@babel/preset-react": "^7.0.0",
-        "babel-loader": "^8.0.5",
-        "jest": "^24.5.0",
-        "webpack": "^4.29.6",
-        "webpack-dev-server": "^3.2.1"
-    },
-    "dependencies": {
-        "mobx": "^5.9.0",
-        "mobx-react": "^6.0.0",
-        "mobx-react-devtools": "^6.1.1",
-        "mobx-state-tree": "^3.11.0",
-        "node-uuid": "^1.4.8",
-        "react": "^16.8.4",
-        "react-dom": "^16.8.4",
-        "react-draggable": "^3.2.1",
-        "remotedev": "^0.2.9",
-        "ws": "^6.2.0"
-    }
+  "name": "mst-example-boxes",
+  "private": true,
+  "version": "2.2.0",
+  "description": "Runnable source code of the #GoReactive #mobservable talk",
+  "scripts": {
+    "start": "node server.js",
+    "test": "jest",
+    "prepare": "relative-deps"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mobxjs/mobx-reactive2015-demo.git"
+  },
+  "keywords": [
+    "react",
+    "reactjs",
+    "reactive-programming",
+    "mobservable",
+    "mobx"
+  ],
+  "author": "Michel Weststrate <mweststrate@gmail.com> (http://github.com/mweststrate)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mobxjs/mobx-reactive2015-demo/issues"
+  },
+  "homepage": "http://mobxjs.github.com/mobx",
+  "devDependencies": {
+    "@babel/core": "^7.15.5",
+    "@babel/plugin-proposal-class-properties": "^7.14.5",
+    "@babel/preset-env": "^7.15.6",
+    "@babel/preset-react": "^7.14.5",
+    "babel-loader": "^8.2.2",
+    "jest": "^24.5.0",
+    "relative-deps": "^1.0.7",
+    "webpack": "^4.46.0",
+    "webpack-dev-server": "^4.2.1"
+  },
+  "dependencies": {
+    "mobx": "^6.3.3",
+    "mobx-react": "^7.2.0",
+    "mobx-state-tree": "^5.0.2",
+    "node-uuid": "^1.4.8",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-draggable": "^4.4.4",
+    "remotedev": "^0.2.9",
+    "ws": "^8.2.2"
+  },
+  "relativeDependencies": {
+    "mobx-state-tree": "../mobx-state-tree"
+  }
 }

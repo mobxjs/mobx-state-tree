@@ -102,9 +102,7 @@ class StoredReference<IT extends IAnyType> {
 
             if (!target) {
                 throw new InvalidReferenceError(
-                    `[mobx-state-tree] Failed to resolve reference '${this.identifier}' to type '${
-                        this.targetType.name
-                    }' (from node: ${node.path})`
+                    `[mobx-state-tree] Failed to resolve reference '${this.identifier}' to type '${this.targetType.name}' (from node: ${node.path})`
                 )
             }
 
@@ -538,12 +536,16 @@ export function isReferenceType<IT extends IReferenceType<any>>(type: IT): type 
 
 export function safeReference<IT extends IAnyComplexType>(
     subType: IT,
-    options: (ReferenceOptionsGetSet<IT> | {}) & { acceptsUndefined: false }
+    options: (ReferenceOptionsGetSet<IT> | {}) & {
+        acceptsUndefined: false
+        onInvalidated?: OnReferenceInvalidated<ReferenceT<IT>>
+    }
 ): IReferenceType<IT>
 export function safeReference<IT extends IAnyComplexType>(
     subType: IT,
     options?: (ReferenceOptionsGetSet<IT> | {}) & {
         acceptsUndefined?: boolean
+        onInvalidated?: OnReferenceInvalidated<ReferenceT<IT>>
     }
 ): IMaybe<IReferenceType<IT>>
 /**
@@ -555,6 +557,7 @@ export function safeReference<IT extends IAnyComplexType>(
  * for model properties.
  * When used inside collections (arrays/maps), it is recommended to set this option to false so it can't take undefined as value,
  * which is usually the desired in those cases.
+ * Additionally, the optional options parameter object accepts a parameter named `onInvalidated`, which will be called when the reference target node that the reference is pointing to is about to be detached/destroyed
  *
  * Strictly speaking it is a `types.maybe(types.reference(X))` (when `acceptsUndefined` is set to true, the default) and
  * `types.reference(X)` (when `acceptsUndefined` is set to false), both of them with a customized `onInvalidated` option.
@@ -567,11 +570,15 @@ export function safeReference<IT extends IAnyComplexType>(
     subType: IT,
     options?: (ReferenceOptionsGetSet<IT> | {}) & {
         acceptsUndefined?: boolean
+        onInvalidated?: OnReferenceInvalidated<ReferenceT<IT>>
     }
 ): IReferenceType<IT> | IMaybe<IReferenceType<IT>> {
     const refType = reference(subType, {
         ...options,
         onInvalidated(ev) {
+            if (options && options.onInvalidated) {
+                options.onInvalidated(ev)
+            }
             ev.removeRef()
         }
     })

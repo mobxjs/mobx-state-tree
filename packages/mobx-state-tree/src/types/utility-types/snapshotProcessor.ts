@@ -11,11 +11,17 @@ import {
     assertIsType,
     isType,
     getSnapshot,
-    devMode
+    devMode,
+    ComplexType,
+    typeCheckFailure,
+    isUnionType
 } from "../../internal"
 
 /** @hidden */
 declare const $mstNotCustomized: unique symbol
+
+/** @hidden */
+const $preProcessorFailed: unique symbol = Symbol("$preProcessorFailed")
 
 /** @hidden */
 // tslint:disable-next-line:class-name
@@ -60,6 +66,14 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
         return sn as any
     }
 
+    private preProcessSnapshotSafe(sn: this["C"]): IT["CreationType"] | typeof $preProcessorFailed {
+        try {
+            return this.preProcessSnapshot(sn)
+        } catch (e) {
+            return $preProcessorFailed
+        }
+    }
+
     private postProcessSnapshot(sn: IT["SnapshotType"]): this["S"] {
         if (this._processors.postProcessor) {
             return this._processors.postProcessor.call(null, sn) as any
@@ -69,11 +83,17 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
 
     private _fixNode(node: this["N"]): void {
         // the node has to use these methods rather than the original type ones
-        proxyNodeTypeMethods(node.type, this, "isAssignableFrom", "create")
+        proxyNodeTypeMethods(node.type, this, "create")
 
         const oldGetSnapshot = node.getSnapshot
         node.getSnapshot = () => {
             return this.postProcessSnapshot(oldGetSnapshot.call(node)) as any
+        }
+
+        if (!isUnionType(this._subtype)) {
+            node.getReconciliationType = () => {
+                return this
+            }
         }
     }
 
@@ -120,7 +140,10 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
     }
 
     isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
-        const processedSn = this.preProcessSnapshot(value)
+        const processedSn = this.preProcessSnapshotSafe(value)
+        if (processedSn === $preProcessorFailed) {
+            return typeCheckFailure(context, value, "Failed to preprocess value")
+        }
         return this._subtype.validate(processedSn, context)
     }
 
@@ -133,8 +156,23 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
             ? this._subtype
             : isStateTreeNode(thing)
             ? getSnapshot(thing, false)
-            : this.preProcessSnapshot(thing)
+            : this.preProcessSnapshotSafe(thing)
+        if (value === $preProcessorFailed) {
+            return false
+        }
         return this._subtype.validate(value, [{ path: "", type: this._subtype }]).length === 0
+    }
+
+    isAssignableFrom(type: IAnyType): boolean {
+        return this._subtype.isAssignableFrom(type)
+    }
+
+    isMatchingSnapshotId(current: this["N"], snapshot: this["C"]): boolean {
+        if (!(this._subtype instanceof ComplexType)) {
+            return false
+        }
+        const processedSn = this.preProcessSnapshot(snapshot)
+        return this._subtype.isMatchingSnapshotId(current as any, processedSn)
     }
 }
 

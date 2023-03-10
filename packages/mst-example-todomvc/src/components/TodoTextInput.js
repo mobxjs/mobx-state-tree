@@ -1,46 +1,44 @@
-import React, { Component } from "react"
+import React, { useState } from "react"
 import classnames from "classnames"
 
-export default class TodoTextInput extends Component {
-    state = {
-        text: this.props.text || ""
-    }
+function TodoTextInput({ text, onSave, newTodo, editing, placeholder }) {
+    const [editingText, setEditingText] = useState(text)
 
-    handleSubmit = e => {
+    const handleSubmit = (e) => {
         const text = e.target.value.trim()
-        if (e.which === 13) {
-            this.props.onSave(text)
-            if (this.props.newTodo) {
-                this.setState({ text: "" })
+        if (e.key === "Enter") {
+            onSave(text)
+            if (newTodo) {
+                setEditingText("")
             }
         }
     }
 
-    handleChange = e => {
-        this.setState({ text: e.target.value })
+    const handleChange = (e) => {
+        setEditingText(e.target.value)
     }
 
-    handleBlur = e => {
-        if (!this.props.newTodo) {
-            this.props.onSave(e.target.value)
+    const handleBlur = (e) => {
+        if (!newTodo) {
+            onSave(e.target.value)
         }
     }
 
-    render() {
-        return (
-            <input
-                className={classnames({
-                    edit: this.props.editing,
-                    "new-todo": this.props.newTodo
-                })}
-                type="text"
-                placeholder={this.props.placeholder}
-                autoFocus={true}
-                value={this.state.text}
-                onBlur={this.handleBlur}
-                onChange={this.handleChange}
-                onKeyDown={this.handleSubmit}
-            />
-        )
-    }
+    return (
+        <input
+            className={classnames({
+                edit: editing,
+                "new-todo": newTodo
+            })}
+            type="text"
+            placeholder={placeholder}
+            autoFocus={true}
+            value={editingText}
+            onBlur={handleBlur}
+            onChange={handleChange}
+            onKeyDown={handleSubmit}
+        />
+    )
 }
+
+export default TodoTextInput

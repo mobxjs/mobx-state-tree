@@ -25,7 +25,7 @@ import {
  * @param {...MiddleWare[]} middlewares
  * @returns {IReduxStore}
  */
-export const asReduxStore = function(model: IAnyStateTreeNode, ...middlewares: any[]) {
+export const asReduxStore = function (model: IAnyStateTreeNode, ...middlewares: any[]) {
     if (!isStateTreeNode(model)) throw new Error("Expected model object")
     let store = {
         getState: () => getSnapshot(model),
@@ -36,7 +36,7 @@ export const asReduxStore = function(model: IAnyStateTreeNode, ...middlewares: a
         },
         subscribe: (listener: any) => onSnapshot(model, listener)
     }
-    let runners = middlewares.map(mw => mw(store))
+    let runners = middlewares.map((mw) => mw(store))
     return store
 }
 
@@ -80,7 +80,7 @@ function getActionContextNameAndTypePath(actionContext: ActionContext, logArgsNe
     let targetTypePath = actionContext.targetTypePath
 
     if (logArgsNearName) {
-        let args = actionContext.callArgs.map(a => JSON.stringify(a)).join(", ")
+        let args = actionContext.callArgs.map((a) => JSON.stringify(a)).join(", ")
 
         if (args.length > 64) {
             args = args.slice(0, 64) + "..."

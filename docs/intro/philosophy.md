@@ -5,13 +5,13 @@ title: Overview & Philosophy
 
 <div id="codefund"></div>
 
-`mobx-state-tree` is a state container that combines the _simplicity and ease of mutable data_ with the _traceability of immutable data_ and the _reactiveness and performance of observable data_.
+`mobx-state-tree` (also known as "MST") is a state container that combines the _simplicity and ease of mutable data_ with the _traceability of immutable data_ and the _reactiveness and performance of observable data_.
 
-Simply put, mobx-state-tree tries to combine the best features of both immutability (transactionality, traceability and composition) and mutability (discoverability, co-location and encapsulation) based approaches to state management; everything to provide the best developer experience possible.
-Unlike MobX itself, mobx-state-tree is very opinionated about how data should be structured and updated.
+Simply put, MST tries to combine the best features of both immutability (transactionality, traceability and composition) and mutability (discoverability, co-location and encapsulation) based approaches to state management; everything to provide the best developer experience possible.
+Unlike MobX itself, MST is very opinionated about how data should be structured and updated.
 This makes it possible to solve many common problems out of the box.
 
-Central in MST (mobx-state-tree) is the concept of a _living tree_. The tree consists of mutable, but strictly protected objects enriched with _runtime type information_. In other words, each tree has a _shape_ (type information) and _state_ (data).
+Central in MST is the concept of a _living tree_. The tree consists of mutable, but strictly protected objects enriched with _runtime type information_. In other words, each tree has a _shape_ (type information) and _state_ (data).
 From this living tree, immutable, structurally shared, snapshots are automatically generated.
 
 ```javascript
@@ -22,7 +22,7 @@ const Todo = types
         title: types.string,
         done: false
     })
-    .actions(self => ({
+    .actions((self) => ({
         toggle() {
             self.done = !self.done
         }
@@ -42,7 +42,7 @@ const store = Store.create({
 })
 
 // listen to new snapshots
-onSnapshot(store, snapshot => {
+onSnapshot(store, (snapshot) => {
     console.dir(snapshot)
 })
 
@@ -77,7 +77,7 @@ Simply subscribing to the patch stream of a tree is another way to sync diffs wi
 
 ![patches](/img/patches.png)
 
-Since MST uses MobX behind the scenes, it integrates seamlessly with [mobx](https://mobx.js.org) and [mobx-react](https://github.com/mobxjs/mobx-react). See also this [egghead.io lesson: Render mobx-state-tree Models in React](https://egghead.io/lessons/react-render-mobx-state-tree-models-in-react).
+Since MST uses MobX behind the scenes, it integrates seamlessly with [mobx](https://mobx.js.org) and [mobx-react-lite (or mobx-react)](https://mobx.js.org/react-integration.html). See also this [egghead.io lesson: Render mobx-state-tree Models in React](https://egghead.io/lessons/react-render-mobx-state-tree-models-in-react).
 Even cooler, because it supports snapshots, middleware and replayable actions out of the box, it is possible to replace a Redux store and reducer with a MobX state tree.
 This makes it possible to connect the Redux devtools to MST. See the [Redux / MST TodoMVC example](https://github.com/mobxjs/mobx-state-tree/blob/1906a394906d2e8f2cc1c778e1e3228307c1b112/packages/mst-example-redux-todomvc/src/index.js#L6).
 
@@ -90,7 +90,7 @@ For futher reading: the conceptual difference between snapshots, patches and act
 Finally, MST has built-in support for references, identifiers, dependency injection, change recording and circular type definitions (even across files).
 Even fancier, it analyses liveliness of objects, failing early when you try to access accidentally cached information! (More on that later)
 
-A unique feature of MST is that it offers liveliness guarantees. MST will throw when reading or writing from objects that are no longer part of a state tree. This protects you against accidental stale reads of objects still referred by, for example, a closure.
+A unique feature of MST is that it offers liveliness guarantees. MST will throw an exception when reading or writing from objects that are no longer part of a state tree. This protects you against accidental stale reads of objects still referred by, for example, a closure.
 
 ```javascript
 const oldTodo = store.todos[0]

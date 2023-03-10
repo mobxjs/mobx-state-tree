@@ -6,7 +6,7 @@
             "request": "launch",
             "name": "debug unit test",
             "program": "${workspaceRoot}/node_modules/.bin/jest",
-            "args": ["-i", "${file}"],
+            "args": ["-i", "${file}"]
         }
     ]
 }

@@ -5,7 +5,7 @@ const TestModel = types
     .model({
         x: 1
     })
-    .actions(self => ({
+    .actions((self) => ({
         inc() {
             self.x += 1
         }

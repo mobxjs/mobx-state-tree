@@ -129,7 +129,7 @@ export function applyPatch(
 ): void {
     // check all arguments
     assertIsStateTreeNode(target, 1)
-    assertArg(patch, p => typeof p === "object", "object or array", 2)
+    assertArg(patch, (p) => typeof p === "object", "object or array", 2)
 
     getStateTreeNode(target).applyPatches(asArray(patch))
 }
@@ -538,7 +538,7 @@ export function resolveIdentifier<IT extends IAnyModelType>(
         type,
         normalizeIdentifier(identifier)
     )
-    return node ? node.value : undefined
+    return node?.value
 }
 
 /**
@@ -795,7 +795,7 @@ export function walk(
 
     const node = getStateTreeNode(target)
     // tslint:disable-next-line:no_unused-variable
-    node.getChildren().forEach(child => {
+    node.getChildren().forEach((child) => {
         if (isStateTreeNode(child.storedValue)) walk(child.storedValue, processor)
     })
     processor(node.storedValue)
@@ -823,7 +823,7 @@ export function getPropertyMembers(
         type = typeOrNode as IAnyModelType
     }
 
-    assertArg(type, t => isModelType(t), "model type or model instance", 1)
+    assertArg(type, (t) => isModelType(t), "model type or model instance", 1)
 
     return {
         name: type.name,
@@ -854,7 +854,7 @@ export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
     }
 
     const props = Object.getOwnPropertyNames(target)
-    props.forEach(key => {
+    props.forEach((key) => {
         if (key in reflected.properties) return
         const descriptor = Object.getOwnPropertyDescriptor(target, key)!
         if (descriptor.get) {
@@ -966,7 +966,7 @@ export function castToSnapshot<I>(
  *
  * const a = ModelA.create({ id: 'someId', n: 5 });
  * // this will allow the compiler to use a model as if it were a reference snapshot
- * const b = ModelB.create({ refA: castToReference(a)})
+ * const b = ModelB.create({ refA: castToReferenceSnapshot(a)})
  * ```
  *
  * @param instance Instance

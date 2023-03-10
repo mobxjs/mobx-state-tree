@@ -22,7 +22,7 @@ class BoxView extends Component {
         )
     }
 
-    handleClick = e => {
+    handleClick = (e) => {
         this.props.store.setSelection(this.props.box.id)
         e.stopPropagation()
     }

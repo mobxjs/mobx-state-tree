@@ -1,7 +1,7 @@
 import {
     _getAdministration,
     action,
-    IArrayChange,
+    IArrayDidChange,
     IArraySplice,
     IArrayWillChange,
     IArrayWillSplice,
@@ -72,7 +72,7 @@ export interface IMSTArray<IT extends IAnyType> extends IObservableArray<IT["Typ
 
 /** @hidden */
 export interface IArrayType<IT extends IAnyType>
-    extends IType<IT["CreationType"][] | undefined, IT["SnapshotType"][], IMSTArray<IT>> {
+    extends IType<readonly IT["CreationType"][] | undefined, IT["SnapshotType"][], IMSTArray<IT>> {
     hooks(hooks: IHooksGetter<IMSTArray<IAnyType>>): IArrayType<IT>
 }
 
@@ -81,7 +81,7 @@ export interface IArrayType<IT extends IAnyType>
  * @hidden
  */
 export class ArrayType<IT extends IAnyType> extends ComplexType<
-    IT["CreationType"][] | undefined,
+    readonly IT["CreationType"][] | undefined,
     IT["SnapshotType"][],
     IMSTArray<IT>
 > {
@@ -129,9 +129,9 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         _getAdministration(instance).dehancer = node.unbox
 
         const type = node.type as this
-        type.hookInitializers.forEach(initializer => {
+        type.hookInitializers.forEach((initializer) => {
             const hooks = initializer(instance)
-            Object.keys(hooks).forEach(name => {
+            Object.keys(hooks).forEach((name) => {
                 const hook = hooks[name as keyof typeof hooks]!
                 const actionInvoker = createActionInvoker(instance as IAnyStateTreeNode, name, hook)
                 ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(
@@ -213,18 +213,18 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     }
 
     getSnapshot(node: this["N"]): this["S"] {
-        return node.getChildren().map(childNode => childNode.snapshot)
+        return node.getChildren().map((childNode) => childNode.snapshot)
     }
 
     processInitialSnapshot(childNodes: IChildNodesMap): this["S"] {
         const processed: this["S"] = []
-        Object.keys(childNodes).forEach(key => {
+        Object.keys(childNodes).forEach((key) => {
             processed.push(childNodes[key].getSnapshot())
         })
         return processed
     }
 
-    didChange(change: IArrayChange<AnyNode> | IArraySplice<AnyNode>): void {
+    didChange(change: IArrayDidChange<AnyNode> | IArraySplice<AnyNode>): void {
         const node = getStateTreeNode(change.object as IAnyStateTreeNode)
         switch (change.type) {
             case "update":
@@ -277,7 +277,6 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         }
     }
 
-    @action
     applySnapshot(node: this["N"], snapshot: this["C"]): void {
         typecheckInternal(this, snapshot)
         const target = node.storedValue
@@ -308,11 +307,12 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         node.storedValue.splice(Number(subpath), 1)
     }
 }
+ArrayType.prototype.applySnapshot = action(ArrayType.prototype.applySnapshot)
 
 /**
  * `types.array` - Creates an index based collection type who's children are all of a uniform declared type.
  *
- * This type will always produce [observable arrays](https://mobx.js.org/refguide/array.html)
+ * This type will always produce [observable arrays](https://mobx.js.org/api.html#observablearray)
  *
  * Example:
  * ```ts
@@ -476,14 +476,19 @@ function areSame(oldNode: AnyNode, newValue: any) {
         return true
     }
 
+    // Non object nodes don't get reconciled
+    if (!(oldNode instanceof ObjectNode)) {
+        return false
+    }
+
+    const oldNodeType = oldNode.getReconciliationType()
     // new value is a snapshot with the correct identifier
     return (
-        oldNode instanceof ObjectNode &&
         oldNode.identifier !== null &&
         oldNode.identifierAttribute &&
         isPlainObject(newValue) &&
-        oldNode.identifier === normalizeIdentifier(newValue[oldNode.identifierAttribute]) &&
-        oldNode.type.is(newValue)
+        oldNodeType.is(newValue) &&
+        (oldNodeType as any).isMatchingSnapshotId(oldNode, newValue)
     )
 }
 

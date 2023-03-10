@@ -1,3 +1,4 @@
+import { configure } from "mobx"
 import {
     types,
     getEnv,
@@ -22,7 +23,7 @@ const Todo = types
     .model({
         title: "test"
     })
-    .views(self => ({
+    .views((self) => ({
         get description() {
             return getEnv(self).useUppercase ? self.title.toUpperCase() : self.title
         }
@@ -132,6 +133,10 @@ test("clone preserves environnment", () => {
 })
 
 test("#1231", () => {
+    configure({
+        useProxies: "never"
+    })
+
     const envObj = createEnvironment()
     const logs: string[] = []
 
@@ -147,7 +152,7 @@ test("#1231", () => {
 
     function leafsFirst(root: IAnyStateTreeNode) {
         const nodes: IAnyStateTreeNode[] = []
-        walk(root, i => {
+        walk(root, (i) => {
             if (isStateTreeNode(i)) {
                 nodes.push(i)
             }
@@ -174,7 +179,7 @@ test("#1231", () => {
         const nodes = leafsFirst(root)
         expect(nodes.length).toBe(7)
 
-        nodes.forEach(i => {
+        nodes.forEach((i) => {
             const env = getEnv(i)
             const parent = hasParent(i)
             if (!parent && i !== root) {
@@ -190,7 +195,7 @@ test("#1231", () => {
         })
 
         unprotect(root)
-        nodes.forEach(i => {
+        nodes.forEach((i) => {
             const optional = optionalPaths.includes(getPath(i))
             if (mode === "detach") {
                 log("detaching node", i)
@@ -301,7 +306,7 @@ test("#1231", () => {
     check(rsCreate2, "using create", "destroy")
     check(rsSnap2, "using snapshot", "destroy")
 
-    const fails = logs.filter(l => l.startsWith("fail:"))
+    const fails = logs.filter((l) => l.startsWith("fail:"))
     if (fails.length > 0) {
         fail(`\n${fails.join("\n")}`)
     }
