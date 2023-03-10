@@ -95,11 +95,6 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
                 return this
             }
         }
-
-        const oldApplySnapshot = node.applySnapshot
-        node.applySnapshot = (snapshot) => { 
-            return oldApplySnapshot.call(node, this.preProcessSnapshot(snapshot)) as any
-        }
     }
 
     instantiate(

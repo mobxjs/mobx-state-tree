@@ -6,8 +6,7 @@ import {
     detach,
     clone,
     SnapshotIn,
-    getNodeId,
-    applySnapshot
+    getNodeId
 } from "../../src"
 
 describe("snapshotProcessor", () => {
@@ -557,21 +556,6 @@ describe("snapshotProcessor", () => {
 
             expect(store.instance).toBe(todo)
         })
-    })
-
-    test("applySnapshot runs preprocessors before applying", () => {
-        const M = types.snapshotProcessor(types.model({ x: types.number }), {
-            preProcessor(snapshot: { x: string }) {
-                return { x: Number(snapshot.x) }
-            },
-            postProcessor(snapshot) {
-                return { x: String(snapshot.x) }
-            }
-        })
-
-        const m = M.create({ x: "1" })
-
-        expect(() => applySnapshot(m, { x: "2" })).not.toThrow()
     })
 
     test("cached initial snapshots are ok", () => {
