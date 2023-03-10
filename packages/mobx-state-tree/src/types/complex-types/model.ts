@@ -655,8 +655,8 @@ export class ModelType<
     }
 
     applySnapshot(node: this["N"], snapshot: this["C"]): void {
+        typecheckInternal(this, snapshot)
         const preProcessedSnapshot = this.applySnapshotPreProcessor(snapshot)
-        typecheckInternal(this, preProcessedSnapshot)
         this.forAllProps((name) => {
             ;(node.storedValue as any)[name] = preProcessedSnapshot[name]
         })
