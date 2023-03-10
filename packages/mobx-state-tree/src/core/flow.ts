@@ -120,7 +120,7 @@ export function createFlowSpawner(name: string, generator: Function) {
 
         function wrap(fn: any, type: IMiddlewareEventType, arg: any) {
             fn.$mst_middleware = (spawner as any).$mst_middleware // pick up any middleware attached to the flow
-            runWithActionContext(
+            return runWithActionContext(
                 {
                     ...contextBase,
                     type,
@@ -136,7 +136,7 @@ export function createFlowSpawner(name: string, generator: Function) {
                 gen = generator.apply(null, arguments)
                 onFulfilled(undefined) // kick off the flow
             }
-            ;(init as any).$mst_middleware = (spawner as any).$mst_middleware
+                ; (init as any).$mst_middleware = (spawner as any).$mst_middleware
 
             runWithActionContext(
                 {
@@ -151,7 +151,10 @@ export function createFlowSpawner(name: string, generator: Function) {
                 let ret
                 try {
                     // prettier-ignore
-                    wrap((r: any) => { ret = gen.next(r) }, "flow_resume", res)
+                    const cancelError: any = wrap((r: any) => { ret = gen.next(r) }, "flow_resume", res)
+                    if (cancelError instanceof Error) {
+                        ret = gen.throw(cancelError);
+                    }
                 } catch (e) {
                     // prettier-ignore
                     setImmediateWithFallback(() => {
