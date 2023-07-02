@@ -103,6 +103,7 @@ export {
     destroy,
     isAlive,
     addDisposer,
+    hasEnv,
     getEnv,
     walk,
     IModelReflectionData,

@@ -35,9 +35,8 @@ import {
 } from "../internal"
 
 /** @hidden */
-export type TypeOrStateTreeNodeToStateTreeNode<
-    T extends IAnyType | IAnyStateTreeNode
-> = T extends IType<any, any, infer TT> ? TT & IStateTreeNode<T> : T
+export type TypeOrStateTreeNodeToStateTreeNode<T extends IAnyType | IAnyStateTreeNode> =
+    T extends IType<any, any, infer TT> ? TT & IStateTreeNode<T> : T
 
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
@@ -761,7 +760,7 @@ export function addDisposer(target: IAnyStateTreeNode, disposer: IDisposer): IDi
 }
 
 /**
- * Returns the environment of the current state tree. For more info on environments,
+ * Returns the environment of the current state tree, or throws. For more info on environments,
  * see [Dependency injection](https://github.com/mobxjs/mobx-state-tree#dependency-injection)
  *
  * Please note that in child nodes access to the root is only possible
@@ -778,8 +777,29 @@ export function getEnv<T = any>(target: IAnyStateTreeNode): T {
 
     const node = getStateTreeNode(target)
     const env = node.root.environment
-    if (!env) return EMPTY_OBJECT as T
+
+    if (!env) throw fail(`Failed to find the environment of ${node} ${node.path}`)
     return env
+}
+
+/**
+ * Returns whether the current state tree has environment or not.
+ *
+ * @export
+ * @param {IStateTreeNode} target
+ * @return {boolean}
+ */
+export function hasEnv(target: IAnyStateTreeNode): boolean {
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+    }
+
+    const node = getStateTreeNode(target)
+    const env = node.root.environment
+
+    return !!env
 }
 
 /**
@@ -844,7 +864,7 @@ export interface IModelReflectionData extends IModelReflectionPropertiesData {
  * @returns
  */
 export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
-    const type = (getStateTreeNode(target).type as unknown) as IAnyModelType
+    const type = getStateTreeNode(target).type as unknown as IAnyModelType
 
     const reflected: IModelReflectionData = {
         ...getPropertyMembers(type),

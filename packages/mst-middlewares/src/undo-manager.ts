@@ -5,6 +5,7 @@ import {
     recordPatches,
     IPatchRecorder,
     createActionTrackingMiddleware2,
+    hasEnv,
     getEnv,
     getRoot,
     applyPatch,
@@ -125,21 +126,23 @@ const UndoManager = types
                         patches: recorder.patches,
                         inversePatches: recorder.inversePatches
                     })
-                    const maxLength = getEnv(self).maxHistoryLength || Infinity
+                    const maxLength = hasEnv(self)
+                        ? getEnv(self).maxHistoryLength || Infinity
+                        : Infinity
                     self.history.splice(0, self.history.length - maxLength)
                     self.undoIdx = self.history.length
                 })
             },
             afterCreate() {
                 const selfRoot = getRoot(self)
-                targetStore = getEnv(self).targetStore || selfRoot
+                targetStore = hasEnv(self) ? getEnv(self).targetStore || selfRoot : selfRoot
                 if (targetStore === self) {
                     throw new Error(
                         "UndoManager should be created as part of a tree, or with `targetStore` in it's environment"
                     )
                 }
 
-                if (typeof getEnv(self).includeHooks === "boolean") {
+                if (hasEnv(self) && typeof getEnv(self).includeHooks === "boolean") {
                     includeHooks = getEnv(self).includeHooks
                 }
 

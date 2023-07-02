@@ -1,6 +1,7 @@
 import { configure } from "mobx"
 import {
     types,
+    hasEnv,
     getEnv,
     clone,
     detach,
@@ -39,6 +40,7 @@ function createEnvironment() {
 test("it should be possible to use environments", () => {
     const env = createEnvironment()
     const todo = Todo.create({}, env)
+    expect(hasEnv(todo)).toBe(true)
     expect(todo.description).toBe("TEST")
     env.useUppercase = false
     expect(todo.description).toBe("test")
@@ -46,19 +48,24 @@ test("it should be possible to use environments", () => {
 test("it should be possible to inherit environments", () => {
     const env = createEnvironment()
     const store = Store.create({ todos: [{}] }, env)
+    expect(hasEnv(store.todos[0])).toBe(true)
     expect(store.todos[0].description).toBe("TEST")
     env.useUppercase = false
     expect(store.todos[0].description).toBe("test")
 })
-test("getEnv returns empty object without environment", () => {
+test("getEnv throws error without environment", () => {
     const todo = Todo.create()
-    expect(getEnv(todo)).toEqual({})
+    expect(hasEnv(todo)).toBe(false)
+    expect(() => getEnv(todo)).toThrowError(
+        "Failed to find the environment of AnonymousModel@<root>"
+    )
 })
 test("detach should preserve environment", () => {
     const env = createEnvironment()
     const store = Store.create({ todos: [{}] }, env)
     unprotect(store)
     const todo = detach(store.todos[0])
+    expect(hasEnv(todo)).toBe(true)
     expect(todo.description).toBe("TEST")
     env.useUppercase = false
     expect(todo.description).toBe("test")
@@ -115,15 +122,20 @@ test("clone preserves environnment", () => {
     const store = Store.create({ todos: [{}] }, env)
     {
         const todo = clone(store.todos[0])
+        expect(hasEnv(todo)).toBe(true)
         expect(getEnv(todo) === env).toBe(true)
     }
     {
         const todo = clone(store.todos[0], true)
+        expect(hasEnv(todo)).toBe(true)
         expect(getEnv(todo) === env).toBe(true)
     }
     {
         const todo = clone(store.todos[0], false)
-        expect(getEnv(todo)).toEqual({})
+        expect(hasEnv(todo)).toBe(false)
+        expect(() => {
+            getEnv(todo)
+        }).toThrowError("Failed to find the environment of AnonymousModel@<root>")
     }
     {
         const env2 = createEnvironment()
@@ -204,7 +216,7 @@ test("#1231", () => {
                 log("destroying node", i)
                 destroy(i)
             }
-            const env = getEnv(i)
+            const env = hasEnv(i) ? getEnv(i) : undefined
             const parent = hasParent(i)
             const alive = isAlive(i)
             if (mode === "detach") {
