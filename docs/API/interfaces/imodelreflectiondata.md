@@ -4,7 +4,7 @@ title: "IModelReflectionData"
 sidebar_label: "IModelReflectionData"
 ---
 
-[mobx-state-tree - v5.1.6](../index.md) › [IModelReflectionData](imodelreflectiondata.md)
+[mobx-state-tree - v5.1.8](../index.md) › [IModelReflectionData](imodelreflectiondata.md)
 
 ## Hierarchy
 
@@ -29,7 +29,7 @@ sidebar_label: "IModelReflectionData"
 
 • **actions**: *string[]*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:834](https://github.com/Slooowpoke/mobx-state-tree/blob/c1d1577f/packages/mobx-state-tree/src/core/mst-operations.ts#L834)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:834](https://github.com/mobxjs/mobx-state-tree/blob/62e7e8ba/packages/mobx-state-tree/src/core/mst-operations.ts#L834)*
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 • **flowActions**: *string[]*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:837](https://github.com/Slooowpoke/mobx-state-tree/blob/c1d1577f/packages/mobx-state-tree/src/core/mst-operations.ts#L837)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:837](https://github.com/mobxjs/mobx-state-tree/blob/62e7e8ba/packages/mobx-state-tree/src/core/mst-operations.ts#L837)*
 
 ___
 
@@ -47,7 +47,7 @@ ___
 
 *Inherited from [IModelReflectionPropertiesData](imodelreflectionpropertiesdata.md).[name](imodelreflectionpropertiesdata.md#name)*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:804](https://github.com/Slooowpoke/mobx-state-tree/blob/c1d1577f/packages/mobx-state-tree/src/core/mst-operations.ts#L804)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:804](https://github.com/mobxjs/mobx-state-tree/blob/62e7e8ba/packages/mobx-state-tree/src/core/mst-operations.ts#L804)*
 
 ___
 
@@ -57,7 +57,7 @@ ___
 
 *Inherited from [IModelReflectionPropertiesData](imodelreflectionpropertiesdata.md).[properties](imodelreflectionpropertiesdata.md#properties)*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:805](https://github.com/Slooowpoke/mobx-state-tree/blob/c1d1577f/packages/mobx-state-tree/src/core/mst-operations.ts#L805)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:805](https://github.com/mobxjs/mobx-state-tree/blob/62e7e8ba/packages/mobx-state-tree/src/core/mst-operations.ts#L805)*
 
 #### Type declaration:
 
@@ -69,7 +69,7 @@ ___
 
 • **views**: *string[]*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:835](https://github.com/Slooowpoke/mobx-state-tree/blob/c1d1577f/packages/mobx-state-tree/src/core/mst-operations.ts#L835)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:835](https://github.com/mobxjs/mobx-state-tree/blob/62e7e8ba/packages/mobx-state-tree/src/core/mst-operations.ts#L835)*
 
 ___
 
@@ -77,4 +77,4 @@ ___
 
 • **volatile**: *string[]*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:836](https://github.com/Slooowpoke/mobx-state-tree/blob/c1d1577f/packages/mobx-state-tree/src/core/mst-operations.ts#L836)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:836](https://github.com/mobxjs/mobx-state-tree/blob/62e7e8ba/packages/mobx-state-tree/src/core/mst-operations.ts#L836)*
