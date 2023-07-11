@@ -1,5 +1,6 @@
 import { argsToArray, fail, setImmediateWithFallback } from "../utils"
 import {
+    FunctionWithFlag,
     getCurrentActionContext,
     getNextActionId,
     getParentActionContext,
@@ -91,7 +92,7 @@ export function* toGenerator<R>(p: Promise<R>) {
  * @internal
  * @hidden
  */
-export function createFlowSpawner(name: string, generator: Function) {
+export function createFlowSpawner(name: string, generator: FunctionWithFlag) {
     const spawner = function flowSpawner(this: any) {
         // Implementation based on https://github.com/tj/co/blob/master/index.js
         const runId = getNextActionId()
@@ -198,5 +199,6 @@ export function createFlowSpawner(name: string, generator: Function) {
             }
         })
     }
+    ;(spawner as FunctionWithFlag)._isFlowAction = true
     return spawner
 }

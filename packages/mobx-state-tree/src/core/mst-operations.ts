@@ -35,9 +35,8 @@ import {
 } from "../internal"
 
 /** @hidden */
-export type TypeOrStateTreeNodeToStateTreeNode<
-    T extends IAnyType | IAnyStateTreeNode
-> = T extends IType<any, any, infer TT> ? TT & IStateTreeNode<T> : T
+export type TypeOrStateTreeNodeToStateTreeNode<T extends IAnyType | IAnyStateTreeNode> =
+    T extends IType<any, any, infer TT> ? TT & IStateTreeNode<T> : T
 
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
@@ -835,22 +834,31 @@ export interface IModelReflectionData extends IModelReflectionPropertiesData {
     actions: string[]
     views: string[]
     volatile: string[]
+    flowActions: string[]
 }
 
 /**
- * Returns a reflection of the model node, including name, properties, views, volatile and actions.
+ * Returns a reflection of the model node, including name, properties, views, volatile state,
+ * and actions. `flowActions` is also provided as a separate array of names for any action that
+ * came from a flow generator as well.
+ *
+ * In the case where a model has two actions: `doSomething` and `doSomethingWithFlow`, where
+ * `doSomethingWithFlow` is a flow generator, the `actions` array will contain both actions,
+ * i.e. ["doSomething", "doSomethingWithFlow"], and the `flowActions` array will contain only
+ * the flow action, i.e. ["doSomethingWithFlow"].
  *
  * @param target
  * @returns
  */
 export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
-    const type = (getStateTreeNode(target).type as unknown) as IAnyModelType
+    const type = getStateTreeNode(target).type as unknown as IAnyModelType
 
     const reflected: IModelReflectionData = {
         ...getPropertyMembers(type),
         actions: [],
         volatile: [],
-        views: []
+        views: [],
+        flowActions: []
     }
 
     const props = Object.getOwnPropertyNames(target)
@@ -863,6 +871,7 @@ export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
             return
         }
         if (descriptor.value._isMSTAction === true) reflected.actions.push(key)
+        if (descriptor.value._isFlowAction === true) reflected.flowActions.push(key)
         else if (isObservableProp(target, key)) reflected.volatile.push(key)
         else reflected.views.push(key)
     })
