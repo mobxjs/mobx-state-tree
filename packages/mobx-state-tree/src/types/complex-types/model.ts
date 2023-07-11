@@ -53,7 +53,8 @@ import {
     Instance,
     devMode,
     assertIsString,
-    assertArg
+    assertArg,
+    FunctionWithFlag
 } from "../../internal"
 import { ComputedValue } from "mobx/dist/internal"
 
@@ -170,7 +171,7 @@ export type ModelInstanceType<P extends ModelProperties, O> = ModelInstanceTypeP
 
 /** @hidden */
 export interface ModelActions {
-    [key: string]: Function
+    [key: string]: FunctionWithFlag
 }
 
 export interface IModelType<
@@ -414,6 +415,7 @@ export class ModelType<
             // while still allowing the middlewares to register them
             const middlewares = (action2 as any).$mst_middleware // make sure middlewares are not lost
             let boundAction = action2.bind(actions)
+            boundAction._isFlowAction = (action2 as FunctionWithFlag)._isFlowAction || false
             boundAction.$mst_middleware = middlewares
             const actionInvoker = createActionInvoker(self as any, name, boundAction)
             actions[name] = actionInvoker
