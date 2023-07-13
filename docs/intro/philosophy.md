@@ -52,7 +52,7 @@ store.todos[0].toggle()
 ```
 
 By using the type information available, snapshots can be converted to living trees, and vice versa, with zero effort.
-Because of this, [time travelling](https://github.com/mobxjs/mobx-state-tree/blob/master/packages/mst-example-boxes/src/stores/time.js) is supported out of the box, and tools like HMR are trivial to support [example](https://github.com/mobxjs/mobx-state-tree/blob/4c2b19ec4a6a8d74064e4b8a87c0f8b46e97e621/examples/boxes/src/stores/domain-state.js#L94).
+Because of this, [time travelling](https://github.com/coolsoftwaretyler/mst-example-boxes/blob/main/src/stores/time.js) is supported out of the box, and tools like HMR are trivial to support [example](https://github.com/coolsoftwaretyler/mst-example-boxes/blob/main/src/stores/domain-state.js#L94).
 
 The type information is designed in such a way that it is used both at design- and run-time to verify type correctness (Design time type checking works in TypeScript only at the moment; Flow PR's are welcome!)
 
@@ -70,16 +70,16 @@ Because state trees are living, mutable models, actions are straight-forward to 
 
 Although mutable sounds scary to some, fear not, actions have many interesting properties.
 By default trees can only be modified by using an action that belongs to the same subtree.
-Furthermore, actions are replayable and can be used to distribute changes ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/packages/mst-example-boxes/src/stores/socket.js)).
+Furthermore, actions are replayable and can be used to distribute changes ([example](https://github.com/coolsoftwaretyler/mst-example-boxes/blob/main/src/stores/socket.js)).
 
 Moreover, because changes can be detected on a fine grained level, JSON patches are supported out of the box.
-Simply subscribing to the patch stream of a tree is another way to sync diffs with, for example, back-end servers or other clients ([example](https://github.com/mobxjs/mobx-state-tree/blob/master/packages/mst-example-boxes/src/stores/socket.js)).
+Simply subscribing to the patch stream of a tree is another way to sync diffs with, for example, back-end servers or other clients ([example](https://github.com/coolsoftwaretyler/mst-example-boxes/blob/main/src/stores/socket.js)).
 
 ![patches](/img/patches.png)
 
 Since MST uses MobX behind the scenes, it integrates seamlessly with [mobx](https://mobx.js.org) and [mobx-react-lite (or mobx-react)](https://mobx.js.org/react-integration.html). See also this [egghead.io lesson: Render mobx-state-tree Models in React](https://egghead.io/lessons/react-render-mobx-state-tree-models-in-react).
 Even cooler, because it supports snapshots, middleware and replayable actions out of the box, it is possible to replace a Redux store and reducer with a MobX state tree.
-This makes it possible to connect the Redux devtools to MST. See the [Redux / MST TodoMVC example](https://github.com/mobxjs/mobx-state-tree/blob/1906a394906d2e8f2cc1c778e1e3228307c1b112/packages/mst-example-redux-todomvc/src/index.js#L6).
+This makes it possible to connect the Redux devtools to MST. See the [Redux / MST TodoMVC example](https://github.com/coolsoftwaretyler/mst-example-redux-todomvc/blob/main/src/index.js#L6).
 
 ---
 

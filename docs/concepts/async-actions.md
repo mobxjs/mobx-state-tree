@@ -21,8 +21,8 @@ _Warning: don't import `flow` from `"mobx"`, but from `"mobx-state-tree"` instea
 ```javascript
 import { types, flow } from "mobx-state-tree"
 
-someModel.actions(self => {
-    const fetchProjects = flow(function*() {
+someModel.actions((self) => {
+    const fetchProjects = flow(function* () {
         // <- note the star, this is a generator function!
         self.state = "pending"
         try {
@@ -60,11 +60,12 @@ This means that each step in an asynchronous flow that needs to actually change 
 For example:
 
 ```javascript
-const Store = types.model({
+const Store = types
+    .model({
         githubProjects: types.array(types.frozen),
         state: types.enumeration("State", ["pending", "done", "error"])
     })
-    .actions(self => ({
+    .actions((self) => ({
         fetchProjects() {
             self.githubProjects = []
             self.state = "pending"
@@ -83,8 +84,7 @@ const Store = types.model({
             console.error("Failed to fetch projects", error)
             self.state = "error"
         }
-    }
-))
+    }))
 ```
 
 This approach works fine and has great type inference, but comes with a few downsides:
@@ -100,12 +100,14 @@ Generators might sound scary, but they are very suitable for expressing asynchro
 ```javascript
 import { flow } from "mobx-state-tree"
 
-const Store = types.model({
+const Store = types
+    .model({
         githubProjects: types.array(types.frozen),
         state: types.enumeration("State", ["pending", "done", "error"])
     })
-    .actions(self => ({
-        fetchProjects: flow(function* fetchProjects() { // <- note the star, this a generator function!
+    .actions((self) => ({
+        fetchProjects: flow(function* fetchProjects() {
+            // <- note the star, this a generator function!
             self.githubProjects = []
             self.state = "pending"
             try {
@@ -144,7 +146,7 @@ For example, the `onAction` middleware will only record starting asynchronous fl
 After all, when replaying the invocation will lead to the other steps being executed automatically.
 Besides that, each step in the generator is allowed to modify its own instance, and there is no need to expose the individual flow steps as actions.
 
-See the [bookshop example sources](https://github.com/mobxjs/mobx-state-tree/blob/5a4bd43ac874cddbf91b40eeef20043198477084/packages/mst-example-bookshop/src/stores/BookStore.js#L25) for a more extensive example.
+See the [bookshop example sources](https://github.com/coolsoftwaretyler/mst-example-bookshop/blob/main/src/stores/BookStore.js#L25) for a more extensive example.
 
 Using generators requires Promises and generators to be available. Promises can easily be polyfilled although they tend to be available on every modern JS environment. Generators are well supported as well, and both TypeScript and Babel can compile generators to ES5.
 
