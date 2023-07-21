@@ -736,6 +736,10 @@ export function model<P extends ModelPropertiesDeclaration = {}>(
  * See the [model type](/concepts/trees#creating-models) description or the [getting started](intro/getting-started.md#getting-started-1) tutorial.
  */
 export function model(...args: any[]): any {
+    if (devMode() && typeof args[0] !== "string" && args[1]) {
+        throw fail("Model creation failed. First argument must be a string when two arguments are provided")
+    }
+
     const name = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
     const properties = args.shift() || {}
     return new ModelType({ name, properties })
