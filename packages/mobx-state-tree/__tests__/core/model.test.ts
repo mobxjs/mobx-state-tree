@@ -120,25 +120,45 @@ describe("Edge case behavior", () => {
             const modelSnapshot = getSnapshot(Model.create())
             expect(modelSnapshot).toEqual({})
         })
+        if (process.env.NODE_ENV !== "production") {
+            test("it should not throw an error", () => {
+                expect(() => {
+                    types.model()
+                }).not.toThrow()
+            })
+        }
     })
     describe("when we provide an invalid name value, but a valid property object", () => {
-        test("the model will be named AnonymousModel", () => {
-            const Model = types.model(null as any, {
-                prop1: "prop1",
-                prop2: 2
-            })
+        if (process.env.NODE_ENV === "production") {
+            test("the model will be named AnonymousModel", () => {
+                const Model = types.model(null as any, {
+                    prop1: "prop1",
+                    prop2: 2
+                })
 
-            expect(Model.name).toBe("AnonymousModel")
-        })
-        test("the model will have no properties", () => {
-            const Model = types.model(null as any, {
-                prop1: "prop1",
-                prop2: 2
+                expect(Model.name).toBe("AnonymousModel")
             })
+            test("the model will have no properties", () => {
+                const Model = types.model(null as any, {
+                    prop1: "prop1",
+                    prop2: 2
+                })
 
-            const modelSnapshot = getSnapshot(Model.create())
-            expect(modelSnapshot).toEqual({})
-        })
+                const modelSnapshot = getSnapshot(Model.create())
+                expect(modelSnapshot).toEqual({})
+            })
+        } else {
+            test("it should complain about invalid name", () => {
+                expect(() => {
+                    types.model(null as any, {
+                        prop1: "prop1",
+                        prop2: 2
+                    })
+                }).toThrowErrorMatchingInlineSnapshot(
+                    `"[mobx-state-tree] Model creation failed. First argument must be a string when two arguments are provided"`
+                )
+            })
+        }
     })
     describe("when we provide three arguments to the function", () => {
         test("the model gets the correct name", () => {
