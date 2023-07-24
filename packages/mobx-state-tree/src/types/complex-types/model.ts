@@ -554,7 +554,8 @@ export class ModelType<
     }
 
     createNewInstance(childNodes: IChildNodesMap): this["T"] {
-        return observable.object(childNodes, EMPTY_OBJECT, mobxShallow) as any
+        const options = { ...mobxShallow, name: this.describe() }
+        return observable.object(childNodes, EMPTY_OBJECT, options) as any
     }
 
     finalizeNewInstance(node: this["N"], instance: this["T"]): void {

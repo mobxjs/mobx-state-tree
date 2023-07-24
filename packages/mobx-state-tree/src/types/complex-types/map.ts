@@ -140,8 +140,8 @@ export enum MapIdentifierMode {
 }
 
 class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
-    constructor(initialData?: [string, any][] | IKeyValueMap<any> | Map<string, any> | undefined) {
-        super(initialData, (observable.ref as any).enhancer)
+    constructor(initialData?: [string, any][] | IKeyValueMap<any> | Map<string, any> | undefined, options = {}) {
+        super(initialData, (observable.ref as any).enhancer, options)
     }
 
     get(key: string): IT["Type"] | undefined {
@@ -278,7 +278,8 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     }
 
     createNewInstance(childNodes: IChildNodesMap): this["T"] {
-        return new MSTMap(childNodes) as any
+        const options = { name: this.describe() }
+        return new MSTMap(childNodes, options) as any
     }
 
     finalizeNewInstance(node: this["N"], instance: ObservableMap<string, any>): void {
