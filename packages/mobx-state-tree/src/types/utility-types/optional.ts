@@ -16,7 +16,7 @@ import {
     devMode
 } from "../../internal"
 
-type IFunctionReturn<T> = (parent?: AnyObjectNode) => T
+type IFunctionReturn<T> = (parent: AnyObjectNode | null) => T
 
 type IOptionalValue<C, T> = C | IFunctionReturn<C | T>
 
@@ -88,7 +88,7 @@ export class OptionalValue<
         )
     }
 
-    getDefaultInstanceOrSnapshot(parent?: AnyObjectNode | null): this["C"] | this["T"] {
+    getDefaultInstanceOrSnapshot(parent: AnyObjectNode | null): this["C"] | this["T"] {
         const defaultInstanceOrSnapshot =
             typeof this._defaultValue === "function"
                 ? (this._defaultValue as IFunctionReturn<this["C"] | this["T"]>)(parent)
