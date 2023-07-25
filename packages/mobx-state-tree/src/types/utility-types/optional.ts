@@ -16,7 +16,7 @@ import {
     devMode
 } from "../../internal"
 
-type IFunctionReturn<T> = () => T
+type IFunctionReturn<T> = (parent?: AnyObjectNode) => T
 
 type IOptionalValue<C, T> = C | IFunctionReturn<C | T>
 
