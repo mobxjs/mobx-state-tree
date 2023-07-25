@@ -61,7 +61,7 @@ export class OptionalValue<
         initialValue: this["C"] | this["T"]
     ): this["N"] {
         if (this.optionalValues.indexOf(initialValue) >= 0) {
-            const defaultInstanceOrSnapshot = this.getDefaultInstanceOrSnapshot()
+            const defaultInstanceOrSnapshot = this.getDefaultInstanceOrSnapshot(parent)
             return this._subtype.instantiate(
                 parent,
                 subpath,
@@ -82,16 +82,16 @@ export class OptionalValue<
             current,
             this.optionalValues.indexOf(newValue) < 0 && this._subtype.is(newValue)
                 ? newValue
-                : this.getDefaultInstanceOrSnapshot(),
+                : this.getDefaultInstanceOrSnapshot(parent),
             parent,
             subpath
         )
     }
 
-    getDefaultInstanceOrSnapshot(): this["C"] | this["T"] {
+    getDefaultInstanceOrSnapshot(parent?: AnyObjectNode | null): this["C"] | this["T"] {
         const defaultInstanceOrSnapshot =
             typeof this._defaultValue === "function"
-                ? (this._defaultValue as IFunctionReturn<this["C"] | this["T"]>)()
+                ? (this._defaultValue as IFunctionReturn<this["C"] | this["T"]>)(parent)
                 : this._defaultValue
 
         // while static values are already snapshots and checked on types.optional
