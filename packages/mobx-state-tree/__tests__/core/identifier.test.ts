@@ -2,12 +2,12 @@ import {
     types,
     tryResolve,
     resolvePath,
-    cast,
     SnapshotOrInstance,
     IAnyModelType,
     IAnyComplexType,
     resolveIdentifier,
-    getIdentifier
+    getIdentifier,
+    detach
 } from "../../src"
 
 if (process.env.NODE_ENV !== "production") {
@@ -87,7 +87,7 @@ if (process.env.NODE_ENV !== "production") {
     test("should throw if identifier of wrong type", () => {
         expect(() => {
             const Model = types.model("Model", { id: types.identifier })
-            Model.create({ id: (1 as any) as string })
+            Model.create({ id: 1 as any as string })
         }).toThrowError(
             'at path "/id" value `1` is not assignable to type: `identifier` (Value is not a valid identifier, expected a string).'
         )
@@ -153,7 +153,7 @@ if (process.env.NODE_ENV !== "production") {
     })
 }
 
-test("it can resolve through refrences", () => {
+test("it can resolve through references", () => {
     const Folder = types.model("Folder", {
         type: types.literal("folder"),
         name: types.identifier,
@@ -267,4 +267,44 @@ test("identifierAttribute of the type", () => {
 
     const M3 = types.model({ myId: types.optional(types.identifier, () => "hi") })
     expect(M3.identifierAttribute).toBe("myId")
+})
+
+test("items detached from arrays don't corrupt identifierCache", () => {
+    const Item = types.model("Item", { id: types.identifier })
+    const ItemArray = types.model("ItemArray", { items: types.array(Item) }).actions((self) => ({
+        removeSecondItemWithDetach() {
+            detach(self.items[1])
+        }
+    }))
+
+    const smallArray = ItemArray.create({
+        items: [{ id: "A" }, { id: "B" }, { id: "C" }, { id: "D" }, { id: "E" }]
+    })
+    expect(resolveIdentifier(Item, smallArray, "E")).toBeDefined()
+    smallArray.removeSecondItemWithDetach()
+    expect(smallArray.items.length).toBe(4)
+    expect(resolveIdentifier(Item, smallArray, "B")).toBeUndefined()
+    expect(resolveIdentifier(Item, smallArray, "E")).toBeDefined()
+
+    const largeArray = ItemArray.create({
+        items: [
+            { id: "A" },
+            { id: "B" },
+            { id: "C" },
+            { id: "D" },
+            { id: "E" },
+            { id: "F" },
+            { id: "G" },
+            { id: "H" },
+            { id: "I" },
+            { id: "J" },
+            { id: "K" }
+        ]
+    })
+    expect(resolveIdentifier(Item, largeArray, "K")).toBeDefined()
+    largeArray.removeSecondItemWithDetach()
+    expect(largeArray.items.length).toBe(10)
+    expect(resolveIdentifier(Item, largeArray, "B")).toBeUndefined()
+    expect(resolveIdentifier(Item, largeArray, "J")).toBeDefined()
+    expect(resolveIdentifier(Item, largeArray, "K")).toBeDefined()
 })
