@@ -49,7 +49,9 @@ export enum TypeFlags {
     Undefined = 1 << 16,
     Integer = 1 << 17,
     Custom = 1 << 18,
-    SnapshotProcessor = 1 << 19
+    SnapshotProcessor = 1 << 19,
+    Float = 1 << 20,
+    Finite = 1 << 21
 }
 
 /**

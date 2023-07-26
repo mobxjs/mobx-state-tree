@@ -63,16 +63,26 @@ export function identity(_: any): any {
 export function noop() {}
 
 /**
- * pollyfill (for IE) suggested in MDN:
- * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger
  * @internal
  * @hidden
  */
-export const isInteger =
-    Number.isInteger ||
-    function (value: any) {
-        return typeof value === "number" && isFinite(value) && Math.floor(value) === value
-    }
+export const isInteger = Number.isInteger
+
+/**
+ * @internal
+ * @hidden
+ */
+export function isFloat(val: any) {
+    return Number(val) === val && val % 1 !== 0
+}
+
+/**
+ * @internal
+ * @hidden
+ */
+export function isFinite(val: any) {
+    return Number.isFinite(val)
+}
 
 /**
  * @internal
@@ -87,7 +97,7 @@ export function isArray(val: any): val is any[] {
  * @hidden
  */
 export function asArray<T>(val: undefined | null | T | T[] | ReadonlyArray<T>): T[] {
-    if (!val) return (EMPTY_ARRAY as any) as T[]
+    if (!val) return EMPTY_ARRAY as any as T[]
     if (isArray(val)) return val as T[]
     return [val] as T[]
 }

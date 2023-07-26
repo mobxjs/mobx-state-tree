@@ -14,7 +14,9 @@ import {
     isType,
     isInteger,
     AnyObjectNode,
-    AnyNode
+    AnyNode,
+    isFloat,
+    isFinite
 } from "../internal"
 
 // TODO: implement CoreType using types.custom ?
@@ -114,6 +116,44 @@ export const integer: ISimpleType<number> = new CoreType<number, number, number>
     "integer",
     TypeFlags.Integer,
     (v) => isInteger(v)
+)
+
+/**
+ * `types.float` - Creates a type that can only contain an float value.
+ * This type is used for float values by default
+ *
+ * Example:
+ * ```ts
+ * const Size = types.model({
+ *   width: types.float,
+ *   height: 10
+ * })
+ * ```
+ */
+// tslint:disable-next-line:variable-name
+export const float: ISimpleType<number> = new CoreType<number, number, number>(
+    "float",
+    TypeFlags.Float,
+    (v) => isFloat(v)
+)
+
+/**
+ * `types.finite` - Creates a type that can only contain an finite value.
+ * This type is used for finite values by default
+ *
+ * Example:
+ * ```ts
+ * const Size = types.model({
+ *   width: types.finite,
+ *   height: 10
+ * })
+ * ```
+ */
+// tslint:disable-next-line:variable-name
+export const finite: ISimpleType<number> = new CoreType<number, number, number>(
+    "finite",
+    TypeFlags.Finite,
+    (v) => isFinite(v)
 )
 
 /**
