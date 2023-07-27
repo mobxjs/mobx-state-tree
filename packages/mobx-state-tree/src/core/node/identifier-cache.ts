@@ -70,6 +70,9 @@ export class IdentifierCache {
 
     splitCache(splitNode: AnyObjectNode): IdentifierCache {
         const newCache = new IdentifierCache()
+        // The slash is added here so we only match children of the splitNode. In version 5.1.8 and
+        // earlier there was no trailing slash, so non children that started with the same path string
+        // were being matched incorrectly.
         const basePath = splitNode.path + "/"
         entries(this.cache).forEach(([id, nodes]) => {
             let modified = false

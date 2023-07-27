@@ -306,5 +306,6 @@ test("items detached from arrays don't corrupt identifierCache", () => {
     expect(largeArray.items.length).toBe(10)
     expect(resolveIdentifier(Item, largeArray, "B")).toBeUndefined()
     expect(resolveIdentifier(Item, largeArray, "J")).toBeDefined()
+    // The following expectation was failing in version 5.1.8 and earlier
     expect(resolveIdentifier(Item, largeArray, "K")).toBeDefined()
 })
