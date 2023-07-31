@@ -65,6 +65,8 @@ sidebar_label: "Globals"
 * [identifier](index.md#const-identifier)
 * [identifierNumber](index.md#const-identifiernumber)
 * [integer](index.md#const-integer)
+* [float](index.md#const-float)
+* [finite](index.md#const-finite)
 * [nullType](index.md#const-nulltype)
 * [number](index.md#const-number)
 * [string](index.md#const-string)
@@ -510,6 +512,52 @@ Example:
 ```ts
 const Size = types.model({
   width: types.integer,
+  height: 10
+})
+```
+
+___
+
+### `Const` float
+
+• **float**: *[ISimpleType](interfaces/isimpletype.md)‹number›* =  new CoreType<number, number, number>(
+    "float",
+    TypeFlags.Float,
+    (v) => isFloat(v)
+)
+
+*Defined in [packages/mobx-state-tree/src/types/primitives.ts:113](https://github.com/mobxjs/mobx-state-tree/blob/62e7e8ba/packages/mobx-state-tree/src/types/primitives.ts#L121)*
+
+`types.float` - Creates a type that can only contain an float value.
+This type is used for float values by default
+
+Example:
+```ts
+const Size = types.model({
+  width: types.float,
+  height: 10
+})
+```
+
+___
+
+### `Const` finite
+
+• **finite**: *[ISimpleType](interfaces/isimpletype.md)‹number›* =  new CoreType<number, number, number>(
+    "finite",
+    TypeFlags.Finite,
+    (v) => isFinite(v)
+)
+
+*Defined in [packages/mobx-state-tree/src/types/primitives.ts:113](https://github.com/mobxjs/mobx-state-tree/blob/62e7e8ba/packages/mobx-state-tree/src/types/primitives.ts#L140)*
+
+`types.finite` - Creates a type that can only contain an finite value.
+This type is used for finite values by default
+
+Example:
+```ts
+const Size = types.model({
+  width: types.finite,
   height: 10
 })
 ```
