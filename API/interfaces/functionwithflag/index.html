@@ -1,0 +1,228 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>FunctionWithFlag · MobX-state-tree</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="[mobx-state-tree - v5.1.8](/API/) › [FunctionWithFlag](/API/interfaces/functionwithflag)"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="FunctionWithFlag · MobX-state-tree"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobx-state-tree.js.org//"/><meta property="og:description" content="[mobx-state-tree - v5.1.8](/API/) › [FunctionWithFlag](/API/interfaces/functionwithflag)"/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/dracula.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-65632006-4', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script type="text/javascript" src="https://codefund.io/properties/635/funder.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="MobX-state-tree"/><h2 class="headerTitleWithLogo">MobX-state-tree</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/intro/welcome" target="_self">Documentation</a></li><li class="siteNavGroupActive"><a href="/API/" target="_self">TypeDocs</a></li><li class=""><a href="https://opencollective.com/mobx" target="_self">Sponsor</a></li><li class=""><a href="https://github.com/mobxjs/mobx-state-tree" target="_self">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Interfaces</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Introduction<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/API/">Globals</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Interfaces<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/API/interfaces/customtypeoptions">CustomTypeOptions</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/API/interfaces/functionwithflag">FunctionWithFlag</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/iactioncontext">IActionContext</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/iactionrecorder">IActionRecorder</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/iactiontrackingmiddleware2call">IActionTrackingMiddleware2Call</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/iactiontrackingmiddleware2hooks">IActionTrackingMiddleware2Hooks</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/iactiontrackingmiddlewarehooks">IActionTrackingMiddlewareHooks</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/ianycomplextype">IAnyComplexType</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/ianymodeltype">IAnyModelType</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/ianytype">IAnyType</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/ihooks">IHooks</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/ijsonpatch">IJsonPatch</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/imiddlewareevent">IMiddlewareEvent</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/imodelreflectiondata">IModelReflectionData</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/imodelreflectionpropertiesdata">IModelReflectionPropertiesData</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/imodeltype">IModelType</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/ipatchrecorder">IPatchRecorder</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/ireversiblejsonpatch">IReversibleJsonPatch</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/iserializedactioncall">ISerializedActionCall</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/isimpletype">ISimpleType</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/isnapshotprocessor">ISnapshotProcessor</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/isnapshotprocessors">ISnapshotProcessors</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/itype">IType</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/ivalidationcontextentry">IValidationContextEntry</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/ivalidationerror">IValidationError</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/referenceoptionsgetset">ReferenceOptionsGetSet</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/referenceoptionsoninvalidated">ReferenceOptionsOnInvalidated</a></li><li class="navListItem"><a class="navItem" href="/API/interfaces/unionoptions">UnionOptions</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx-state-tree/edit/master/docs/API/interfaces/functionwithflag.md" target="_blank" rel="noreferrer noopener">Edit</a><h1 class="postHeaderTitle">FunctionWithFlag</h1></header><article><div><span><p><a href="/API/">mobx-state-tree - v5.1.8</a> › <a href="/API/interfaces/functionwithflag">FunctionWithFlag</a></p>
+<h2><a class="anchor" aria-hidden="true" id="hierarchy"></a><a href="#hierarchy" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Hierarchy</h2>
+<ul>
+<li><p>Function</p>
+<p>↳ <strong>FunctionWithFlag</strong></p></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="index"></a><a href="#index" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Index</h2>
+<h3><a class="anchor" aria-hidden="true" id="properties"></a><a href="#properties" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Properties</h3>
+<ul>
+<li><a href="/API/interfaces/functionwithflag#function">Function</a></li>
+<li><a href="/API/interfaces/functionwithflag#optional-_isflowaction">_isFlowAction</a></li>
+<li><a href="/API/interfaces/functionwithflag#optional-_ismstaction">_isMSTAction</a></li>
+<li><a href="/API/interfaces/functionwithflag#arguments">arguments</a></li>
+<li><a href="/API/interfaces/functionwithflag#caller">caller</a></li>
+<li><a href="/API/interfaces/functionwithflag#length">length</a></li>
+<li><a href="/API/interfaces/functionwithflag#name">name</a></li>
+<li><a href="/API/interfaces/functionwithflag#prototype">prototype</a></li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="methods"></a><a href="#methods" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Methods</h3>
+<ul>
+<li><a href="/API/interfaces/functionwithflag#[symbol.hasinstance]">[Symbol.hasInstance]</a></li>
+<li><a href="/API/interfaces/functionwithflag#apply">apply</a></li>
+<li><a href="/API/interfaces/functionwithflag#bind">bind</a></li>
+<li><a href="/API/interfaces/functionwithflag#call">call</a></li>
+<li><a href="/API/interfaces/functionwithflag#tostring">toString</a></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="properties-1"></a><a href="#properties-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Properties</h2>
+<h3><a class="anchor" aria-hidden="true" id="function"></a><a href="#function" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Function</h3>
+<p>• <strong>Function</strong>: <em>FunctionConstructor</em></p>
+<p>Defined in node_modules/typescript/lib/lib.es5.d.ts:316</p>
+<hr>
+<h3><a class="anchor" aria-hidden="true" id="optional-_isflowaction"></a><a href="#optional-_isflowaction" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>Optional</code> _isFlowAction</h3>
+<p>• <strong>_isFlowAction</strong>? : <em>undefined | false | true</em></p>
+<p><em>Defined in <a href="https://github.com/mobxjs/mobx-state-tree/blob/50de5c27/packages/mobx-state-tree/src/core/action.ts#L42">packages/mobx-state-tree/src/core/action.ts:42</a></em></p>
+<hr>
+<h3><a class="anchor" aria-hidden="true" id="optional-_ismstaction"></a><a href="#optional-_ismstaction" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>Optional</code> _isMSTAction</h3>
+<p>• <strong>_isMSTAction</strong>? : <em>undefined | false | true</em></p>
+<p><em>Defined in <a href="https://github.com/mobxjs/mobx-state-tree/blob/50de5c27/packages/mobx-state-tree/src/core/action.ts#L41">packages/mobx-state-tree/src/core/action.ts:41</a></em></p>
+<hr>
+<h3><a class="anchor" aria-hidden="true" id="arguments"></a><a href="#arguments" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>arguments</h3>
+<p>• <strong>arguments</strong>: <em>any</em></p>
+<p><em>Inherited from void</em></p>
+<p>Defined in node_modules/typescript/lib/lib.es5.d.ts:302</p>
+<hr>
+<h3><a class="anchor" aria-hidden="true" id="caller"></a><a href="#caller" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>caller</h3>
+<p>• <strong>caller</strong>: <em>Function</em></p>
+<p><em>Inherited from void</em></p>
+<p>Defined in node_modules/typescript/lib/lib.es5.d.ts:303</p>
+<hr>
+<h3><a class="anchor" aria-hidden="true" id="length"></a><a href="#length" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>length</h3>
+<p>• <strong>length</strong>: <em>number</em></p>
+<p><em>Inherited from void</em></p>
+<p>Defined in node_modules/typescript/lib/lib.es5.d.ts:299</p>
+<hr>
+<h3><a class="anchor" aria-hidden="true" id="name"></a><a href="#name" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>name</h3>
+<p>• <strong>name</strong>: <em>string</em></p>
+<p><em>Inherited from void</em></p>
+<p>Defined in node_modules/typescript/lib/lib.es2015.core.d.ts:97</p>
+<p>Returns the name of the function. Function names are read-only and can not be changed.</p>
+<hr>
+<h3><a class="anchor" aria-hidden="true" id="prototype"></a><a href="#prototype" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>prototype</h3>
+<p>• <strong>prototype</strong>: <em>any</em></p>
+<p><em>Inherited from void</em></p>
+<p>Defined in node_modules/typescript/lib/lib.es5.d.ts:298</p>
+<h2><a class="anchor" aria-hidden="true" id="methods-1"></a><a href="#methods-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Methods</h2>
+<h3><a class="anchor" aria-hidden="true" id="symbolhasinstance"></a><a href="#symbolhasinstance" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>[Symbol.hasInstance]</h3>
+<p>▸ <strong>[Symbol.hasInstance]</strong>(<code>value</code>: any): <em>boolean</em></p>
+<p><em>Inherited from void</em></p>
+<p>Defined in node_modules/typescript/lib/lib.es2015.symbol.wellknown.d.ts:162</p>
+<p>Determines whether the given value inherits from this function if this function was used
+as a constructor function.</p>
+<p>A constructor function can control which objects are recognized as its instances by
+'instanceof' by overriding this method.</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr><th>Name</th><th>Type</th></tr>
+</thead>
+<tbody>
+<tr><td><code>value</code></td><td>any</td></tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em>boolean</em></p>
+<hr>
+<h3><a class="anchor" aria-hidden="true" id="apply"></a><a href="#apply" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>apply</h3>
+<p>▸ <strong>apply</strong>(<code>this</code>: Function, <code>thisArg</code>: any, <code>argArray?</code>: any): <em>any</em></p>
+<p><em>Inherited from void</em></p>
+<p>Defined in node_modules/typescript/lib/lib.es5.d.ts:278</p>
+<p>Calls the function, substituting the specified object for the this value of the function, and the specified array for the arguments of the function.</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr><th>Name</th><th>Type</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>this</code></td><td>Function</td><td>-</td></tr>
+<tr><td><code>thisArg</code></td><td>any</td><td>The object to be used as the this object.</td></tr>
+<tr><td><code>argArray?</code></td><td>any</td><td>A set of arguments to be passed to the function.</td></tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em>any</em></p>
+<hr>
+<h3><a class="anchor" aria-hidden="true" id="bind"></a><a href="#bind" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>bind</h3>
+<p>▸ <strong>bind</strong>(<code>this</code>: Function, <code>thisArg</code>: any, ...<code>argArray</code>: any[]): <em>any</em></p>
+<p><em>Inherited from void</em></p>
+<p>Defined in node_modules/typescript/lib/lib.es5.d.ts:293</p>
+<p>For a given function, creates a bound function that has the same body as the original function.
+The this object of the bound function is associated with the specified object, and has the specified initial parameters.</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr><th>Name</th><th>Type</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>this</code></td><td>Function</td><td>-</td></tr>
+<tr><td><code>thisArg</code></td><td>any</td><td>An object to which the this keyword can refer inside the new function.</td></tr>
+<tr><td><code>...argArray</code></td><td>any[]</td><td>A list of arguments to be passed to the new function.</td></tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em>any</em></p>
+<hr>
+<h3><a class="anchor" aria-hidden="true" id="call"></a><a href="#call" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>call</h3>
+<p>▸ <strong>call</strong>(<code>this</code>: Function, <code>thisArg</code>: any, ...<code>argArray</code>: any[]): <em>any</em></p>
+<p><em>Inherited from void</em></p>
+<p>Defined in node_modules/typescript/lib/lib.es5.d.ts:285</p>
+<p>Calls a method of an object, substituting another object for the current object.</p>
+<p><strong>Parameters:</strong></p>
+<table>
+<thead>
+<tr><th>Name</th><th>Type</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>this</code></td><td>Function</td><td>-</td></tr>
+<tr><td><code>thisArg</code></td><td>any</td><td>The object to be used as the current object.</td></tr>
+<tr><td><code>...argArray</code></td><td>any[]</td><td>A list of arguments to be passed to the method.</td></tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <em>any</em></p>
+<hr>
+<h3><a class="anchor" aria-hidden="true" id="tostring"></a><a href="#tostring" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>toString</h3>
+<p>▸ <strong>toString</strong>(): <em>string</em></p>
+<p><em>Inherited from void</em></p>
+<p>Defined in node_modules/typescript/lib/lib.es5.d.ts:296</p>
+<p>Returns a string representation of a function.</p>
+<p><strong>Returns:</strong> <em>string</em></p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/API/interfaces/customtypeoptions"><span class="arrow-prev">← </span><span class="function-name-prevnext">CustomTypeOptions</span></a><a class="docs-next button" href="/API/interfaces/iactioncontext"><span class="function-name-prevnext">IActionContext</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#hierarchy">Hierarchy</a></li><li><a href="#index">Index</a><ul class="toc-headings"><li><a href="#properties">Properties</a></li><li><a href="#methods">Methods</a></li></ul></li><li><a href="#properties-1">Properties</a><ul class="toc-headings"><li><a href="#function">Function</a></li><li><a href="#optional-_isflowaction"><code>Optional</code> _isFlowAction</a></li><li><a href="#optional-_ismstaction"><code>Optional</code> _isMSTAction</a></li><li><a href="#arguments">arguments</a></li><li><a href="#caller">caller</a></li><li><a href="#length">length</a></li><li><a href="#name">name</a></li><li><a href="#prototype">prototype</a></li></ul></li><li><a href="#methods-1">Methods</a><ul class="toc-headings"><li><a href="#symbolhasinstance">[Symbol.hasInstance]</a></li><li><a href="#apply">apply</a></li><li><a href="#bind">bind</a></li><li><a href="#call">call</a></li><li><a href="#tostring">toString</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="MobX-state-tree" width="66" height="58"/></a><div><h5>Docs</h5><a href="/intro/getting-started">Getting Started</a><a href="/concepts/trees">Basic concepts</a><a href="/concepts/patches">Advanced concepts</a><a href="/overview/types">API Reference</a></div><div><h5>Community</h5><a href="https://github.com/mobxjs/mobx-state-tree/discussions" target="_blank" rel="noreferrer noopener">GitHub Discussions</a><a href="https://stackoverflow.com/questions/tagged/mobx-state-tree" target="_blank" rel="noreferrer noopener">Stack Overflow</a></div><div><h5>More</h5><a href="/blog">Blog</a><a href="https://github.com/mobxjs/mobx-state-tree">GitHub</a><a class="github-button" href="https://github.com/mobxjs/mobx-state-tree" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2023 Michel Weststrate</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: 'b7b0cfe7d1c8fa6db6089df94a3128f1',
+                indexName: 'mobx-state-tree',
+                inputSelector: '#search_input_react'
+              });
+            </script></body></html>

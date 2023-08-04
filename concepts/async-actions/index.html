@@ -75,8 +75,8 @@
 <p><em>Warning: don't import <code>flow</code> from <code>&quot;mobx&quot;</code>, but from <code>&quot;mobx-state-tree&quot;</code> instead!</em></p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { types, flow } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-state-tree"</span>
 
-someModel.actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> {
-    <span class="hljs-keyword">const</span> fetchProjects = flow(<span class="hljs-function"><span class="hljs-keyword">function</span>*(<span class="hljs-params"></span>) </span>{
+someModel.actions(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> fetchProjects = flow(<span class="hljs-function"><span class="hljs-keyword">function</span>* (<span class="hljs-params"></span>) </span>{
         <span class="hljs-comment">// &lt;- note the star, this is a generator function!</span>
         self.state = <span class="hljs-string">"pending"</span>
         <span class="hljs-keyword">try</span> {
@@ -108,11 +108,12 @@ But let's take a look at modelling asynchronous actions as a set of actions firs
 <p>MST doesn't allow changing state outside actions (except when the tree is unprotected).
 This means that each step in an asynchronous flow that needs to actually change the model needs to become a separate action.
 For example:</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> Store = types.model({
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> Store = types
+    .model({
         <span class="hljs-attr">githubProjects</span>: types.array(types.frozen),
         <span class="hljs-attr">state</span>: types.enumeration(<span class="hljs-string">"State"</span>, [<span class="hljs-string">"pending"</span>, <span class="hljs-string">"done"</span>, <span class="hljs-string">"error"</span>])
     })
-    .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
+    .actions(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
         fetchProjects() {
             self.githubProjects = []
             self.state = <span class="hljs-string">"pending"</span>
@@ -131,8 +132,7 @@ For example:</p>
             <span class="hljs-built_in">console</span>.error(<span class="hljs-string">"Failed to fetch projects"</span>, error)
             self.state = <span class="hljs-string">"error"</span>
         }
-    }
-))
+    }))
 </code></pre>
 <p>This approach works fine and has great type inference, but comes with a few downsides:</p>
 <ol>
@@ -144,12 +144,14 @@ For example:</p>
 <p>Generators might sound scary, but they are very suitable for expressing asynchronous flows. The above example looks as follows when using generators:</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { flow } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-state-tree"</span>
 
-<span class="hljs-keyword">const</span> Store = types.model({
+<span class="hljs-keyword">const</span> Store = types
+    .model({
         <span class="hljs-attr">githubProjects</span>: types.array(types.frozen),
         <span class="hljs-attr">state</span>: types.enumeration(<span class="hljs-string">"State"</span>, [<span class="hljs-string">"pending"</span>, <span class="hljs-string">"done"</span>, <span class="hljs-string">"error"</span>])
     })
-    .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
-        <span class="hljs-attr">fetchProjects</span>: flow(<span class="hljs-function"><span class="hljs-keyword">function</span>* <span class="hljs-title">fetchProjects</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-comment">// &lt;- note the star, this a generator function!</span>
+    .actions(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
+        <span class="hljs-attr">fetchProjects</span>: flow(<span class="hljs-function"><span class="hljs-keyword">function</span>* <span class="hljs-title">fetchProjects</span>(<span class="hljs-params"></span>) </span>{
+            <span class="hljs-comment">// &lt;- note the star, this a generator function!</span>
             self.githubProjects = []
             self.state = <span class="hljs-string">"pending"</span>
             <span class="hljs-keyword">try</span> {
@@ -187,13 +189,13 @@ Middleware (see below) can implement specific behavior for asynchronous actions.
 For example, the <code>onAction</code> middleware will only record starting asynchronous flows, but not any async steps that are taking during the flow.
 After all, when replaying the invocation will lead to the other steps being executed automatically.
 Besides that, each step in the generator is allowed to modify its own instance, and there is no need to expose the individual flow steps as actions.</p>
-<p>See the <a href="https://github.com/mobxjs/mobx-state-tree/blob/5a4bd43ac874cddbf91b40eeef20043198477084/packages/mst-example-bookshop/src/stores/BookStore.js#L25">bookshop example sources</a> for a more extensive example.</p>
+<p>See the <a href="https://github.com/coolsoftwaretyler/mst-example-bookshop/blob/main/src/stores/BookStore.js#L25">bookshop example sources</a> for a more extensive example.</p>
 <p>Using generators requires Promises and generators to be available. Promises can easily be polyfilled although they tend to be available on every modern JS environment. Generators are well supported as well, and both TypeScript and Babel can compile generators to ES5.</p>
 <p>To see how <code>flows</code>s can be monitored and detected in middleware, see the <a href="/concepts/middleware">middleware docs</a>.</p>
 <h2><a class="anchor" aria-hidden="true" id="what-about-async-await"></a><a href="#what-about-async-await" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>What about async / await?</h2>
 <p>Async/await can only be used in trees that are unprotected. Async / await is not flexible enough to allow MST to wrap asynchronous steps in actions automatically, as is done for the generator functions.
 Luckily, using generators in combination with <code>flow</code> is very similar to <code>async / await</code>: <code>async function() {}</code> becomes <code>flow(function* () {})</code>, and <code>await promise</code> becomes <code>yield promise</code>, and further behavior should be the same.</p>
-</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/concepts/references"><span class="arrow-prev">← </span><span>Identifiers and references</span></a><a class="docs-next button" href="/concepts/patches"><span>Patches</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#using-separate-actions">Using separate actions</a></li><li><a href="#using-generators">Using generators</a></li><li><a href="#what-about-async-await">What about async / await?</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="MobX-state-tree" width="66" height="58"/></a><div><h5>Docs</h5><a href="/intro/getting-started">Getting Started</a><a href="/concepts/trees">Basic concepts</a><a href="/concepts/patches">Advanced concepts</a><a href="/overview/types">API Reference</a></div><div><h5>Community</h5><a href="https://github.com/mobxjs/mobx-state-tree/discussions" target="_blank" rel="noreferrer noopener">GitHub Discussions</a><a href="https://stackoverflow.com/questions/tagged/mobx-state-tree" target="_blank" rel="noreferrer noopener">Stack Overflow</a></div><div><h5>More</h5><a href="/blog">Blog</a><a href="https://github.com/mobxjs/mobx-state-tree">GitHub</a><a class="github-button" href="https://github.com/mobxjs/mobx-state-tree" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2021 Michel Weststrate</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/concepts/references"><span class="arrow-prev">← </span><span>Identifiers and references</span></a><a class="docs-next button" href="/concepts/patches"><span>Patches</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#using-separate-actions">Using separate actions</a></li><li><a href="#using-generators">Using generators</a></li><li><a href="#what-about-async-await">What about async / await?</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="MobX-state-tree" width="66" height="58"/></a><div><h5>Docs</h5><a href="/intro/getting-started">Getting Started</a><a href="/concepts/trees">Basic concepts</a><a href="/concepts/patches">Advanced concepts</a><a href="/overview/types">API Reference</a></div><div><h5>Community</h5><a href="https://github.com/mobxjs/mobx-state-tree/discussions" target="_blank" rel="noreferrer noopener">GitHub Discussions</a><a href="https://stackoverflow.com/questions/tagged/mobx-state-tree" target="_blank" rel="noreferrer noopener">Stack Overflow</a></div><div><h5>More</h5><a href="/blog">Blog</a><a href="https://github.com/mobxjs/mobx-state-tree">GitHub</a><a class="github-button" href="https://github.com/mobxjs/mobx-state-tree" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2023 Michel Weststrate</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
                     return;
