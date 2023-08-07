@@ -554,7 +554,8 @@ export class ModelType<
     }
 
     createNewInstance(childNodes: IChildNodesMap): this["T"] {
-        return observable.object(childNodes, EMPTY_OBJECT, mobxShallow) as any
+        const options = { ...mobxShallow, name: this.describe() }
+        return observable.object(childNodes, EMPTY_OBJECT, options) as any
     }
 
     finalizeNewInstance(node: this["N"], instance: this["T"]): void {
@@ -737,7 +738,9 @@ export function model<P extends ModelPropertiesDeclaration = {}>(
  */
 export function model(...args: any[]): any {
     if (devMode() && typeof args[0] !== "string" && args[1]) {
-        throw fail("Model creation failed. First argument must be a string when two arguments are provided")
+        throw fail(
+            "Model creation failed. First argument must be a string when two arguments are provided"
+        )
     }
 
     const name = typeof args[0] === "string" ? args.shift() : "AnonymousModel"

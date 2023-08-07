@@ -118,6 +118,7 @@ const TYPES = stringToArray(`
     identifier,
     identifierNumber,
     late,
+    lazy,
     undefined,
     null,
     snapshotProcessor

@@ -140,8 +140,11 @@ export enum MapIdentifierMode {
 }
 
 class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
-    constructor(initialData?: [string, any][] | IKeyValueMap<any> | Map<string, any> | undefined) {
-        super(initialData, (observable.ref as any).enhancer)
+    constructor(
+        initialData?: [string, any][] | IKeyValueMap<any> | Map<string, any> | undefined,
+        name?: string
+    ) {
+        super(initialData, (observable.ref as any).enhancer, name)
     }
 
     get(key: string): IT["Type"] | undefined {
@@ -248,15 +251,18 @@ export class MapType<IT extends IAnyType> extends ComplexType<
 
         const modelTypes: IAnyModelType[] = []
         if (tryCollectModelTypes(this._subType, modelTypes)) {
-            const identifierAttribute: string | undefined = modelTypes.reduce((current: IAnyModelType["identifierAttribute"], type) => {
-                if (!type.identifierAttribute) return current
-                if (current && current !== type.identifierAttribute) {
-                    throw fail(
-                        `The objects in a map should all have the same identifier attribute, expected '${current}', but child of type '${type.name}' declared attribute '${type.identifierAttribute}' as identifier`
-                    )
-                }
-                return type.identifierAttribute
-            }, undefined as IAnyModelType["identifierAttribute"])
+            const identifierAttribute: string | undefined = modelTypes.reduce(
+                (current: IAnyModelType["identifierAttribute"], type) => {
+                    if (!type.identifierAttribute) return current
+                    if (current && current !== type.identifierAttribute) {
+                        throw fail(
+                            `The objects in a map should all have the same identifier attribute, expected '${current}', but child of type '${type.name}' declared attribute '${type.identifierAttribute}' as identifier`
+                        )
+                    }
+                    return type.identifierAttribute
+                },
+                undefined as IAnyModelType["identifierAttribute"]
+            )
 
             if (identifierAttribute) {
                 this.identifierMode = MapIdentifierMode.YES
@@ -278,7 +284,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     }
 
     createNewInstance(childNodes: IChildNodesMap): this["T"] {
-        return new MSTMap(childNodes) as any
+        return new MSTMap(childNodes, this.describe()) as any
     }
 
     finalizeNewInstance(node: this["N"], instance: ObservableMap<string, any>): void {
@@ -286,7 +292,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
 
         const type = node.type as this
         type.hookInitializers.forEach((initializer) => {
-            const hooks = initializer((instance as unknown) as IMSTMap<IT>)
+            const hooks = initializer(instance as unknown as IMSTMap<IT>)
             Object.keys(hooks).forEach((name) => {
                 const hook = hooks[name as keyof typeof hooks]!
                 const actionInvoker = createActionInvoker(instance as IAnyStateTreeNode, name, hook)

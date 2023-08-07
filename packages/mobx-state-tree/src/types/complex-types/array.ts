@@ -122,7 +122,8 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     }
 
     createNewInstance(childNodes: IChildNodesMap): this["T"] {
-        return observable.array(convertChildNodesToArray(childNodes), mobxShallow) as this["T"]
+        const options = { ...mobxShallow, name: this.describe() }
+        return observable.array(convertChildNodesToArray(childNodes), options) as this["T"]
     }
 
     finalizeNewInstance(node: this["N"], instance: this["T"]): void {
