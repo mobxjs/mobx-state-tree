@@ -185,4 +185,29 @@ describe("Edge case behavior", () => {
             })
         })
     })
+
+    describe("When a model has duplicate key in actions or views", () => {
+        test("it should show friendly message", () => {
+            const UserModel = types
+                .model("UserModel", {
+                    id: types.identifier,
+                    name: types.string
+                })
+                .views((user) => ({
+                    // if you change this view's name, the error
+                    // will go away
+                    get name() {
+                        return user.name
+                    }
+                }))
+
+            const myUser = UserModel.create({
+                id: "jamon",
+                name: "Jamon Holmgren"
+            })
+
+            expect(myUser.id).toBe("jamon")
+            expect(myUser.name).toBe("Jamon Holmgren")
+        })
+    })
 })
