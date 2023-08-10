@@ -38,6 +38,8 @@ Note that since MST v3 `types.array` and `types.map` are wrapped in `types.optio
 -   [`types.string`](/API/#const-string)
 -   [`types.number`](/API/#const-number)
 -   [`types.integer`](/API/#const-integer)
+-   [`types.float`](/API/#const-float)
+-   [`types.finite`](/API/#const-finite)
 -   [`types.boolean`](/API/#const-boolean)
 -   [`types.Date`](/API/#const-dateprimitive)
 -   [`types.custom`](/API/#custom) creates a custom primitive type. This is useful to define your own types that map a serialized form one-to-one to an immutable object like a Decimal or Date.
@@ -92,4 +94,3 @@ Property types can only be used as a direct member of a `types.model` type and n
 
 -   [`types.identifier`](/API/#const-identifier) Only one such member can exist in a `types.model` and should uniquely identify the object. See [identifiers](/concepts/references#identifiers) for more details.
 -   [`types.identifierNumber`](/API/#const-identifiernumber) Similar to `types.identifier`. However, during serialization, the identifier value will be parsed from / serialized to a number.
-
