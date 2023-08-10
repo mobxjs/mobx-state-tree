@@ -109,6 +109,8 @@ const TYPES = stringToArray(`
     boolean,
     number,
     integer,
+    float,
+    finite,
     Date,
     map,
     array,

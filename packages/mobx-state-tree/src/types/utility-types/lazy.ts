@@ -24,7 +24,7 @@ export function lazy<T extends IType<any, any, any>, U>(
     options: LazyOptions<T, U>
 ): T {
     // TODO: fix this unknown casting to be stricter
-    return (new Lazy(name, options) as unknown) as T
+    return new Lazy(name, options) as unknown as T
 }
 
 /**

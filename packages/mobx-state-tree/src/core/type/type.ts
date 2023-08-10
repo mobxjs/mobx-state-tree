@@ -50,7 +50,9 @@ export enum TypeFlags {
     Integer = 1 << 17,
     Custom = 1 << 18,
     SnapshotProcessor = 1 << 19,
-    Lazy = 1 << 20
+    Lazy = 1 << 20,
+    Finite = 1 << 21,
+    Float = 1 << 22
 }
 
 /**

@@ -738,7 +738,9 @@ export function model<P extends ModelPropertiesDeclaration = {}>(
  */
 export function model(...args: any[]): any {
     if (devMode() && typeof args[0] !== "string" && args[1]) {
-        throw fail("Model creation failed. First argument must be a string when two arguments are provided")
+        throw fail(
+            "Model creation failed. First argument must be a string when two arguments are provided"
+        )
     }
 
     const name = typeof args[0] === "string" ? args.shift() : "AnonymousModel"

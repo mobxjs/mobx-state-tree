@@ -65,6 +65,8 @@ sidebar_label: "Globals"
 * [identifier](index.md#const-identifier)
 * [identifierNumber](index.md#const-identifiernumber)
 * [integer](index.md#const-integer)
+* [float](index.md#const-float)
+* [finite](index.md#const-finite)
 * [nullType](index.md#const-nulltype)
 * [number](index.md#const-number)
 * [string](index.md#const-string)
@@ -510,6 +512,52 @@ Example:
 ```ts
 const Size = types.model({
   width: types.integer,
+  height: 10
+})
+```
+
+___
+
+### `Const` float
+
+• **float**: *[ISimpleType](interfaces/isimpletype.md)‹number›* =  new CoreType<number, number, number>(
+    "float",
+    TypeFlags.Float,
+    (v) => isFloat(v)
+)
+
+*Defined in [packages/mobx-state-tree/src/types/primitives.ts:113](https://github.com/mobxjs/mobx-state-tree/blob/62e7e8ba/packages/mobx-state-tree/src/types/primitives.ts#L121)*
+
+`types.float` - Creates a type that can only contain an float value.
+This type is used for float values by default
+
+Example:
+```ts
+const Size = types.model({
+  width: types.float,
+  height: 10
+})
+```
+
+___
+
+### `Const` finite
+
+• **finite**: *[ISimpleType](interfaces/isimpletype.md)‹number›* =  new CoreType<number, number, number>(
+    "finite",
+    TypeFlags.Finite,
+    (v) => isFinite(v)
+)
+
+*Defined in [packages/mobx-state-tree/src/types/primitives.ts:113](https://github.com/mobxjs/mobx-state-tree/blob/62e7e8ba/packages/mobx-state-tree/src/types/primitives.ts#L140)*
+
+`types.finite` - Creates a type that can only contain an finite value.
+This type is used for finite values by default
+
+Example:
+```ts
+const Size = types.model({
+  width: types.finite,
   height: 10
 })
 ```
@@ -3492,63 +3540,64 @@ ___
 
 ###  lazy
 
-▸ **lazy**<**T**, **U**>({`loadType`: function, `shouldLoadPredicate`: function}): *T*
+ ▸ **lazy**<**T**, **U**>({`loadType`: function, `shouldLoadPredicate`: function}): *T*
 
-*Defined in [packages/mobx-state-tree/src/types/utility-types/lazy.ts:103](https://github.com/mobxjs/mobx-state-tree/blob/126ab41a/packages/mobx-state-tree/src/types/utility-types/lazy.ts#L103)*
+ *Defined in [packages/mobx-state-tree/src/types/utility-types/lazy.ts:103](https://github.com/mobxjs/mobx-state-tree/blob/126ab41a/packages/mobx-state-tree/src/types/utility-types/lazy.ts#L103)*
 
-`types.lazy` - Defines a type that is loaded at a later date, this can be done as a promise and can be useful when trying to code split your stores.
+ `types.lazy` - Defines a type that is loaded at a later date, this can be done as a promise and can be useful when trying to code split your stores.
 
-Example:
-```ts
+ Example:
+ ```ts
 
-interface IRootModel {
-    shouldLoad: boolean
-}
+ interface IRootModel {
+     shouldLoad: boolean
+ }
 
-const LazyModel = types
-        .model("LazyModel", {
-            width: types.number,
-            height: types.number
-        })
-        .views((self) => ({
-            get area() {
-                return self.height * self.width
-            }
-        }))
+ const LazyModel = types
+         .model("LazyModel", {
+             width: types.number,
+             height: types.number
+         })
+         .views((self) => ({
+             get area() {
+                 return self.height * self.width
+             }
+         }))
 
- const Root = types
-        .model("Root", {
-            shouldLoad: types.optional(types.boolean, false),
-            lazyModel: types.lazy<typeof LazyModel, IRootModel>("lazy", {
-                loadType: () => Promise.resolve(LazyModel),
-                shouldLoadPredicate: (parent) => parent.shouldLoad == true
-            })
-        })
-```
+  const Root = types
+         .model("Root", {
+             shouldLoad: types.optional(types.boolean, false),
+             lazyModel: types.lazy<typeof LazyModel, IRootModel>("lazy", {
+                 loadType: () => Promise.resolve(LazyModel),
+                 shouldLoadPredicate: (parent) => parent.shouldLoad == true
+             })
+         })
+ ```
 
-**Type parameters:**
+ **Type parameters:**
 
-▪ **T**: *[IAnyType](interfaces/ianytype.md)*
+ ▪ **T**: *[IAnyType](interfaces/ianytype.md)*
 
-▪ **U**: Generic interface for the properties of the parent model
+ ▪ **U**: Generic interface for the properties of the parent model
 
-**Parameters:**
+ **Parameters:**
 
-▪ **loadType**: *function*
+ ▪ **loadType**: *function*
 
-A function that returns a promise, which resolves to the **T** type.
+ A function that returns a promise, which resolves to the **T** type.
 
-▸ (): Promise<*T*>
+ ▸ (): Promise<*T*>
 
-▪ **shouldLoadPredicate**: *function*
+ ▪ **shouldLoadPredicate**: *function*
 
-This is a function that when its resolution is **true** will invoke the **loadType** function.
+ This is a function that when its resolution is **true** will invoke the **loadType** function.
 
-▸ (): boolean
+ ▸ (): boolean
 
-**Returns:** *T*
+ **Returns:** *T*
 
-___
+ ___
+
 ###  literal
 
 ▸ **literal**<**S**>(`value`: S): *[ISimpleType](interfaces/isimpletype.md)‹S›*
