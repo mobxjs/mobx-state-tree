@@ -101,7 +101,6 @@ export const number: ISimpleType<number> = new CoreType<number, number, number>(
 
 /**
  * `types.integer` - Creates a type that can only contain an integer value.
- * This type is used for integer values by default
  *
  * Example:
  * ```ts
@@ -120,7 +119,6 @@ export const integer: ISimpleType<number> = new CoreType<number, number, number>
 
 /**
  * `types.float` - Creates a type that can only contain an float value.
- * This type is used for float values by default
  *
  * Example:
  * ```ts
@@ -139,7 +137,6 @@ export const float: ISimpleType<number> = new CoreType<number, number, number>(
 
 /**
  * `types.finite` - Creates a type that can only contain an finite value.
- * This type is used for finite values by default
  *
  * Example:
  * ```ts
