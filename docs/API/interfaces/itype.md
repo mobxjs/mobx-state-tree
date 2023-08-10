@@ -4,7 +4,7 @@ title: "IType"
 sidebar_label: "IType"
 ---
 
-[mobx-state-tree - v5.1.8](../index.md) › [IType](itype.md)
+[mobx-state-tree - v5.2.0-alpha.1](../index.md) › [IType](itype.md)
 
 A type, either complex or simple.
 
@@ -50,7 +50,7 @@ A type, either complex or simple.
 
 • **identifierAttribute**? : *undefined | string*
 
-*Defined in [packages/mobx-state-tree/src/core/type/type.ts:86](https://github.com/mobxjs/mobx-state-tree/blob/62e7e8ba/packages/mobx-state-tree/src/core/type/type.ts#L86)*
+*Defined in [packages/mobx-state-tree/src/core/type/type.ts:89](https://github.com/mobxjs/mobx-state-tree/blob/bac4349d/packages/mobx-state-tree/src/core/type/type.ts#L89)*
 
 Name of the identifier attribute or null if none.
 
@@ -60,7 +60,7 @@ ___
 
 • **name**: *string*
 
-*Defined in [packages/mobx-state-tree/src/core/type/type.ts:81](https://github.com/mobxjs/mobx-state-tree/blob/62e7e8ba/packages/mobx-state-tree/src/core/type/type.ts#L81)*
+*Defined in [packages/mobx-state-tree/src/core/type/type.ts:84](https://github.com/mobxjs/mobx-state-tree/blob/bac4349d/packages/mobx-state-tree/src/core/type/type.ts#L84)*
 
 Friendly type name.
 
@@ -70,7 +70,7 @@ Friendly type name.
 
 ▸ **create**(`snapshot?`: [C](undefined), `env?`: any): *this["Type"]*
 
-*Defined in [packages/mobx-state-tree/src/core/type/type.ts:93](https://github.com/mobxjs/mobx-state-tree/blob/62e7e8ba/packages/mobx-state-tree/src/core/type/type.ts#L93)*
+*Defined in [packages/mobx-state-tree/src/core/type/type.ts:96](https://github.com/mobxjs/mobx-state-tree/blob/bac4349d/packages/mobx-state-tree/src/core/type/type.ts#L96)*
 
 Creates an instance for the type given an snapshot input.
 
@@ -91,7 +91,7 @@ ___
 
 ▸ **describe**(): *string*
 
-*Defined in [packages/mobx-state-tree/src/core/type/type.ts:115](https://github.com/mobxjs/mobx-state-tree/blob/62e7e8ba/packages/mobx-state-tree/src/core/type/type.ts#L115)*
+*Defined in [packages/mobx-state-tree/src/core/type/type.ts:118](https://github.com/mobxjs/mobx-state-tree/blob/bac4349d/packages/mobx-state-tree/src/core/type/type.ts#L118)*
 
 Gets the textual representation of the type as a string.
 
@@ -103,7 +103,7 @@ ___
 
 ▸ **is**(`thing`: any): *thing is C | this["Type"]*
 
-*Defined in [packages/mobx-state-tree/src/core/type/type.ts:101](https://github.com/mobxjs/mobx-state-tree/blob/62e7e8ba/packages/mobx-state-tree/src/core/type/type.ts#L101)*
+*Defined in [packages/mobx-state-tree/src/core/type/type.ts:104](https://github.com/mobxjs/mobx-state-tree/blob/bac4349d/packages/mobx-state-tree/src/core/type/type.ts#L104)*
 
 Checks if a given snapshot / instance is of the given type.
 
@@ -123,7 +123,7 @@ ___
 
 ▸ **validate**(`thing`: C, `context`: [IValidationContext](../index.md#ivalidationcontext)): *[IValidationResult](../index.md#ivalidationresult)*
 
-*Defined in [packages/mobx-state-tree/src/core/type/type.ts:110](https://github.com/mobxjs/mobx-state-tree/blob/62e7e8ba/packages/mobx-state-tree/src/core/type/type.ts#L110)*
+*Defined in [packages/mobx-state-tree/src/core/type/type.ts:113](https://github.com/mobxjs/mobx-state-tree/blob/bac4349d/packages/mobx-state-tree/src/core/type/type.ts#L113)*
 
 Run's the type's typechecker on the given value with the given validation context.
 
