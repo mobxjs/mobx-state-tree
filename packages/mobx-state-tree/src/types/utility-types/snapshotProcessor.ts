@@ -59,7 +59,10 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
         return `snapshotProcessor(${this._subtype.describe()})`
     }
 
-    private preProcessSnapshot(sn: this["C"], parent: AnyObjectNode | null): IT["CreationType"] {
+    private preProcessSnapshot(
+        sn: this["C"],
+        parent: AnyObjectNode | null = null
+    ): IT["CreationType"] {
         if (this._processors.preProcessor) {
             return this._processors.preProcessor.call(null, sn, parent)
         }
@@ -87,7 +90,10 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
 
         const oldGetSnapshot = node.getSnapshot
         node.getSnapshot = () => {
-            return this.postProcessSnapshot(oldGetSnapshot.call(node), node.parent ? node.parent.storedValue : null) as any
+            return this.postProcessSnapshot(
+                oldGetSnapshot.call(node),
+                node.parent ? node.parent.storedValue : null
+            ) as any
         }
 
         if (!isUnionType(this._subtype)) {
@@ -136,7 +142,9 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
 
     getSnapshot(node: this["N"], applyPostProcess: boolean = true): this["S"] {
         const sn = this._subtype.getSnapshot(node)
-        return applyPostProcess ? this.postProcessSnapshot(sn, node.parent ? node.parent.storedValue : null) : sn
+        return applyPostProcess
+            ? this.postProcessSnapshot(sn, node.parent ? node.parent.storedValue : null)
+            : sn
     }
 
     isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
@@ -171,7 +179,10 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
         if (!(this._subtype instanceof ComplexType)) {
             return false
         }
-        const processedSn = this.preProcessSnapshot(snapshot, current.parent ? current.parent.storedValue : null)
+        const processedSn = this.preProcessSnapshot(
+            snapshot,
+            current.parent ? current.parent.storedValue : null
+        )
         return this._subtype.isMatchingSnapshotId(current as any, processedSn)
     }
 }
