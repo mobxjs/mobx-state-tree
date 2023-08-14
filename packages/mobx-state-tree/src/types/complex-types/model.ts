@@ -639,15 +639,16 @@ export class ModelType<
 
     getSnapshot(node: this["N"], applyPostProcess = true): this["S"] {
         const res = {} as any
-        try {
-            this.forAllProps((name, type) => {
+        this.forAllProps((name, type) => {
+            try {
                 // TODO: FIXME, make sure the observable ref is used!
-                ;(getAtom(node.storedValue, name) as any).reportObserved()
-                res[name] = this.getChildNode(node, name).snapshot
-            })
-        } catch (error) {
-            console.log({ error })
-        }
+                const atom = getAtom(node.storedValue, name)
+                ;(atom as any).reportObserved()
+            } catch (e) {
+                throw fail(`${name} property is declared twice`)
+            }
+            res[name] = this.getChildNode(node, name).snapshot
+        })
         if (applyPostProcess) {
             return this.applySnapshotPostProcessor(res)
         }

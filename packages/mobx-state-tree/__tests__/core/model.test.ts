@@ -194,20 +194,17 @@ describe("Edge case behavior", () => {
                     name: types.string
                 })
                 .views((user) => ({
-                    // if you change this view's name, the error
-                    // will go away
                     get name() {
                         return user.name
                     }
                 }))
 
-            const myUser = UserModel.create({
-                id: "jamon",
-                name: "Jamon Holmgren"
-            })
-
-            expect(myUser.id).toBe("jamon")
-            expect(myUser.name).toBe("Jamon Holmgren")
+            expect(() =>
+                UserModel.create({
+                    id: "chakri",
+                    name: "Subramanya Chakravarthy"
+                })
+            ).toThrow("[mobx-state-tree] name property is declared twice")
         })
     })
 })
