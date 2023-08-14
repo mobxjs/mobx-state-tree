@@ -13,10 +13,11 @@ import {
     BaseType,
     assertIsType,
     ExtractCSTWithSTN,
-    devMode
+    devMode,
+    IAnyStateTreeNode
 } from "../../internal"
 
-type IFunctionReturn<T> = (parent: AnyObjectNode | null) => T
+type IFunctionReturn<T> = (parent: IAnyStateTreeNode | null) => T
 
 type IOptionalValue<C, T> = C | IFunctionReturn<C | T>
 
@@ -91,7 +92,9 @@ export class OptionalValue<
     getDefaultInstanceOrSnapshot(parent: AnyObjectNode | null): this["C"] | this["T"] {
         const defaultInstanceOrSnapshot =
             typeof this._defaultValue === "function"
-                ? (this._defaultValue as IFunctionReturn<this["C"] | this["T"]>)(parent)
+                ? (this._defaultValue as IFunctionReturn<this["C"] | this["T"]>)(
+                      parent && parent.storedValue
+                  )
                 : this._defaultValue
 
         // while static values are already snapshots and checked on types.optional
