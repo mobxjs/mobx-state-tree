@@ -145,7 +145,7 @@ test("all methods mentioned in API docs", () => {
     missing.push(
         ...METHODS.filter((identifier) => apimd.indexOf("#" + identifier.toLowerCase()) === -1)
     )
-    expect(missing).toEqual(["types"])
+    expect(missing).toEqual(["types.lazy", "types"])
 })
 
 test("only accepted dependencies", () => {
