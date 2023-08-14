@@ -25,7 +25,7 @@ sidebar_label: "IModelReflectionPropertiesData"
 
 • **name**: *string*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:804](https://github.com/mobxjs/mobx-state-tree/blob/8be2235d/packages/mobx-state-tree/src/core/mst-operations.ts#L804)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:804](https://github.com/mobxjs/mobx-state-tree/blob/1cec2e71/packages/mobx-state-tree/src/core/mst-operations.ts#L804)*
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 • **properties**: *object*
 
-*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:805](https://github.com/mobxjs/mobx-state-tree/blob/8be2235d/packages/mobx-state-tree/src/core/mst-operations.ts#L805)*
+*Defined in [packages/mobx-state-tree/src/core/mst-operations.ts:805](https://github.com/mobxjs/mobx-state-tree/blob/1cec2e71/packages/mobx-state-tree/src/core/mst-operations.ts#L805)*
 
 #### Type declaration:
 
