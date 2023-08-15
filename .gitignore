@@ -11,3 +11,4 @@ package-lock.json
 .editorconfig
 /test-results/**/*.xml
 /website/build
+.DS_Store
