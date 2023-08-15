@@ -374,27 +374,6 @@ describe("Model properties objects", () => {
         })
     })
     describe("when a user defines a property using a function", () => {
-        // if (process.env.NODE_ENV === "production") {
-        //     test("it sets the default value to undefined in production", () => {
-        //         // @ts-ignore
-        //         const Model = types.model({
-        //             foo: () => "bar"
-        //         })
-
-        //         const modelSnapshot = getSnapshot(Model.create())
-        //         expect(modelSnapshot).toEqual({
-        //             foo: undefined
-        //         })
-        //     })
-        //     test("it does not throw an error in production", () => {
-        //         expect(() => {
-        //             // @ts-ignore
-        //             types.model({
-        //                 foo: () => "bar"
-        //             })
-        //         }).not.toThrow()
-        //     })
-        // }
         if (process.env.NODE_ENV !== "production") {
             test("it throws an error when not in production", () => {
                 expect(() => {
@@ -409,29 +388,6 @@ describe("Model properties objects", () => {
         }
     })
     describe("when a user defins a property using a plain JavaScript object", () => {
-        // test("it sets the default value to undefined in production", () => {
-        //     if (process.env.NODE_ENV === "production") {
-        //         // @ts-ignore
-        //         const Model = types.model({
-        //             foo: {}
-        //         })
-
-        //         const modelSnapshot = getSnapshot(Model.create())
-        //         expect(modelSnapshot).toEqual({
-        //             foo: undefined
-        //         })
-        //     }
-        // })
-        // if (process.env.NODE_ENV === "production") {
-        //     test("it does not throw an error in production", () => {
-        //         expect(() => {
-        //             // @ts-ignore
-        //             types.model({
-        //                 foo: {}
-        //             })
-        //         }).not.toThrow()
-        //     })
-        // }
         if (process.env.NODE_ENV !== "production") {
             test("it throws an error when not in production", () => {
                 expect(() => {
