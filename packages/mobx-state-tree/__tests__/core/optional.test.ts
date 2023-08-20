@@ -146,3 +146,27 @@ test("undefined can work as a missing value", () => {
     const m3 = M.create({}) // is ok as well (even in TS)
     expect(m3.x).toBe(undefined)
 })
+
+test("optional can access parent state", () => {
+    const TodoModel = types.model({
+        id: types.identifier,
+        name: types.string,
+        // @ts-ignore
+        priority: types.optional(types.string, (snapshot) => {
+            console.log({ snapshot })
+            if (snapshot) {
+                if (snapshot.name.toLowerCase().includes("today")) {
+                    return "High"
+                }
+            }
+            return ""
+        })
+    })
+
+    const todo1 = TodoModel.create({
+        id: "1",
+        name: "Learn MobX Today"
+    })
+    console.log({ todo: getSnapshot(todo1) })
+    expect(todo1.id).toBe("1")
+})
