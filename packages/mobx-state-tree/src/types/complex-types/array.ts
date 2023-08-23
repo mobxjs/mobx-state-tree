@@ -122,7 +122,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     }
 
     createNewInstance(childNodes: IChildNodesMap): this["T"] {
-        const options = { ...mobxShallow, name: this.describe() }
+        const options = { ...mobxShallow, name: this.name }
         return observable.array(convertChildNodesToArray(childNodes), options) as this["T"]
     }
 
@@ -336,8 +336,7 @@ ArrayType.prototype.applySnapshot = action(ArrayType.prototype.applySnapshot)
  */
 export function array<IT extends IAnyType>(subtype: IT): IArrayType<IT> {
     assertIsType(subtype, 1)
-
-    return new ArrayType<IT>(subtype.name + "[]", subtype)
+    return new ArrayType<IT>(`Array<${subtype.name}>`, subtype)
 }
 
 function reconcileArrayChildren<TT>(
