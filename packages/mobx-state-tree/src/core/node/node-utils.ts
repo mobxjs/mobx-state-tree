@@ -158,46 +158,43 @@ export function resolveNodeByPathParts(
     failIfResolveFails: boolean = true
 ): AnyNode | undefined {
     let current: AnyNode | null = base
-
-    for (let i = 0; i < pathParts.length; i++) {
-        const part = pathParts[i]
-        if (part === "..") {
-            current = current!.parent
-            if (current) continue // not everything has a parent
-        } else if (part === ".") {
-            continue
-        } else if (current) {
-            if (current instanceof ScalarNode) {
-                // check if the value of a scalar resolves to a state tree node (e.g. references)
-                // then we can continue resolving...
-                try {
+    try {
+        for (let i = 0; i < pathParts.length; i++) {
+            const part = pathParts[i]
+            if (part === "..") {
+                current = current!.parent
+                if (current) continue // not everything has a parent
+            } else if (part === ".") {
+                continue
+            } else if (current) {
+                if (current instanceof ScalarNode) {
+                    // check if the value of a scalar resolves to a state tree node (e.g. references)
+                    // then we can continue resolving...
                     const value: any = current.value
                     if (isStateTreeNode(value)) {
                         current = getStateTreeNode(value)
                         // fall through
                     }
-                } catch (e) {
-                    if (!failIfResolveFails) {
-                        return undefined
+                }
+                if (current instanceof ObjectNode) {
+                    const subType = current.getChildType(part)
+                    if (subType) {
+                        current = current.getChildNode(part)
+                        if (current) continue
                     }
-                    throw e
                 }
-            }
-            if (current instanceof ObjectNode) {
-                const subType = current.getChildType(part)
-                if (subType) {
-                    current = current.getChildNode(part)
-                    if (current) continue
-                }
+            } else {
+                throw fail(
+                    `Could not resolve '${part}' in path '${joinJsonPath(pathParts.slice(0, i)) || "/"
+                    }' while resolving '${joinJsonPath(pathParts)}'`
+                )
             }
         }
-        if (failIfResolveFails)
-            throw fail(
-                `Could not resolve '${part}' in path '${
-                    joinJsonPath(pathParts.slice(0, i)) || "/"
-                }' while resolving '${joinJsonPath(pathParts)}'`
-            )
-        else return undefined
+    } catch (e) {
+        if (!failIfResolveFails) {
+            return undefined
+        }
+        throw e
     }
     return current!
 }
