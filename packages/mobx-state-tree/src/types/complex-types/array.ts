@@ -336,7 +336,7 @@ ArrayType.prototype.applySnapshot = action(ArrayType.prototype.applySnapshot)
  */
 export function array<IT extends IAnyType>(subtype: IT): IArrayType<IT> {
     assertIsType(subtype, 1)
-    return new ArrayType<IT>(`Array<${subtype.name}>`, subtype)
+    return new ArrayType<IT>(`${subtype.name}[]`, subtype)
 }
 
 function reconcileArrayChildren<TT>(

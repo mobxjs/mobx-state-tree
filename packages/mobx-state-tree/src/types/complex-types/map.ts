@@ -508,7 +508,7 @@ MapType.prototype.applySnapshot = action(MapType.prototype.applySnapshot)
  * @returns
  */
 export function map<IT extends IAnyType>(subtype: IT): IMapType<IT> {
-    return new MapType<IT>(`Map<string, ${subtype.name}>`, subtype)
+    return new MapType<IT>(`map<string, ${subtype.name}>`, subtype)
 }
 
 /**

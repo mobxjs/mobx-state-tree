@@ -9,6 +9,6 @@ test("it should have a debug name", () => {
     const map = types.map(Model).create()
 
     expect(getDebugName(model)).toBe("Name")
-    expect(getDebugName(array)).toBe("Array<Name>")
-    expect(getDebugName(map)).toBe("Map<string, Name>")
+    expect(getDebugName(array)).toBe("Name[]")
+    expect(getDebugName(map)).toBe("map<string, Name>")
 })
