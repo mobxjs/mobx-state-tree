@@ -148,7 +148,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     }
 
     describe() {
-        return this._subType.describe() + "[]"
+        return this.name
     }
 
     getChildren(node: this["N"]): AnyNode[] {

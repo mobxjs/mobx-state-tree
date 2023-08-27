@@ -10,5 +10,5 @@ test("it should have a debug name", () => {
 
     expect(getDebugName(model)).toBe("Name")
     expect(getDebugName(array)).toBe("Name[]")
-    expect(getDebugName(map)).toBe("map<string, Name>")
+    expect(getDebugName(map)).toBe("Map<string, Name>")
 })
