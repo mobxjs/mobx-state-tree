@@ -183,14 +183,15 @@ export function resolveNodeByPathParts(
                         if (current) continue
                     }
                 }
-            } else {
-                throw fail(
-                    `Could not resolve '${part}' in path '${joinJsonPath(pathParts.slice(0, i)) || "/"
-                    }' while resolving '${joinJsonPath(pathParts)}'`
-                )
             }
+            throw fail(
+                `Could not resolve '${part}' in path '${
+                    joinJsonPath(pathParts.slice(0, i)) || "/"
+                }' while resolving '${joinJsonPath(pathParts)}'`
+            )
         }
     } catch (e) {
+        console.log("error?", e)
         if (!failIfResolveFails) {
             return undefined
         }
