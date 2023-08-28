@@ -4,7 +4,7 @@ title: "IActionTrackingMiddleware2Hooks"
 sidebar_label: "IActionTrackingMiddleware2Hooks"
 ---
 
-[mobx-state-tree - v5.2.0-alpha.1](../index.md) › [IActionTrackingMiddleware2Hooks](iactiontrackingmiddleware2hooks.md)
+[mobx-state-tree - v5.2.0-alpha.2](../index.md) › [IActionTrackingMiddleware2Hooks](iactiontrackingmiddleware2hooks.md)
 
 ## Type parameters
 
@@ -28,7 +28,7 @@ sidebar_label: "IActionTrackingMiddleware2Hooks"
 
 • **filter**? : *undefined | function*
 
-*Defined in [packages/mobx-state-tree/src/middlewares/createActionTrackingMiddleware2.ts:11](https://github.com/mobxjs/mobx-state-tree/blob/1cec2e71/packages/mobx-state-tree/src/middlewares/createActionTrackingMiddleware2.ts#L11)*
+*Defined in [packages/mobx-state-tree/src/middlewares/createActionTrackingMiddleware2.ts:11](https://github.com/mobxjs/mobx-state-tree/blob/9757a738/packages/mobx-state-tree/src/middlewares/createActionTrackingMiddleware2.ts#L11)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **onFinish**: *function*
 
-*Defined in [packages/mobx-state-tree/src/middlewares/createActionTrackingMiddleware2.ts:13](https://github.com/mobxjs/mobx-state-tree/blob/1cec2e71/packages/mobx-state-tree/src/middlewares/createActionTrackingMiddleware2.ts#L13)*
+*Defined in [packages/mobx-state-tree/src/middlewares/createActionTrackingMiddleware2.ts:13](https://github.com/mobxjs/mobx-state-tree/blob/9757a738/packages/mobx-state-tree/src/middlewares/createActionTrackingMiddleware2.ts#L13)*
 
 #### Type declaration:
 
@@ -55,7 +55,7 @@ ___
 
 • **onStart**: *function*
 
-*Defined in [packages/mobx-state-tree/src/middlewares/createActionTrackingMiddleware2.ts:12](https://github.com/mobxjs/mobx-state-tree/blob/1cec2e71/packages/mobx-state-tree/src/middlewares/createActionTrackingMiddleware2.ts#L12)*
+*Defined in [packages/mobx-state-tree/src/middlewares/createActionTrackingMiddleware2.ts:12](https://github.com/mobxjs/mobx-state-tree/blob/9757a738/packages/mobx-state-tree/src/middlewares/createActionTrackingMiddleware2.ts#L12)*
 
 #### Type declaration:
 
