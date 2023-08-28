@@ -191,7 +191,6 @@ export function resolveNodeByPathParts(
             )
         }
     } catch (e) {
-        console.log("error?", e)
         if (!failIfResolveFails) {
             return undefined
         }
