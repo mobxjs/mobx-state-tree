@@ -71,10 +71,11 @@ export class IdentifierCache {
     splitCache(node: AnyObjectNode): IdentifierCache {
         const res = new IdentifierCache()
         const basePath = node.path
+        const branchPath = node.path+'/'
         entries(this.cache).forEach(([id, nodes]) => {
             let modified = false
             for (let i = nodes.length - 1; i >= 0; i--) {
-                if (nodes[i].path.indexOf(basePath) === 0) {
+                if (nodes[i].path.indexOf(branchPath) === 0||nodes[i].path===basePath) {
                     res.addNodeToCache(nodes[i], false) // no need to update lastUpdated since it is a whole new cache
                     nodes.splice(i, 1)
                     modified = true
