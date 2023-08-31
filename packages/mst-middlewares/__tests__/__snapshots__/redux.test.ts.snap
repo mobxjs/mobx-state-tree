@@ -1826,7 +1826,7 @@ Array [
   Array [
     Object {
       "args": Array [],
-      "targetTypePath": "SchoolYearConfigurationModel/map<string, late(() => ContentDefinitionModel)>/ContentDefinition",
+      "targetTypePath": "SchoolYearConfigurationModel/Map<string, late(() => ContentDefinitionModel)>/ContentDefinition",
       "type": "[root/contents/one] toggleState()",
     },
     Object {
