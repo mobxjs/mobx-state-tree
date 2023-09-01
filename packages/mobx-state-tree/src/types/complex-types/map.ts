@@ -68,16 +68,19 @@ export interface IMSTMap<IT extends IAnyType> {
     // bases on ObservableMap, but fine tuned to the auto snapshot conversion of MST
 
     clear(): void
-    delete(key: string): boolean
-    forEach(callbackfn: (value: IT["Type"], key: string, map: this) => void, thisArg?: any): void
-    get(key: string): IT["Type"] | undefined
-    has(key: string): boolean
-    set(key: string, value: ExtractCSTWithSTN<IT>): this
+    delete(key: string | number): boolean
+    forEach(
+        callbackfn: (value: IT["Type"], key: string | number, map: this) => void,
+        thisArg?: any
+    ): void
+    get(key: string | number): IT["Type"] | undefined
+    has(key: string | number): boolean
+    set(key: string | number, value: ExtractCSTWithSTN<IT>): this
     readonly size: number
     put(value: ExtractCSTWithSTN<IT>): IT["Type"]
-    keys(): IterableIterator<string>
+    keys(): IterableIterator<string | number>
     values(): IterableIterator<IT["Type"]>
-    entries(): IterableIterator<[string, IT["Type"]]>
+    entries(): IterableIterator<[string | number, IT["Type"]]>
     [Symbol.iterator](): IterableIterator<[string, IT["Type"]]>
     /** Merge another object into this map, returns self. */
     merge(
@@ -248,15 +251,18 @@ export class MapType<IT extends IAnyType> extends ComplexType<
 
         const modelTypes: IAnyModelType[] = []
         if (tryCollectModelTypes(this._subType, modelTypes)) {
-            const identifierAttribute: string | undefined = modelTypes.reduce((current: IAnyModelType["identifierAttribute"], type) => {
-                if (!type.identifierAttribute) return current
-                if (current && current !== type.identifierAttribute) {
-                    throw fail(
-                        `The objects in a map should all have the same identifier attribute, expected '${current}', but child of type '${type.name}' declared attribute '${type.identifierAttribute}' as identifier`
-                    )
-                }
-                return type.identifierAttribute
-            }, undefined as IAnyModelType["identifierAttribute"])
+            const identifierAttribute: string | undefined = modelTypes.reduce(
+                (current: IAnyModelType["identifierAttribute"], type) => {
+                    if (!type.identifierAttribute) return current
+                    if (current && current !== type.identifierAttribute) {
+                        throw fail(
+                            `The objects in a map should all have the same identifier attribute, expected '${current}', but child of type '${type.name}' declared attribute '${type.identifierAttribute}' as identifier`
+                        )
+                    }
+                    return type.identifierAttribute
+                },
+                undefined as IAnyModelType["identifierAttribute"]
+            )
 
             if (identifierAttribute) {
                 this.identifierMode = MapIdentifierMode.YES
@@ -286,7 +292,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
 
         const type = node.type as this
         type.hookInitializers.forEach((initializer) => {
-            const hooks = initializer((instance as unknown) as IMSTMap<IT>)
+            const hooks = initializer(instance as unknown as IMSTMap<IT>)
             Object.keys(hooks).forEach((name) => {
                 const hook = hooks[name as keyof typeof hooks]!
                 const actionInvoker = createActionInvoker(instance as IAnyStateTreeNode, name, hook)
