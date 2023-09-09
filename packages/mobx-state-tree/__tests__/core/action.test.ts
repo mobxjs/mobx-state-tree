@@ -19,13 +19,10 @@ const Task = types
     .model({
         done: false
     })
-    .actions((self) => {
-        function toggle() {
-            self.done = !self.done
-            return self.done
-        }
-        return {
-            toggle
+    .actions({
+        toggle() {
+            this.done = !this.done
+            return this.done
         }
     })
 test("it should be possible to invoke a simple action", () => {
@@ -108,16 +105,12 @@ const Order = types
     .model("Order", {
         customer: types.maybeNull(types.reference(Customer))
     })
-    .actions((self) => {
-        function setCustomer(customer: Instance<typeof Customer>) {
-            self.customer = customer
-        }
-        function noopSetCustomer(_: Instance<typeof Customer>) {
+    .actions({
+        setCustomer(customer: Instance<typeof Customer>) {
+            this.customer = customer
+        },
+        noopSetCustomer(_: Instance<typeof Customer>) {
             // noop
-        }
-        return {
-            setCustomer,
-            noopSetCustomer
         }
     })
 const OrderStore = types.model("OrderStore", {
@@ -255,15 +248,13 @@ test("snapshot should be available and updated during an action", () => {
         .model({
             x: types.number
         })
-        .actions((self) => {
-            function inc() {
-                self.x += 1
-                const res = getSnapshot(self).x
-                self.x += 1
+        .actions({
+            inc() {
+                this.x += 1
+                // @ts-ignore
+                const res = getSnapshot<any>(this).x
+                this.x += 1
                 return res
-            }
-            return {
-                inc
             }
         })
     const a = Model.create({ x: 2 })
@@ -277,16 +268,16 @@ test("indirectly called private functions should be able to modify state", () =>
         .model({
             x: 3
         })
-        .actions((self) => {
-            function incrementBy(delta: number) {
-                self.x += delta
+        .actions(() => {
+            function incrementBy(model: any, delta: number) {
+                model.x += delta
             }
             return {
                 inc() {
-                    incrementBy(1)
+                    incrementBy(this, +1)
                 },
                 dec() {
-                    incrementBy(-1)
+                    incrementBy(this, -1)
                 }
             }
         })
@@ -296,15 +287,16 @@ test("indirectly called private functions should be able to modify state", () =>
     expect(cnt.x).toBe(2)
     expect((cnt as any).incrementBy).toBe(undefined)
 })
+
 test("volatile state survives reonciliation", () => {
-    const Model = types.model({ x: 3 }).actions((self) => {
+    const Model = types.model({ x: 3 }).actions(() => {
         let incrementor = 1
         return {
             setIncrementor(value: number) {
                 incrementor = value
             },
             inc() {
-                self.x += incrementor
+                this.x += incrementor
             }
         }
     })
@@ -327,14 +319,14 @@ test("middleware events are correct", () => {
         useProxies: "never"
     })
 
-    const A = types.model({}).actions((self) => ({
+    const A = types.model({}).actions({
         a(x: number) {
             return this.b(x * 2)
         },
         b(y: number) {
             return y + 1
         }
-    }))
+    })
     const a = A.create()
     const events: IMiddlewareEvent[] = []
     addMiddleware(a, function (call, next) {
@@ -344,26 +336,26 @@ test("middleware events are correct", () => {
     a.a(7)
     const event1 = {
         args: [7],
-        context: {},
+        context: a,
         id: process.env.NODE_ENV !== "production" ? 29 : 28,
         name: "a",
         parentId: 0,
         rootId: process.env.NODE_ENV !== "production" ? 29 : 28,
         allParentIds: [],
-        tree: {},
+        tree: a,
         type: "action",
         parentEvent: undefined,
         parentActionEvent: undefined
     }
     const event2 = {
         args: [14],
-        context: {},
+        context: a,
         id: process.env.NODE_ENV !== "production" ? 30 : 29,
         name: "b",
         parentId: process.env.NODE_ENV !== "production" ? 29 : 28,
         rootId: process.env.NODE_ENV !== "production" ? 29 : 28,
         allParentIds: [process.env.NODE_ENV !== "production" ? 29 : 28],
-        tree: {},
+        tree: a,
         type: "action",
         parentEvent: event1,
         parentActionEvent: event1
@@ -378,16 +370,16 @@ test("actions are mockable", () => {
 
     const M = types
         .model()
-        .actions((self) => ({
+        .actions({
             method(): number {
                 return 3
             }
-        }))
-        .views((self) => ({
+        })
+        .views({
             view(): number {
                 return 3
             }
-        }))
+        })
     const m = M.create()
     if (process.env.NODE_ENV === "production") {
         expect(() => {
@@ -417,20 +409,20 @@ test("after attach action should work correctly", () => {
         .model({
             title: "test"
         })
-        .actions((self) => ({
+        .actions({
             remove() {
-                getRoot<typeof S>(self).remove(cast(self))
+                getRoot<typeof S>(this).remove(cast(this))
             }
-        }))
+        })
     const S = types
         .model({
             todos: types.array(Todo)
         })
-        .actions((self) => ({
+        .actions({
             remove(todo: Instance<typeof Todo>) {
-                self.todos.remove(todo)
+                this.todos.remove(todo)
             }
-        }))
+        })
 
     const s = S.create({
         todos: [{ title: "todo" }]

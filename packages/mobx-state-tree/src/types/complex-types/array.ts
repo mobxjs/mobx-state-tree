@@ -134,7 +134,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
             const hooks = initializer(instance)
             Object.keys(hooks).forEach((name) => {
                 const hook = hooks[name as keyof typeof hooks]!
-                const actionInvoker = createActionInvoker(instance as IAnyStateTreeNode, name, hook)
+                const actionInvoker = createActionInvoker(name, hook).bind(instance)
                 ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(
                     instance,
                     name,

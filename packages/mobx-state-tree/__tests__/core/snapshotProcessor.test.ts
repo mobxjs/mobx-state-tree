@@ -503,14 +503,14 @@ describe("snapshotProcessor", () => {
                 todos: types.map(TodoWithProcessor),
                 instance: types.optional(TodoWithProcessor, { id: "new" })
             })
-            .actions((self) => ({
+            .actions({
                 addTodo(todo: { id: string }) {
-                    self.todos.put(todo)
+                    this.todos.put(todo)
                 },
                 setInstance(next: { id: string }) {
-                    self.instance = next
+                    this.instance = next
                 }
-            }))
+            })
 
         test("using instances in maps work", () => {
             const store = Store.create()
@@ -543,11 +543,12 @@ describe("snapshotProcessor", () => {
         test("using the processed type in place of the non processed one works", () => {
             const store = types
                 .model("Store", { instance: Todo })
-                .actions((self) => ({
+                .actions({
                     setInstance(next: { id: string }) {
-                        self.instance = next
+                        console.log("what is this", this.instance)
+                        this.instance = next
                     }
-                }))
+                })
                 .create({ instance: { id: "new" } })
 
             const todo = TodoWithProcessor.create({ id: "map" })
@@ -617,9 +618,9 @@ describe("snapshotProcessor", () => {
                     }
                 }
             )
-            const Store = types.model({ items: types.array(SP) }).actions((self) => ({
+            const Store = types.model({ items: types.array(SP) }).actions(() => ({
                 setItems(items: SnapshotIn<typeof SP>[]) {
-                    self.items = cast(items)
+                    this.items = cast(items)
                 }
             }))
             const store = Store.create({ items: [{ id: "1", y: 0 }] })
@@ -639,9 +640,9 @@ describe("snapshotProcessor", () => {
                     }
                 }
             )
-            const Store = types.model({ items: types.array(SP) }).actions((self) => ({
+            const Store = types.model({ items: types.array(SP) }).actions(() => ({
                 setItems(items: SnapshotIn<typeof SP>[]) {
-                    self.items = cast(items)
+                    this.items = cast(items)
                 }
             }))
             const store = Store.create({ items: [{ foo: "1" }] })
@@ -668,9 +669,9 @@ describe("snapshotProcessor", () => {
                     }
                 }
             )
-            const Store = types.model({ item: SP }).actions((self) => ({
+            const Store = types.model({ item: SP }).actions(() => ({
                 setItem(item: SnapshotIn<typeof SP>) {
-                    self.item = cast(item)
+                    this.item = cast(item)
                 }
             }))
             const store = Store.create({ item: { id: "1", y: 0 } })
@@ -691,9 +692,9 @@ describe("snapshotProcessor", () => {
                     }
                 }
             )
-            const Store = types.model({ item: SP }).actions((self) => ({
+            const Store = types.model({ item: SP }).actions(() => ({
                 setItem(item: SnapshotIn<typeof SP>) {
-                    self.item = cast(item)
+                    this.item = cast(item)
                 }
             }))
             const store = Store.create({ item: { foo: "1" } })
@@ -715,9 +716,9 @@ describe("snapshotProcessor", () => {
                     }
                 }
             )
-            const Store = types.model({ item: types.maybe(SP) }).actions((self) => ({
+            const Store = types.model({ item: types.maybe(SP) }).actions(() => ({
                 setItem(item: SnapshotIn<typeof SP>) {
-                    self.item = cast(item)
+                    this.item = cast(item)
                 }
             }))
             const store = Store.create({ item: { id: "1", y: 0 } })
@@ -741,9 +742,9 @@ describe("snapshotProcessor", () => {
             )
             const Store = types
                 .model({ item: types.optional(SP, { id: "1", y: 0 }) })
-                .actions((self) => ({
+                .actions(() => ({
                     setItem(item?: SnapshotIn<typeof SP>) {
-                        self.item = cast(item)
+                        this.item = cast(item)
                     }
                 }))
             const store = Store.create()
@@ -770,9 +771,9 @@ describe("snapshotProcessor", () => {
                 }
             }
         )
-        const Store = types.model({ item: types.maybe(SP) }).actions((self) => ({
+        const Store = types.model({ item: types.maybe(SP) }).actions(() => ({
             setItem(item?: SnapshotIn<typeof SP>) {
-                self.item = cast(item)
+                this.item = cast(item)
             }
         }))
         const store = Store.create()
@@ -794,9 +795,10 @@ describe("snapshotProcessor", () => {
                     "a"
                 )
             })
-            .actions((self) => ({
-                setProp(prop: typeof self.prop) {
-                    self.prop = prop
+            .actions(() => ({
+                // @ts-ignore
+                setProp(prop: typeof this.prop) {
+                    this.prop = prop
                 }
             }))
 

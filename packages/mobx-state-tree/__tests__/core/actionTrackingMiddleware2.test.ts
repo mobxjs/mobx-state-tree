@@ -62,22 +62,22 @@ async function syncTest(mode: "success" | "fail") {
             y: 2,
             z: 3
         })
-        .actions((self) => ({
+        .actions({
             setX(v: number) {
-                self.x = v
+                this.x = v
                 if (mode === "fail") {
                     throw "error"
                 }
             },
             setY(v: number) {
-                self.y = v
+                this.y = v
                 this.setX(v + 1)
             },
             setZ(v: number) {
-                self.z = v
+                this.z = v
                 this.setY(v + 1)
             }
-        }))
+        })
 
     const m = M.create()
 
@@ -116,24 +116,24 @@ async function flowTest(mode: "success" | "fail") {
             y: 2,
             z: 3
         })
-        .actions((self) => ({
-            setX: flow(function* flowSetX(v: number) {
+        .actions({
+            setX: function* flowSetX(v: number) {
                 yield Promise.resolve()
                 yield _subFlow()
-                self.x = v
+                this.x = v
                 if (mode === "fail") {
                     throw "error"
                 }
-            }),
-            setY: flow(function* flowSetY(v: number) {
-                self.y = v
-                yield (self as any).setX(v + 1)
-            }),
-            setZ: flow(function* flowSetZ(v: number) {
-                self.z = v
-                yield (self as any).setY(v + 1)
-            })
-        }))
+            },
+            setY: function* flowSetY(v: number) {
+                this.y = v
+                yield this.setX(v + 1)
+            },
+            setZ: function* flowSetZ(v: number) {
+                this.z = v
+                yield this.setY(v + 1)
+            }
+        })
 
     const m = M.create()
 
@@ -167,15 +167,15 @@ test("#1250", async () => {
             x: 0,
             y: 0
         })
-        .actions((self) => ({
-            setX: flow(function* () {
-                self.x = 10
+        .actions({
+            setX: function* () {
+                this.x = 10
                 yield new Promise((resolve) => setTimeout(resolve, 1000))
-            }),
+            },
             setY() {
-                self.y = 10
+                this.y = 10
             }
-        }))
+        })
 
     const calls: string[] = []
     const mware = createActionTrackingMiddleware2({

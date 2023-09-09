@@ -93,14 +93,35 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     isProtectionEnabled = true
     middlewares?: IMiddleware[]
 
-    private _applyPatches?: (patches: IJsonPatch[]) => void
+    _applyPatches: (patches: IJsonPatch[]) => void = createActionInvoker(
+        "@APPLY_PATCHES",
+        (patches: IJsonPatch[]) => {
+            patches.forEach((patch) => {
+                if (!patch.path) {
+                    this.type.applySnapshot(this, patch.value)
+                    return
+                }
+                const parts = splitJsonPath(patch.path)
+                const node = resolveNodeByPathParts(this, parts.slice(0, -1)) as AnyObjectNode
+                node.applyPatchLocally(parts[parts.length - 1], patch)
+            })
+        }
+    )
+
+    _applySnapshot: (snapshot: C) => void = createActionInvoker(
+        "@APPLY_SNAPSHOT",
+        (snapshot: C) => {
+            // if the snapshot is the same as the current one, avoid performing a reconcile
+            if (snapshot === (this.snapshot as any)) return
+            // else, apply it by calling the type logic
+            return this.type.applySnapshot(this, snapshot as any)
+        }
+    )
 
     applyPatches(patches: IJsonPatch[]): void {
         this.createObservableInstanceIfNeeded()
         this._applyPatches!(patches)
     }
-
-    private _applySnapshot?: (snapshot: C) => void
 
     applySnapshot(snapshot: C): void {
         this.createObservableInstanceIfNeeded()
@@ -215,7 +236,9 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         const type = this.type
 
         try {
+            // Regular mobx observable.
             this.storedValue = type.createNewInstance(this._childNodes)
+            // Bind ObjectNode to it using hidden prop.
             this.preboot()
 
             this._isRunningAction = true
@@ -506,33 +529,8 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     }
 
     private preboot(): void {
-        const self = this
-        this._applyPatches = createActionInvoker(
-            this.storedValue,
-            "@APPLY_PATCHES",
-            (patches: IJsonPatch[]) => {
-                patches.forEach((patch) => {
-                    if (!patch.path) {
-                        self.type.applySnapshot(self, patch.value)
-                        return
-                    }
-                    const parts = splitJsonPath(patch.path)
-                    const node = resolveNodeByPathParts(self, parts.slice(0, -1)) as AnyObjectNode
-                    node.applyPatchLocally(parts[parts.length - 1], patch)
-                })
-            }
-        )
-        this._applySnapshot = createActionInvoker(
-            this.storedValue,
-            "@APPLY_SNAPSHOT",
-            (snapshot: C) => {
-                // if the snapshot is the same as the current one, avoid performing a reconcile
-                if (snapshot === (self.snapshot as any)) return
-                // else, apply it by calling the type logic
-                return self.type.applySnapshot(self, snapshot as any)
-            }
-        )
-
+        this._applyPatches = this._applyPatches.bind(this.storedValue)
+        this._applySnapshot = this._applySnapshot.bind(this.storedValue)
         addHiddenFinalProp(this.storedValue, "$treenode", this)
         addHiddenFinalProp(this.storedValue, "toJSON", toJSON)
     }

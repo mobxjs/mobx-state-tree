@@ -380,11 +380,11 @@ test("it should correctly handle re-adding of the same objects", () => {
         .model("Task", {
             objects: types.array(types.maybe(types.frozen()))
         })
-        .actions((self) => ({
+        .actions({
             setObjects(objects: {}[]) {
-                self.objects.replace(objects)
+                this.objects.replace(objects)
             }
-        }))
+        })
     const store = Store.create({
         objects: []
     })
@@ -464,11 +464,9 @@ test("#1105 - it should return pop/shift'ed values for scalar arrays", () => {
         .model({
             array: types.array(types.number)
         })
-        .actions((self) => {
-            return {
-                shift() {
-                    return self.array.shift()
-                }
+        .actions({
+            shift() {
+                return this.array.shift()
             }
         })
 
@@ -484,14 +482,12 @@ test("it should return pop/shift'ed values for object arrays", () => {
         .model({
             array: types.array(TestObject)
         })
-        .actions((self) => {
-            return {
-                shift() {
-                    return self.array.shift()
-                },
-                pop() {
-                    return self.array.pop()
-                }
+        .actions({
+            shift() {
+                return this.array.shift()
+            },
+            pop() {
+                return this.array.pop()
             }
         })
 
@@ -541,11 +537,11 @@ test("assigning filtered instances works", () => {
         .model({
             todos: types.array(Task)
         })
-        .actions((self) => ({
+        .actions({
             clearFinishedTodos() {
-                self.todos = cast(self.todos.filter((todo) => !todo.done))
+                this.todos = cast(this.todos.filter((todo) => !todo.done))
             }
-        }))
+        })
         .create({
             todos: [{ done: true }, { done: false }, { done: true }]
         })

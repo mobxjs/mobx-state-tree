@@ -10,7 +10,8 @@ import {
     warnError,
     AnyObjectNode,
     devMode,
-    IActionContext
+    IActionContext,
+    flow
 } from "../internal"
 
 export type IMiddlewareEventType =
@@ -112,28 +113,40 @@ export function getParentActionContext(parentContext: IMiddlewareEvent | undefin
     return parentContext.parentActionEvent
 }
 
+export function isGenerator(obj: any): boolean {
+    const constructor = obj?.constructor
+    if (!constructor) {
+        return false
+    }
+    if (
+        "GeneratorFunction" === constructor.name ||
+        "GeneratorFunction" === constructor.displayName
+    ) {
+        return true
+    }
+    return false
+}
+
 /**
- * @internal
- * @hidden
  */
-export function createActionInvoker<T extends FunctionWithFlag>(
-    target: IAnyStateTreeNode,
-    name: string,
-    fn: T
-) {
-    const res = function () {
+export function createActionInvoker<T extends FunctionWithFlag>(name: string, fn: T) {
+    // @ts-ignore
+    const res: (...args: Parameters<T>) => ReturnType<T> = function (
+        this: any,
+        ...args: Parameters<T>
+    ) {
         const id = getNextActionId()
         const parentContext = currentActionContext
         const parentActionContext = getParentActionContext(parentContext)
-
+        if (!this || !this.$treenode) console.log("target", this)
         return runWithActionContext(
             {
                 type: "action",
                 name,
                 id,
-                args: argsToArray(arguments),
-                context: target,
-                tree: getRoot(target),
+                args: args,
+                context: this,
+                tree: getRoot(this),
                 rootId: parentContext ? parentContext.rootId : id,
                 parentId: parentContext ? parentContext.id : 0,
                 allParentIds: parentContext
@@ -142,7 +155,7 @@ export function createActionInvoker<T extends FunctionWithFlag>(
                 parentEvent: parentContext,
                 parentActionEvent: parentActionContext
             },
-            fn
+            fn.bind(this)
         )
     }
     ;(res as FunctionWithFlag)._isMSTAction = true
@@ -251,6 +264,10 @@ function runMiddleWares(
     originalFn: Function
 ): any {
     const middlewares = new CollectedMiddlewares(node, originalFn)
+
+    // @ts-ignore
+    originalFn = isGenerator(originalFn) ? flow(originalFn) : originalFn
+
     // Short circuit
     if (middlewares.isEmpty) return mobxAction(originalFn).apply(null, baseCall.args)
 

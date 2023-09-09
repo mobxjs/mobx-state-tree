@@ -11,7 +11,8 @@ import {
     observe,
     set,
     IObjectDidChange,
-    makeObservable
+    makeObservable,
+    AnnotationsMap
 } from "mobx"
 import {
     addHiddenFinalProp,
@@ -54,9 +55,10 @@ import {
     devMode,
     assertIsString,
     assertArg,
-    FunctionWithFlag
+    FunctionWithFlag,
+    IStateTreeNode
 } from "../../internal"
-import { ComputedValue } from "mobx/dist/internal"
+import { makeAutoObservable } from "mobx"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
 const POST_PROCESS_SNAPSHOT = "postProcessSnapshot"
@@ -194,21 +196,21 @@ export interface IModelType<
         props: PROPS2
     ): IModelType<PROPS & ModelPropertiesDeclarationToProperties<PROPS2>, OTHERS, CustomC, CustomS>
 
-    views<V extends Object>(
-        fn: (self: Instance<this>) => V
-    ): IModelType<PROPS, OTHERS & V, CustomC, CustomS>
+    views<V extends Object>(fn: V): IModelType<PROPS, OTHERS & V, CustomC, CustomS>
 
     actions<A extends ModelActions>(
-        fn: (self: Instance<this>) => A
+        a:
+            | ThisType<ModelInstanceType<PROPS, OTHERS> & A>
+            | (() => ThisType<ModelInstanceType<PROPS, OTHERS> & A>)
     ): IModelType<PROPS, OTHERS & A, CustomC, CustomS>
 
-    volatile<TP extends object>(
-        fn: (self: Instance<this>) => TP
-    ): IModelType<PROPS, OTHERS & TP, CustomC, CustomS>
+    volatile<TP extends object>(fn: TP): IModelType<PROPS, OTHERS & TP, CustomC, CustomS>
 
-    extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
-        fn: (self: Instance<this>) => { actions?: A; views?: V; state?: VS }
-    ): IModelType<PROPS, OTHERS & A & V & VS, CustomC, CustomS>
+    extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(fn: {
+        actions?: A
+        views?: V
+        state?: VS
+    }): IModelType<PROPS, OTHERS & A & V & VS, CustomC, CustomS>
 
     preProcessSnapshot<NewC = ModelCreationType2<PROPS, CustomC>>(
         fn: (snapshot: NewC) => ModelCreationType2<PROPS, CustomC>
@@ -244,15 +246,19 @@ function objectTypeToString(this: any) {
 export interface ModelTypeConfig {
     name?: string
     properties?: ModelPropertiesDeclaration
-    initializers?: ReadonlyArray<(instance: any) => any>
     preProcessor?: (snapshot: any) => any
     postProcessor?: (snapshot: any) => any
+    actionDescriptors?: ReadonlyArray<any>
+    viewDescriptors?: ReadonlyArray<any>
+    volatileDescriptors?: ReadonlyArray<any>
 }
 
 const defaultObjectOptions = {
     name: "AnonymousModel",
     properties: {},
-    initializers: EMPTY_ARRAY
+    actionDescriptors: EMPTY_ARRAY as any[],
+    viewDescriptors: EMPTY_ARRAY as any[],
+    volatileDescriptors: EMPTY_ARRAY as any[]
 }
 
 function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelProperties {
@@ -341,8 +347,12 @@ export class ModelType<
     /*
      * The original object definition
      */
-    public readonly initializers!: ((instance: any) => any)[]
+    public readonly actionDescriptors!: any[]
+    public readonly viewDescriptors!: any[]
+    public readonly volatileDescriptors!: any[]
     public readonly properties!: PROPS
+
+    private baseClass?: new (param: string) => any
 
     private preProcessor!: (snapshot: any) => any | undefined
     private postProcessor!: (snapshot: any) => any | undefined
@@ -376,21 +386,24 @@ export class ModelType<
         return new ModelType({
             name: opts.name || this.name,
             properties: Object.assign({}, this.properties, opts.properties),
-            initializers: this.initializers.concat(opts.initializers || []),
             preProcessor: opts.preProcessor || this.preProcessor,
-            postProcessor: opts.postProcessor || this.postProcessor
+            postProcessor: opts.postProcessor || this.postProcessor,
+            actionDescriptors: this.actionDescriptors.concat(opts.actionDescriptors || []),
+            viewDescriptors: this.viewDescriptors.concat(opts.viewDescriptors || []),
+            volatileDescriptors: this.volatileDescriptors.concat(opts.volatileDescriptors || [])
         })
     }
 
-    actions<A extends ModelActions>(fn: (self: Instance<this>) => A) {
-        const actionInitializer = (self: Instance<this>) => {
-            this.instantiateActions(self, fn(self))
-            return self
-        }
-        return this.cloneAndEnhance({ initializers: [actionInitializer] })
+    actions<A extends ModelActions>(actions: A) {
+        return this.cloneAndEnhance({ actionDescriptors: [actions] })
     }
 
-    private instantiateActions(self: this["T"], actions: ModelActions): void {
+    private instantiateActions(
+        self: this["T"],
+        actions: ModelActions | (() => ModelActions)
+    ): void {
+        if (typeof actions === "function") actions = actions()
+
         // check if return is correct
         if (!isPlainObject(actions))
             throw fail(`actions initializer should return a plain object containing actions`)
@@ -408,29 +421,28 @@ export class ModelType<
                     `Cannot define action '${POST_PROCESS_SNAPSHOT}', it should be defined using 'type.postProcessSnapshot(fn)' instead`
                 )
 
-            let action2 = actions[name]
+            // @ts-ignore
+            let action = actions[name]
 
             // apply hook composition
             let baseAction = (self as any)[name]
             if (name in Hook && baseAction) {
-                let specializedAction = action2
-                action2 = function () {
+                let specializedAction = action
+                action = function () {
                     baseAction.apply(null, arguments)
                     specializedAction.apply(null, arguments)
                 }
             }
 
-            // the goal of this is to make sure actions using "this" can call themselves,
-            // while still allowing the middlewares to register them
-            const middlewares = (action2 as any).$mst_middleware // make sure middlewares are not lost
-            let boundAction = action2.bind(actions)
-            boundAction._isFlowAction = (action2 as FunctionWithFlag)._isFlowAction || false
-            boundAction.$mst_middleware = middlewares
-            const actionInvoker = createActionInvoker(self as any, name, boundAction)
+            const actionInvoker = createActionInvoker(name, action)
+
+            // @ts-ignore
             actions[name] = actionInvoker
 
             // See #646, allow models to be mocked
             ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(self, name, actionInvoker)
+            // @ts-ignore
+            self.prototype[name] = actionInvoker
         })
     }
 
@@ -442,60 +454,74 @@ export class ModelType<
         return this.cloneAndEnhance({ properties })
     }
 
-    volatile<TP extends object>(fn: (self: Instance<this>) => TP) {
-        if (typeof fn !== "function") {
-            throw fail(
-                `You passed an ${typeof fn} to volatile state as an argument, when function is expected`
-            )
-        }
-        const stateInitializer = (self: Instance<this>) => {
-            this.instantiateVolatileState(self, fn(self))
-            return self
-        }
-        return this.cloneAndEnhance({ initializers: [stateInitializer] })
+    volatile<TP extends object>(volatile: TP) {
+        return this.cloneAndEnhance({ volatileDescriptors: [volatile] })
     }
 
     private instantiateVolatileState(
         self: this["T"],
-        state: {
-            [key: string]: any
-        }
+        state:
+            | {
+                  [key: string]: any
+              }
+            | (() => {
+                  [key: string]: any
+              })
     ): void {
+        if (typeof state === "function") state = state()
+
         // check views return
         if (!isPlainObject(state))
             throw fail(`volatile state initializer should return a plain object containing state`)
-        set(self, state)
+
+        Object.getOwnPropertyNames(state).forEach((key) => {
+            defineProperty(self, key, {
+                // @ts-ignore
+                value: state[key]
+            })
+        })
     }
 
-    extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
-        fn: (self: Instance<this>) => { actions?: A; views?: V; state?: VS }
-    ) {
-        const initializer = (self: Instance<this>) => {
-            const { actions, views, state, ...rest } = fn(self)
-            for (let key in rest)
-                throw fail(
-                    `The \`extend\` function should return an object with a subset of the fields 'actions', 'views' and 'state'. Found invalid key '${key}'`
-                )
-            if (state) this.instantiateVolatileState(self, state)
-            if (views) this.instantiateViews(self, views)
-            if (actions) this.instantiateActions(self, actions)
-            return self
-        }
-        return this.cloneAndEnhance({ initializers: [initializer] })
+    extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>({
+        actions,
+        views,
+        state
+    }: {
+        actions?: A
+        views?: V
+        state?: VS
+    }) {
+        // const initializer = (self: Instance<this>) => {
+        //     const { actions, views, state, ...rest } = fn(self)
+        //     for (let key in rest)
+        //         throw fail(
+        //             `The \`extend\` function should return an object with a subset of the fields 'actions', 'views' and 'state'. Found invalid key '${key}'`
+        //         )
+        //     if (state) this.instantiateVolatileState(self, state)
+        //     if (views) this.instantiateViews(self, views)
+        //     if (actions) this.instantiateActions(self, actions)
+        //     return self
+        // }
+        return this.cloneAndEnhance({
+            actionDescriptors: [actions],
+            viewDescriptors: [views],
+            volatileDescriptors: [state]
+        })
     }
 
-    views<V extends Object>(fn: (self: Instance<this>) => V) {
-        const viewInitializer = (self: Instance<this>) => {
-            this.instantiateViews(self, fn(self))
-            return self
-        }
-        return this.cloneAndEnhance({ initializers: [viewInitializer] })
+    views<V extends Object>(views: V) {
+        return this.cloneAndEnhance({ viewDescriptors: [views] })
     }
 
-    private instantiateViews(self: this["T"], views: Object): void {
+    private instantiateViews(self: this["T"], views: Object | (() => Object)): void {
+        if (typeof views === "function") views = views()
+
         // check views return
-        if (!isPlainObject(views))
-            throw fail(`views initializer should return a plain object containing views`)
+        if (!isPlainObject(views)) {
+            // throw fail(`views initializer should return a plain object containing views`)
+            // @ts-ignore
+            views = views(self)
+        }
         Object.getOwnPropertyNames(views).forEach((key) => {
             // is this a computed property?
             const descriptor = Object.getOwnPropertyDescriptor(views, key)!
@@ -540,12 +566,50 @@ export class ModelType<
         environment: any,
         initialValue: this["C"] | this["T"]
     ): this["N"] {
+        // Optimization: record all prop- view- and action names after first construction, and generate an optimal base class
+        // that pre-reserves all these fields for fast object-member lookups
+        if (!this.baseClass) {
+            const options = { ...mobxShallow, name: this.describe() }
+            // @ts-ignore
+            this.baseClass = class {
+                constructor(childNodes: IChildNodesMap) {
+                    const annotations = {} as AnnotationsMap<string, any>
+                    Object.keys(childNodes).forEach((key) => {
+                        // @ts-ignore
+                        this[key] = childNodes[key]
+                        annotations[key] = observable
+                    })
+                    // makeObservable(this, annotations, options);
+
+                    makeAutoObservable(this, EMPTY_OBJECT, options)
+
+                    // Binds all actions to the current instance.
+                    const prototype = Reflect.getPrototypeOf(this)!
+                    for (const key of Reflect.ownKeys(prototype)) {
+                        if (key === "constructor") continue
+                        const descriptor = Reflect.getOwnPropertyDescriptor(prototype, key)
+                        if (descriptor && typeof descriptor.value === "function") {
+                            // @ts-ignore
+                            this[key] = this[key].bind(this)
+                        }
+                    }
+                }
+            }
+            Object.defineProperty(this.baseClass, "name", { value: this.name })
+            // @ts-ignore
+            this.volatileDescriptors.forEach((v) =>
+                this.instantiateVolatileState(this.baseClass, v)
+            )
+            // @ts-ignore
+            this.viewDescriptors.forEach((v) => this.instantiateViews(this.baseClass, v))
+            // @ts-ignore
+            this.actionDescriptors.forEach((v) => this.instantiateActions(this.baseClass, v))
+        }
+
         const value = isStateTreeNode(initialValue)
             ? initialValue
             : this.applySnapshotPreProcessor(initialValue)
         return createObjectNode(this, parent, subpath, environment, value)
-        // Optimization: record all prop- view- and action names after first construction, and generate an optimal base class
-        // that pre-reserves all these fields for fast object-member lookups
     }
 
     initializeChildNodes(objNode: this["N"], initialSnapshot: any = {}): IChildNodesMap {
@@ -563,8 +627,8 @@ export class ModelType<
     }
 
     createNewInstance(childNodes: IChildNodesMap): this["T"] {
-        const options = { ...mobxShallow, name: this.describe() }
-        return observable.object(childNodes, EMPTY_OBJECT, options) as any
+        // @ts-ignore
+        return new this.baseClass!(childNodes)
     }
 
     finalizeNewInstance(node: this["N"], instance: this["T"]): void {
@@ -574,7 +638,6 @@ export class ModelType<
             _interceptReads(instance, name, node.unbox)
         })
 
-        this.initializers.reduce((self, fn) => fn(self), instance)
         intercept(instance, this.willChange)
         observe(instance, this.didChange)
     }
@@ -838,7 +901,8 @@ export function compose(...args: any[]): any {
             prev.cloneAndEnhance({
                 name: prev.name + "_" + cur.name,
                 properties: cur.properties,
-                initializers: cur.initializers,
+                actionDescriptors: cur.actionDescriptors,
+                viewDescriptors: cur.viewDescriptors,
                 preProcessor: (snapshot: any) =>
                     cur.applySnapshotPreProcessor(prev.applySnapshotPreProcessor(snapshot)),
                 postProcessor: (snapshot: any) =>

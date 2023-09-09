@@ -88,6 +88,26 @@ export function* toGenerator<R>(p: Promise<R>) {
     return (yield p) as R
 }
 
+function isGenerator(obj: any) {
+    return (
+        obj &&
+        typeof obj.next === "function" &&
+        typeof obj.throw === "function" &&
+        obj.constructor &&
+        (obj.constructor.name === "Generator" || obj[Symbol.toStringTag] === "Generator")
+    )
+}
+
+async function handleGenerator(gen: Generator) {
+    while (true) {
+        const next = gen.next()
+        if (next.done) {
+            return next.value
+        }
+        await next.value
+    }
+}
+
 /**
  * @internal
  * @hidden
@@ -105,6 +125,7 @@ export function createFlowSpawner(name: string, generator: FunctionWithFlag) {
             throw fail("a mst flow must always have a parent action context")
         }
 
+        console.log("name", name)
         const contextBase = {
             name,
             id: runId,
@@ -137,7 +158,7 @@ export function createFlowSpawner(name: string, generator: FunctionWithFlag) {
                 gen = generator.apply(null, arguments)
                 onFulfilled(undefined) // kick off the flow
             }
-                ; (init as any).$mst_middleware = (spawner as any).$mst_middleware
+            ;(init as any).$mst_middleware = (spawner as any).$mst_middleware
 
             runWithActionContext(
                 {
@@ -154,7 +175,7 @@ export function createFlowSpawner(name: string, generator: FunctionWithFlag) {
                     // prettier-ignore
                     const cancelError: any = wrap((r: any) => { ret = gen.next(r) }, "flow_resume", res)
                     if (cancelError instanceof Error) {
-                        ret = gen.throw(cancelError);
+                        ret = gen.throw(cancelError)
                     }
                 } catch (e) {
                     // prettier-ignore
@@ -189,11 +210,16 @@ export function createFlowSpawner(name: string, generator: FunctionWithFlag) {
                         wrap((r: any) => { resolve(r) }, "flow_return", ret.value)
                     })
                     return
-                }
-                // TODO: support more type of values? See https://github.com/tj/co/blob/249bbdc72da24ae44076afd716349d2089b31c4c/index.js#L100
-                if (!ret.value || typeof ret.value.then !== "function") {
+                } else if (isGenerator(ret.value)) {
+                    // @ts-ignore
+                    createFlowSpawner(ret.value.name, ret.value)
+                        .call(this)
+                        .then(onFulfilled, onRejected)
+                    return
+                } else if (!ret.value || typeof ret.value.then !== "function") {
                     // istanbul ignore next
-                    throw fail("Only promises can be yielded to `async`, got: " + ret)
+                    console.log("ret", ret, ret.value, isGenerator(ret.value))
+                    throw fail("Only promises can be yielded to `async`, got: " + ret.value)
                 }
                 return ret.value.then(onFulfilled, onRejected)
             }
