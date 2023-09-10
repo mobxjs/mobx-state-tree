@@ -88,24 +88,18 @@ export function* toGenerator<R>(p: Promise<R>) {
     return (yield p) as R
 }
 
-function isGenerator(obj: any) {
-    return (
-        obj &&
-        typeof obj.next === "function" &&
-        typeof obj.throw === "function" &&
-        obj.constructor &&
-        (obj.constructor.name === "Generator" || obj[Symbol.toStringTag] === "Generator")
-    )
-}
-
-async function handleGenerator(gen: Generator) {
-    while (true) {
-        const next = gen.next()
-        if (next.done) {
-            return next.value
-        }
-        await next.value
+export function isGeneratorFunction(obj: any): boolean {
+    const constructor = obj?.constructor
+    if (!constructor) {
+        return false
     }
+    if (
+        "GeneratorFunction" === constructor.name ||
+        "GeneratorFunction" === constructor.displayName
+    ) {
+        return true
+    }
+    return false
 }
 
 /**
@@ -113,7 +107,8 @@ async function handleGenerator(gen: Generator) {
  * @hidden
  */
 export function createFlowSpawner(name: string, generator: FunctionWithFlag) {
-    const spawner = function flowSpawner(this: any) {
+    // @ts-ignore
+    const spawner = function flowSpawner() {
         // Implementation based on https://github.com/tj/co/blob/master/index.js
         const runId = getNextActionId()
         const parentContext = getCurrentActionContext()!
@@ -125,7 +120,6 @@ export function createFlowSpawner(name: string, generator: FunctionWithFlag) {
             throw fail("a mst flow must always have a parent action context")
         }
 
-        console.log("name", name)
         const contextBase = {
             name,
             id: runId,
@@ -142,6 +136,7 @@ export function createFlowSpawner(name: string, generator: FunctionWithFlag) {
 
         function wrap(fn: any, type: IMiddlewareEventType, arg: any) {
             fn.$mst_middleware = (spawner as any).$mst_middleware // pick up any middleware attached to the flow
+            fn = isGeneratorFunction(fn) ? flow(fn) : fn
             return runWithActionContext(
                 {
                     ...contextBase,
@@ -155,6 +150,7 @@ export function createFlowSpawner(name: string, generator: FunctionWithFlag) {
         return new Promise(function (resolve, reject) {
             let gen: any
             const init = function asyncActionInit() {
+                // @ts-ignore
                 gen = generator.apply(null, arguments)
                 onFulfilled(undefined) // kick off the flow
             }
@@ -210,15 +206,9 @@ export function createFlowSpawner(name: string, generator: FunctionWithFlag) {
                         wrap((r: any) => { resolve(r) }, "flow_return", ret.value)
                     })
                     return
-                } else if (isGenerator(ret.value)) {
-                    // @ts-ignore
-                    createFlowSpawner(ret.value.name, ret.value)
-                        .call(this)
-                        .then(onFulfilled, onRejected)
-                    return
                 } else if (!ret.value || typeof ret.value.then !== "function") {
                     // istanbul ignore next
-                    console.log("ret", ret, ret.value, isGenerator(ret.value))
+                    console.log("ret", ret, ret.value)
                     throw fail("Only promises can be yielded to `async`, got: " + ret.value)
                 }
                 return ret.value.then(onFulfilled, onRejected)

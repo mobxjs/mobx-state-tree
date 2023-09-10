@@ -113,7 +113,7 @@ export function getParentActionContext(parentContext: IMiddlewareEvent | undefin
     return parentContext.parentActionEvent
 }
 
-export function isGenerator(obj: any): boolean {
+export function isGeneratorFunction(obj: any): boolean {
     const constructor = obj?.constructor
     if (!constructor) {
         return false
@@ -133,12 +133,17 @@ export function createActionInvoker<T extends FunctionWithFlag>(name: string, fn
     // @ts-ignore
     const res: (...args: Parameters<T>) => ReturnType<T> = function (
         this: any,
+        // @ts-ignore
         ...args: Parameters<T>
     ) {
         const id = getNextActionId()
         const parentContext = currentActionContext
         const parentActionContext = getParentActionContext(parentContext)
         if (!this || !this.$treenode) console.log("target", this)
+        // @ts-ignore
+        const boundAction = isGeneratorFunction(fn) ? flow(fn.bind(this)) : fn.bind(this)
+        boundAction._isFlowAction = (fn as FunctionWithFlag)._isFlowAction || false
+        boundAction.$mst_middleware = (fn as any).$mst_middleware
         return runWithActionContext(
             {
                 type: "action",
@@ -155,7 +160,7 @@ export function createActionInvoker<T extends FunctionWithFlag>(name: string, fn
                 parentEvent: parentContext,
                 parentActionEvent: parentActionContext
             },
-            fn.bind(this)
+            boundAction
         )
     }
     ;(res as FunctionWithFlag)._isMSTAction = true
@@ -266,7 +271,7 @@ function runMiddleWares(
     const middlewares = new CollectedMiddlewares(node, originalFn)
 
     // @ts-ignore
-    originalFn = isGenerator(originalFn) ? flow(originalFn) : originalFn
+    // originalFn = isGenerator(originalFn) ? flow(originalFn) : originalFn
 
     // Short circuit
     if (middlewares.isEmpty) return mobxAction(originalFn).apply(null, baseCall.args)

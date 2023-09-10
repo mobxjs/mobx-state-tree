@@ -598,6 +598,7 @@ export class ModelType<
             Object.defineProperty(this.baseClass, "name", { value: this.name })
             // @ts-ignore
             this.volatileDescriptors.forEach((v) =>
+                // @ts-ignore
                 this.instantiateVolatileState(this.baseClass, v)
             )
             // @ts-ignore

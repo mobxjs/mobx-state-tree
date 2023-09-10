@@ -545,7 +545,6 @@ describe("snapshotProcessor", () => {
                 .model("Store", { instance: Todo })
                 .actions({
                     setInstance(next: { id: string }) {
-                        console.log("what is this", this.instance)
                         this.instance = next
                     }
                 })

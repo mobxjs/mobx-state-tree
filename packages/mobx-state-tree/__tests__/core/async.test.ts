@@ -231,13 +231,15 @@ test("recordActions should only emit invocation", (done) => {
 })
 test("can handle nested async actions", (t) => {
     // tslint:disable-next-line:no-shadowed-variable
-    const uppercase = function* uppercase(value: string): any {
+    const uppercase = flow(function* uppercase(value: string): any {
         const res = yield delay(20, value.toUpperCase())
         return res
-    }
+    })
     testCoffeeTodo(
         t,
+        // @ts-ignore
         function* fetchData(kind: string) {
+            console.log("this", this)
             this.title = yield uppercase("drinking " + kind)
             return this.title
         },
@@ -253,11 +255,11 @@ test("can handle nested async actions when using decorate", (done) => {
         return next(call)
     }
     // tslint:disable-next-line:no-shadowed-variable
-    const uppercase = function* uppercase(value: string) {
+    const uppercase = flow(function* uppercase(value: string) {
         // @ts-ignore
         const res = yield delay(20, value.toUpperCase())
         return res
-    }
+    })
     const Todo = types.model({}).actions({
         act: decorate(middleware, function* actUppercase(value: string) {
             // @ts-ignore
@@ -285,7 +287,7 @@ test("flow gain back control when node become not alive during yield", async () 
     const MyModel = types.model({}).actions(() => {
         return {
             doAction() {
-                return (function* () {
+                return flow(function* () {
                     try {
                         yield delay(20, "").then(() => Promise.reject(rejectError))
                     } catch (e) {
@@ -301,6 +303,7 @@ test("flow gain back control when node become not alive during yield", async () 
     const p = m.doAction()
     destroy(m)
     try {
+        console.log("what is p", p)
         await p
     } catch (e) {
         expect(e).toEqual(rejectError)
