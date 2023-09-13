@@ -192,9 +192,9 @@ export function recordPatches(
         inversePatches: IJsonPatch[]
     }
 
-    const data: Pick<IPatches, "patches" | "reversedInversePatches"> = {
+    const data: Pick<IPatches, "patches" | "inversePatches"> = {
         patches: [],
-        reversedInversePatches: []
+        inversePatches: []
     }
 
     // we will generate the immutable copy of patches on demand for public consumption
@@ -214,13 +214,13 @@ export function recordPatches(
         },
         get reversedInversePatches() {
             if (!publicData.reversedInversePatches) {
-                publicData.reversedInversePatches = data.reversedInversePatches.slice()
+                publicData.reversedInversePatches = data.inversePatches.slice().reverse()
             }
             return publicData.reversedInversePatches
         },
         get inversePatches() {
             if (!publicData.inversePatches) {
-                publicData.inversePatches = data.reversedInversePatches.slice().reverse()
+                publicData.inversePatches = data.inversePatches.slice()
             }
             return publicData.inversePatches
         },
@@ -238,7 +238,7 @@ export function recordPatches(
                     return
                 }
                 data.patches.push(patch)
-                data.reversedInversePatches.unshift(inversePatch)
+                data.inversePatches.push(inversePatch)
 
                 // mark immutable public patches as dirty
                 publicData.patches = undefined
@@ -250,7 +250,7 @@ export function recordPatches(
             applyPatch(target || subject, data.patches)
         },
         undo(target?: IAnyStateTreeNode) {
-            applyPatch(target || subject, data.reversedInversePatches)
+            applyPatch(target || subject, data.inversePatches.slice().reverse())
         }
     }
 
