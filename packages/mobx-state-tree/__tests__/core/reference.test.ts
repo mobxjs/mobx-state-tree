@@ -123,11 +123,11 @@ test("it should resolve refs during creation, when using path", () => {
         .model({
             book: types.reference(Book)
         })
-        .views((self) => ({
+        .views({
             get price() {
-                return self.book.price * 2
+                return this.book.price * 2
             }
-        }))
+        })
     const Store = types.model({
         books: types.array(Book),
         entries: types.optional(types.array(BookEntry), [])
@@ -159,11 +159,11 @@ test("it should resolve refs over late types", () => {
         .model({
             book: types.reference(types.late(() => Book))
         })
-        .views((self) => ({
+        .views({
             get price() {
-                return self.book.price * 2
+                return this.book.price * 2
             }
-        }))
+        })
     const Store = types.model({
         books: types.array(Book),
         entries: types.array(BookEntry)
@@ -187,11 +187,11 @@ test("it should resolve refs during creation, when using generic reference", () 
         .model({
             book: types.reference(Book)
         })
-        .views((self) => ({
+        .views({
             get price() {
-                return self.book.price * 2
+                return this.book.price * 2
             }
-        }))
+        })
     const Store = types.model({
         books: types.array(Book),
         entries: types.optional(types.array(BookEntry), [])
@@ -261,7 +261,7 @@ test("122 - identifiers should support numbers as well", () => {
     expect(F.is({ id: "bla" })).toBe(false)
 })
 
-test("self reference with a late type", () => {
+test("this reference with a late type", () => {
     const Book = types.model("Book", {
         id: types.identifier,
         genre: types.string,
@@ -271,12 +271,9 @@ test("self reference with a late type", () => {
         .model("Store", {
             books: types.array(Book)
         })
-        .actions((self) => {
-            function addBook(book: SnapshotOrInstance<typeof Book>) {
-                self.books.push(book)
-            }
-            return {
-                addBook
+        .actions({
+            addBook(book: SnapshotOrInstance<typeof Book>) {
+                this.books.push(book)
             }
         })
     const s = Store.create({
@@ -569,15 +566,14 @@ test("References in recursive structures", () => {
             children: types.array(types.late((): IAnyModelType => Tree)),
             data: types.maybeNull(types.reference(Folder))
         })
-        .actions((self) => {
-            function addFolder(data: SnapshotOrInstance<typeof Folder>) {
+        .actions({
+            addFolder(data: SnapshotOrInstance<typeof Folder>) {
                 const folder3 = Folder.create(data)
-                getRoot<typeof Storage>(self).putFolderHelper(folder3)
-                self.children.push(
+                getRoot<typeof Storage>(this).putFolderHelper(folder3)
+                this.children.push(
                     Tree.create({ data: castToReferenceSnapshot(folder3), children: [] })
                 )
             }
-            return { addFolder }
         })
 
     const Storage = types
@@ -585,11 +581,11 @@ test("References in recursive structures", () => {
             objects: types.map(Folder),
             tree: Tree
         })
-        .actions((self) => ({
+        .actions({
             putFolderHelper(aFolder: SnapshotOrInstance<typeof Folder>) {
-                self.objects.put(aFolder)
+                this.objects.put(aFolder)
             }
-        }))
+        })
     const store = Storage.create({ objects: {}, tree: { children: [], data: null } })
     const folder = { id: 1, name: "Folder 1", files: ["a.jpg", "b.jpg"] }
     store.tree.addFolder(folder)
@@ -657,20 +653,15 @@ test("it should applyPatch references in array", () => {
             objects: types.map(Item),
             hovers: types.array(types.reference(Item))
         })
-        .actions((self) => {
-            function addObject(anItem: typeof Item.Type) {
-                self.objects.put(anItem)
-            }
-            function addHover(anItem: typeof Item.Type) {
-                self.hovers.push(anItem)
-            }
-            function removeHover(anItem: typeof Item.Type) {
-                self.hovers.remove(anItem)
-            }
-            return {
-                addObject,
-                addHover,
-                removeHover
+        .actions({
+            addObject(anItem: typeof Item.Type) {
+                this.objects.put(anItem)
+            },
+            addHover(anItem: typeof Item.Type) {
+                this.hovers.push(anItem)
+            },
+            removeHover(anItem: typeof Item.Type) {
+                this.hovers.remove(anItem)
             }
         })
     const folder = Folder.create({ id: "folder 1", objects: {}, hovers: [] })
@@ -769,12 +760,10 @@ test("array of references should work fine", () => {
             blocks: types.array(B),
             blockRefs: types.array(types.reference(B))
         })
-        .actions((self) => {
-            return {
-                order() {
-                    const res = self.blockRefs.slice()
-                    self.blockRefs.replace([res[1], res[0]])
-                }
+        .actions({
+            order() {
+                const res = this.blockRefs.slice()
+                this.blockRefs.replace([res[1], res[0]])
             }
         })
     const a = S.create({ blocks: [{ id: "1" }, { id: "2" }], blockRefs: ["1", "2"] })
@@ -850,21 +839,21 @@ test("#1052 - Reference returns destroyed model after subtree replacing", () => 
             lastWithId: types.maybe(types.reference(Todo)),
             counter: -1
         })
-        .actions((self) => ({
+        .actions({
             load() {
-                self.counter++
-                self.todos = Todos.create({
+                this.counter++
+                this.todos = Todos.create({
                     items: [
-                        { id: 1, title: "Get Coffee " + self.counter },
-                        { id: 2, title: "Write simpler code " + self.counter }
+                        { id: 1, title: "Get Coffee " + this.counter },
+                        { id: 2, title: "Write simpler code " + this.counter }
                     ]
                 })
             },
             select(todo: Instance<typeof Todo>) {
-                self.last = todo
-                self.lastWithId = todo.id as any
+                this.last = todo
+                this.lastWithId = todo.id as any
             }
-        }))
+        })
 
     const store = Store.create({ todos: {} })
     store.load()
@@ -927,31 +916,31 @@ test("#1080 - does not crash trying to resolve a reference to a destroyed+recrea
         .model("BranchStore", {
             activeBranch: types.maybeNull(types.reference(Branch))
         })
-        .actions((self) => ({
+        .actions({
             setActiveBranch(branchId: any) {
-                self.activeBranch = branchId
+                this.activeBranch = branchId
             }
-        }))
+        })
 
     const RootStore = types
         .model("RootStore", {
             user: types.maybeNull(User),
             branchStore: types.maybeNull(BranchStore)
         })
-        .actions((self) => ({
+        .actions({
             setUser(snapshot: typeof userSnapshot) {
-                self.user = cast(snapshot)
+                this.user = cast(snapshot)
             },
             setBranchStore(snapshot: typeof branchStoreSnapshot) {
-                self.branchStore = cast(snapshot)
+                this.branchStore = cast(snapshot)
             },
             destroyUser() {
-                destroy(self.user!)
+                destroy(this.user!)
             },
             destroyBranchStore() {
-                destroy(self.branchStore!)
+                destroy(this.branchStore!)
             }
-        }))
+        })
 
     const userSnapshot = {
         id: 1,
@@ -1000,15 +989,15 @@ test("tryReference / isValidReference", () => {
             ref2: types.maybeNull(types.reference(Todo)),
             ref3: types.maybe(types.reference(Todo))
         })
-        .actions((self) => ({
+        .actions({
             clearRef3() {
-                self.ref3 = undefined
+                this.ref3 = undefined
             },
             afterCreate() {
                 addDisposer(
-                    self,
+                    this,
                     reaction(
-                        () => isValidReference(() => self.ref3),
+                        () => isValidReference(() => this.ref3),
                         (valid) => {
                             if (!valid) {
                                 this.clearRef3()
@@ -1018,7 +1007,7 @@ test("tryReference / isValidReference", () => {
                     )
                 )
             }
-        }))
+        })
 
     const store = TodoStore.create({
         todos: [{ id: "1" }, { id: "2" }, { id: "3" }]

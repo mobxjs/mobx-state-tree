@@ -5,17 +5,17 @@ const Todo = types
     .model({
         done: false
     })
-    .volatile((self) => ({
+    .volatile({
         state: Promise.resolve(1)
-    }))
-    .actions((self) => ({
+    })
+    .actions({
         toggle() {
-            self.done = !self.done
+            this.done = !this.done
         },
         reload() {
-            self.state = Promise.resolve(2)
+            this.state = Promise.resolve(2)
         }
-    }))
+    })
 
 test("Properties should be readable and writable", () => {
     const i = Todo.create()
@@ -53,9 +53,9 @@ test("VS be observable", () => {
 test("VS should not be deeply observable", () => {
     const i = types
         .model({})
-        .volatile((self) => ({
+        .volatile({
             x: { a: 1 }
-        }))
+        })
         .create()
     unprotect(i)
     expect(isObservableProp(i, "x")).toBe(true)
@@ -105,9 +105,8 @@ test("VS should not be modifiable when unprotected", () => {
 })
 
 test("VS sample from the docs should work (1)", () => {
-    const T = types.model({}).extend((self) => {
+    const T = types.model({}).extend(() => {
         const localState = observable.box(3)
-
         return {
             views: {
                 get x() {
@@ -140,9 +139,8 @@ test("VS sample from the docs should work (1)", () => {
 })
 
 test("VS sample from the docs should work (2)", () => {
-    const T = types.model({}).extend((self) => {
+    const T = types.model({}).extend(() => {
         let localState = 3
-
         return {
             views: {
                 getX() {

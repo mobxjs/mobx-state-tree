@@ -139,31 +139,31 @@ test("it should support dynamic loading", (done) => {
             users: types.array(User),
             selection: UserByNameReference
         })
-        .actions((self) => ({
-            loadUser: flow(function* loadUser(name: string) {
+        .actions({
+            loadUser: function* loadUser(name: string) {
                 events.push("loading " + name)
-                self.users.push({ name })
+                this.users.push({ name })
                 yield new Promise((resolve) => {
                     setTimeout(resolve, 200)
                 })
                 events.push("loaded " + name)
-                const user = (self.users.find((u) => u.name === name)!.age = name.length * 3) // wonderful!
-            })
-        }))
-        .views((self) => ({
+                const user = (this.users.find((u) => u.name === name)!.age = name.length * 3) // wonderful!
+            }
+        })
+        .views({
             // Important: a view so that the reference will automatically react to the reference being changed!
             getOrLoadUser(name: string) {
-                const user = self.users.find((u) => u.name === name) || null
+                const user = this.users.find((u) => u.name === name) || null
                 if (!user) {
                     /*
                     TODO: this is ugly, but workaround the idea that views should be side effect free.
                     We need a more elegant solution..
                 */
-                    setImmediate(() => self.loadUser(name))
+                    setImmediate(() => this.loadUser(name))
                 }
                 return user
             }
-        }))
+        })
     const s = Store.create({
         users: [],
         selection: "Mattia"

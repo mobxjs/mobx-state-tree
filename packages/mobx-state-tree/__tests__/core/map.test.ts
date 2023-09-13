@@ -198,12 +198,9 @@ test("#192 - put should not throw when identifier is a number", () => {
         .model("TodoStore", {
             todos: types.optional(types.map(Todo), {})
         })
-        .actions((self) => {
-            function addTodo(todo: typeof Todo.Type | typeof Todo.CreationType) {
-                self.todos.put(todo)
-            }
-            return {
-                addTodo
+        .actions({
+            addTodo(todo: typeof Todo.Type | typeof Todo.CreationType) {
+                this.todos.put(todo)
             }
         })
     const todoStore = TodoStore.create({})
@@ -227,12 +224,9 @@ test("#192 - map should not mess up keys when putting twice", () => {
         .model("TodoStore", {
             todos: types.optional(types.map(Todo), {})
         })
-        .actions((self) => {
-            function addTodo(todo: typeof Todo.Type | typeof Todo.CreationType) {
-                self.todos.put(todo)
-            }
-            return {
-                addTodo
+        .actions({
+            addTodo(todo: typeof Todo.Type | typeof Todo.CreationType) {
+                this.todos.put(todo)
             }
         })
     const todoStore = TodoStore.create({})
@@ -260,12 +254,9 @@ test("#694 - map.put should return new node", () => {
         .model("TodoStore", {
             todos: types.map(Todo)
         })
-        .actions((self) => {
-            function addAndReturnTodo(todo: typeof Todo.Type | typeof Todo.CreationType) {
-                return self.todos.put(todo)
-            }
-            return {
-                addAndReturnTodo
+        .actions({
+            addAndReturnTodo(todo: typeof Todo.Type | typeof Todo.CreationType) {
+                return this.todos.put(todo)
             }
         })
     const todoStore = TodoStore.create({ todos: {} })
@@ -301,12 +292,9 @@ test("it should not throw when removing a non existing item from a map", () => {
             .model({
                 myMap: types.map(types.number)
             })
-            .actions((self) => {
-                function something() {
-                    return self.myMap.delete("1020")
-                }
-                return {
-                    something
+            .actions({
+                something() {
+                    return this.myMap.delete("1020")
                 }
             })
         const store = AppModel.create()
@@ -318,11 +306,11 @@ test("it should get map keys from reversePatch when deleted an item from a neste
         .model({
             value: types.map(types.map(types.map(types.number)))
         })
-        .actions((self) => ({
+        .actions({
             remove(k: string) {
-                self.value.delete(k)
+                this.value.delete(k)
             }
-        }))
+        })
     const store = AppModel.create({ value: { a: { b: { c: 10 } } } })
     onPatch(store, (patch, reversePatch) => {
         expect(patch).toEqual({ op: "remove", path: "/value/a" })
@@ -361,15 +349,15 @@ test("issue #876 - map.put works fine for models with preProcessSnapshot", () =>
         .model("Store", {
             items: types.optional(types.map(Item), {})
         })
-        .actions((self) => ({
+        .actions({
             afterCreate() {
-                self.items.put({
+                this.items.put({
                     id: "1",
                     title: "",
                     notes: [{ text: "first note" }, { text: "second note" }]
                 })
             }
-        }))
+        })
 
     let store!: typeof Store.Type
     expect(() => {
@@ -412,12 +400,9 @@ test("get should return value when key is a number", () => {
         .model("TodoStore", {
             todos: types.optional(types.map(Todo), {})
         })
-        .actions((self) => {
-            function addTodo(aTodo: typeof Todo.Type | typeof Todo.CreationType) {
-                self.todos.put(aTodo)
-            }
-            return {
-                addTodo
+        .actions({
+            addTodo(aTodo: typeof Todo.Type | typeof Todo.CreationType) {
+                this.todos.put(aTodo)
             }
         })
     const todoStore = TodoStore.create({})
@@ -428,7 +413,7 @@ test("get should return value when key is a number", () => {
     }
 
     todoStore.addTodo(todo)
-    expect(todoStore.todos.get((1 as any) as string)!.title).toEqual("Test")
+    expect(todoStore.todos.get(1 as any as string)!.title).toEqual("Test")
 })
 
 test("numeric keys should work", () => {
@@ -447,30 +432,30 @@ test("numeric keys should work", () => {
     unprotect(s)
 
     s.mies.set(7 as any, { id: "7" })
-    const i7 = s.mies.get((7 as any) as string)!
+    const i7 = s.mies.get(7 as any as string)!
     expect(i7.title).toBe("test")
     expect(s.mies.has("7")).toBeTruthy()
-    expect(s.mies.has((7 as any) as string)).toBeTruthy()
+    expect(s.mies.has(7 as any as string)).toBeTruthy()
     expect(s.mies.get("7")).toBeTruthy()
-    expect(s.mies.get((7 as any) as string)).toBeTruthy()
+    expect(s.mies.get(7 as any as string)).toBeTruthy()
 
     s.mies.set("8", { id: "8" })
     expect(s.mies.has("8")).toBeTruthy()
-    expect(s.mies.has((8 as any) as string)).toBeTruthy()
+    expect(s.mies.has(8 as any as string)).toBeTruthy()
     expect(s.mies.get("8")).toBeTruthy()
-    expect(s.mies.get((8 as any) as string)).toBeTruthy()
+    expect(s.mies.get(8 as any as string)).toBeTruthy()
 
     expect(Array.from(s.mies.keys())).toEqual(["7", "8"])
 
     s.mies.put({ id: "7", title: "coffee" })
     expect(s.mies.size).toBe(2)
     expect(s.mies.has("7")).toBeTruthy()
-    expect(s.mies.has((7 as any) as string)).toBeTruthy()
+    expect(s.mies.has(7 as any as string)).toBeTruthy()
     expect(s.mies.get("7")).toBeTruthy()
-    expect(s.mies.get((7 as any) as string)).toBeTruthy()
+    expect(s.mies.get(7 as any as string)).toBeTruthy()
     expect(i7.title).toBe("coffee")
 
-    expect(s.mies.delete((8 as any) as string)).toBeTruthy()
+    expect(s.mies.delete(8 as any as string)).toBeTruthy()
     expect(s.mies.size).toBe(1)
 })
 
@@ -479,11 +464,11 @@ describe("#826, adding stuff twice", () => {
         .model({
             map: types.optional(types.map(types.boolean), {})
         })
-        .actions((self) => ({
-            toogleMap: (id: string) => {
-                self.map.set(id, !self.map.get(id))
+        .actions({
+            toogleMap(id: string) {
+                this.map.set(id, !this.map.get(id))
             }
-        }))
+        })
 
     // This one pass fine 👍
     test("Toogling once shouldn't throw", () => {
@@ -516,10 +501,10 @@ test("#751 restore from snapshot should work", () => {
 
     // We add an item with a number id
     unprotect(server)
-    server.map.set((1 as any) as string, { id: 1 })
+    server.map.set(1 as any as string, { id: 1 })
 
     // We can access it using a number
-    expect(server.map.get((1 as any) as string)!.id).toBe(1)
+    expect(server.map.get(1 as any as string)!.id).toBe(1)
 
     // But if we get a snapshot...
     const snapshot = getSnapshot(server)
@@ -530,7 +515,7 @@ test("#751 restore from snapshot should work", () => {
     expect(server.map.get("1")!.id).toBe(1)
 
     // And as number
-    expect(server.map.get((1 as any) as string)!.id).toBe(1)
+    expect(server.map.get(1 as any as string)!.id).toBe(1)
 
     expect(server.map.size).toBe(1)
 })

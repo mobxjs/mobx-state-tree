@@ -321,11 +321,11 @@ test("#1115 - safe reference doesn't become invalidated when the reference has n
             mapOfRef: types.map(MyRefModel),
             arrayOfSafeRef: types.array(SafeRef)
         })
-        .actions((self) => ({
+        .actions({
             deleteSqr(id: string) {
-                self.mapOfRef.delete(id)
+                this.mapOfRef.delete(id)
             }
-        }))
+        })
 
     const rootModel = RootModel.create({
         mapOfRef: {

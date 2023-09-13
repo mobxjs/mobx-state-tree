@@ -13,16 +13,12 @@ test("Date instance can be reused", () => {
             one: Model,
             index: types.array(Model)
         })
-        .actions((self) => {
-            function set(one: typeof Model.Type) {
-                self.one = one
-            }
-            function push(model: typeof Model.Type) {
-                self.index.push(model)
-            }
-            return {
-                set,
-                push
+        .actions({
+            set(one: typeof Model.Type) {
+                this.one = one
+            },
+            push(model: typeof Model.Type) {
+                this.index.push(model)
             }
         })
     const object = { a: { b: "string" }, c: new Date() } // string -> date (number)

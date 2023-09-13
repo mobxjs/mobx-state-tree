@@ -19,50 +19,40 @@ function createTestStore(listener: (s: string) => void) {
         .model("Todo", {
             title: ""
         })
-        .actions((self) => {
-            function afterCreate() {
-                listener("new todo: " + self.title)
-                addDisposer(self, () => {
-                    listener("custom disposer 1 for " + self.title)
+        .actions({
+            afterCreate() {
+                listener("new todo: " + this.title)
+                addDisposer(this, () => {
+                    listener("custom disposer 1 for " + this.title)
                 })
-                addDisposer(self, () => {
-                    listener("custom disposer 2 for " + self.title)
+                addDisposer(this, () => {
+                    listener("custom disposer 2 for " + this.title)
                 })
-            }
-            function beforeDestroy() {
-                listener("destroy todo: " + self.title)
-            }
-            function afterAttach() {
-                listener("attach todo: " + self.title)
-            }
-            function beforeDetach() {
-                listener("detach todo: " + self.title)
-            }
-            return {
-                afterCreate,
-                beforeDestroy,
-                afterAttach,
-                beforeDetach
+            },
+            beforeDestroy() {
+                listener("destroy todo: " + this.title)
+            },
+            afterAttach() {
+                listener("attach todo: " + this.title)
+            },
+            beforeDetach() {
+                listener("detach todo: " + this.title)
             }
         })
     const Store = types
         .model("Store", {
             todos: types.array(Todo)
         })
-        .actions((self) => {
-            function afterCreate() {
-                unprotect(self)
-                listener("new store: " + self.todos.length)
-                addDisposer(self, () => {
+        .actions({
+            afterCreate() {
+                unprotect(this)
+                listener("new store: " + this.todos.length)
+                addDisposer(this, () => {
                     listener("custom disposer for store")
                 })
-            }
-            function beforeDestroy() {
-                listener("destroy store: " + self.todos.length)
-            }
-            return {
-                afterCreate,
-                beforeDestroy
+            },
+            beforeDestroy() {
+                listener("destroy store: " + this.todos.length)
             }
         })
     return {
@@ -148,25 +138,25 @@ test("lifecycle hooks can access their children", () => {
         .model("Todo", {
             title: ""
         })
-        .actions((self) => ({
+        .actions({
             afterCreate() {
-                listener("new child: " + self.title)
+                listener("new child: " + this.title)
             },
             afterAttach() {
-                listener("parent available: " + !!getParent(self))
+                listener("parent available: " + !!getParent(this))
             }
-        }))
+        })
 
     const Parent = types
         .model("Parent", {
             child: Child
         })
-        .actions((self) => ({
+        .actions({
             afterCreate() {
                 // **This the key line**: it is trying to access the child
-                listener("new parent, child.title: " + self.child?.title)
+                listener("new parent, child.title: " + this.child?.title)
             }
-        }))
+        })
 
     const Store = types.model("Store", {
         parent: types.maybe(Parent)
@@ -293,35 +283,33 @@ test("base hooks can be composed", () => {
     }
     const Todo = types
         .model("Todo", { title: "" })
-        .actions((self) => {
-            function afterCreate() {
+        .actions({
+            afterCreate() {
                 listener("aftercreate1")
-            }
-            function beforeDestroy() {
+            },
+            beforeDestroy() {
                 listener("beforedestroy1")
-            }
-            function afterAttach() {
+            },
+            afterAttach() {
                 listener("afterattach1")
-            }
-            function beforeDetach() {
+            },
+            beforeDetach() {
                 listener("beforedetach1")
             }
-            return { afterCreate, beforeDestroy, afterAttach, beforeDetach }
         })
-        .actions((self) => {
-            function afterCreate() {
+        .actions({
+            afterCreate() {
                 listener("aftercreate2")
-            }
-            function beforeDestroy() {
+            },
+            beforeDestroy() {
                 listener("beforedestroy2")
-            }
-            function afterAttach() {
+            },
+            afterAttach() {
                 listener("afterattach2")
-            }
-            function beforeDetach() {
+            },
+            beforeDetach() {
                 listener("beforedetach2")
             }
-            return { afterCreate, beforeDestroy, afterAttach, beforeDetach }
         })
     const Store = types.model("Store", { todos: types.array(Todo) })
     const store = Store.create({ todos: [] })
@@ -366,8 +354,8 @@ test("snapshot processors can be composed", () => {
 
 test("addDisposer must return the passed disposer", () => {
     const listener = jest.fn()
-    const M = types.model({}).actions((self) => {
-        expect(addDisposer(self, listener)).toBe(listener)
+    const M = types.model({}).actions(() => {
+        expect(addDisposer(this, listener)).toBe(listener)
         return {}
     })
     M.create()
@@ -379,7 +367,7 @@ test("array calls all hooks", () => {
         events.push(message)
     }
     const Item = types.model("Item", { id: types.string })
-    const Collection = types.array(Item).hooks((self) => ({
+    const Collection = types.array(Item).hooks({
         afterCreate() {
             listener("afterCreate")
         },
@@ -392,7 +380,7 @@ test("array calls all hooks", () => {
         beforeDestroy() {
             listener("beforeDestroy")
         }
-    }))
+    })
     const Holder = types.model("Holder", { items: types.maybe(Collection) })
 
     const collection = Collection.create([{ id: "1" }, { id: "2" }, { id: "3" }])
@@ -420,7 +408,7 @@ test("map calls all hooks", () => {
         events.push(message)
     }
     const Item = types.model("Item", { id: types.string })
-    const Collection = types.map(Item).hooks((self) => ({
+    const Collection = types.map(Item).hooks({
         afterCreate() {
             listener("afterCreate")
         },
@@ -433,7 +421,7 @@ test("map calls all hooks", () => {
         beforeDestroy() {
             listener("beforeDestroy")
         }
-    }))
+    })
     const Holder = types.model("Holder", { items: types.maybe(Collection) })
 
     const collection = Collection.create({ "1": { id: "1" }, "2": { id: "2" }, "3": { id: "3" } })

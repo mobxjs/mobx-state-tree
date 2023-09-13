@@ -23,11 +23,11 @@ const Todo = types
     .model({
         title: "test"
     })
-    .views((self) => ({
+    .views({
         get description() {
-            return getEnv(self).useUppercase ? self.title.toUpperCase() : self.title
+            return getEnv(this).useUppercase ? this.title.toUpperCase() : this.title
         }
-    }))
+    })
 const Store = types.model({
     todos: types.array(Todo)
 })

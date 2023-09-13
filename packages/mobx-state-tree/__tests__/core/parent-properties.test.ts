@@ -6,32 +6,32 @@ const ChildModel = types
         parentEnvIsNullAfterCreate: false,
         parentPropertyIsNullAfterAttach: false
     })
-    .views((self) => {
-        return {
-            get parent(): IParentModelInstance {
-                return getParent<typeof ParentModel>(self)
-            }
+    .views({
+        get parent(): IParentModelInstance {
+            return getParent<typeof ParentModel>(this)
         }
     })
-    .actions((self) => ({
+    .actions({
         afterCreate() {
-            self.parentPropertyIsNullAfterCreate = typeof self.parent.fetch === "undefined"
-            self.parentEnvIsNullAfterCreate = typeof getEnv(self.parent).fetch === "undefined"
+            // @ts-ignore
+            this.parentPropertyIsNullAfterCreate = typeof this.parent.fetch === "undefined"
+            this.parentEnvIsNullAfterCreate = typeof getEnv(this.parent).fetch === "undefined"
         },
         afterAttach() {
-            self.parentPropertyIsNullAfterAttach = typeof self.parent.fetch === "undefined"
+            // @ts-ignore
+            this.parentPropertyIsNullAfterAttach = typeof this.parent.fetch === "undefined"
         }
-    }))
+    })
 
 const ParentModel = types
     .model("Parent", {
         child: types.optional(ChildModel, {})
     })
-    .views((self) => ({
+    .views({
         get fetch() {
-            return getEnv(self).fetch
+            return getEnv(this).fetch
         }
-    }))
+    })
 
 interface IParentModelInstance extends Instance<typeof ParentModel> {}
 
@@ -58,16 +58,16 @@ test("#917", () => {
             title: types.string,
             finished: false
         })
-        .views((self) => ({
+        .views({
             get path() {
-                return getPath(self)
+                return getPath(this)
             }
-        }))
-        .actions((self) => ({
+        })
+        .actions({
             toggle() {
-                self.finished = !self.finished
+                this.finished = !this.finished
             }
-        }))
+        })
 
     const Todo = types
         .model("Todo", {
@@ -76,29 +76,29 @@ test("#917", () => {
             finished: false,
             subTodos: types.array(SubTodo)
         })
-        .views((self) => ({
+        .views({
             get path() {
-                return getPath(self)
+                return getPath(this)
             }
-        }))
-        .actions((self) => ({
+        })
+        .actions({
             toggle() {
-                self.finished = !self.finished
+                this.finished = !this.finished
             }
-        }))
+        })
 
     const TodoStore = types
         .model("TodoStore", {
             todos: types.array(Todo)
         })
-        .views((self) => ({
+        .views({
             get unfinishedTodoCount() {
-                return self.todos.filter((todo) => !todo.finished).length
+                return this.todos.filter((todo) => !todo.finished).length
             }
-        }))
-        .actions((self) => ({
+        })
+        .actions({
             addTodo(title: string) {
-                self.todos.push({
+                this.todos.push({
                     title,
                     subTodos: [
                         {
@@ -107,7 +107,7 @@ test("#917", () => {
                     ]
                 })
             }
-        }))
+        })
 
     const store2 = TodoStore.create({
         todos: [

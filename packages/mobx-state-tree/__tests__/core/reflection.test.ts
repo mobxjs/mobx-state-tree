@@ -22,28 +22,25 @@ const Model = types
         dogs: types.array(User),
         user: types.maybe(types.late(() => User))
     })
-    .volatile((self) => ({
+    .volatile({
         volatileProperty: { propName: "halo" }
-    }))
-    .actions((self) => {
-        function actionName() {
-            return 1
-        }
-        return {
-            actionName,
-            generatorAction: flow(function* generatorAction() {
-                const promise = new Promise((resolve) => {
-                    resolve(true)
-                })
-                yield promise
-            })
-        }
     })
-    .views((self) => ({
+    .actions({
+        actionName() {
+            return 1
+        },
+        generatorAction: flow(function* generatorAction() {
+            const promise = new Promise((resolve) => {
+                resolve(true)
+            })
+            yield promise
+        })
+    })
+    .views({
         get viewName() {
             return 1
         }
-    }))
+    })
 
 function expectPropertyMembersToMatchMembers(
     propertyMembers: IModelReflectionPropertiesData,
@@ -151,30 +148,26 @@ test("reflection - members chained", () => {
         .model({
             isPerson: false
         })
-        .actions((self) => {
-            return {
-                actionName() {
-                    return 1
-                }
+        .actions({
+            actionName() {
+                return 1
             }
         })
-        .actions((self) => {
-            return {
-                anotherAction() {
-                    return 1
-                }
+        .actions({
+            anotherAction() {
+                return 1
             }
         })
-        .views((self) => ({
+        .views({
             get viewName() {
                 return 1
             }
-        }))
-        .views((self) => ({
+        })
+        .views({
             anotherView(prop: string) {
                 return 1
             }
-        }))
+        })
     const node = ChainedModel.create()
     const reflection = getMembers(node)
     const keys = Object.keys(reflection.properties || {})
@@ -190,12 +183,12 @@ test("reflection - conditionals respected", () => {
         .model({
             isPerson: false
         })
-        .actions((self) => ({
+        .actions({
             actionName0() {
                 return 1
             }
-        }))
-        .actions((self): { actionName1(): number } | { actionName2(): number } => {
+        })
+        .actions(function (): { actionName1(): number } | { actionName2(): number } {
             if (swap) {
                 return {
                     actionName1() {
@@ -210,7 +203,7 @@ test("reflection - conditionals respected", () => {
                 }
             }
         })
-        .views((self) => {
+        .views(() => {
             if (swap) {
                 return {
                     get view1() {

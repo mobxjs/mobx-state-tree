@@ -19,26 +19,24 @@ export const Box = types
         x: 0,
         y: 0
     })
-    .views((self) => ({
+    .views({
+        // @ts-ignore
         get width() {
-            return self.name.length * 15
+            // @ts-ignore
+            return this.name.length * 15
         },
         get isSelected(): boolean {
-            if (!hasParent(self)) return false
-            return getParent<typeof Store>(getParent(self)).selection === self
+            if (!hasParent(this)) return false
+            return getParent<typeof Store>(getParent(this)).selection === this
         }
-    }))
-    .actions((self) => {
-        function move(dx: number, dy: number) {
-            self.x += dx
-            self.y += dy
-        }
-        function setName(newName: string) {
-            self.name = newName
-        }
-        return {
-            move,
-            setName
+    })
+    .actions({
+        move(dx: number, dy: number) {
+            this.x += dx
+            this.y += dy
+        },
+        setName(newName: string) {
+            this.name = newName
         }
     })
 export const Arrow = types.model("Arrow", {
@@ -52,22 +50,22 @@ export const Store = types
         arrows: types.array(Arrow),
         selection: types.reference(Box)
     })
-    .actions((self) => {
-        function afterCreate() {
-            unprotect(self)
-        }
-        function addBox(id: string, name: string, x: number, y: number) {
+    .actions({
+        afterCreate() {
+            unprotect(this)
+        },
+        addBox(id: string, name: string, x: number, y: number) {
             const box = Box.create({ name, x, y, id })
-            self.boxes.put(box)
+            this.boxes.put(box)
             return box
-        }
-        function addArrow(id: string, from: string, to: string) {
-            self.arrows.push(Arrow.create({ id, from, to }))
-        }
-        function setSelection(selection: Instance<typeof Box>) {
-            self.selection = selection
-        }
-        function createBox(
+        },
+        addArrow(id: string, from: string, to: string) {
+            this.arrows.push(Arrow.create({ id, from, to }))
+        },
+        setSelection(selection: Instance<typeof Box>) {
+            this.selection = selection
+        },
+        createBox(
             id: string,
             name: string,
             x: number,
@@ -75,16 +73,9 @@ export const Store = types
             source: Instance<typeof Box> | null | undefined,
             arrowId: string | null
         ) {
-            const box = addBox(id, name, x, y)
-            setSelection(box)
-            if (source) addArrow(arrowId!, source.id, box.id)
-        }
-        return {
-            afterCreate,
-            addBox,
-            addArrow,
-            setSelection,
-            createBox
+            const box = this.addBox(id, name, x, y)
+            this.setSelection(box)
+            if (source) this.addArrow(arrowId!, source.id, box.id)
         }
     })
 function createStore() {

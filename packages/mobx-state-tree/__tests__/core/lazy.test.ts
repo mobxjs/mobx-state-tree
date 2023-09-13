@@ -11,11 +11,11 @@ test("it should load the correct type", async () => {
             width: types.number,
             height: types.number
         })
-        .views((self) => ({
+        .views({
             get area() {
-                return self.height * self.width
+                return this.height * this.width
             }
-        }))
+        })
 
     const Root = types
         .model("Root", {
@@ -25,11 +25,11 @@ test("it should load the correct type", async () => {
                 shouldLoadPredicate: (parent) => parent.shouldLoad == true
             })
         })
-        .actions((self) => ({
-            load: () => {
-                self.shouldLoad = true
+        .actions({
+            load: function () {
+                this.shouldLoad = true
             }
-        }))
+        })
 
     const store = Root.create({
         lazyModel: {
@@ -60,12 +60,12 @@ test("maintains the tree structure when loaded", async () => {
             width: types.number,
             height: types.number
         })
-        .views((self) => ({
+        .views({
             get area() {
-                const root = getRoot<{ rootValue: number }>(self)
-                return self.height * self.width * root.rootValue
+                const root = getRoot<{ rootValue: number }>(this)
+                return this.height * this.width * root.rootValue
             }
-        }))
+        })
 
     const Root = types
         .model("Root", {
@@ -80,11 +80,11 @@ test("maintains the tree structure when loaded", async () => {
                 return 5
             }
         }))
-        .actions((self) => ({
-            load: () => {
-                self.shouldLoad = true
+        .actions({
+            load: function () {
+                this.shouldLoad = true
             }
-        }))
+        })
 
     const store = Root.create({
         lazyModel: {

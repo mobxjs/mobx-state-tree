@@ -38,12 +38,12 @@ test("it should type strongly", () => {
         .model({
             loc: types.frozen<Point>()
         })
-        .actions((self) => ({
+        .actions({
             moveABit() {
-                // self.loc.x += 1; // compile error, x is readonly!
-                ;(self.loc as any).x += 1 // throws, frozen!
+                // this.loc.x += 1; // compile error, x is readonly!
+                ;(this.loc as any).x += 1 // throws, frozen!
             }
-        }))
+        })
 
     expect(Mouse.is({})).toBeTruthy() // any value is acceptable to frozen, even undefined...
 

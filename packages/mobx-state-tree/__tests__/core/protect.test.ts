@@ -4,12 +4,9 @@ const Todo = types
     .model("Todo", {
         title: ""
     })
-    .actions((self) => {
-        function setTitle(newTitle: string) {
-            self.title = newTitle
-        }
-        return {
-            setTitle
+    .actions({
+        setTitle(newTitle: string) {
+            this.title = newTitle
         }
     })
 const Store = types.model("Store", {
@@ -108,11 +105,11 @@ test("action cannot modify parent", () => {
         .model("Child", {
             x: 2
         })
-        .actions((self) => ({
+        .actions({
             setParentX() {
-                getParent<typeof self>(self).x += 1
+                getParent<typeof this>(this).x += 1
             }
-        }))
+        })
     const Parent = types.model("Parent", {
         x: 3,
         child: Child

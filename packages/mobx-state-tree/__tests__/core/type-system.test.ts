@@ -69,21 +69,17 @@ test("it should do typescript type inference correctly", () => {
             x: types.number,
             y: types.maybeNull(types.string)
         })
-        .views((self) => ({
+        .views({
             get z(): string {
                 return "hi"
             }
-        }))
-        .actions((self) => {
-            function method() {
-                const x: string = self.z + self.x + self.y
-                anotherMethod(x)
-            }
-            function anotherMethod(x: string) {}
-            return {
-                method,
-                anotherMethod
-            }
+        })
+        .actions({
+            method() {
+                const x: string = this.z + this.x + this.y
+                this.anotherMethod(x)
+            },
+            anotherMethod(x: string) {}
         })
     // factory is invokable
     const a = A.create({ x: 2, y: "7" })
@@ -199,11 +195,8 @@ test("it is possible to refer to a type", () => {
         .model({
             title: types.string
         })
-        .actions((self) => {
-            function setTitle(v: string) {}
-            return {
-                setTitle
-            }
+        .actions({
+            setTitle(v: string) {}
         })
     function x(): typeof Todo.Type {
         return Todo.create({ title: "test" })
@@ -220,11 +213,8 @@ test(".Type should not be callable", () => {
         .model({
             title: types.string
         })
-        .actions((self) => {
-            function setTitle(v: string) {}
-            return {
-                setTitle
-            }
+        .actions({
+            setTitle(v: string) {}
         })
     expect(() => Todo.Type).toThrow()
 })
@@ -233,26 +223,17 @@ test(".SnapshotType should not be callable", () => {
         .model({
             title: types.string
         })
-        .actions((self) => {
-            function setTitle(v: string) {}
-            return {
-                setTitle
-            }
+        .actions({
+            setTitle(v: string) {}
         })
     expect(() => Todo.SnapshotType).toThrow()
 })
 test("types instances with compatible snapshots should not be interchangeable", () => {
-    const A = types.model("A", {}).actions((self) => {
-        function doA() {}
-        return {
-            doA
-        }
+    const A = types.model("A", {}).actions({
+        doA() {}
     })
-    const B = types.model("B", {}).actions((self) => {
-        function doB() {}
-        return {
-            doB
-        }
+    const B = types.model("B", {}).actions({
+        doB() {}
     })
     const C = types.model("C", {
         x: types.maybe(A)
@@ -280,35 +261,29 @@ test("it handles complex types correctly", () => {
         .model({
             title: types.string
         })
-        .actions((self) => {
-            function setTitle(v: string) {}
-            return {
-                setTitle
-            }
+        .actions({
+            setTitle(v: string) {}
         })
     const Store = types
         .model({
             todos: types.map(Todo)
         })
-        .views((self) => {
-            function getActualAmount() {
-                return self.todos.size
+        .views(() => {
+            function getActualAmount(store) {
+                return store.todos.size
             }
             return {
                 get amount() {
-                    return getActualAmount()
+                    return getActualAmount(this)
                 },
                 getAmount(): number {
-                    return self.todos.size + getActualAmount()
+                    return this.todos.size + getActualAmount(this)
                 }
             }
         })
-        .actions((self) => {
-            function setAmount() {
-                const x: number = self.todos.size + self.amount + self.getAmount()
-            }
-            return {
-                setAmount
+        .actions({
+            setAmount() {
+                const x: number = this.todos.size + this.amount + this.getAmount()
             }
         })
     expect(true).toBe(true) // supress no asserts warning
@@ -319,30 +294,24 @@ if (process.env.NODE_ENV !== "production") {
             .model({
                 title: types.string
             })
-            .actions((self) => {
-                function setTitle(v: string) {}
-                return {
-                    setTitle
-                }
+            .actions({
+                setTitle(v: string) {}
             })
         const Store = types
             .model({
                 todos: types.map(Todo)
             })
-            .views((self) => ({
+            .views({
                 get amount() {
-                    return self.todos.size
+                    return this.todos.size
                 },
                 getAmount(): number {
-                    return self.todos.size + self.todos.size
+                    return this.todos.size + this.todos.size
                 }
-            }))
-            .actions((self) => {
-                function setAmount() {
-                    const x: number = self.todos.size + self.amount + self.getAmount()
-                }
-                return {
-                    setAmount
+            })
+            .actions({
+                setAmount() {
+                    const x: number = this.todos.size + this.amount + this.getAmount()
                 }
             })
         expect(() =>
@@ -367,7 +336,7 @@ test("it should type compose correctly", () => {
         .model({
             wheels: 3
         })
-        .actions((self) => {
+        .actions(() => {
             let connection = null as any as Promise<any>
             function drive() {}
             function afterCreate() {
@@ -382,11 +351,8 @@ test("it should type compose correctly", () => {
         .model({
             logNode: "test"
         })
-        .actions((self) => {
-            function log(msg: string) {}
-            return {
-                log
-            }
+        .actions({
+            log(msg: string) {}
         })
     const LoggableCar = types.compose(Car, Logger)
     const x = LoggableCar.create({ wheels: 3, logNode: "test" /* compile error: x: 7  */ })
@@ -448,18 +414,15 @@ test("it should extend types correctly", () => {
         .model({
             wheels: 3
         })
-        .actions((self) => {
-            function drive() {}
-            return {
-                drive
-            }
+        .actions({
+            drive() {}
         })
     const Logger = types
         .model("Logger")
         .props({
             logNode: "test"
         })
-        .actions((self) => {
+        .actions(() => {
             let connection: Promise<any>
             return {
                 log(msg: string) {},
@@ -474,17 +437,14 @@ test("it should extend types correctly", () => {
     x.drive()
     x.log("z")
 })
-test("self referring views", () => {
-    const Car = types.model({ x: 3 }).views((self) => {
-        const views = {
-            get tripple() {
-                return self.x + views.double
-            },
-            get double() {
-                return self.x * 2
-            }
+test("this referring views", () => {
+    const Car = types.model({ x: 3 }).views({
+        get tripple() {
+            return this.x + this.double
+        },
+        get double() {
+            return this.x * 2
         }
-        return views
     })
     expect(Car.create().tripple).toBe(9)
 })
@@ -656,110 +616,110 @@ test("cast and SnapshotOrInstance", () => {
     const NumberMap = types.map(types.number)
     const A = types
         .model({ n: 123, n2: types.number, arr: NumberArray, map: NumberMap })
-        .actions((self) => ({
+        .actions((this) => ({
             // for primitives (although not needed)
-            setN(nn: SnapshotOrInstance<typeof self.n>) {
-                self.n = cast(nn)
+            setN(nn: SnapshotOrInstance<typeof this.n>) {
+                this.n = cast(nn)
             },
             setN2(nn: SnapshotOrInstance<typeof types.number>) {
-                self.n = cast(nn)
+                this.n = cast(nn)
             },
             setN3(nn: SnapshotOrInstance<number>) {
-                self.n = cast(nn)
+                this.n = cast(nn)
             },
             setN4(nn: number) {
-                self.n = cast(nn)
+                this.n = cast(nn)
             },
             setN5() {
-                self.n = cast(5)
+                this.n = cast(5)
             },
 
             // for arrays
-            setArr(nn: SnapshotOrInstance<typeof self.arr>) {
-                self.arr = cast(nn)
+            setArr(nn: SnapshotOrInstance<typeof this.arr>) {
+                this.arr = cast(nn)
             },
             setArr2(nn: SnapshotOrInstance<typeof NumberArray>) {
-                self.arr = cast(nn)
+                this.arr = cast(nn)
             },
             setArr3(nn: SnapshotIn<typeof NumberArray>) {
-                self.arr = cast(nn)
+                this.arr = cast(nn)
             },
             setArr31(nn: number[]) {
-                self.arr = cast(nn)
+                this.arr = cast(nn)
             },
             setArr4() {
                 // it works even without specifying the target type, magic!
-                self.arr = cast([2, 3, 4])
-                self.arr = cast(NumberArray.create([2, 3, 4]))
+                this.arr = cast([2, 3, 4])
+                this.arr = cast(NumberArray.create([2, 3, 4]))
             },
 
             // for maps
-            setMap(nn: SnapshotOrInstance<typeof self.map>) {
-                self.map = cast(nn)
+            setMap(nn: SnapshotOrInstance<typeof this.map>) {
+                this.map = cast(nn)
             },
             setMap2(nn: SnapshotOrInstance<typeof NumberMap>) {
-                self.map = cast(nn)
+                this.map = cast(nn)
             },
             setMap3(nn: SnapshotIn<typeof NumberMap>) {
-                self.map = cast(nn)
+                this.map = cast(nn)
             },
             setMap31(nn: { [k: string]: number }) {
-                self.map = cast(nn)
+                this.map = cast(nn)
             },
             setMap4() {
                 // it works even without specifying the target type, magic!
-                self.map = cast({ a: 2, b: 3 })
-                self.map = cast(NumberMap.create({ a: 2, b: 3 }))
+                this.map = cast({ a: 2, b: 3 })
+                this.map = cast(NumberMap.create({ a: 2, b: 3 }))
             }
         }))
 
     const C = types
         .model({ a: A, maybeA: types.maybe(A), maybeNullA: types.maybeNull(A) })
-        .actions((self) => ({
-            // for submodels, using typeof self.var
-            setA(na: SnapshotOrInstance<typeof self.a>) {
-                self.a = cast(na)
+        .actions((this) => ({
+            // for submodels, using typeof this.var
+            setA(na: SnapshotOrInstance<typeof this.a>) {
+                this.a = cast(na)
                 // we just want to check it compiles
                 if (0 !== 0) {
-                    self.maybeA = cast(na)
-                    self.maybeNullA = cast(na)
+                    this.maybeA = cast(na)
+                    this.maybeNullA = cast(na)
                 }
             },
             // for submodels, using the type directly
             setA2(na: SnapshotOrInstance<typeof A>) {
-                self.a = cast(na)
+                this.a = cast(na)
                 // we just want to check it compiles
                 if (0 !== 0) {
-                    self.maybeA = cast(na)
-                    self.maybeNullA = cast(na)
+                    this.maybeA = cast(na)
+                    this.maybeNullA = cast(na)
                 }
             },
             setA3(na: SnapshotIn<typeof A>) {
-                self.a = cast(na)
+                this.a = cast(na)
                 // we just want to check it compiles
                 if (0 !== 0) {
-                    self.maybeA = cast(na)
-                    self.maybeNullA = cast(na)
+                    this.maybeA = cast(na)
+                    this.maybeNullA = cast(na)
                 }
             },
-            setA4(na: Instance<typeof self.a>) {
-                self.a = cast(na)
+            setA4(na: Instance<typeof this.a>) {
+                this.a = cast(na)
                 // we just want to check it compiles
                 if (0 !== 0) {
-                    self.maybeA = cast(na)
-                    self.maybeNullA = cast(na)
+                    this.maybeA = cast(na)
+                    this.maybeNullA = cast(na)
                 }
             },
             setA5() {
                 // it works even without specifying the target type, magic!
-                self.a = cast({ n2: 5 })
-                self.a = cast(A.create({ n2: 5 }))
+                this.a = cast({ n2: 5 })
+                this.a = cast(A.create({ n2: 5 }))
                 // we just want to check it compiles
                 if (0 !== 0) {
-                    self.maybeA = cast({ n2: 5 })
-                    self.maybeA = cast(A.create({ n2: 5 }))
-                    self.maybeNullA = cast({ n2: 5 })
-                    self.maybeNullA = cast(A.create({ n2: 5 }))
+                    this.maybeA = cast({ n2: 5 })
+                    this.maybeA = cast(A.create({ n2: 5 }))
+                    this.maybeNullA = cast({ n2: 5 })
+                    this.maybeNullA = cast(A.create({ n2: 5 }))
                 }
             }
         }))
@@ -831,7 +791,7 @@ test("castToSnapshot", () => {
     const firstModel = types.model({ brew1: types.map(types.number) })
     const secondModel = types
         .model({ brew2: types.map(firstModel) })
-        .actions((self) => ({ do() {} }))
+        .actions((this) => ({ do() {} }))
     const appMod = types.model({ aaa: secondModel })
 
     const storeSnapshot: SnapshotIn<typeof secondModel> = {
@@ -956,9 +916,9 @@ test("MST array type should be assignable to plain array type", () => {
                 done: false,
                 name: types.string
             })
-            .actions((self) => ({
+            .actions((this) => ({
                 toggleDone() {
-                    self.done = !self.done
+                    this.done = !this.done
                 }
             }))
         const TodoArray = types.array(Todo)
@@ -1051,9 +1011,9 @@ test("#1307 custom types failing", () => {
                 someProp: types.boolean,
                 someType: CustomType
             })
-            .views((self) => ({
+            .views((this) => ({
                 get isSomePropTrue(): boolean {
-                    return self.someProp
+                    return this.someProp
                 }
             }))
     }
@@ -1061,7 +1021,7 @@ test("#1307 custom types failing", () => {
 
 test("#1343", () => {
     function createTypeA<T extends ModelPropertiesDeclaration>(t: T) {
-        return types.model("TypeA", t).views((self) => ({
+        return types.model("TypeA", t).views((this) => ({
             get someView() {
                 return null
             }
@@ -1073,9 +1033,9 @@ test("#1343", () => {
             .model("TypeB", {
                 a: createTypeA(t)
             })
-            .views((self) => ({
+            .views((this) => ({
                 get someViewFromA() {
-                    return self.a.someView
+                    return this.a.someView
                 }
             }))
     }
@@ -1087,14 +1047,14 @@ test("#1330", () => {
             foo: types.string,
             bar: types.boolean
         })
-        .views((self) => ({
+        .views((this) => ({
             get root(): IRootStore {
-                return getRoot<IRootStore>(self)
+                return getRoot<IRootStore>(this)
             }
         }))
-        .actions((self) => ({
+        .actions((this) => ({
             test() {
-                const { childStore } = self.root
+                const { childStore } = this.root
                 // childStore and childStore.foo is properly inferred in TS 3.4 but not in 3.5
                 console.log(childStore.foo)
             }

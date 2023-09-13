@@ -5,9 +5,9 @@ import { isObservableProp, isComputedProp } from "mobx"
 test.skip("this support", () => {
     const M = types
         .model({ x: 5 })
-        .views((self) => ({
+        .views({
             get x2() {
-                return self.x * 2
+                return this.x * 2
             },
             get x4() {
                 return this.x2 * 2
@@ -26,8 +26,8 @@ test.skip("this support", () => {
                     isComputedProp(this, "x2")
                 )
             }
-        }))
-        .volatile((self) => ({
+        })
+        .volatile({
             localState: 3,
             getLocalState() {
                 return this.localState
@@ -35,25 +35,22 @@ test.skip("this support", () => {
             getLocalState2() {
                 return this.getLocalState() * 2
             }
-        }))
-
-        .actions((self) => {
-            return {
-                xBy(by: number) {
-                    return self.x * by
-                },
-                setX(x: number) {
-                    self.x = x
-                },
-                setThisX(x: number) {
-                    ;(this as any).x = x // this should not affect self.x
-                },
-                setXBy(x: number) {
-                    this.setX(this.xBy(x))
-                },
-                setLocalState(x: number) {
-                    self.localState = x
-                }
+        })
+        .actions({
+            xBy(by: number) {
+                return this.x * by
+            },
+            setX(x: number) {
+                this.x = x
+            },
+            setThisX(x: number) {
+                ;(this as any).x = x // this should not affect this.x
+            },
+            setXBy(x: number) {
+                this.setX(this.xBy(x))
+            },
+            setLocalState(x: number) {
+                this.localState = x
             }
         })
 
@@ -87,7 +84,7 @@ test.skip("this support", () => {
     mi.setLocalState(7)
     expect(mi.localState).toBe(7)
 
-    // make sure attempts to modify this (as long as it is not an action) doesn't affect self
+    // make sure attempts to modify this (as long as it is not an action) doesn't affect this
     const oldX = mi.x
     mi.setThisX(oldX + 1)
     expect(mi.x).toBe(oldX)

@@ -196,21 +196,23 @@ export interface IModelType<
         props: PROPS2
     ): IModelType<PROPS & ModelPropertiesDeclarationToProperties<PROPS2>, OTHERS, CustomC, CustomS>
 
-    views<V extends Object>(fn: V): IModelType<PROPS, OTHERS & V, CustomC, CustomS>
+    views<V extends Object>(
+        v:
+            | (ThisType<ModelInstanceType<PROPS, OTHERS>> & V)
+            | (() => ThisType<ModelInstanceType<PROPS, OTHERS>> & V)
+    ): IModelType<PROPS, OTHERS & V, CustomC, CustomS>
 
     actions<A extends ModelActions>(
         a:
-            | ThisType<ModelInstanceType<PROPS, OTHERS> & A>
-            | (() => ThisType<ModelInstanceType<PROPS, OTHERS> & A>)
+            | (ThisType<ModelInstanceType<PROPS, OTHERS>> & A)
+            | (() => ThisType<ModelInstanceType<PROPS, OTHERS>> & A)
     ): IModelType<PROPS, OTHERS & A, CustomC, CustomS>
 
     volatile<TP extends object>(fn: TP): IModelType<PROPS, OTHERS & TP, CustomC, CustomS>
 
-    extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(fn: {
-        actions?: A
-        views?: V
-        state?: VS
-    }): IModelType<PROPS, OTHERS & A & V & VS, CustomC, CustomS>
+    extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
+        e: { actions?: A; views?: V; state?: VS } | (() => { actions?: A; views?: V; state?: VS })
+    ): IModelType<PROPS, OTHERS & A & V & VS, CustomC, CustomS>
 
     preProcessSnapshot<NewC = ModelCreationType2<PROPS, CustomC>>(
         fn: (snapshot: NewC) => ModelCreationType2<PROPS, CustomC>
@@ -523,11 +525,13 @@ export class ModelType<
             views = views(self)
         }
         Object.getOwnPropertyNames(views).forEach((key) => {
-            // is this a computed property?
+            if (key in self.prototype || key in this.properties) {
+                throw fail(`${key} property is declared twice`)
+            }
+
             const descriptor = Object.getOwnPropertyDescriptor(views, key)!
             if ("get" in descriptor) {
-                defineProperty(self, key, descriptor)
-                makeObservable(self, { [key]: computed } as any)
+                Object.defineProperty(self.prototype, key, descriptor)
             } else if (typeof descriptor.value === "function") {
                 // this is a view function, merge as is!
                 // See #646, allow models to be mocked
@@ -584,6 +588,7 @@ export class ModelType<
                     makeAutoObservable(this, EMPTY_OBJECT, options)
 
                     // Binds all actions to the current instance.
+                    // Remove this because autoObservable does it.
                     const prototype = Reflect.getPrototypeOf(this)!
                     for (const key of Reflect.ownKeys(prototype)) {
                         if (key === "constructor") continue

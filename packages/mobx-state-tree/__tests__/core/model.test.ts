@@ -202,11 +202,12 @@ describe("Model instantiation", () => {
                     id: types.identifier,
                     name: types.string
                 })
-                .views((user) => ({
+                .views({
+                    // @ts-ignore
                     get name() {
-                        return user.name
+                        return this.name
                     }
-                }))
+                })
 
             expect(() =>
                 UserModel.create({

@@ -20,20 +20,20 @@ if (process.env.NODE_ENV !== "production") {
                     (identifier) => identifier.indexOf("Model_") === 0
                 )
             })
-            .actions((self) => ({
+            .actions({
                 setId(id: string) {
-                    self.id = id
+                    this.id = id
                 }
-            }))
+            })
         const ParentModel = types
             .model("ParentModel", {
                 models: types.array(Model)
             })
-            .actions((self) => ({
+            .actions({
                 addModel(model: SnapshotOrInstance<typeof Model>) {
-                    self.models.push(model)
+                    this.models.push(model)
                 }
-            }))
+            })
         expect(() => {
             ParentModel.create({ models: [{ id: "WrongId_1" }] })
         }).toThrow()
@@ -233,18 +233,18 @@ test("#1019", () => {
         .model("CommentStore", {
             items: types.array(CommentModel)
         })
-        .actions((self) => ({
+        .actions({
             test1() {
                 expect(calls).toBe(0)
                 const comment = CommentModel.create({})
                 expect(calls).toBe(1)
 
-                self.items.push(comment)
-                const item = resolveIdentifier(CommentModel, self.items, comment.uid)
-                const item2 = self.items.find((i) => i.uid === comment.uid)
+                this.items.push(comment)
+                const item = resolveIdentifier(CommentModel, this.items, comment.uid)
+                const item2 = this.items.find((i) => i.uid === comment.uid)
                 expect(item).toBe(item2)
             }
-        }))
+        })
 
     const c = CommentStore.create({})
     c.test1()
@@ -271,11 +271,11 @@ test("identifierAttribute of the type", () => {
 
 test("items detached from arrays don't corrupt identifierCache", () => {
     const Item = types.model("Item", { id: types.identifier })
-    const ItemArray = types.model("ItemArray", { items: types.array(Item) }).actions((self) => ({
+    const ItemArray = types.model("ItemArray", { items: types.array(Item) }).actions({
         removeSecondItemWithDetach() {
-            detach(self.items[1])
+            detach(this.items[1])
         }
-    }))
+    })
 
     const smallArray = ItemArray.create({
         items: [{ id: "A" }, { id: "B" }, { id: "C" }, { id: "D" }, { id: "E" }]

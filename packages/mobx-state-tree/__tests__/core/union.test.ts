@@ -138,22 +138,22 @@ test("dispatch", () => {
         .model({
             value: types.number
         })
-        .actions((self) => ({
+        .actions({
             isOdd() {
                 return true
             },
             isEven() {
                 return false
             }
-        }))
-    const Even = types.model({ value: types.number }).actions((self) => ({
+        })
+    const Even = types.model({ value: types.number }).actions({
         isOdd() {
             return false
         },
         isEven() {
             return true
         }
-    }))
+    })
     const Num = types.union(
         { dispatcher: (snapshot) => (snapshot.value % 2 === 0 ? Even : Odd) },
         Even,

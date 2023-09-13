@@ -27,12 +27,9 @@ const createTestFactories = () => {
         .model({
             to: "world"
         })
-        .actions((self) => {
-            function setTo(to: string) {
-                self.to = to
-            }
-            return {
-                setTo
+        .actions({
+            setTo(to: string) {
+                this.to = to
             }
         })
     const ComputedFactory = types
@@ -40,30 +37,26 @@ const createTestFactories = () => {
             width: 100,
             height: 200
         })
-        .views((self) => ({
+        .views({
             get area() {
-                return self.width * self.height
+                return this.width * this.height
             }
-        }))
+        })
     const ComputedFactory2 = types
         .model({
             props: types.map(types.number)
         })
-        .views((self) => ({
+        .views({
             get area() {
-                return self.props.get("width")! * self.props.get("height")!
+                return this.props.get("width")! * this.props.get("height")!
             }
-        }))
-        .actions((self) => {
-            function setWidth(value: number) {
-                self.props.set("width", value)
-            }
-            function setHeight(value: number) {
-                self.props.set("height", value)
-            }
-            return {
-                setWidth,
-                setHeight
+        })
+        .actions({
+            setWidth(value: number) {
+                this.props.set("width", value)
+            },
+            setHeight(value: number) {
+                this.props.set("height", value)
             }
         })
     const BoxFactory = types.model({
@@ -81,22 +74,22 @@ const createFactoryWithChildren = () => {
         .model("File", {
             name: types.string
         })
-        .actions((self) => ({
+        .actions({
             rename(value: string) {
-                self.name = value
+                this.name = value
             }
-        }))
+        })
 
     const Folder = types
         .model("Folder", {
             name: types.string,
             files: types.array(File)
         })
-        .actions((self) => ({
+        .actions({
             rename(value: string) {
-                self.name = value
+                this.name = value
             }
-        }))
+        })
     return Folder
 }
 // === FACTORY TESTS ===
@@ -284,17 +277,17 @@ test("it should throw if a replaced object is read or written to", () => {
                     .model("Sub", {
                         title: "test2"
                     })
-                    .actions((self) => ({
+                    .actions({
                         fn2() {}
-                    })),
+                    }),
                 {}
             )
         })
-        .actions((self) => ({
+        .actions({
             fn() {
-                self.sub.fn2()
+                this.sub.fn2()
             }
-        }))
+        })
     const Store = types.model("Store", {
         todo: Todo
     })
@@ -403,11 +396,8 @@ test("it should warn if a replaced object is read or written to", () => {
         .model("Todo", {
             title: "test"
         })
-        .actions((self) => {
-            function fn() {}
-            return {
-                fn
-            }
+        .actions({
+            fn() {}
         })
     const Store = types.model("Store", {
         todo: Todo
@@ -461,19 +451,16 @@ test("methods get overridden by compose", () => {
         .model({
             count: types.optional(types.number, 0)
         })
-        .actions((self) => {
-            function increment() {
-                self.count += 1
-            }
-            return {
-                increment
+        .actions({
+            increment() {
+                this.count += 1
             }
         })
-    const B = A.actions((self) => ({
+    const B = A.actions({
         increment() {
-            self.count += 10
+            this.count += 10
         }
-    }))
+    })
     const store = B.create()
     expect(getSnapshot(store)).toEqual({ count: 0 })
     expect(store.count).toBe(0)
@@ -496,22 +483,19 @@ test("models should expose their actions to be used in a composable way", () => 
         .model({
             count: types.optional(types.number, 0)
         })
-        .actions((self) => {
-            function increment() {
-                self.count += 1
-            }
-            return {
-                increment
+        .actions({
+            increment() {
+                this.count += 1
             }
         })
     const B = A.props({
         called: types.optional(types.number, 0)
-    }).actions((self) => {
-        const baseIncrement = self.increment
+    }).actions(function () {
+        const baseIncrement = this.increment
         return {
             increment() {
                 baseIncrement()
-                self.called += 1
+                this.called += 1
             }
         }
     })
@@ -528,18 +512,18 @@ test("compose should be overwrite", () => {
             name: "",
             alias: ""
         })
-        .views((self) => ({
+        .views({
             get displayName() {
-                return self.alias || self.name
+                return this.alias || this.name
             }
-        }))
+        })
     const B = A.props({
         type: ""
-    }).views((self) => ({
+    }).views({
         get displayName() {
-            return self.alias || self.name + self.type
+            return this.alias || this.name + this.type
         }
-    }))
+    })
     const storeA = A.create({ name: "nameA", alias: "aliasA" })
     const storeB = B.create({ name: "nameB", alias: "aliasB", type: "typeB" })
     const storeC = B.create({ name: "nameC", type: "typeC" })
@@ -615,11 +599,11 @@ test("view functions should be tracked", () => {
         .model({
             x: 3
         })
-        .views((self) => ({
+        .views({
             doubler() {
-                return self.x * 2
+                return this.x * 2
             }
-        }))
+        })
         .create()
     unprotect(model)
     const values: number[] = []
@@ -634,17 +618,14 @@ test("view functions should not be allowed to change state", () => {
         .model({
             x: 3
         })
-        .views((self) => ({
+        .views({
             doubler() {
-                self.x *= 2
+                this.x *= 2
             }
-        }))
-        .actions((self) => {
-            function anotherDoubler() {
-                self.x *= 2
-            }
-            return {
-                anotherDoubler
+        })
+        .actions({
+            anotherDoubler() {
+                this.x *= 2
             }
         })
         .create()
@@ -719,7 +700,7 @@ if (process.env.NODE_ENV !== "production") {
     })
 }
 test("it should be possible to share states between views and actions using enhance", () => {
-    const A = types.model({}).extend((self) => {
+    const A = types.model({}).extend(() => {
         const localState = observable.box(3)
         return {
             views: {
@@ -794,50 +775,50 @@ test("#967 - changing values in afterCreate/afterAttach when node is instantiate
             title: types.string,
             selected: false
         })
-        .actions((self) => ({
+        .actions({
             toggle() {
-                self.selected = !self.selected
+                this.selected = !this.selected
             }
-        }))
+        })
     const Question = types
         .model("Question", { title: types.string, answers: types.array(Answer) })
-        .views((self) => ({
+        .views({
             get brokenView() {
                 // this should not be allowed
                 // MWE: disabled, MobX 6 no longer forbids this
                 // expect(() => {
-                //     self.answers[0].toggle()
+                //     this.answers[0].toggle()
                 // }).toThrow()
                 return 0
             }
-        }))
-        .actions((self) => ({
+        })
+        .actions({
             afterCreate() {
                 // we should allow changes even when inside a computed property when done inside afterCreate/afterAttach
-                self.answers[0].toggle()
+                this.answers[0].toggle()
                 // but not further computed changes
-                expect(self.brokenView).toBe(0)
+                expect(this.brokenView).toBe(0)
             },
             afterAttach() {
                 // we should allow changes even when inside a computed property when done inside afterCreate/afterAttach
-                self.answers[0].toggle()
-                expect(self.brokenView).toBe(0)
+                this.answers[0].toggle()
+                expect(this.brokenView).toBe(0)
             }
-        }))
+        })
 
     const Product = types
         .model("Product", {
             questions: types.array(Question)
         })
-        .views((self) => ({
+        .views({
             get selectedAnswers() {
                 const result = []
-                for (const question of self.questions) {
+                for (const question of this.questions) {
                     result.push(question.answers.find((a) => a.selected))
                 }
                 return result
             }
-        }))
+        })
 
     const product = Product.create({
         questions: [
@@ -856,38 +837,38 @@ test("#993-1 - after attach should have a parent when accesing a reference direc
             id: types.identifier,
             finished: false
         })
-        .actions((self) => ({
+        .actions({
             afterAttach() {
-                expect(getParent(self)).toBeTruthy()
+                expect(getParent(this)).toBeTruthy()
             }
-        }))
+        })
 
-    const L3 = types.model({ l4: L4 }).actions((self) => ({
+    const L3 = types.model({ l4: L4 }).actions({
         afterAttach() {
-            expect(getParent(self)).toBeTruthy()
+            expect(getParent(this)).toBeTruthy()
         }
-    }))
+    })
 
     const L2 = types
         .model({
             l3: L3
         })
-        .actions((self) => ({
+        .actions({
             afterAttach() {
-                expect(getParent(self)).toBeTruthy()
+                expect(getParent(this)).toBeTruthy()
             }
-        }))
+        })
 
     const L1 = types
         .model({
             l2: L2,
             selected: types.reference(L4)
         })
-        .actions((self) => ({
+        .actions({
             afterAttach() {
                 throw fail("should never be called")
             }
-        }))
+        })
 
     const createL1 = () =>
         L1.create({
@@ -926,9 +907,9 @@ test("#993-2 - references should have a parent even when the parent has not been
             id: types.identifier,
             finished: false
         })
-        .actions((self) => ({
+        .actions({
             toggle() {
-                self.finished = !self.finished
+                this.finished = !this.finished
             },
             afterCreate() {
                 events.push("l4-ac")
@@ -936,43 +917,43 @@ test("#993-2 - references should have a parent even when the parent has not been
             afterAttach() {
                 events.push("l4-at")
             }
-        }))
+        })
 
-    const L3 = types.model({ l4: L4 }).actions((self) => ({
+    const L3 = types.model({ l4: L4 }).actions({
         afterCreate() {
             events.push("l3-ac")
         },
         afterAttach() {
             events.push("l3-at")
         }
-    }))
+    })
 
     const L2 = types
         .model({
             l3: L3
         })
-        .actions((self) => ({
+        .actions({
             afterCreate() {
                 events.push("l2-ac")
             },
             afterAttach() {
                 events.push("l2-at")
             }
-        }))
+        })
 
     const L1 = types
         .model({
             l2: L2,
             selected: types.reference(L4)
         })
-        .actions((self) => ({
+        .actions({
             afterCreate() {
                 events.push("l1-ac")
             },
             afterAttach() {
                 events.push("l1-at")
             }
-        }))
+        })
 
     const createL1 = () =>
         L1.create({
@@ -1147,11 +1128,11 @@ test("#1112 - identifier cache should be cleared for unaccessed wrapped objects"
             list: types.optional(types.array(Wrapper), []),
             selectedId: 2
         })
-        .views((self) => ({
+        .views({
             get selectedEntity() {
-                return resolveIdentifier(Entity, self, self.selectedId)
+                return resolveIdentifier(Entity, this, this.selectedId)
             }
-        }))
+        })
 
     const store = Store.create()
     unprotect(store)
@@ -1182,11 +1163,11 @@ test("#1702 - should not throw with useProxies: 'ifavailable'", () => {
         useProxies: "ifavailable"
     })
 
-    const M = types.model({ x: 5 }).views((self) => ({
+    const M = types.model({ x: 5 }).views({
         get y() {
-            return self.x
+            return this.x
         }
-    }))
+    })
 
     expect(() => {
         M.create({})

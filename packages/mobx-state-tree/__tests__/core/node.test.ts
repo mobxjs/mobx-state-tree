@@ -290,12 +290,9 @@ test("make sure array filter works properly", () => {
         .model({
             rows: types.optional(types.array(Row), [])
         })
-        .actions((self) => {
-            function clearDone() {
-                self.rows.filter((row) => row.done === true).forEach(destroy)
-            }
-            return {
-                clearDone
+        .actions({
+            clearDone() {
+                this.rows.filter((row) => row.done === true).forEach(destroy)
             }
         })
     const doc = Document.create()
@@ -331,12 +328,9 @@ test("it can record and replay actions", () => {
         .model({
             article_id: 0
         })
-        .actions((self) => {
-            function setArticle(article_id: number) {
-                self.article_id = article_id
-            }
-            return {
-                setArticle
+        .actions({
+            setArticle(article_id: number) {
+                this.article_id = article_id
             }
         })
     const Document = types
@@ -344,16 +338,12 @@ test("it can record and replay actions", () => {
             customer_id: 0,
             rows: types.optional(types.array(Row), [])
         })
-        .actions((self) => {
-            function setCustomer(customer_id: number) {
-                self.customer_id = customer_id
-            }
-            function addRow() {
-                self.rows.push(Row.create())
-            }
-            return {
-                setCustomer,
-                addRow
+        .actions({
+            setCustomer(customer_id: number) {
+                this.customer_id = customer_id
+            },
+            addRow() {
+                this.rows.push(Row.create())
             }
         })
     const source = Document.create()
@@ -373,18 +363,17 @@ test("Liveliness issue #683", () => {
         .model({
             list: types.map(User)
         })
-        .actions((self) => ({
+        .actions({
             put(aUser: typeof User.CreationType | typeof User.Type) {
-                // if (self.has(user.id)) detach(self.get(user.id));
-                self.list.put(aUser)
+                this.list.put(aUser)
             },
             get(id: string) {
-                return self.list.get(id)
+                return this.list.get(id)
             },
             has(id: string) {
-                return self.list.has(id)
+                return this.list.has(id)
             }
-        }))
+        })
 
     const users = Users.create({
         list: {
@@ -407,11 +396,11 @@ test("triggers on changing paths - 1", () => {
         .model({
             todos: types.array(Todo)
         })
-        .actions((self) => ({
+        .actions({
             do(fn: () => void) {
                 fn()
             }
-        }))
+        })
 
     const t1 = Todo.create({ title: "t1 " })
     const t2 = Todo.create({ title: "t2 " })
