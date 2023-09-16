@@ -74,7 +74,7 @@ class RunningAction {
 export function createActionTrackingMiddleware2<TEnv = any>(
     middlewareHooks: IActionTrackingMiddleware2Hooks<TEnv>
 ): IMiddlewareHandler {
-    const runningActions = new WeakMap<IMiddlewareEvent, RunningAction>()
+    const runningActions = new Map<number, RunningAction>()
 
     return function actionTrackingMiddleware(
         call: IMiddlewareEvent,
@@ -82,7 +82,7 @@ export function createActionTrackingMiddleware2<TEnv = any>(
     ) {
         // find parentRunningAction
         const parentRunningAction = call.parentActionEvent
-            ? runningActions.get(call.parentActionEvent)
+            ? runningActions.get(call.parentActionEvent.id)
             : undefined
 
         if (call.type === "action") {
@@ -94,10 +94,23 @@ export function createActionTrackingMiddleware2<TEnv = any>(
             }
 
             const passesFilter = !middlewareHooks.filter || middlewareHooks.filter(newCall)
-            const hooks = passesFilter ? middlewareHooks : undefined
+            const hooks: IActionTrackingMiddleware2Hooks<TEnv> = passesFilter
+                ? {
+                      ...middlewareHooks,
+                      onFinish(call: IActionTrackingMiddleware2Call<TEnv>, error: any) {
+                          middlewareHooks.onFinish(call, error)
+                          runningActions.delete(call.id)
+                      }
+                  }
+                : {
+                      onStart() {},
+                      onFinish() {
+                          runningActions.delete(call.id)
+                      }
+                  }
 
             const runningAction = new RunningAction(hooks, newCall)
-            runningActions.set(call, runningAction)
+            runningActions.set(call.id, runningAction)
 
             let res
             try {
