@@ -94,20 +94,7 @@ export function createActionTrackingMiddleware2<TEnv = any>(
             }
 
             const passesFilter = !middlewareHooks.filter || middlewareHooks.filter(newCall)
-            const hooks: IActionTrackingMiddleware2Hooks<TEnv> = passesFilter
-                ? {
-                      ...middlewareHooks,
-                      onFinish(call: IActionTrackingMiddleware2Call<TEnv>, error: any) {
-                          middlewareHooks.onFinish(call, error)
-                          runningActions.delete(call.id)
-                      }
-                  }
-                : {
-                      onStart() {},
-                      onFinish() {
-                          runningActions.delete(call.id)
-                      }
-                  }
+            const hooks = passesFilter ? middlewareHooks : undefined
 
             const runningAction = new RunningAction(hooks, newCall)
             runningActions.set(call.id, runningAction)
@@ -116,12 +103,13 @@ export function createActionTrackingMiddleware2<TEnv = any>(
             try {
                 res = next(call)
             } catch (e) {
+                runningActions.delete(call.id)
                 runningAction.finish(e)
                 throw e
             }
-
+            // sync action finished
             if (!runningAction.hasFlowsPending) {
-                // sync action finished
+                runningActions.delete(call.id)
                 runningAction.finish()
             }
             return res
@@ -146,6 +134,7 @@ export function createActionTrackingMiddleware2<TEnv = any>(
                     } finally {
                         parentRunningAction.decFlowsPending()
                         if (!parentRunningAction.hasFlowsPending) {
+                            runningActions.delete(call.parentActionEvent!.id)
                             parentRunningAction.finish(error)
                         }
                     }
@@ -156,6 +145,7 @@ export function createActionTrackingMiddleware2<TEnv = any>(
                     } finally {
                         parentRunningAction.decFlowsPending()
                         if (!parentRunningAction.hasFlowsPending) {
+                            runningActions.delete(call.parentActionEvent!.id)
                             parentRunningAction.finish()
                         }
                     }
