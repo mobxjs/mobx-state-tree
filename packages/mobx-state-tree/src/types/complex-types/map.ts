@@ -68,7 +68,7 @@ export interface IMSTMap<IT extends IAnyType> {
     // bases on ObservableMap, but fine tuned to the auto snapshot conversion of MST
 
     clear(): void
-    delete(key: string | number): boolean
+    delete(key: string): boolean
     forEach(
         callbackfn: (value: IT["Type"], key: string | number, map: this) => void,
         thisArg?: any
@@ -78,9 +78,9 @@ export interface IMSTMap<IT extends IAnyType> {
     set(key: string | number, value: ExtractCSTWithSTN<IT>): this
     readonly size: number
     put(value: ExtractCSTWithSTN<IT>): IT["Type"]
-    keys(): IterableIterator<string | number>
+    keys(): IterableIterator<string>
     values(): IterableIterator<IT["Type"]>
-    entries(): IterableIterator<[string | number, IT["Type"]]>
+    entries(): IterableIterator<[string, IT["Type"]]>
     [Symbol.iterator](): IterableIterator<[string, IT["Type"]]>
     /** Merge another object into this map, returns self. */
     merge(
