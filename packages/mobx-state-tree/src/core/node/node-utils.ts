@@ -13,7 +13,8 @@ import {
     assertArg,
     STNValue,
     Instance,
-    IAnyComplexType
+    IAnyComplexType,
+    EMPTY_SET
 } from "../../internal"
 
 /**
@@ -215,6 +216,24 @@ export function convertChildNodesToArray(childNodes: IChildNodesMap | null): Any
     const result = new Array(keys.length) as AnyNode[]
     keys.forEach((key, index) => {
         result[index] = childNodes![key]
+    })
+    return result
+}
+
+// TODO: can I use convertChildNodesToArray function written above??
+/**
+ * @internal
+ * @hidden
+ */
+export function convertChildNodesToSet(childNodes: IChildNodesMap | null): Set<AnyNode> {
+    if (!childNodes) return EMPTY_SET as Set<AnyNode>
+
+    const keys = Object.keys(childNodes)
+    if (!keys.length) return EMPTY_SET as Set<AnyNode>
+
+    const result = new Set<AnyNode>()
+    keys.forEach((key) => {
+        result.add(childNodes![key])
     })
     return result
 }

@@ -52,7 +52,8 @@ export enum TypeFlags {
     SnapshotProcessor = 1 << 19,
     Lazy = 1 << 20,
     Finite = 1 << 21,
-    Float = 1 << 22
+    Float = 1 << 22,
+    Set = 1 << 23
 }
 
 /**

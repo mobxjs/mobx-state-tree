@@ -20,6 +20,13 @@ declare const global: any
  */
 export const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([])
 
+// TODO: Can I use Empty array instead of empty set??
+/**
+ * @internal
+ * @hidden
+ */
+export const EMPTY_SET: ReadonlySet<any> = Object.freeze(new Set())
+
 /**
  * @internal
  * @hidden
