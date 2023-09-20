@@ -14,8 +14,7 @@ import {
     devMode,
     ComplexType,
     typeCheckFailure,
-    isUnionType,
-    IAnyStateTreeNode
+    isUnionType
 } from "../../internal"
 
 /** @hidden */
@@ -60,12 +59,9 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
         return `snapshotProcessor(${this._subtype.describe()})`
     }
 
-    private preProcessSnapshot(
-        sn: this["C"],
-        parent: AnyObjectNode | null = null
-    ): IT["CreationType"] {
+    private preProcessSnapshot(sn: this["C"]): IT["CreationType"] {
         if (this._processors.preProcessor) {
-            return this._processors.preProcessor.call(null, sn, parent && parent.storedValue)
+            return this._processors.preProcessor.call(null, sn)
         }
         return sn as any
     }
@@ -78,13 +74,9 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
         }
     }
 
-    private postProcessSnapshot(sn: IT["SnapshotType"], parent: AnyObjectNode | null): this["S"] {
+    private postProcessSnapshot(sn: IT["SnapshotType"]): this["S"] {
         if (this._processors.postProcessor) {
-            return this._processors.postProcessor.call(
-                null,
-                sn,
-                parent && parent.storedValue
-            ) as any
+            return this._processors.postProcessor.call(null, sn) as any
         }
         return sn
     }
@@ -94,9 +86,9 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
         proxyNodeTypeMethods(node.type, this, "create")
 
         const oldGetSnapshot = node.getSnapshot
-        node.getSnapshot = () =>
-            this.postProcessSnapshot(oldGetSnapshot.call(node), node.parent) as any
-
+        node.getSnapshot = () => {
+            return this.postProcessSnapshot(oldGetSnapshot.call(node)) as any
+        }
         if (!isUnionType(this._subtype)) {
             node.getReconciliationType = () => {
                 return this
@@ -112,7 +104,7 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
     ): this["N"] {
         const processedInitialValue = isStateTreeNode(initialValue)
             ? initialValue
-            : this.preProcessSnapshot(initialValue, parent)
+            : this.preProcessSnapshot(initialValue)
         const node = this._subtype.instantiate(
             parent,
             subpath,
@@ -131,7 +123,7 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
     ): this["N"] {
         const node = this._subtype.reconcile(
             current,
-            isStateTreeNode(newValue) ? newValue : this.preProcessSnapshot(newValue, parent),
+            isStateTreeNode(newValue) ? newValue : this.preProcessSnapshot(newValue),
             parent,
             subpath
         ) as any
@@ -143,7 +135,7 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
 
     getSnapshot(node: this["N"], applyPostProcess: boolean = true): this["S"] {
         const sn = this._subtype.getSnapshot(node)
-        return applyPostProcess ? this.postProcessSnapshot(sn, node.parent) : sn
+        return applyPostProcess ? this.postProcessSnapshot(sn) : sn
     }
 
     isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
@@ -178,7 +170,7 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
         if (!(this._subtype instanceof ComplexType)) {
             return false
         }
-        const processedSn = this.preProcessSnapshot(snapshot, current.parent)
+        const processedSn = this.preProcessSnapshot(snapshot)
         return this._subtype.isMatchingSnapshotId(current as any, processedSn)
     }
 }
@@ -212,12 +204,12 @@ export interface ISnapshotProcessors<C, CustomC, S, CustomS> {
     /**
      * Function that transforms an input snapshot.
      */
-    preProcessor?(snapshot: CustomC, parent: IAnyStateTreeNode | null): C
+    preProcessor?(snapshot: CustomC): C
     /**
      * Function that transforms an output snapshot.
      * @param snapshot
      */
-    postProcessor?(snapshot: S, parent: IAnyStateTreeNode | null): CustomS
+    postProcessor?(snapshot: S): CustomS
 }
 
 /**

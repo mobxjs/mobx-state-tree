@@ -284,7 +284,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     }
 
     createNewInstance(childNodes: IChildNodesMap): this["T"] {
-        return new MSTMap(childNodes, this.describe()) as any
+        return new MSTMap(childNodes, this.name) as any
     }
 
     finalizeNewInstance(node: this["N"], instance: ObservableMap<string, any>): void {
@@ -309,7 +309,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     }
 
     describe() {
-        return "Map<string, " + this._subType.describe() + ">"
+        return this.name
     }
 
     getChildren(node: this["N"]): ReadonlyArray<AnyNode> {
@@ -508,7 +508,7 @@ MapType.prototype.applySnapshot = action(MapType.prototype.applySnapshot)
  * @returns
  */
 export function map<IT extends IAnyType>(subtype: IT): IMapType<IT> {
-    return new MapType<IT>(`map<string, ${subtype.name}>`, subtype)
+    return new MapType<IT>(`Map<string, ${subtype.name}>`, subtype)
 }
 
 /**
