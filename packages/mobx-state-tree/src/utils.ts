@@ -25,7 +25,7 @@ export const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([])
  * @internal
  * @hidden
  */
-export const EMPTY_SET: ReadonlySet<any> = Object.freeze(new Set())
+export const EMPTY_SET: Set<any> = Object.freeze(new Set())
 
 /**
  * @internal

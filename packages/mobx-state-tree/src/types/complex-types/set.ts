@@ -48,12 +48,17 @@ export interface IMSTSet<IT extends IAnyType> {
     add(value: IT["Type"]): void
     clear(): void
     delete(value: IT["Type"]): boolean
+    entries(): IterableIterator<[IT["Type"], IT["Type"]]>
     forEach(
         callbackfn: (value: IT["Type"], value2: IT["Type"], set: this) => void,
         thisArg?: any
     ): void
     has(value: IT["Type"]): boolean
+    keys(): IterableIterator<IT["Type"]>
+    values(): IterableIterator<IT["Type"]>
     readonly size: number
+    [Symbol.iterator](): IterableIterator<IT["Type"]>
+    [Symbol.toStringTag]: "Set"
 }
 
 /** @hidden */
