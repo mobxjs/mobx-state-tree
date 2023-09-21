@@ -1,9 +1,0 @@
-node_modules
-*.log
-lib
-dist
-coverage
-.nyc_output
-.idea
-package-lock.json
-/junit.xml
