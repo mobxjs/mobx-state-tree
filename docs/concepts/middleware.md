@@ -12,7 +12,7 @@ The order in which middlewares are invoked is inside-out:
 This means that the middlewares are invoked in the order you attach them.
 The value returned by the action invoked/ the aborted value gets passed through the middleware chain and can be manipulated.
 
-MST ships with a small set of [pre-built / example middlewares](https://github.com/mobxjs/mobx-state-tree/blob/master/packages/mst-middlewares/README.md).
+The community has created a small set of [pre-built / example middlewares](https://github.com/coolsoftwaretyler/mst-middlewares).
 
 Play around with a simple example of middleware in action with [this CodeSandbox](https://codesandbox.io/s/vjoql07ool).
 
@@ -39,7 +39,7 @@ const disposer = addMiddleware(store, (call, next, abort) => {
     // if there is no middleware left to run
 
     // the value returned from the next can be manipulated
-    next(call, value => value + 1)
+    next(call, (value) => value + 1)
 })
 ```
 
