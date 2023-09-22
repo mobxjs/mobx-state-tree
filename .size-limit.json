@@ -4,11 +4,5 @@
         "limit": "25 KB",
         "webpack": false,
         "running": false
-    },
-    {
-        "path": "packages/mst-middlewares/dist/mst-middlewares.min.js",
-        "limit": "5 KB",
-        "webpack": false,
-        "running": false
     }
 ]
