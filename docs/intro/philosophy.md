@@ -52,7 +52,7 @@ store.todos[0].toggle()
 ```
 
 By using the type information available, snapshots can be converted to living trees, and vice versa, with zero effort.
-Because of this, [time travelling](https://github.com/coolsoftwaretyler/mst-example-boxes/blob/main/src/stores/time.js) is supported out of the box, and tools like HMR are trivial to support [example](https://github.com/coolsoftwaretyler/mst-example-boxes/blob/main/src/stores/domain-state.js#L94).
+Because of this, [time travelling](https://github.com/coolsoftwaretyler/mst-example-boxes/blob/main/src/stores/time.js) is supported out of the box, and tools like <abbr title="Hot Module Reload">HMR</abbr> are trivial to support, see this [HMR example](https://github.com/coolsoftwaretyler/mst-example-boxes/blob/main/src/stores/domain-state.js#L116-L126).
 
 The type information is designed in such a way that it is used both at design- and run-time to verify type correctness (Design time type checking works in TypeScript only at the moment; Flow PR's are welcome!)
 
