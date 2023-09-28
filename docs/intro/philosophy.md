@@ -66,11 +66,11 @@ _Runtime type error_
 
 _Designtime type error_
 
-Because state trees are living, mutable models, actions are straight-forward to write; just modify local instance properties where appropriate. See `toggleTodo()` above or the examples below. It is not necessary to produce a new state tree yourself, MST's snapshot functionality will derive one for you automatically.
+Because state trees are living, mutable models, actions are straight-forward to write; just modify local instance properties where appropriate. See the `toggle()`-action in the Todo-store above or the examples below. It is not necessary to produce a new state tree yourself, MST's snapshot functionality will derive one for you automatically.
 
 Although mutable sounds scary to some, fear not, actions have many interesting properties.
 By default trees can only be modified by using an action that belongs to the same subtree.
-Furthermore, actions are replayable and can be used to distribute changes ([example](https://github.com/coolsoftwaretyler/mst-example-boxes/blob/main/src/stores/socket.js)).
+Furthermore, actions are replayable and can be used to distribute changes ([example](https://github.com/coolsoftwaretyler/mst-example-boxes/blob/main/src/stores/time.js)).
 
 Moreover, because changes can be detected on a fine grained level, JSON patches are supported out of the box.
 Simply subscribing to the patch stream of a tree is another way to sync diffs with, for example, back-end servers or other clients ([example](https://github.com/coolsoftwaretyler/mst-example-boxes/blob/main/src/stores/socket.js)).
