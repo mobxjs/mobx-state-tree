@@ -563,7 +563,7 @@ export class ModelType<
     }
 
     createNewInstance(childNodes: IChildNodesMap): this["T"] {
-        const options = { ...mobxShallow, name: this.describe() }
+        const options = { ...mobxShallow, name: this.name }
         return observable.object(childNodes, EMPTY_OBJECT, options) as any
     }
 

@@ -11,7 +11,7 @@ orbs:
     node: circleci/node@4.7.0
 
 jobs:
-    # mobx-state-tree and mst-middlewares build
+    # mobx-state-tree build
     build:
         executor: my-executor
         steps:
@@ -63,32 +63,6 @@ jobs:
             - store_test_results:
                   path: ./test-results
 
-    # mst-middlewares tests
-    test-mst-middlewares-dev:
-        executor: my-executor
-        steps:
-            - attach_workspace:
-                  at: .
-
-            - run: yarn test:mst-middlewares:dev -i --coverage
-            - store_test_results:
-                  path: ./test-results
-
-            - persist_to_workspace:
-                  root: .
-                  paths:
-                      - packages/mst-middlewares/coverage/*
-
-    test-mst-middlewares-prod:
-        executor: my-executor
-        steps:
-            - attach_workspace:
-                  at: .
-
-            - run: yarn test:mst-middlewares:prod -i
-            - store_test_results:
-                  path: ./test-results
-
     test-size:
         executor: my-executor
         steps:
@@ -130,18 +104,10 @@ workflows:
                   requires:
                       - build
 
-            - test-mst-middlewares-dev:
-                  requires:
-                      - build
-            - test-mst-middlewares-prod:
-                  requires:
-                      - build
-
             - test-size:
                   requires:
                       - build
 
             - upload-codecov:
-                 requires:
-                     - test-mst-dev
-                     - test-mst-middlewares-dev
+                  requires:
+                      - test-mst-dev

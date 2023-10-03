@@ -8,9 +8,7 @@
         "test:mst:dev": "cd packages/mobx-state-tree && yarn test:dev",
         "test:mst:prod": "cd packages/mobx-state-tree && yarn test:prod",
         "test:mst:others": "cd packages/mobx-state-tree && yarn test:others",
-        "test:mst-middlewares:dev": "cd packages/mst-middlewares && yarn test:dev",
-        "test:mst-middlewares:prod": "cd packages/mst-middlewares && yarn test:prod",
-        "test:all": "yarn test && yarn test:mst:dev && yarn test:mst:prod && yarn test:mst:others && yarn test:mst-middlewares:dev && yarn test:mst-middlewares:prod && yarn size && yarn coverage",
+        "test:all": "yarn test && yarn test:mst:dev && yarn test:mst:prod && yarn test:mst:others && yarn size && yarn coverage",
         "size": "size-limit",
         "coverage": "lerna run coverage --stream",
         "release": "yarn build && lerna publish",
@@ -22,8 +20,7 @@
         "prepare": "husky install"
     },
     "workspaces": [
-        "packages/mobx-state-tree",
-        "packages/mst-middlewares"
+        "packages/mobx-state-tree"
     ],
     "lint-staged": {
         "*.{ts,tsx,js,jsx}": [

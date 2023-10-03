@@ -75,7 +75,7 @@ export function getChildType(object: IAnyStateTreeNode, propertyName?: string): 
 /**
  * Registers a function that will be invoked for each mutation that is applied to the provided model instance, or to any of its children.
  * See [patches](https://github.com/mobxjs/mobx-state-tree#patches) for more details. onPatch events are emitted immediately and will not await the end of a transaction.
- * Patches can be used to deep observe a model tree.
+ * Patches can be used to deeply observe a model tree.
  *
  * @param target the model instance from which to receive patches
  * @param callback the callback that is invoked for each patch. The reversePatch is a patch that would actually undo the emitted patch
@@ -146,7 +146,7 @@ export interface IPatchRecorder {
 
 /**
  * Small abstraction around `onPatch` and `applyPatch`, attaches a patch listener to a tree and records all the patches.
- * Returns an recorder object with the following signature:
+ * Returns a recorder object with the following signature:
  *
  * Example:
  * ```ts
@@ -192,9 +192,9 @@ export function recordPatches(
         inversePatches: IJsonPatch[]
     }
 
-    const data: Pick<IPatches, "patches" | "reversedInversePatches"> = {
+    const data: Pick<IPatches, "patches" | "inversePatches"> = {
         patches: [],
-        reversedInversePatches: []
+        inversePatches: []
     }
 
     // we will generate the immutable copy of patches on demand for public consumption
@@ -214,13 +214,13 @@ export function recordPatches(
         },
         get reversedInversePatches() {
             if (!publicData.reversedInversePatches) {
-                publicData.reversedInversePatches = data.reversedInversePatches.slice()
+                publicData.reversedInversePatches = data.inversePatches.slice().reverse()
             }
             return publicData.reversedInversePatches
         },
         get inversePatches() {
             if (!publicData.inversePatches) {
-                publicData.inversePatches = data.reversedInversePatches.slice().reverse()
+                publicData.inversePatches = data.inversePatches.slice()
             }
             return publicData.inversePatches
         },
@@ -238,7 +238,7 @@ export function recordPatches(
                     return
                 }
                 data.patches.push(patch)
-                data.reversedInversePatches.unshift(inversePatch)
+                data.inversePatches.push(inversePatch)
 
                 // mark immutable public patches as dirty
                 publicData.patches = undefined
@@ -250,7 +250,7 @@ export function recordPatches(
             applyPatch(target || subject, data.patches)
         },
         undo(target?: IAnyStateTreeNode) {
-            applyPatch(target || subject, data.reversedInversePatches)
+            applyPatch(target || subject, data.inversePatches.slice().reverse())
         }
     }
 
@@ -555,7 +555,7 @@ export function getIdentifier(target: IAnyStateTreeNode): string | null {
 }
 
 /**
- * Tests if a reference is valid (pointing to an existing node and optionally if alive) and returns such reference if it the check passes,
+ * Tests if a reference is valid (pointing to an existing node and optionally if alive) and returns such reference if the check passes,
  * else it returns undefined.
  *
  * @param getter Function to access the reference.
@@ -656,9 +656,9 @@ export function getRelativePath(base: IAnyStateTreeNode, target: IAnyStateTreeNo
 
 /**
  * Returns a deep copy of the given state tree node as new tree.
- * Short hand for `snapshot(x) = getType(x).create(getSnapshot(x))`
+ * Shorthand for `snapshot(x) = getType(x).create(getSnapshot(x))`
  *
- * _Tip: clone will create a literal copy, including the same identifiers. To modify identifiers etc during cloning, don't use clone but take a snapshot of the tree, modify it, and create new instance_
+ * _Tip: clone will create a literal copy, including the same identifiers. To modify identifiers etc. during cloning, don't use clone but take a snapshot of the tree, modify it, and create new instance_
  *
  * @param source
  * @param keepEnvironment indicates whether the clone should inherit the same environment (`true`, the default), or not have an environment (`false`). If an object is passed in as second argument, that will act as the environment for the cloned tree.
@@ -914,14 +914,14 @@ export function cast<O = never>(
  * ```
  *
  * @param snapshotOrInstance Snapshot or instance
- * @returns The same object casted as an instance
+ * @returns The same object cast as an instance
  */
 export function cast(snapshotOrInstance: any): any {
     return snapshotOrInstance as any
 }
 
 /**
- * Casts a node instance type to an snapshot type so it can be assigned to a type snapshot (e.g. to be used inside a create call).
+ * Casts a node instance type to a snapshot type so it can be assigned to a type snapshot (e.g. to be used inside a create call).
  * Note that this is just a cast for the type system, this is, it won't actually convert an instance to a snapshot,
  * but just fool typescript into thinking so.
  *
@@ -945,7 +945,7 @@ export function cast(snapshotOrInstance: any): any {
  * ```
  *
  * @param snapshotOrInstance Snapshot or instance
- * @returns The same object casted as an input (creation) snapshot
+ * @returns The same object cast as an input (creation) snapshot
  */
 export function castToSnapshot<I>(
     snapshotOrInstance: I
@@ -954,8 +954,8 @@ export function castToSnapshot<I>(
 }
 
 /**
- * Casts a node instance type to a reference snapshot type so it can be assigned to a refernence snapshot (e.g. to be used inside a create call).
- * Note that this is just a cast for the type system, this is, it won't actually convert an instance to a refererence snapshot,
+ * Casts a node instance type to a reference snapshot type so it can be assigned to a reference snapshot (e.g. to be used inside a create call).
+ * Note that this is just a cast for the type system, this is, it won't actually convert an instance to a reference snapshot,
  * but just fool typescript into thinking so.
  *
  * Example:
@@ -979,7 +979,7 @@ export function castToSnapshot<I>(
  * ```
  *
  * @param instance Instance
- * @returns The same object casted as an reference snapshot (string or number)
+ * @returns The same object cast as a reference snapshot (string or number)
  */
 export function castToReferenceSnapshot<I>(
     instance: I
