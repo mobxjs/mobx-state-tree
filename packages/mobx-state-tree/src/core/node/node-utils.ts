@@ -13,8 +13,8 @@ import {
     assertArg,
     STNValue,
     Instance,
-    IAnyComplexType,
-    EMPTY_SET
+    IAnyComplexType
+    // EMPTY_SET
 } from "../../internal"
 
 /**
@@ -225,15 +225,15 @@ export function convertChildNodesToArray(childNodes: IChildNodesMap | null): Any
  * @internal
  * @hidden
  */
-export function convertChildNodesToSet(childNodes: IChildNodesMap | null): Set<AnyNode> {
-    if (!childNodes) return EMPTY_SET as Set<AnyNode>
+// export function convertChildNodesToSet(childNodes: IChildNodesMap | null): Set<AnyNode> {
+//     if (!childNodes) return EMPTY_SET as Set<AnyNode>
 
-    const keys = Object.keys(childNodes)
-    if (!keys.length) return EMPTY_SET as Set<AnyNode>
+//     const keys = Object.keys(childNodes)
+//     if (!keys.length) return EMPTY_SET as Set<AnyNode>
 
-    const result = new Set<AnyNode>()
-    keys.forEach((key) => {
-        result.add(childNodes![key])
-    })
-    return result
-}
+//     const result = new Set<AnyNode>()
+//     keys.forEach((key) => {
+//         result.add(childNodes![key])
+//     })
+//     return result
+// }

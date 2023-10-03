@@ -26,11 +26,12 @@ import {
     addHiddenFinalProp,
     addHiddenWritableProp,
     ComplexType,
-    convertChildNodesToSet,
+    convertChildNodesToArray,
+    // convertChildNodesToSet,
     createActionInvoker,
     createObjectNode,
     devMode,
-    EMPTY_SET,
+    EMPTY_ARRAY,
     getStateTreeNode,
     IAnyStateTreeNode,
     IAnyType,
@@ -56,6 +57,7 @@ export interface IMSTSet<IT extends IAnyType> {
     has(value: IT["Type"]): boolean
     keys(): IterableIterator<IT["Type"]>
     values(): IterableIterator<IT["Type"]>
+    toJSON(): IT["Type"][]
     readonly size: number
     [Symbol.iterator](): IterableIterator<IT["Type"]>
     [Symbol.toStringTag]: "Set"
@@ -116,12 +118,14 @@ export class SetType<IT extends IAnyType> extends ComplexType<
     }
 
     getDefaultSnapshot(): this["C"] {
-        return EMPTY_SET as unknown as this["C"]
+        return EMPTY_ARRAY as unknown as this["C"]
     }
 
     createNewInstance(childNodes: IChildNodesMap): this["T"] {
         // const options = { ...mobxShallow, name: this.describe() }
-        return new MSTSet(convertChildNodesToSet(childNodes), this.describe()) as any
+        const mChildNodes = convertChildNodesToArray(childNodes)
+        console.log({ mChildNodes })
+        return new MSTSet(mChildNodes, this.describe()) as any
         // TODO: remove this
         // return observable.set(convertChildNodesToSet(childNodes), options) as this["T"]
     }
@@ -250,7 +254,8 @@ export class SetType<IT extends IAnyType> extends ComplexType<
         console.log("🚀 ~ file: set.ts:237 ~ getChildNode ~ node:", node)
         const childNode = node.storedValue.has(key) ? key : undefined
         if (!childNode) throw fail("Not a child " + key)
-        return
+        const index = Number(key)
+        return [...node.storedValue][index]
     }
     getChildType(propertyName?: string): IAnyType {
         return this._subType
@@ -258,7 +263,7 @@ export class SetType<IT extends IAnyType> extends ComplexType<
     initializeChildNodes(node: this["N"], snapshot: this["C"]): IChildNodesMap {
         const subType = (node.type as this)._subType
         const result: IChildNodesMap = {}
-        snapshot.forEach((item, index) => {
+        snapshot?.forEach((item, index) => {
             const subpath = "" + index
             result[subpath] = subType.instantiate(node, subpath, undefined, item)
         })
@@ -287,8 +292,8 @@ export class SetType<IT extends IAnyType> extends ComplexType<
         }
 
         return flattenTypeErrors(
-            Object.keys(value).map((path) =>
-                this._subType.validate(value[path], getContextForPath(context, path, this._subType))
+            Object.keys(value).map((item, index) =>
+                this._subType.validate(item, getContextForPath(context, "" + index, this._subType))
             )
         )
     }
