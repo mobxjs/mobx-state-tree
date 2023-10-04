@@ -10,7 +10,8 @@ import {
     observable,
     ObservableMap,
     observe,
-    values
+    values,
+    IObservableMapInitialValues,
 } from "mobx"
 import {
     ComplexType,
@@ -141,7 +142,7 @@ export enum MapIdentifierMode {
 
 class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
     constructor(
-        initialData?: [string, any][] | IKeyValueMap<any> | Map<string, any> | undefined,
+        initialData?: IObservableMapInitialValues<string, any> | undefined,
         name?: string
     ) {
         super(initialData, (observable.ref as any).enhancer, name)
@@ -296,11 +297,11 @@ export class MapType<IT extends IAnyType> extends ComplexType<
             Object.keys(hooks).forEach((name) => {
                 const hook = hooks[name as keyof typeof hooks]!
                 const actionInvoker = createActionInvoker(instance as IAnyStateTreeNode, name, hook)
-                ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(
-                    instance,
-                    name,
-                    actionInvoker
-                )
+                    ; (!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(
+                        instance,
+                        name,
+                        actionInvoker
+                    )
             })
         })
 
