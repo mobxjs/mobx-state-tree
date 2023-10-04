@@ -575,7 +575,7 @@ test("#1131 - put with optional identifier", () => {
  * It looks like `[string, any][]` and `Map<string, any>` are actually not supported, so we just test the `IKeyValueMap<any>` and `undefined` cases
  * for now. See https://github.com/mobxjs/mobx-state-tree/pull/2072#issuecomment-1747482100
  */
-test("#2072 - IObservableMapInitialValues types should work correctly", () => {
+describe("#2072 - IObservableMapInitialValues types should work correctly", () => {
     it("should accept IKeyValueMap<any>", () => {
         const initialData = {
             "1": "Tyler",
