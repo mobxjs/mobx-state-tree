@@ -428,7 +428,7 @@ test("get should return value when key is a number", () => {
     }
 
     todoStore.addTodo(todo)
-    expect(todoStore.todos.get((1 as any) as string)!.title).toEqual("Test")
+    expect(todoStore.todos.get(1 as any as string)!.title).toEqual("Test")
 })
 
 test("numeric keys should work", () => {
@@ -447,30 +447,30 @@ test("numeric keys should work", () => {
     unprotect(s)
 
     s.mies.set(7 as any, { id: "7" })
-    const i7 = s.mies.get((7 as any) as string)!
+    const i7 = s.mies.get(7 as any as string)!
     expect(i7.title).toBe("test")
     expect(s.mies.has("7")).toBeTruthy()
-    expect(s.mies.has((7 as any) as string)).toBeTruthy()
+    expect(s.mies.has(7 as any as string)).toBeTruthy()
     expect(s.mies.get("7")).toBeTruthy()
-    expect(s.mies.get((7 as any) as string)).toBeTruthy()
+    expect(s.mies.get(7 as any as string)).toBeTruthy()
 
     s.mies.set("8", { id: "8" })
     expect(s.mies.has("8")).toBeTruthy()
-    expect(s.mies.has((8 as any) as string)).toBeTruthy()
+    expect(s.mies.has(8 as any as string)).toBeTruthy()
     expect(s.mies.get("8")).toBeTruthy()
-    expect(s.mies.get((8 as any) as string)).toBeTruthy()
+    expect(s.mies.get(8 as any as string)).toBeTruthy()
 
     expect(Array.from(s.mies.keys())).toEqual(["7", "8"])
 
     s.mies.put({ id: "7", title: "coffee" })
     expect(s.mies.size).toBe(2)
     expect(s.mies.has("7")).toBeTruthy()
-    expect(s.mies.has((7 as any) as string)).toBeTruthy()
+    expect(s.mies.has(7 as any as string)).toBeTruthy()
     expect(s.mies.get("7")).toBeTruthy()
-    expect(s.mies.get((7 as any) as string)).toBeTruthy()
+    expect(s.mies.get(7 as any as string)).toBeTruthy()
     expect(i7.title).toBe("coffee")
 
-    expect(s.mies.delete((8 as any) as string)).toBeTruthy()
+    expect(s.mies.delete(8 as any as string)).toBeTruthy()
     expect(s.mies.size).toBe(1)
 })
 
@@ -516,10 +516,10 @@ test("#751 restore from snapshot should work", () => {
 
     // We add an item with a number id
     unprotect(server)
-    server.map.set((1 as any) as string, { id: 1 })
+    server.map.set(1 as any as string, { id: 1 })
 
     // We can access it using a number
-    expect(server.map.get((1 as any) as string)!.id).toBe(1)
+    expect(server.map.get(1 as any as string)!.id).toBe(1)
 
     // But if we get a snapshot...
     const snapshot = getSnapshot(server)
@@ -530,7 +530,7 @@ test("#751 restore from snapshot should work", () => {
     expect(server.map.get("1")!.id).toBe(1)
 
     // And as number
-    expect(server.map.get((1 as any) as string)!.id).toBe(1)
+    expect(server.map.get(1 as any as string)!.id).toBe(1)
 
     expect(server.map.size).toBe(1)
 })
@@ -562,4 +562,31 @@ test("#1131 - put with optional identifier", () => {
     const val = myMap.put({})
     expect(val.id).toBeTruthy()
     expect(val.value).toBe("hi")
+})
+
+/**
+ * This test exercises the TypeScript types fo `MSTMap`, to ensure that our typings stay consistent. In PR #2072,
+ * we changed from accepting `[string, any][] | IKeyValueMap<any> | Map<string, any> | undefined,` in `initialdata`
+ * to accepting `IObservableMapInitialValues<string, any> | undefined,`.
+ *
+ * This test demonstrates backwards compatibility for the change, and will let us know if anything changes and breaks
+ * if we ever update those types as well, or if MobX changes the exported `IObservableMapInitialValues` type.
+ *
+ * It looks like `[string, any][]` and `Map<string, any>` are actually not supported, so we just test the `IKeyValueMap<any>` and `undefined` cases
+ * for now. See https://github.com/mobxjs/mobx-state-tree/pull/2072#issuecomment-1747482100
+ */
+test("#2072 - IObservableMapInitialValues types should work correctly", () => {
+    it("should accept IKeyValueMap<any>", () => {
+        const initialData = {
+            "1": "Tyler",
+            "2": "Jamon"
+        }
+
+        const mapInstance = types.map(types.string).create(initialData)
+        expect(mapInstance.size).toBe(2)
+    })
+    it("should accept undefined", () => {
+        const mapInstance = types.map(types.string).create(undefined)
+        expect(mapInstance.size).toBe(0)
+    })
 })
