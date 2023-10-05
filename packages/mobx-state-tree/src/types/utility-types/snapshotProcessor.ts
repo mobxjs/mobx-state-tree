@@ -89,7 +89,6 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
         node.getSnapshot = () => {
             return this.postProcessSnapshot(oldGetSnapshot.call(node)) as any
         }
-
         if (!isUnionType(this._subtype)) {
             node.getReconciliationType = () => {
                 return this

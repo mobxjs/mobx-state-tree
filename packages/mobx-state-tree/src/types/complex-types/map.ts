@@ -10,7 +10,8 @@ import {
     observable,
     ObservableMap,
     observe,
-    values
+    values,
+    IObservableMapInitialValues,
 } from "mobx"
 import {
     ComplexType,
@@ -143,8 +144,11 @@ export enum MapIdentifierMode {
 }
 
 class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
-    constructor(initialData?: [string, any][] | IKeyValueMap<any> | Map<string, any> | undefined) {
-        super(initialData, (observable.ref as any).enhancer)
+    constructor(
+        initialData?: IObservableMapInitialValues<string, any> | undefined,
+        name?: string
+    ) {
+        super(initialData, (observable.ref as any).enhancer, name)
     }
 
     get(key: string): IT["Type"] | undefined {
@@ -284,7 +288,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     }
 
     createNewInstance(childNodes: IChildNodesMap): this["T"] {
-        return new MSTMap(childNodes) as any
+        return new MSTMap(childNodes, this.name) as any
     }
 
     finalizeNewInstance(node: this["N"], instance: ObservableMap<string, any>): void {
@@ -296,11 +300,11 @@ export class MapType<IT extends IAnyType> extends ComplexType<
             Object.keys(hooks).forEach((name) => {
                 const hook = hooks[name as keyof typeof hooks]!
                 const actionInvoker = createActionInvoker(instance as IAnyStateTreeNode, name, hook)
-                ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(
-                    instance,
-                    name,
-                    actionInvoker
-                )
+                    ; (!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(
+                        instance,
+                        name,
+                        actionInvoker
+                    )
             })
         })
 
@@ -309,7 +313,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     }
 
     describe() {
-        return "Map<string, " + this._subType.describe() + ">"
+        return this.name
     }
 
     getChildren(node: this["N"]): ReadonlyArray<AnyNode> {
@@ -508,7 +512,7 @@ MapType.prototype.applySnapshot = action(MapType.prototype.applySnapshot)
  * @returns
  */
 export function map<IT extends IAnyType>(subtype: IT): IMapType<IT> {
-    return new MapType<IT>(`map<string, ${subtype.name}>`, subtype)
+    return new MapType<IT>(`Map<string, ${subtype.name}>`, subtype)
 }
 
 /**

@@ -171,13 +171,13 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         }
     }
 
-    createObservableInstanceIfNeeded(): void {
+    createObservableInstanceIfNeeded(fireHooks = true): void {
         if (this._observableInstanceState === ObservableInstanceLifecycle.UNINITIALIZED) {
-            this.createObservableInstance()
+            this.createObservableInstance(fireHooks)
         }
     }
 
-    createObservableInstance(): void {
+    createObservableInstance(fireHooks = true): void {
         if (devMode()) {
             if (this.state !== NodeLifeCycle.INITIALIZING) {
                 // istanbul ignore next
@@ -208,7 +208,8 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
         // initialize the uninitialized parent chain from parent to child
         for (const p of parentChain) {
-            p.createObservableInstanceIfNeeded()
+            // delay firing hooks until after all parents have been created
+            p.createObservableInstanceIfNeeded(false)
         }
 
         const type = this.type
@@ -238,9 +239,20 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         this._childNodes = EMPTY_OBJECT
 
         this.state = NodeLifeCycle.CREATED
-        this.fireHook(Hook.afterCreate)
 
-        this.finalizeCreation()
+        if (fireHooks) {
+            this.fireHook(Hook.afterCreate)
+            // Note that the parent might not be finalized at this point
+            // so afterAttach won't be called until later in that case
+            this.finalizeCreation()
+
+            // fire the hooks of the parents that we created
+            for (const p of parentChain.reverse()) {
+                p.fireHook(Hook.afterCreate)
+                // This will call afterAttach on the child if necessary
+                p.finalizeCreation()
+            }
+        }
     }
 
     get root(): AnyObjectNode {

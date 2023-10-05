@@ -20,7 +20,7 @@ import {
     resolveIdentifier
 } from "../../src"
 
-import { autorun, reaction, observable, configure } from "mobx"
+import { autorun, reaction, observable, configure, getDebugName } from "mobx"
 
 const createTestFactories = () => {
     const Factory = types
@@ -323,79 +323,81 @@ test("it should throw if a replaced object is read or written to", () => {
 
     setLivelinessChecking("error")
 
-    function getError(objType: string, path: string, subpath: string, action: string) {
-        return `You are trying to read or write to an object that is no longer part of a state tree. (Object type: '${objType}', Path upon death: '${path}', Subpath: '${subpath}', Action: '${action}'). Either detach nodes first, or don't use objects after removing / replacing them in the tree.`
+    function getError(obj: any, path: string, subpath: string, action: string) {
+        return `You are trying to read or write to an object that is no longer part of a state tree. (Object type: '${getDebugName(
+            obj
+        )}', Path upon death: '${path}', Subpath: '${subpath}', Action: '${action}'). Either detach nodes first, or don't use objects after removing / replacing them in the tree.`
     }
 
     // dead todo
     expect(() => {
         deadTodo.fn()
-    }).toThrow(getError("Todo", "/todo", "", "/todo.fn()"))
+    }).toThrow(getError(deadTodo, "/todo", "", "/todo.fn()"))
     expect(() => {
         // tslint:disable-next-line:no-unused-expression
         deadTodo.title
-    }).toThrow(getError("Todo", "/todo", "title", ""))
+    }).toThrow(getError(deadTodo, "/todo", "title", ""))
     expect(() => {
         deadTodo.title = "5"
-    }).toThrow(getError("Todo", "/todo", "title", ""))
+    }).toThrow(getError(deadTodo, "/todo", "title", ""))
 
     expect(() => {
         // tslint:disable-next-line:no-unused-expression
         deadTodo.arr[0]
-    }).toThrow(getError("Todo", "/todo", "arr", ""))
+    }).toThrow(getError(deadTodo, "/todo", "arr", ""))
     expect(() => {
         deadTodo.arr.push("arr1")
-    }).toThrow(getError("Todo", "/todo", "arr", ""))
+    }).toThrow(getError(deadTodo, "/todo", "arr", ""))
 
     expect(() => {
         deadTodo.map.get("mapkey0")
-    }).toThrow(getError("Todo", "/todo", "map", ""))
+    }).toThrow(getError(deadTodo, "/todo", "map", ""))
     expect(() => {
         deadTodo.map.set("mapkey1", "val")
-    }).toThrow(getError("Todo", "/todo", "map", ""))
+    }).toThrow(getError(deadTodo, "/todo", "map", ""))
 
     expect(() => {
         deadTodo.sub.fn2()
-    }).toThrow(getError("Todo", "/todo", "sub", ""))
+    }).toThrow(getError(deadTodo, "/todo", "sub", ""))
     expect(() => {
         // tslint:disable-next-line:no-unused-expression
         deadTodo.sub.title
-    }).toThrow(getError("Todo", "/todo", "sub", ""))
+    }).toThrow(getError(deadTodo, "/todo", "sub", ""))
     expect(() => {
         deadTodo.sub.title = "hi"
-    }).toThrow(getError("Todo", "/todo", "sub", ""))
+    }).toThrow(getError(deadTodo, "/todo", "sub", ""))
 
     // dead array
     expect(() => {
         // tslint:disable-next-line:no-unused-expression
         deadArr[0]
-    }).toThrow(getError("string[]", "/todo/arr", "0", ""))
+    }).toThrow(getError(deadArr, "/todo/arr", "0", ""))
     expect(() => {
         deadArr[0] = "hi"
-    }).toThrow(getError("string[]", "/todo/arr", "0", ""))
+    }).toThrow(getError(deadArr, "/todo/arr", "0", ""))
     expect(() => {
         deadArr.push("hi")
-    }).toThrow(getError("string[]", "/todo/arr", "1", ""))
+    }).toThrow(getError(deadArr, "/todo/arr", "1", ""))
 
     // dead map
     expect(() => {
         deadMap.get("mapkey0")
-    }).toThrow(getError("map<string, string>", "/todo/map", "mapkey0", ""))
+    }).toThrow(getError(deadMap, "/todo/map", "mapkey0", ""))
     expect(() => {
         deadMap.set("mapkey0", "val")
-    }).toThrow(getError("map<string, string>", "/todo/map", "mapkey0", ""))
+    }).toThrow(getError(deadMap, "/todo/map", "mapkey0", ""))
 
     // dead subobj
     expect(() => {
         deadSub.fn2()
-    }).toThrow(getError("Sub", "/todo/sub", "", "/todo/sub.fn2()"))
+    }).toThrow(getError(deadSub, "/todo/sub", "", "/todo/sub.fn2()"))
     expect(() => {
         // tslint:disable-next-line:no-unused-expression
         deadSub.title
-    }).toThrow(getError("Sub", "/todo/sub", "title", ""))
+    }).toThrow(getError(deadSub, "/todo/sub", "title", ""))
     expect(() => {
         deadSub.title = "ho"
-    }).toThrow(getError("Sub", "/todo/sub", "title", ""))
+    }).toThrow(getError(deadSub, "/todo/sub", "title", ""))
 })
 
 test("it should warn if a replaced object is read or written to", () => {
@@ -918,7 +920,7 @@ test("#993-1 - after attach should have a parent when accesing a reference direc
     }
 })
 
-test("#993-2 - references should have a parent event when the parent has not been accesed before", () => {
+test("#993-2 - references should have a parent even when the parent has not been accessed before", () => {
     const events: string[] = []
 
     const L4 = types
@@ -995,6 +997,7 @@ test("#993-2 - references should have a parent event when the parent has not bee
         "l4-ac",
         "l4-at",
         "onSnapshot",
+        "-",
         "onSnapshot"
     ]
 
@@ -1006,11 +1009,26 @@ test("#993-2 - references should have a parent event when the parent has not bee
         })
 
         l1.l2.l3.l4.toggle()
+        events.push("-")
         l1.selected.toggle()
         expect(events).toEqual(expectedEvents)
     }
 
+    const expectedEvents2 = [
+        "l1-ac",
+        "l4-ac",
+        "l3-ac",
+        "l2-ac",
+        "l2-at",
+        "l3-at",
+        "l4-at",
+        "onSnapshot",
+        "-",
+        "onSnapshot"
+    ]
+
     // test 2, reference first
+    // the order of hooks is different but they are all called
     events.length = 0
     {
         const l1 = createL1()
@@ -1019,8 +1037,9 @@ test("#993-2 - references should have a parent event when the parent has not bee
         })
 
         l1.selected.toggle()
+        events.push("-")
         l1.l2.l3.l4.toggle()
-        expect(events).toEqual(expectedEvents)
+        expect(events).toEqual(expectedEvents2)
     }
 
     // test 3, reference get parent should be available from the beginning and all the way to the root

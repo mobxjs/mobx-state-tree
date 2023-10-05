@@ -46,3 +46,29 @@ test("should support optional enums inside a model", () => {
     const l = TrafficLight.create({})
     expect(l.color).toBe(ColorEnum.Orange)
 })
+test("should support plain string[] arrays", () => {
+    const colorOptions: string[] = ["Red", "Orange", "Green"]
+    const TrafficLight = types.model({ color: types.enumeration(colorOptions) })
+    const l = TrafficLight.create({ color: "Orange" })
+    unprotect(l)
+    l.color = "Red"
+    expect(TrafficLight.describe()).toBe('{ color: ("Red" | "Orange" | "Green") }')
+    if (process.env.NODE_ENV !== "production") {
+        expect(() => (l.color = "Blue" as any)).toThrowError(
+            /Error while converting `"Blue"` to `"Red" | "Orange" | "Green"`/
+        )
+    }
+})
+test("should support readonly enums as const", () => {
+    const colorOptions = ["Red", "Orange", "Green"] as const
+    const TrafficLight = types.model({ color: types.enumeration(colorOptions) })
+    const l = TrafficLight.create({ color: "Orange" })
+    unprotect(l)
+    l.color = "Red"
+    expect(TrafficLight.describe()).toBe('{ color: ("Red" | "Orange" | "Green") }')
+    if (process.env.NODE_ENV !== "production") {
+        expect(() => (l.color = "Blue" as any)).toThrowError(
+            /Error while converting `"Blue"` to `"Red" | "Orange" | "Green"`/
+        )
+    }
+})

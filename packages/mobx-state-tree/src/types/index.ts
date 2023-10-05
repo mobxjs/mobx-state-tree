@@ -16,6 +16,8 @@ import {
     boolean,
     number,
     integer,
+    float,
+    finite,
     DatePrimitive,
     map,
     array,
@@ -23,6 +25,7 @@ import {
     identifier,
     identifierNumber,
     late,
+    lazy,
     undefinedType,
     nullType,
     snapshotProcessor
@@ -45,6 +48,8 @@ export const types = {
     boolean,
     number,
     integer,
+    float,
+    finite,
     Date: DatePrimitive,
     map,
     array,
@@ -52,6 +57,7 @@ export const types = {
     identifier,
     identifierNumber,
     late,
+    lazy,
     undefined: undefinedType,
     null: nullType,
     snapshotProcessor

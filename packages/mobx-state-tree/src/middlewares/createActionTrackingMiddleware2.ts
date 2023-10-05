@@ -74,7 +74,7 @@ class RunningAction {
 export function createActionTrackingMiddleware2<TEnv = any>(
     middlewareHooks: IActionTrackingMiddleware2Hooks<TEnv>
 ): IMiddlewareHandler {
-    const runningActions = new WeakMap<IMiddlewareEvent, RunningAction>()
+    const runningActions = new Map<number, RunningAction>()
 
     return function actionTrackingMiddleware(
         call: IMiddlewareEvent,
@@ -82,7 +82,7 @@ export function createActionTrackingMiddleware2<TEnv = any>(
     ) {
         // find parentRunningAction
         const parentRunningAction = call.parentActionEvent
-            ? runningActions.get(call.parentActionEvent)
+            ? runningActions.get(call.parentActionEvent.id)
             : undefined
 
         if (call.type === "action") {
@@ -97,18 +97,19 @@ export function createActionTrackingMiddleware2<TEnv = any>(
             const hooks = passesFilter ? middlewareHooks : undefined
 
             const runningAction = new RunningAction(hooks, newCall)
-            runningActions.set(call, runningAction)
+            runningActions.set(call.id, runningAction)
 
             let res
             try {
                 res = next(call)
             } catch (e) {
+                runningActions.delete(call.id)
                 runningAction.finish(e)
                 throw e
             }
-
+            // sync action finished
             if (!runningAction.hasFlowsPending) {
-                // sync action finished
+                runningActions.delete(call.id)
                 runningAction.finish()
             }
             return res
@@ -133,6 +134,7 @@ export function createActionTrackingMiddleware2<TEnv = any>(
                     } finally {
                         parentRunningAction.decFlowsPending()
                         if (!parentRunningAction.hasFlowsPending) {
+                            runningActions.delete(call.parentActionEvent!.id)
                             parentRunningAction.finish(error)
                         }
                     }
@@ -143,6 +145,7 @@ export function createActionTrackingMiddleware2<TEnv = any>(
                     } finally {
                         parentRunningAction.decFlowsPending()
                         if (!parentRunningAction.hasFlowsPending) {
+                            runningActions.delete(call.parentActionEvent!.id)
                             parentRunningAction.finish()
                         }
                     }

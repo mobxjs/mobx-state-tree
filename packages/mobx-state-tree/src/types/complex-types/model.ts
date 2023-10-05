@@ -53,7 +53,8 @@ import {
     Instance,
     devMode,
     assertIsString,
-    assertArg
+    assertArg,
+    FunctionWithFlag
 } from "../../internal"
 import { ComputedValue } from "mobx/dist/internal"
 
@@ -170,7 +171,7 @@ export type ModelInstanceType<P extends ModelProperties, O> = ModelInstanceTypeP
 
 /** @hidden */
 export interface ModelActions {
-    [key: string]: Function
+    [key: string]: FunctionWithFlag
 }
 
 export interface IModelType<
@@ -255,8 +256,17 @@ const defaultObjectOptions = {
 }
 
 function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelProperties {
+    const keysList = Object.keys(declaredProps)
+    const alreadySeenKeys: { [key: string]: boolean } = {}
+    keysList.forEach((key) => {
+        if (alreadySeenKeys[key]) {
+            throw fail(`${key} is declared twice in the model. Model should not contain same keys`)
+        } else {
+            alreadySeenKeys[key] = true
+        }
+    })
     // loop through properties and ensures that all items are types
-    return Object.keys(declaredProps).reduce((props, key) => {
+    return keysList.reduce((props, key) => {
         // warn if user intended a HOOK
         if (key in Hook)
             throw fail(
@@ -414,6 +424,7 @@ export class ModelType<
             // while still allowing the middlewares to register them
             const middlewares = (action2 as any).$mst_middleware // make sure middlewares are not lost
             let boundAction = action2.bind(actions)
+            boundAction._isFlowAction = (action2 as FunctionWithFlag)._isFlowAction || false
             boundAction.$mst_middleware = middlewares
             const actionInvoker = createActionInvoker(self as any, name, boundAction)
             actions[name] = actionInvoker
@@ -552,7 +563,8 @@ export class ModelType<
     }
 
     createNewInstance(childNodes: IChildNodesMap): this["T"] {
-        return observable.object(childNodes, EMPTY_OBJECT, mobxShallow) as any
+        const options = { ...mobxShallow, name: this.name }
+        return observable.object(childNodes, EMPTY_OBJECT, options) as any
     }
 
     finalizeNewInstance(node: this["N"], instance: this["T"]): void {
@@ -621,7 +633,7 @@ export class ModelType<
     getChildNode(node: this["N"], key: string): AnyNode {
         if (!(key in this.properties)) throw fail("Not a value property: " + key)
         const adm = _getAdministration(node.storedValue, key)
-        const childNode = adm.raw()
+        const childNode = adm.raw?.()
         if (!childNode) throw fail("Node not available for property " + key)
         return childNode
     }
@@ -629,8 +641,13 @@ export class ModelType<
     getSnapshot(node: this["N"], applyPostProcess = true): this["S"] {
         const res = {} as any
         this.forAllProps((name, type) => {
-            // TODO: FIXME, make sure the observable ref is used!
-            ;(getAtom(node.storedValue, name) as any).reportObserved()
+            try {
+                // TODO: FIXME, make sure the observable ref is used!
+                const atom = getAtom(node.storedValue, name)
+                ;(atom as any).reportObserved()
+            } catch (e) {
+                throw fail(`${name} property is declared twice`)
+            }
             res[name] = this.getChildNode(node, name).snapshot
         })
         if (applyPostProcess) {
@@ -734,6 +751,12 @@ export function model<P extends ModelPropertiesDeclaration = {}>(
  * See the [model type](/concepts/trees#creating-models) description or the [getting started](intro/getting-started.md#getting-started-1) tutorial.
  */
 export function model(...args: any[]): any {
+    if (devMode() && typeof args[0] !== "string" && args[1]) {
+        throw fail(
+            "Model creation failed. First argument must be a string when two arguments are provided"
+        )
+    }
+
     const name = typeof args[0] === "string" ? args.shift() : "AnonymousModel"
     const properties = args.shift() || {}
     return new ModelType({ name, properties })
@@ -762,7 +785,7 @@ export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends Mod
 // prettier-ignore
 export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC, PD extends ModelProperties, OD, FCD, FSD, PE extends ModelProperties, OE, FCE, FSE>(A:
     IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>): IModelType<PA & PB & PC & PD & PE, OA & OB & OC & OD & OE, _CustomJoin<FCA,
-    _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, FCE>>>>, _CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, FSE>>>>>
+        _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, FCE>>>>, _CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, FSE>>>>>
 // prettier-ignore
 export function compose<PA extends ModelProperties, OA, FCA, FSA, PB extends ModelProperties, OB, FCB, FSB, PC extends ModelProperties, OC, FCC, FSC, PD extends ModelProperties, OD, FCD, FSD, PE extends ModelProperties, OE, FCE, FSE, PF
     extends ModelProperties, OF, FCF, FSF>(name: string, A: IModelType<PA, OA, FCA, FSA>, B: IModelType<PB, OB, FCB, FSB>, C: IModelType<PC, OC, FCC, FSC>, D: IModelType<PD, OD, FCD, FSD>, E: IModelType<PE, OE, FCE, FSE>, F: IModelType<PF, OF, FCF, FSF>): IModelType<PA & PB & PC & PD & PE & PF, OA & OB & OC & OD & OE & OF, _CustomJoin<FCA, _CustomJoin<FCB, _CustomJoin<FCC, _CustomJoin<FCD, _CustomJoin<FCE, FCF>>>>>, _CustomJoin<FSA, _CustomJoin<FSB, _CustomJoin<FSC, _CustomJoin<FSD, _CustomJoin<FSE, FSF>>>>>>
