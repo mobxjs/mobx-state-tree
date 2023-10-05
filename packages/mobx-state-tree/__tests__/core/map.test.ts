@@ -446,8 +446,8 @@ test("numeric keys should work", () => {
     })
     unprotect(s)
 
-    s.mies.set(7 as any, { id: "7" })
-    const i7 = s.mies.get((7 as any) as string)!
+    s.mies.set(7, { id: "7" })
+    const i7 = s.mies.get(7)!
     expect(i7.title).toBe("test")
     expect(s.mies.has("7")).toBeTruthy()
     expect(s.mies.has((7 as any) as string)).toBeTruthy()
