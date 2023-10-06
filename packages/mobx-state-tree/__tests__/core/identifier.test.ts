@@ -125,10 +125,19 @@ if (process.env.NODE_ENV !== "production") {
             fooRef: "123"
         }
     })
+
     test("try resolve doesn't work #686", () => {
         expect(tryResolve(root, "/bar/fooRef")).toBe(undefined)
-
         expect(tryResolve(root, "/bar/fooRef/name")).toBe(undefined)
+    })
+
+    test("try resolve shouldn't fail with a complex object node #2071", () => {
+        const array = types.array(types.number).create([])
+        const model = types.model().create({})
+        const map = types.map(types.number).create({})
+        expect(tryResolve(array, "/boop")).toBeUndefined()
+        expect(tryResolve(model, "/boop")).toBeUndefined()
+        expect(tryResolve(map, "/boop")).toBeUndefined()
     })
 
     test("failing to resolve throws sane errors", () => {
