@@ -237,3 +237,201 @@ test("#1250", async () => {
     expect(calls).toEqual(["setX (21) <- (undefined) - onFinish (error: false)"])
     calls.length = 0
 })
+
+/**
+ * Test that when createActionTrackingMiddleware2 is called with valid hooks and a synchronous action, it runs onStart and onFinish hooks.
+ */
+test("successful execution", () => {
+    const M = types.model({}).actions((self) => ({
+        test() {}
+    }))
+
+    const calls: string[] = []
+
+    const mware = createActionTrackingMiddleware2({
+        filter(call) {
+            calls.push(`${call.name} - filter`)
+            return true
+        },
+        onStart(call) {
+            calls.push(`${call.name} - onStart`)
+        },
+        onFinish(call, error) {
+            calls.push(`${call.name} - onFinish (error: ${!!error})`)
+        }
+    })
+
+    const model = M.create({})
+    addMiddleware(model, mware, false)
+
+    model.test()
+
+    expect(calls).toEqual(["test - filter", "test - onStart", "test - onFinish (error: false)"])
+})
+
+/**
+ * Test that when createActionTrackingMiddleware2 is called with valid hooks and an asynchronous action, it runs onStart and onFinish hooks.
+ */
+test("successful execution with async action", async () => {
+    const M = types.model({}).actions((self) => ({
+        async test() {}
+    }))
+
+    const calls: string[] = []
+
+    const mware = createActionTrackingMiddleware2({
+        filter(call) {
+            calls.push(`${call.name} - filter`)
+            return true
+        },
+        onStart(call) {
+            calls.push(`${call.name} - onStart`)
+        },
+        onFinish(call, error) {
+            calls.push(`${call.name} - onFinish (error: ${!!error})`)
+        }
+    })
+
+    const model = M.create({})
+    addMiddleware(model, mware, false)
+
+    await model.test()
+
+    expect(calls).toEqual(["test - filter", "test - onStart", "test - onFinish (error: false)"])
+})
+
+/**
+ * Test the filter for createActionTrackingMiddleware2 when it passes, and when it fails.
+ */
+describe("filtering", () => {
+    /**
+     * Test that when the filter returns true, the action is tracked. We check
+     * this by checking that the onStart and onFinish hooks are called for `runThisOne`,
+     * which is the name provided to the `filter` function.
+     */
+    it("calls onStart and onFinish hooks for actions that pass the filter", () => {
+        const M = types.model({}).actions((self) => ({
+            trackThisOne() {},
+            doNotTrackThisOne() {}
+        }))
+
+        const calls: string[] = []
+
+        const mware = createActionTrackingMiddleware2({
+            filter(call) {
+                return call.name === "trackThisOne"
+            },
+            onStart(call) {
+                calls.push(`${call.name} - onStart`)
+            },
+            onFinish(call, error) {
+                calls.push(`${call.name} - onFinish (error: ${!!error})`)
+            }
+        })
+
+        const model = M.create({})
+        addMiddleware(model, mware, false)
+
+        model.trackThisOne()
+        // We call this action to prove that it is not tracked since it fails - there's also a test for this below.
+        model.doNotTrackThisOne()
+
+        expect(calls).toEqual(["trackThisOne - onStart", "trackThisOne - onFinish (error: false)"])
+    })
+    /**
+     * Test that when the filter returns false, the action is not tracked. We check
+     * this by checking that the onStart and onFinish hooks are not called for `doNotTrackThisOne`,
+     */
+    it("does not call onStart and onFinish hooks for actions that do not pass the filter", () => {
+        const M = types.model({}).actions((self) => ({
+            trackThisOne() {},
+            doNotTrackThisOne() {}
+        }))
+
+        const calls: string[] = []
+
+        const mware = createActionTrackingMiddleware2({
+            filter(call) {
+                return call.name === "trackThisOne"
+            },
+            onStart(call) {
+                calls.push(`${call.name} - onStart`)
+            },
+            onFinish(call, error) {
+                calls.push(`${call.name} - onFinish (error: ${!!error})`)
+            }
+        })
+
+        const model = M.create({})
+        addMiddleware(model, mware, false)
+
+        model.doNotTrackThisOne()
+
+        expect(calls).toEqual([])
+    })
+})
+
+/**
+ * Test that parent actions and child actions have the expected order of operations -
+ * if we had an action `a` that called an action `b1`, then `b2` inside `a`, the flow would be:
+ *
+ * - `filter(a)`
+ * - `onStart(a)`
+ *  - `filter(b1)`
+ *  - `onStart(b1)`
+ *  - `onFinish(b1)`
+ *  - `filter(b2)`
+ *  - `onStart(b2)`
+ *  - `onFinish(b2)`
+ * - `onFinish(a)`
+ *
+ * See https://mobx-state-tree.js.org/API/#createactiontrackingmiddleware2
+ */
+describe("nested actions", () => {
+    test("complete in the expected recursive order", () => {
+        const M = types
+            .model({})
+            .actions((self) => ({
+                childAction1() {},
+                childAction2() {}
+            }))
+            .actions((self) => ({
+                parentAction() {
+                    self.childAction1()
+                    self.childAction2()
+                }
+            }))
+
+        const calls: string[] = []
+
+        const mware = createActionTrackingMiddleware2({
+            filter(call) {
+                calls.push(`${call.name} - filter`)
+                return true
+            },
+            onStart(call) {
+                calls.push(`${call.name} - onStart`)
+            },
+            onFinish(call, error) {
+                calls.push(`${call.name} - onFinish (error: ${!!error})`)
+            }
+        })
+
+        const model = M.create({})
+        addMiddleware(model, mware, false)
+
+        model.parentAction()
+
+        expect(calls).toEqual([
+            "parentAction - filter",
+            "parentAction - onStart",
+            "childAction1 - filter",
+            "childAction1 - onStart",
+            "childAction1 - onFinish (error: false)",
+            "childAction2 - filter",
+            "childAction2 - onStart",
+            "childAction2 - onFinish (error: false)",
+            "parentAction - onFinish (error: false)"
+        ])
+    })
+})
