@@ -70,10 +70,13 @@ export interface IMSTMap<IT extends IAnyType> {
 
     clear(): void
     delete(key: string): boolean
-    forEach(callbackfn: (value: IT["Type"], key: string, map: this) => void, thisArg?: any): void
-    get(key: string): IT["Type"] | undefined
-    has(key: string): boolean
-    set(key: string, value: ExtractCSTWithSTN<IT>): this
+    forEach(
+        callbackfn: (value: IT["Type"], key: string | number, map: this) => void,
+        thisArg?: any
+    ): void
+    get(key: string | number): IT["Type"] | undefined
+    has(key: string | number): boolean
+    set(key: string | number, value: ExtractCSTWithSTN<IT>): this
     readonly size: number
     put(value: ExtractCSTWithSTN<IT>): IT["Type"]
     keys(): IterableIterator<string>
