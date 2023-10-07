@@ -34,14 +34,14 @@ jobs:
             - attach_workspace:
                   at: .
 
-            - run: yarn test:mst:dev -i --coverage
+            - run: yarn test:dev -i --coverage
             - store_test_results:
                   path: ./test-results
 
             - persist_to_workspace:
                   root: .
                   paths:
-                      - packages/mobx-state-tree/coverage/*
+                      - ./coverage/*
 
     test-mst-prod:
         executor: my-executor
@@ -49,7 +49,7 @@ jobs:
             - attach_workspace:
                   at: .
 
-            - run: yarn test:mst:prod -i
+            - run: yarn test:prod -i
             - store_test_results:
                   path: ./test-results
 
@@ -59,7 +59,7 @@ jobs:
             - attach_workspace:
                   at: .
 
-            - run: yarn test:mst:others
+            - run: yarn test:others
             - store_test_results:
                   path: ./test-results
 

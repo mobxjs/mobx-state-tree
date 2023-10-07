@@ -4,7 +4,7 @@ title: "IValidationContextEntry"
 sidebar_label: "IValidationContextEntry"
 ---
 
-[mobx-state-tree - v5.2.0](../index.md) › [IValidationContextEntry](ivalidationcontextentry.md)
+[mobx-state-tree - v5.3.0](../index.md) › [IValidationContextEntry](ivalidationcontextentry.md)
 
 Validation context entry, this is, where the validation should run against which type
 
@@ -25,7 +25,7 @@ Validation context entry, this is, where the validation should run against which
 
 • **path**: *string*
 
-*Defined in [packages/mobx-state-tree/src/core/type/type-checker.ts:17](https://github.com/mobxjs/mobx-state-tree/blob/707cb5de/packages/mobx-state-tree/src/core/type/type-checker.ts#L17)*
+*Defined in [src/core/type/type-checker.ts:17](https://github.com/mobxjs/mobx-state-tree/blob/3e437f73/src/core/type/type-checker.ts#L17)*
 
 Subpath where the validation should be run, or an empty string to validate it all
 
@@ -35,6 +35,6 @@ ___
 
 • **type**: *[IAnyType](ianytype.md)*
 
-*Defined in [packages/mobx-state-tree/src/core/type/type-checker.ts:19](https://github.com/mobxjs/mobx-state-tree/blob/707cb5de/packages/mobx-state-tree/src/core/type/type-checker.ts#L19)*
+*Defined in [src/core/type/type-checker.ts:19](https://github.com/mobxjs/mobx-state-tree/blob/3e437f73/src/core/type/type-checker.ts#L19)*
 
 Type to validate the subpath against
