@@ -1,113 +1,103 @@
 version: 2.1
 
 executors:
-    my-executor:
-        docker:
-            - image: cimg/node:14.18.1
-              environment:
-                  CI: true
+  my-executor:
+    docker:
+      - image: cimg/node:14.18.1
+        environment:
+          CI: true
 
 orbs:
-    node: circleci/node@4.7.0
+  node: circleci/node@4.7.0
 
 jobs:
-    # mobx-state-tree build
-    build:
-        executor: my-executor
-        steps:
-            - checkout
+  # mobx-state-tree build
+  build:
+    executor: my-executor
+    steps:
+      - checkout
 
-            - node/install-packages:
-                  pkg-manager: yarn
+      - node/install-packages:
+          pkg-manager: yarn
 
-            - run: yarn build
+      - run: yarn build
 
-            - persist_to_workspace:
-                  root: .
-                  paths:
-                      - ./*
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./*
 
-    # mobx-state-tree tests
-    test-mst-dev:
-        executor: my-executor
-        steps:
-            - attach_workspace:
-                  at: .
+  # mobx-state-tree tests
+  test-mst-dev:
+    executor: my-executor
+    steps:
+      - attach_workspace:
+          at: .
 
-            - run: yarn test:dev -i --coverage
-            - store_test_results:
-                  path: ./test-results
+      - run: yarn test:dev -i --coverage
+      - store_test_results:
+          path: ./test-results
 
-            - persist_to_workspace:
-                  root: .
-                  paths:
-                      - ./coverage/*
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./coverage/*
 
-    test-mst-prod:
-        executor: my-executor
-        steps:
-            - attach_workspace:
-                  at: .
+  test-mst-prod:
+    executor: my-executor
+    steps:
+      - attach_workspace:
+          at: .
 
-            - run: yarn test:prod -i
-            - store_test_results:
-                  path: ./test-results
+      - run: yarn test:prod -i
+      - store_test_results:
+          path: ./test-results
 
-    test-mst-others:
-        executor: my-executor
-        steps:
-            - attach_workspace:
-                  at: .
+  test-size:
+    executor: my-executor
+    steps:
+      - attach_workspace:
+          at: .
 
-            - run: yarn test:others
-            - store_test_results:
-                  path: ./test-results
+      - run: yarn size
 
-    test-size:
-        executor: my-executor
-        steps:
-            - attach_workspace:
-                  at: .
-
-            - run: yarn size
-
-    # upload coverage
-    upload-codecov:
-        executor: my-executor
-        steps:
-            - attach_workspace:
-                  at: .
-            # only run codecov if the token is present (it is not present for fork PRs for security reasons)
-            - run:
-                  name: upload codecov
-                  command: |
-                      if [[ -v CODECOV_TOKEN ]]
-                      then
-                          ./node_modules/.bin/codecov
-                      else
-                          echo "Warning - Codecov info could NOT be uploaded since the CODECOV_TOKEN was not available"
-                      fi
+  # upload coverage
+  upload-codecov:
+    executor: my-executor
+    steps:
+      - attach_workspace:
+          at: .
+      # only run codecov if the token is present (it is not present for fork PRs for security reasons)
+      - run:
+          name: upload codecov
+          command: |
+            if [[ -v CODECOV_TOKEN ]]
+            then
+                ./node_modules/.bin/codecov
+            else
+                echo "Warning - Codecov info could NOT be uploaded since the CODECOV_TOKEN was not available"
+            fi
 
 workflows:
-    version: 2
-    build-and-test:
-        jobs:
+  version: 2
+  build-and-test:
+    jobs:
+      - build
+
+      - test-mst-dev:
+          requires:
+            - build
+      - test-mst-prod:
+          requires:
+            - build
+      - test-mst-others:
+          requires:
             - build
 
-            - test-mst-dev:
-                  requires:
-                      - build
-            - test-mst-prod:
-                  requires:
-                      - build
-            - test-mst-others:
-                  requires:
-                      - build
+      - test-size:
+          requires:
+            - build
 
-            - test-size:
-                  requires:
-                      - build
-
-            - upload-codecov:
-                  requires:
-                      - test-mst-dev
+      - upload-codecov:
+          requires:
+            - test-mst-dev
