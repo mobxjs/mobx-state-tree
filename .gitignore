@@ -12,3 +12,4 @@ package-lock.json
 /test-results/**/*.xml
 /website/build
 .DS_Store
+junit.xml
