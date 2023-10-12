@@ -1,8 +1,0 @@
-[
-    {
-        "path": "packages/mobx-state-tree/dist/mobx-state-tree.min.js",
-        "limit": "25 KB",
-        "webpack": false,
-        "running": false
-    }
-]

@@ -4,7 +4,7 @@ title: "FunctionWithFlag"
 sidebar_label: "FunctionWithFlag"
 ---
 
-[mobx-state-tree - v5.2.0](../index.md) › [FunctionWithFlag](functionwithflag.md)
+[mobx-state-tree - v5.3.0-alpha.1](../index.md) › [FunctionWithFlag](functionwithflag.md)
 
 ## Hierarchy
 
@@ -47,7 +47,7 @@ ___
 
 • **_isFlowAction**? : *undefined | false | true*
 
-*Defined in [packages/mobx-state-tree/src/core/action.ts:42](https://github.com/mobxjs/mobx-state-tree/blob/707cb5de/packages/mobx-state-tree/src/core/action.ts#L42)*
+*Defined in [src/core/action.ts:42](https://github.com/mobxjs/mobx-state-tree/blob/a397be56/src/core/action.ts#L42)*
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 • **_isMSTAction**? : *undefined | false | true*
 
-*Defined in [packages/mobx-state-tree/src/core/action.ts:41](https://github.com/mobxjs/mobx-state-tree/blob/707cb5de/packages/mobx-state-tree/src/core/action.ts#L41)*
+*Defined in [src/core/action.ts:41](https://github.com/mobxjs/mobx-state-tree/blob/a397be56/src/core/action.ts#L41)*
 
 ___
 
@@ -117,7 +117,7 @@ Defined in node_modules/typescript/lib/lib.es5.d.ts:298
 
 *Inherited from void*
 
-Defined in node_modules/typescript/lib/lib.es2015.symbol.wellknown.d.ts:162
+Defined in node_modules/typescript/lib/lib.es2015.symbol.wellknown.d.ts:157
 
 Determines whether the given value inherits from this function if this function was used
 as a constructor function.
