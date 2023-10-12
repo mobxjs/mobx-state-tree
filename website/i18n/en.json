@@ -9,7 +9,7 @@
         "title": "API_header"
       },
       "API/index": {
-        "title": "mobx-state-tree - v5.2.0-alpha.1",
+        "title": "mobx-state-tree - v5.3.0-alpha.1",
         "sidebar_label": "Globals"
       },
       "API/interfaces/customtypeoptions": {
@@ -191,9 +191,6 @@
       "tips/circular-deps": {
         "title": "Handle circular dependencies between files and types using `late`",
         "sidebar_label": "Circular dependencies"
-      },
-      "tips/contributing": {
-        "title": "Contributing"
       },
       "tips/faq": {
         "title": "Frequently Asked Questions"
