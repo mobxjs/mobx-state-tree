@@ -215,6 +215,7 @@ export function convertChildNodesToArray(childNodes: IChildNodesMap | null): Any
   return result
 }
 
+
 // TODO: can I use convertChildNodesToArray function written above??
 /**
  * @internal
