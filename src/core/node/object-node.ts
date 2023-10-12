@@ -215,7 +215,9 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     const type = this.type
 
     try {
-      this.storedValue = type.createNewInstance(this._childNodes)
+      // TODO: Fix this type
+      this.storedValue = type.createNewInstance(this._childNodes) as unknown as T &
+        IStateTreeNode<IType<C, S, T>>
       this.preboot()
 
       this._isRunningAction = true

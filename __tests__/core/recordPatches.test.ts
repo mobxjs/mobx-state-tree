@@ -8,7 +8,8 @@ import {
   Instance,
   cast,
   IAnyModelType,
-  IMSTMap
+  IMSTMap,
+  IStateTreeNode
 } from "../../src"
 
 function testPatches<C, S, T>(
@@ -18,7 +19,8 @@ function testPatches<C, S, T>(
   expectedPatches: IJsonPatch[],
   expectedInversePatches: IJsonPatch[]
 ) {
-  const instance = type.create(snapshot)
+  // TODO: fix unknown
+  const instance = type.create(snapshot) as unknown as IStateTreeNode<IType<C, S, T>>
   const baseSnapshot = getSnapshot(instance)
   const recorder = recordPatches(instance)
   unprotect(instance)
@@ -26,7 +28,8 @@ function testPatches<C, S, T>(
   recorder.stop()
   expect(recorder.patches).toEqual(expectedPatches)
   expect(recorder.inversePatches).toEqual(expectedInversePatches)
-  const clone = type.create(snapshot)
+  // TODO: fix unknown
+  const clone = type.create(snapshot) as unknown as IStateTreeNode<IType<C, S, T>>
   recorder.replay(clone)
   expect(getSnapshot(clone)).toEqual(getSnapshot(instance))
   recorder.undo()
