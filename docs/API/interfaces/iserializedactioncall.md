@@ -24,7 +24,7 @@ sidebar_label: "ISerializedActionCall"
 
 • **args**? : *any[]*
 
-*Defined in [src/middlewares/on-action.ts:33](https://github.com/mobxjs/mobx-state-tree/blob/73343f6b/src/middlewares/on-action.ts#L33)*
+*Defined in [src/middlewares/on-action.ts:33](https://github.com/mobxjs/mobx-state-tree/blob/bef5159a/src/middlewares/on-action.ts#L33)*
 
 ___
 
@@ -32,7 +32,7 @@ ___
 
 • **name**: *string*
 
-*Defined in [src/middlewares/on-action.ts:31](https://github.com/mobxjs/mobx-state-tree/blob/73343f6b/src/middlewares/on-action.ts#L31)*
+*Defined in [src/middlewares/on-action.ts:31](https://github.com/mobxjs/mobx-state-tree/blob/bef5159a/src/middlewares/on-action.ts#L31)*
 
 ___
 
@@ -40,4 +40,4 @@ ___
 
 • **path**? : *undefined | string*
 
-*Defined in [src/middlewares/on-action.ts:32](https://github.com/mobxjs/mobx-state-tree/blob/73343f6b/src/middlewares/on-action.ts#L32)*
+*Defined in [src/middlewares/on-action.ts:32](https://github.com/mobxjs/mobx-state-tree/blob/bef5159a/src/middlewares/on-action.ts#L32)*

@@ -26,4 +26,4 @@ sidebar_label: "ReferenceOptionsOnInvalidated"
 
 • **onInvalidated**: *[OnReferenceInvalidated](../index.md#onreferenceinvalidated)‹ReferenceT‹IT››*
 
-*Defined in [src/types/utility-types/reference.ts:448](https://github.com/mobxjs/mobx-state-tree/blob/73343f6b/src/types/utility-types/reference.ts#L448)*
+*Defined in [src/types/utility-types/reference.ts:448](https://github.com/mobxjs/mobx-state-tree/blob/bef5159a/src/types/utility-types/reference.ts#L448)*
