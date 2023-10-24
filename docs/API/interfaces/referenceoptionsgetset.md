@@ -4,7 +4,7 @@ title: "ReferenceOptionsGetSet"
 sidebar_label: "ReferenceOptionsGetSet"
 ---
 
-[mobx-state-tree - v5.3.0-alpha.1](../index.md) › [ReferenceOptionsGetSet](referenceoptionsgetset.md)
+[mobx-state-tree - v5.3.0](../index.md) › [ReferenceOptionsGetSet](referenceoptionsgetset.md)
 
 ## Type parameters
 
@@ -27,7 +27,7 @@ sidebar_label: "ReferenceOptionsGetSet"
 
 ▸ **get**(`identifier`: [ReferenceIdentifier](../index.md#referenceidentifier), `parent`: IAnyStateTreeNode | null): *ReferenceT‹IT›*
 
-*Defined in [src/types/utility-types/reference.ts:442](https://github.com/mobxjs/mobx-state-tree/blob/a397be56/src/types/utility-types/reference.ts#L442)*
+*Defined in [src/types/utility-types/reference.ts:442](https://github.com/mobxjs/mobx-state-tree/blob/73343f6b/src/types/utility-types/reference.ts#L442)*
 
 **Parameters:**
 
@@ -44,7 +44,7 @@ ___
 
 ▸ **set**(`value`: ReferenceT‹IT›, `parent`: IAnyStateTreeNode | null): *[ReferenceIdentifier](../index.md#referenceidentifier)*
 
-*Defined in [src/types/utility-types/reference.ts:443](https://github.com/mobxjs/mobx-state-tree/blob/a397be56/src/types/utility-types/reference.ts#L443)*
+*Defined in [src/types/utility-types/reference.ts:443](https://github.com/mobxjs/mobx-state-tree/blob/73343f6b/src/types/utility-types/reference.ts#L443)*
 
 **Parameters:**
 
