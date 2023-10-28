@@ -197,15 +197,15 @@ export interface IModelType<
     ): IModelType<PROPS & ModelPropertiesDeclarationToProperties<PROPS2>, OTHERS, CustomC, CustomS>
 
     views<V extends Object>(
-        v:
-            | (ThisType<ModelInstanceType<PROPS, OTHERS>> & V)
-            | (() => ThisType<ModelInstanceType<PROPS, OTHERS>> & V)
+        a:
+            | ThisType<ModelInstanceType<PROPS, OTHERS> & V>
+            | (() => ThisType<ModelInstanceType<PROPS, OTHERS> & V>)
     ): IModelType<PROPS, OTHERS & V, CustomC, CustomS>
 
     actions<A extends ModelActions>(
         a:
-            | (ThisType<ModelInstanceType<PROPS, OTHERS>> & A)
-            | (() => ThisType<ModelInstanceType<PROPS, OTHERS>> & A)
+            | ThisType<ModelInstanceType<PROPS, OTHERS> & A>
+            | (() => ThisType<ModelInstanceType<PROPS, OTHERS> & A>)
     ): IModelType<PROPS, OTHERS & A, CustomC, CustomS>
 
     volatile<TP extends object>(fn: TP): IModelType<PROPS, OTHERS & TP, CustomC, CustomS>
