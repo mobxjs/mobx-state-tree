@@ -130,10 +130,12 @@ export function createActionInvoker<T extends FunctionWithFlag>(name: string, fn
 
         const boundFn = fn.bind(this)
         Object.defineProperty(boundFn, "name", { value: name })
+        Object.defineProperty(boundFn, "_isMSTAction", { value: true })
 
         const boundAction = isGeneratorFunction(fn) ? flow(boundFn) : boundFn
         boundAction._isFlowAction = (fn as FunctionWithFlag)._isFlowAction || false
         boundAction.$mst_middleware = (fn as any).$mst_middleware
+        boundAction._isMSTAction = true
 
         return runWithActionContext(
             {

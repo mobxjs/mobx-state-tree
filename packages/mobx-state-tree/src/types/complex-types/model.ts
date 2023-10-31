@@ -197,9 +197,9 @@ export interface IModelType<
     ): IModelType<PROPS & ModelPropertiesDeclarationToProperties<PROPS2>, OTHERS, CustomC, CustomS>
 
     views<V extends Object>(
-        a:
-            | ThisType<ModelInstanceType<PROPS, OTHERS> & V>
-            | (() => ThisType<ModelInstanceType<PROPS, OTHERS> & V>)
+        v:
+            | (ThisType<ModelInstanceType<PROPS, OTHERS>> & V)
+            | (() => ThisType<ModelInstanceType<PROPS, OTHERS>> & V)
     ): IModelType<PROPS, OTHERS & V, CustomC, CustomS>
 
     actions<A extends ModelActions>(
@@ -437,14 +437,22 @@ export class ModelType<
             }
 
             const actionInvoker = createActionInvoker(name, action)
+            // @ts-ignore
+            console.log("instantiateActions", name, actionInvoker._isMSTAction)
 
             // @ts-ignore
             actions[name] = actionInvoker
 
             // See #646, allow models to be mocked
-            ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(self, name, actionInvoker)
+            ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(
+                self.prototype,
+                name,
+                actionInvoker
+            )
             // @ts-ignore
-            self.prototype[name] = actionInvoker
+            // self.prototype[name] = actionInvoker
+
+            if (name === "actionName") debugger
         })
     }
 
@@ -477,7 +485,7 @@ export class ModelType<
             throw fail(`volatile state initializer should return a plain object containing state`)
 
         Object.getOwnPropertyNames(state).forEach((key) => {
-            defineProperty(self, key, {
+            Object.defineProperty(self, key, {
                 // @ts-ignore
                 value: state[key]
             })
@@ -577,15 +585,15 @@ export class ModelType<
             // @ts-ignore
             this.baseClass = class {
                 constructor(childNodes: IChildNodesMap) {
-                    const annotations = {} as AnnotationsMap<string, any>
+                    // const annotations = {} as AnnotationsMap<string, any>
                     Object.keys(childNodes).forEach((key) => {
                         // @ts-ignore
                         this[key] = childNodes[key]
-                        annotations[key] = observable
+                        // annotations[key] = observable
                     })
                     // makeObservable(this, annotations, options);
 
-                    makeAutoObservable(this, EMPTY_OBJECT, options)
+                    // makeAutoObservable(this, EMPTY_OBJECT, options)
 
                     // Binds all actions to the current instance.
                     // Remove this because autoObservable does it.

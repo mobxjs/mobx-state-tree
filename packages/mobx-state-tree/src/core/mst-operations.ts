@@ -862,14 +862,20 @@ export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
     }
 
     const props = Object.getOwnPropertyNames(target)
+    console.log("props", props)
+
     props.forEach((key) => {
+        if (key === "actionName") debugger
         if (key in reflected.properties) return
-        const descriptor = Object.getOwnPropertyDescriptor(target, key)!
+        const descriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(target), key)!
+        if (!descriptor) debugger
         if (descriptor.get) {
             if (isComputedProp(target, key)) reflected.views.push(key)
             else reflected.volatile.push(key)
             return
         }
+        if (key === "actionName")
+            console.log("getMembers", descriptor.value, descriptor.value._isMSTAction)
         if (descriptor.value._isMSTAction === true) reflected.actions.push(key)
         if (descriptor.value._isFlowAction === true) reflected.flowActions.push(key)
         else if (isObservableProp(target, key)) reflected.volatile.push(key)
