@@ -257,24 +257,26 @@ const defaultObjectOptions = {
 
 function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelProperties {
   const keysList = Object.keys(declaredProps)
-  const alreadySeenKeys: { [key: string]: boolean } = {}
+  const alreadySeenKeys = new Set<string>()
+
   keysList.forEach((key) => {
-    if (alreadySeenKeys[key]) {
-      throw fail(`${key} is declared twice in the model. Model should not contain same keys`)
-    } else {
-      alreadySeenKeys[key] = true
+    if (alreadySeenKeys.has(key)) {
+      throw fail(`${key} is declared twice in the model. Model should not contain the same keys`)
     }
+    alreadySeenKeys.add(key)
   })
+
   // loop through properties and ensures that all items are types
   return keysList.reduce((props, key) => {
     // warn if user intended a HOOK
-    if (key in Hook)
+    if (key in Hook) {
       throw fail(
         `Hook '${key}' was defined as property. Hooks should be defined as part of the actions`
       )
+    }
 
     // the user intended to use a view
-    const descriptor = Object.getOwnPropertyDescriptor(props, key)!
+    const descriptor = Object.getOwnPropertyDescriptor(declaredProps, key)!
     if ("get" in descriptor) {
       throw fail("Getters are not supported as properties. Please use views instead")
     }
@@ -284,37 +286,39 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
       throw fail(
         "The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?"
       )
-      // its a primitive, convert to its type
-    } else if (isPrimitive(value)) {
-      return Object.assign({}, props, {
-        [key]: optional(getPrimitiveFactoryFromValue(value), value)
-      })
-      // map defaults to empty object automatically for models
-    } else if (value instanceof MapType) {
-      return Object.assign({}, props, {
-        [key]: optional(value, {})
-      })
+    }
+    // its a primitive, convert to its type
+    else if (isPrimitive(value)) {
+      props[key] = optional(getPrimitiveFactoryFromValue(value), value)
+    }
+    // map defaults to empty object automatically for models
+    else if (value instanceof MapType) {
+      props[key] = optional(value, {})
     } else if (value instanceof ArrayType) {
-      return Object.assign({}, props, { [key]: optional(value, []) })
-      // its already a type
-    } else if (isType(value)) {
-      return props
-      // its a function, maybe the user wanted a view?
-    } else if (devMode() && typeof value === "function") {
+      props[key] = optional(value, [])
+    }
+    // its already a type
+    else if (isType(value)) {
+      // do nothing, it's already a type
+    }
+    // its a function, maybe the user wanted a view?
+    else if (devMode() && typeof value === "function") {
       throw fail(
         `Invalid type definition for property '${key}', it looks like you passed a function. Did you forget to invoke it, or did you intend to declare a view / action?`
       )
-      // no other complex values
-    } else if (devMode() && typeof value === "object") {
+    }
+    // no other complex values
+    else if (devMode() && typeof value === "object") {
       throw fail(
         `Invalid type definition for property '${key}', it looks like you passed an object. Try passing another model type or a types.frozen.`
       )
-      // WTF did you pass in mate?
     } else {
       throw fail(
         `Invalid type definition for property '${key}', cannot infer a type from a value like '${value}' (${typeof value})`
       )
     }
+
+    return props
   }, declaredProps as any)
 }
 
