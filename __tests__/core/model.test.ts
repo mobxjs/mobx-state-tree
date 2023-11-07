@@ -409,7 +409,7 @@ describe("Model properties objects", () => {
       })
     }
   })
-  describe("when a user defins a property using a plain JavaScript object", () => {
+  describe("when a user defines a property using a plain JavaScript object", () => {
     if (process.env.NODE_ENV !== "production") {
       test("it throws an error when not in production", () => {
         expect(() => {
@@ -422,5 +422,18 @@ describe("Model properties objects", () => {
         )
       })
     }
+  })
+  describe("when a user uses `.props` to create a child model", () => {
+    it("does not modify the parent properties", () => {
+      const Parent = types.model({
+        first: types.string
+      })
+
+      const Child = Parent.props({
+        second: types.string
+      })
+
+      expect(Parent.properties).not.toHaveProperty("second")
+    })
   })
 })
