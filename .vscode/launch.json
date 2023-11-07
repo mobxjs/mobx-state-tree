@@ -1,14 +1,14 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "node",
-            "request": "launch",
-            "cwd": "${workspaceRoot}/packages/mobx-state-tree",
-            "name": "debug unit test",
-            "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
-            "args": ["-i", "${fileBasename}"],
-            "skipFiles": ["<node_internals>/**/*", "${workspaceRoot}/node_modules/**/*"]
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceRoot}",
+      "name": "debug unit test",
+      "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
+      "args": ["-i", "${fileBasename}"],
+      "skipFiles": ["<node_internals>/**/*", "${workspaceRoot}/node_modules/**/*"]
+    }
+  ]
 }
