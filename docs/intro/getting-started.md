@@ -55,12 +55,12 @@ So far our entities and their attributes look like this:
 
 `Todo`
 
--   name
--   done
+- name
+- done
 
 `User`
 
--   name
+- name
 
 ## Creating our first model
 
@@ -71,15 +71,15 @@ This means that in order to make our application work, we need to describe to MS
 The simplest way to define a model for an entity in MST is to provide sample data that will be used as defaults for it, and pass it to the `types.model` function.
 
 ```javascript
-import { types } from "mobx-state-tree"
+import { types } from "mobx-state-tree" // alternatively, `import { t } from "mobx-state-tree"`
 
 const Todo = types.model({
-    name: "",
-    done: false
+  name: "",
+  done: false
 })
 
 const User = types.model({
-    name: ""
+  name: ""
 })
 ```
 
@@ -95,12 +95,12 @@ This can be easily done by calling `.create()` on the `Todo` and `User` models w
 import { types, getSnapshot } from "mobx-state-tree"
 
 const Todo = types.model({
-    name: "",
-    done: false
+  name: "",
+  done: false
 })
 
 const User = types.model({
-    name: ""
+  name: ""
 })
 
 const john = User.create()
@@ -139,12 +139,12 @@ What does this mean? As I said before, MST nodes are type-enriched. This means t
 
 ```javascript
 const Todo = types.model({
-    name: types.optional(types.string, ""),
-    done: types.optional(types.boolean, false)
+  name: types.optional(types.string, ""),
+  done: types.optional(types.boolean, false)
 })
 
 const User = types.model({
-    name: types.optional(types.string, "")
+  name: types.optional(types.string, "")
 })
 ```
 
@@ -152,27 +152,29 @@ const User = types.model({
 
 The `types` namespace provided in the MST package provides a lot of useful types and utility types like array, map, maybe, refinements and unions. If you are interested in them, feel free to check out the [types overview](/overview/types) for the whole list and their parameters.
 
+In version `5.4.z` and above, MST also provides a namespace called `t`, which is the exact same export as `types`, but may offer some clarity when you are discussing things like TypeScript types and MobX-State-Tree "types" in the same context. We hope this gives user a tool to disambiguate their thoughts, both in code and person-to-person communication.
+
 We can now use this knowledge to combine models and define the root model of our store that will hold `Todo` and `User` instances in the `todos` and `users` maps.
 
 ```javascript
-import { types } from "mobx-state-tree"
+import { types } from "mobx-state-tree" // alternatively, `import { t } from "mobx-state-tree"`
 
 const Todo = types.model({
-    name: types.optional(types.string, ""),
-    done: types.optional(types.boolean, false)
+  name: types.optional(types.string, ""),
+  done: types.optional(types.boolean, false)
 })
 
 const User = types.model({
-    name: types.optional(types.string, "")
+  name: types.optional(types.string, "")
 })
 
 const RootStore = types.model({
-    users: types.map(User),
-    todos: types.optional(types.map(Todo), {})
+  users: types.map(User),
+  todos: types.optional(types.map(Todo), {})
 })
 
 const store = RootStore.create({
-    users: {} // users is not required really since arrays and maps are optional by default since MST3
+  users: {} // users is not required really since arrays and maps are optional by default since MST3
 })
 ```
 
@@ -188,34 +190,34 @@ For example, the following actions will be defined on the `Todo` model, and will
 
 ```javascript
 const Todo = types
-    .model({
-        name: types.optional(types.string, ""),
-        done: types.optional(types.boolean, false)
-    })
-    .actions(self => ({
-        setName(newName) {
-            self.name = newName
-        },
+  .model({
+    name: types.optional(types.string, ""),
+    done: types.optional(types.boolean, false)
+  })
+  .actions((self) => ({
+    setName(newName) {
+      self.name = newName
+    },
 
-        toggle() {
-            self.done = !self.done
-        }
-    }))
+    toggle() {
+      self.done = !self.done
+    }
+  }))
 
 const User = types.model({
-    name: types.optional(types.string, "")
+  name: types.optional(types.string, "")
 })
 
 const RootStore = types
-    .model({
-        users: types.map(User),
-        todos: types.map(Todo)
-    })
-    .actions(self => ({
-        addTodo(id, name) {
-            self.todos.set(id, Todo.create({ name }))
-        }
-    }))
+  .model({
+    users: types.map(User),
+    todos: types.map(Todo)
+  })
+  .actions((self) => ({
+    addTodo(id, name) {
+      self.todos.set(id, Todo.create({ name }))
+    }
+  }))
 ```
 
 [View sample in the playground](https://codesandbox.io/s/3xw9x060mp)
@@ -267,24 +269,24 @@ That basically means that you can restore your objects with your custom methods 
 ```javascript
 // 1st
 const store = RootStore.create({
-    users: {},
-    todos: {
-        "1": {
-            name: "Eat a cake",
-            done: true
-        }
+  users: {},
+  todos: {
+    1: {
+      name: "Eat a cake",
+      done: true
     }
+  }
 })
 
 // 2nd
 applySnapshot(store, {
-    users: {},
-    todos: {
-        "1": {
-            name: "Eat a cake",
-            done: true
-        }
+  users: {},
+  todos: {
+    1: {
+      name: "Eat a cake",
+      done: true
     }
+  }
 })
 ```
 
@@ -302,23 +304,23 @@ import { applySnapshot, onSnapshot } from "mobx-state-tree"
 var states = []
 var currentFrame = -1
 
-onSnapshot(store, snapshot => {
-    if (currentFrame === states.length - 1) {
-        currentFrame++
-        states.push(snapshot)
-    }
+onSnapshot(store, (snapshot) => {
+  if (currentFrame === states.length - 1) {
+    currentFrame++
+    states.push(snapshot)
+  }
 })
 
 export function previousState() {
-    if (currentFrame === 0) return
-    currentFrame--
-    applySnapshot(store, states[currentFrame])
+  if (currentFrame === 0) return
+  currentFrame--
+  applySnapshot(store, states[currentFrame])
 }
 
 export function nextState() {
-    if (currentFrame === states.length - 1) return
-    currentFrame++
-    applySnapshot(store, states[currentFrame])
+  if (currentFrame === states.length - 1) return
+  currentFrame++
+  applySnapshot(store, states[currentFrame])
 }
 ```
 
@@ -327,18 +329,18 @@ export function nextState() {
 MST loves MobX, and is fully compatible with it's `autorun`, `reaction`, `observe` and other parts of the API. You can use the `mobx-react-lite` package to connect a MST store to a React component. More details can be found in the `mobx-react-lite` package documentation, but keep in mind that any view engine could be easily integrated with MST, just listen to `onSnapshot` and update accordingly!
 
 ```javascript
-import { observer } from 'mobx-react-lite'
+import { observer } from "mobx-react-lite"
 
-const App = observer(props => (
-    <div>
-        <button onClick={e => props.store.addTodo(randomId(), "New Task")}>Add Task</button>
-        {Array.from(props.store.todos.values()).map(todo => (
-            <div>
-                <input type="checkbox" checked={todo.done} onChange={e => todo.toggle()} />
-                <input type="text" value={todo.name} onChange={e => todo.setName(e.target.value)} />
-            </div>
-        ))}
-    </div>
+const App = observer((props) => (
+  <div>
+    <button onClick={(e) => props.store.addTodo(randomId(), "New Task")}>Add Task</button>
+    {Array.from(props.store.todos.values()).map((todo) => (
+      <div>
+        <input type="checkbox" checked={todo.done} onChange={(e) => todo.toggle()} />
+        <input type="text" value={todo.name} onChange={(e) => todo.setName(e.target.value)} />
+      </div>
+    ))}
+  </div>
 ))
 ```
 
@@ -351,24 +353,24 @@ If you have the React DevTools installed, enable the "Highlight Updates" check a
 Thanks to the ability of MobX to emit granular updates, fixing that becomes pretty easy! You just need to split the rendering of a `Todo` into another component to only re-render that component whenever the `Todo` data changes.
 
 ```javascript
-const TodoView = observer(props => (
-    <div>
-        <input type="checkbox" checked={props.todo.done} onChange={e => props.todo.toggle()} />
-        <input
-            type="text"
-            value={props.todo.name}
-            onChange={e => props.todo.setName(e.target.value)}
-        />
-    </div>
+const TodoView = observer((props) => (
+  <div>
+    <input type="checkbox" checked={props.todo.done} onChange={(e) => props.todo.toggle()} />
+    <input
+      type="text"
+      value={props.todo.name}
+      onChange={(e) => props.todo.setName(e.target.value)}
+    />
+  </div>
 ))
 
-const AppView = observer(props => (
-    <div>
-        <button onClick={e => props.store.addTodo(randomId(), "New Task")}>Add Task</button>
-        {Array.from(props.store.todos.values()).map(todo => (
-            <TodoView todo={todo} />
-        ))}
-    </div>
+const AppView = observer((props) => (
+  <div>
+    <button onClick={(e) => props.store.addTodo(randomId(), "New Task")}>Add Task</button>
+    {Array.from(props.store.todos.values()).map((todo) => (
+      <TodoView todo={todo} />
+    ))}
+  </div>
 ))
 ```
 
@@ -384,23 +386,23 @@ We now want to display the count of TODOs to be done in our application, to help
 
 ```javascript
 const RootStore = types
-    .model({
-        users: types.map(User),
-        todos: types.map(Todo),
-    })
-    .views(self => ({
-        get pendingCount() {
-            return Array.from(self.todos.values()).filter(todo => !todo.done).length
-        },
-        get completedCount() {
-            return Array.from(self.todos.values()).filter(todo => todo.done).length
-        }
-    }))
-    .actions(self => ({
-        addTodo(id, name) {
-            self.todos.set(id, Todo.create({ name }))
-        }
-    }))
+  .model({
+    users: types.map(User),
+    todos: types.map(Todo)
+  })
+  .views((self) => ({
+    get pendingCount() {
+      return Array.from(self.todos.values()).filter((todo) => !todo.done).length
+    },
+    get completedCount() {
+      return Array.from(self.todos.values()).filter((todo) => todo.done).length
+    }
+  }))
+  .actions((self) => ({
+    addTodo(id, name) {
+      self.todos.set(id, Todo.create({ name }))
+    }
+  }))
 ```
 
 [View sample in the playground](https://codesandbox.io/s/7z01y57no0)
@@ -410,20 +412,20 @@ These properties are called "computed" because they keep track of the changes to
 We can easily see that by creating an additional component in our application that observes the store and renders those counters. Using the React DevTools and tracing updates, you'll see that changing the `name` of a TODO won't re-render the counters, while checking completed or uncompleted will re-render the `TodoView` and `TodoCounterView`.
 
 ```javascript
-const TodoCounterView = observer(props => (
-    <div>
-        {props.store.pendingCount} pending, {props.store.completedCount} completed
-    </div>
+const TodoCounterView = observer((props) => (
+  <div>
+    {props.store.pendingCount} pending, {props.store.completedCount} completed
+  </div>
 ))
 
-const AppView = observer(props => (
-    <div>
-        <button onClick={e => props.store.addTodo(randomId(), "New Task")}>Add Task</button>
-        {Array.from(props.store.todos.values()).map(todo => (
-            <TodoView todo={todo} />
-        ))}
-        <TodoCounterView store={props.store} />
-    </div>
+const AppView = observer((props) => (
+  <div>
+    <button onClick={(e) => props.store.addTodo(randomId(), "New Task")}>Add Task</button>
+    {Array.from(props.store.todos.values()).map((todo) => (
+      <TodoView todo={todo} />
+    ))}
+    <TodoCounterView store={props.store} />
+  </div>
 ))
 ```
 
@@ -439,26 +441,26 @@ MST solves that by providing the ability to declare model views. A model's `.vie
 
 ```javascript
 const RootStore = types
-    .model({
-        users: types.map(User),
-        todos: types.map(Todo)
-    })
-    .views(self => ({
-        get pendingCount() {
-            return Array.from(self.todos.values()).filter(todo => !todo.done).length
-        },
-        get completedCount() {
-            return Array.from(self.todos.values()).filter(todo => todo.done).length
-        },
-        getTodosWhereDoneIs(done) {
-            return Array.from(self.todos.values()).filter(todo => todo.done === done)
-        }
-    }))
-    .actions(self => ({
-        addTodo(id, name) {
-            self.todos.set(id, Todo.create({ name }))
-        }
-    }))
+  .model({
+    users: types.map(User),
+    todos: types.map(Todo)
+  })
+  .views((self) => ({
+    get pendingCount() {
+      return Array.from(self.todos.values()).filter((todo) => !todo.done).length
+    },
+    get completedCount() {
+      return Array.from(self.todos.values()).filter((todo) => todo.done).length
+    },
+    getTodosWhereDoneIs(done) {
+      return Array.from(self.todos.values()).filter((todo) => todo.done === done)
+    }
+  }))
+  .actions((self) => ({
+    addTodo(id, name) {
+      self.todos.set(id, Todo.create({ name }))
+    }
+  }))
 ```
 
 [View sample in the playground](https://codesandbox.io/s/x293k4q95o)
@@ -475,23 +477,23 @@ First, we need to populate the `users` map. To do so, we will simply pass in som
 
 ```javascript
 const store = RootStore.create({
-    users: {
-        "1": {
-            name: "mweststrate"
-        },
-        "2": {
-            name: "mattiamanzati"
-        },
-        "3": {
-            name: "johndoe"
-        }
+  users: {
+    1: {
+      name: "mweststrate"
     },
-    todos: {
-        "1": {
-            name: "Eat a cake",
-            done: true
-        }
+    2: {
+      name: "mattiamanzati"
+    },
+    3: {
+      name: "johndoe"
     }
+  },
+  todos: {
+    1: {
+      name: "Eat a cake",
+      done: true
+    }
+  }
 })
 ```
 
@@ -511,8 +513,8 @@ To define an identifier, you will need to define a property using the `types.ide
 
 ```javascript
 const User = types.model({
-    id: types.identifier,
-    name: types.optional(types.string, "")
+  id: types.identifier,
+  name: types.optional(types.string, "")
 })
 ```
 
@@ -529,26 +531,26 @@ We can easily fix that by providing a correct snapshot.
 
 ```javascript
 const store = RootStore.create({
-    users: {
-        "1": {
-            id: "1",
-            name: "mweststrate"
-        },
-        "2": {
-            id: "2",
-            name: "mattiamanzati"
-        },
-        "3": {
-            id: "3",
-            name: "johndoe"
-        }
+  users: {
+    1: {
+      id: "1",
+      name: "mweststrate"
     },
-    todos: {
-        "1": {
-            name: "Eat a cake",
-            done: true
-        }
+    2: {
+      id: "2",
+      name: "mattiamanzati"
+    },
+    3: {
+      id: "3",
+      name: "johndoe"
     }
+  },
+  todos: {
+    1: {
+      name: "Eat a cake",
+      done: true
+    }
+  }
 })
 ```
 
@@ -560,19 +562,19 @@ The reference we are looking for can be easily defined as `types.reference(User)
 
 ```javascript
 const Todo = types
-    .model({
-        name: types.optional(types.string, ""),
-        done: types.optional(types.boolean, false),
-        user: types.maybe(types.reference(types.late(() => User)))
-    })
-    .actions(self => ({
-        setName(newName) {
-            self.name = newName
-        },
-        toggle() {
-            self.done = !self.done
-        }
-    }))
+  .model({
+    name: types.optional(types.string, ""),
+    done: types.optional(types.boolean, false),
+    user: types.maybe(types.reference(types.late(() => User)))
+  })
+  .actions((self) => ({
+    setName(newName) {
+      self.name = newName
+    },
+    toggle() {
+      self.done = !self.done
+    }
+  }))
 ```
 
 [View sample in the playground](https://codesandbox.io/s/xv1lkqw9oq)
@@ -583,71 +585,71 @@ The reference value can be set by providing either the identifier or a model ins
 
 ```javascript
 const Todo = types
-    .model({
-        name: types.optional(types.string, ""),
-        done: types.optional(types.boolean, false),
-        user: types.maybe(types.reference(types.late(() => User)))
-    })
-    .actions(self => ({
-        setName(newName) {
-            self.name = newName
-        },
-        setUser(user) {
-            if (user === "") {
-                // When selected value is empty, set as undefined
-                self.user = undefined
-            } else {
-                self.user = user
-            }
-        },
-        toggle() {
-            self.done = !self.done
-        }
-    }))
+  .model({
+    name: types.optional(types.string, ""),
+    done: types.optional(types.boolean, false),
+    user: types.maybe(types.reference(types.late(() => User)))
+  })
+  .actions((self) => ({
+    setName(newName) {
+      self.name = newName
+    },
+    setUser(user) {
+      if (user === "") {
+        // When selected value is empty, set as undefined
+        self.user = undefined
+      } else {
+        self.user = user
+      }
+    },
+    toggle() {
+      self.done = !self.done
+    }
+  }))
 ```
 
 Now we need to edit our views to display a select along with each `TodoView`, where the user can choose the assignee for that task. To do so, we will create a separate component `UserPickerView` and use it inside the `TodoView` component to trigger the `setUser` call. That's it!
 
 ```javascript
-const UserPickerView = observer(props => (
-    <select value={props.user ? props.user.id : ""} onChange={e => props.onChange(e.target.value)}>
-        <option value="">-none-</option>
-        {Array.from(props.store.users.values()).map(user => (
-            <option value={user.id}>{user.name}</option>
-        ))}
-    </select>
+const UserPickerView = observer((props) => (
+  <select value={props.user ? props.user.id : ""} onChange={(e) => props.onChange(e.target.value)}>
+    <option value="">-none-</option>
+    {Array.from(props.store.users.values()).map((user) => (
+      <option value={user.id}>{user.name}</option>
+    ))}
+  </select>
 ))
 
-const TodoView = observer(props => (
-    <div>
-        <input type="checkbox" checked={props.todo.done} onChange={e => props.todo.toggle()} />
-        <input
-            type="text"
-            value={props.todo.name}
-            onChange={e => props.todo.setName(e.target.value)}
-        />
-        <UserPickerView
-            user={props.todo.user}
-            store={props.store}
-            onChange={userId => props.todo.setUser(userId)}
-        />
-    </div>
+const TodoView = observer((props) => (
+  <div>
+    <input type="checkbox" checked={props.todo.done} onChange={(e) => props.todo.toggle()} />
+    <input
+      type="text"
+      value={props.todo.name}
+      onChange={(e) => props.todo.setName(e.target.value)}
+    />
+    <UserPickerView
+      user={props.todo.user}
+      store={props.store}
+      onChange={(userId) => props.todo.setUser(userId)}
+    />
+  </div>
 ))
 
-const TodoCounterView = observer(props => (
-    <div>
-        {props.store.pendingCount} pending, {props.store.completedCount} completed
-    </div>
+const TodoCounterView = observer((props) => (
+  <div>
+    {props.store.pendingCount} pending, {props.store.completedCount} completed
+  </div>
 ))
 
-const AppView = observer(props => (
-    <div>
-        <button onClick={e => props.store.addTodo(randomId(), "New Task")}>Add Task</button>
-        {Array.from(props.store.todos.values()).map(todo => (
-            <TodoView store={props.store} todo={todo} />
-        ))}
-        <TodoCounterView store={props.store} />
-    </div>
+const AppView = observer((props) => (
+  <div>
+    <button onClick={(e) => props.store.addTodo(randomId(), "New Task")}>Add Task</button>
+    {Array.from(props.store.todos.values()).map((todo) => (
+      <TodoView store={props.store} todo={todo} />
+    ))}
+    <TodoCounterView store={props.store} />
+  </div>
 ))
 ```
 
