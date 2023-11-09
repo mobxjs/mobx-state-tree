@@ -92,6 +92,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
   identifierCache?: IdentifierCache
   isProtectionEnabled = true
   middlewares?: IMiddleware[]
+  hasSnapshotPostProcessor = false
 
   private _applyPatches?: (patches: IJsonPatch[]) => void
 
@@ -350,6 +351,9 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
   // advantage of using computed for a snapshot is that nicely respects transactions etc.
   get snapshot(): S {
+    if (this.hasSnapshotPostProcessor) {
+      this.createObservableInstanceIfNeeded()
+    }
     return this._snapshotComputed.get()
   }
 

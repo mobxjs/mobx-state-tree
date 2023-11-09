@@ -56,3 +56,5 @@ Useful methods:
 -   `getSnapshot(model, applyPostProcess)`: returns a snapshot representing the current state of the model
 -   `onSnapshot(model, callback)`: creates a listener that fires whenever a new snapshot is available (but only one per MobX transaction).
 -   `applySnapshot(model, snapshot)`: updates the state of the model and all its descendants to the state represented by the snapshot
+
+`mobx-state-tree` also supports customizing snapshots when they are generated or when they are applied with [`types.snapshotProcessor`](/overview/hooks).

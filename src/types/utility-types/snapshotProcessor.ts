@@ -14,7 +14,9 @@ import {
   devMode,
   ComplexType,
   typeCheckFailure,
-  isUnionType
+  isUnionType,
+  Instance,
+  ObjectNode
 } from "../../internal"
 
 /** @hidden */
@@ -44,12 +46,7 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
 
   constructor(
     private readonly _subtype: IT,
-    private readonly _processors: ISnapshotProcessors<
-      IT["CreationType"],
-      CustomC,
-      IT["SnapshotType"],
-      CustomS
-    >,
+    private readonly _processors: ISnapshotProcessors<IT, CustomC, CustomS>,
     name?: string
   ) {
     super(name || _subtype.name)
@@ -74,9 +71,9 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
     }
   }
 
-  private postProcessSnapshot(sn: IT["SnapshotType"]): this["S"] {
+  private postProcessSnapshot(sn: IT["SnapshotType"], node: this["N"]): this["S"] {
     if (this._processors.postProcessor) {
-      return this._processors.postProcessor.call(null, sn) as any
+      return this._processors.postProcessor!.call(null, sn, node.storedValue) as any
     }
     return sn
   }
@@ -85,10 +82,11 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
     // the node has to use these methods rather than the original type ones
     proxyNodeTypeMethods(node.type, this, "create")
 
-    const oldGetSnapshot = node.getSnapshot
-    node.getSnapshot = () => {
-      return this.postProcessSnapshot(oldGetSnapshot.call(node)) as any
+    if (node instanceof ObjectNode) {
+      node.hasSnapshotPostProcessor = !!this._processors.postProcessor
     }
+    const oldGetSnapshot = node.getSnapshot
+    node.getSnapshot = () => this.postProcessSnapshot(oldGetSnapshot.call(node), node) as any
     if (!isUnionType(this._subtype)) {
       node.getReconciliationType = () => {
         return this
@@ -135,7 +133,7 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
 
   getSnapshot(node: this["N"], applyPostProcess: boolean = true): this["S"] {
     const sn = this._subtype.getSnapshot(node)
-    return applyPostProcess ? this.postProcessSnapshot(sn) : sn
+    return applyPostProcess ? this.postProcessSnapshot(sn, node) : sn
   }
 
   isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
@@ -200,16 +198,16 @@ export interface ISnapshotProcessor<IT extends IAnyType, CustomC, CustomS>
 /**
  * Snapshot processors.
  */
-export interface ISnapshotProcessors<C, CustomC, S, CustomS> {
+export interface ISnapshotProcessors<IT extends IAnyType, CustomC, CustomS> {
   /**
    * Function that transforms an input snapshot.
    */
-  preProcessor?(snapshot: CustomC): C
+  preProcessor?(snapshot: CustomC): IT["CreationType"]
   /**
    * Function that transforms an output snapshot.
    * @param snapshot
    */
-  postProcessor?(snapshot: S): CustomS
+  postProcessor?(snapshot: IT["SnapshotType"], node: Instance<IT>): CustomS
 }
 
 /**
@@ -222,15 +220,17 @@ export interface ISnapshotProcessors<C, CustomC, S, CustomS> {
  * interface BackendTodo {
  *     text: string | null
  * }
+ *
  * const Todo2 = types.snapshotProcessor(Todo1, {
  *     // from snapshot to instance
- *     preProcessor(sn: BackendTodo) {
+ *     preProcessor(snapshot: BackendTodo) {
  *         return {
  *             text: sn.text || "";
  *         }
  *     },
+ *
  *     // from instance to snapshot
- *     postProcessor(sn): BackendTodo {
+ *     postProcessor(snapshot, node): BackendTodo {
  *         return {
  *             text: !sn.text ? null : sn.text
  *         }
@@ -249,7 +249,7 @@ export function snapshotProcessor<
   CustomS = _NotCustomized
 >(
   type: IT,
-  processors: ISnapshotProcessors<IT["CreationType"], CustomC, IT["SnapshotType"], CustomS>,
+  processors: ISnapshotProcessors<IT, CustomC, CustomS>,
   name?: string
 ): ISnapshotProcessor<IT, CustomC, CustomS> {
   assertIsType(type, 1)
