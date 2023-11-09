@@ -75,6 +75,7 @@ const METHODS_AND_INTERNAL_TYPES = stringToArray(`
     isValidReference,
     tryReference,
     types,
+    t,
     getNodeId,
     getRunningActionContext,
     isActionContextChildOf,
@@ -135,6 +136,10 @@ test("correct api exposed", () => {
 
 test("correct types exposed", () => {
   expect(Object.keys(mst.types).sort()).toEqual(TYPES.sort())
+})
+
+test("types also exposed on t module", () => {
+  expect(Object.keys(mst.t).sort()).toEqual(TYPES.sort())
 })
 
 test("all methods mentioned in API docs", () => {

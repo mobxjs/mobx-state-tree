@@ -149,6 +149,7 @@ export {
   isActionContextChildOf,
   isActionContextThisOrChildOf,
   types,
+  types as t, // We do this as a less ambiguous term for the traditional types module, which sometimes gets confused when discussing "types" in general
   toGeneratorFunction,
   toGenerator
 } from "./internal"
