@@ -1,3 +1,4 @@
+import { observable } from "mobx"
 import {
   types,
   getSnapshot,
@@ -6,7 +7,10 @@ import {
   detach,
   clone,
   SnapshotIn,
-  getNodeId
+  getNodeId,
+  Instance,
+  getType,
+  onSnapshot
 } from "../../src"
 
 describe("snapshotProcessor", () => {
@@ -51,26 +55,58 @@ describe("snapshotProcessor", () => {
     })
 
     test("post processor", () => {
+      let model: Instance<typeof Model>
       const Model = types.model({
         m: types.snapshotProcessor(M, {
-          postProcessor(sn): { x: number } {
+          postProcessor(sn, node): { x: number; val?: string } {
+            expect(node).toBeTruthy()
+
             return {
               ...sn,
-              x: Number(sn.x)
+              x: Number(sn.x),
+              val: node.x
             }
           }
         })
       })
-      const model = Model.create({
+      model = Model.create({
         m: { x: "5" }
       })
       unprotect(model)
       expect(model.m.x).toBe("5")
       expect(getSnapshot(model).m.x).toBe(5)
+      expect(getSnapshot(model).m.val).toBe("5")
       // reconciliation
       model.m = cast({ x: "6" })
       expect(model.m.x).toBe("6")
       expect(getSnapshot(model).m.x).toBe(6)
+      expect(getSnapshot(model).m.val).toBe("6")
+    })
+
+    test("post processor that observes other observables recomputes when they change", () => {
+      let model: Instance<typeof Model>
+      const atom = observable.box("foo")
+
+      const Model = types.model({
+        m: types.snapshotProcessor(M, {
+          postProcessor(sn, node): { x: number; val: string } {
+            return {
+              ...sn,
+              x: Number(sn.x),
+              val: atom.get()
+            }
+          }
+        })
+      })
+      model = Model.create({
+        m: { x: "5" }
+      })
+      const newSnapshot = jest.fn()
+      onSnapshot(model, newSnapshot)
+      expect(getSnapshot(model).m.val).toBe("foo")
+      atom.set("bar")
+      expect(getSnapshot(model).m.val).toBe("bar")
+      expect(newSnapshot).toHaveBeenCalledTimes(1)
     })
 
     test("pre and post processor", () => {
@@ -143,7 +179,8 @@ describe("snapshotProcessor", () => {
     test("post processor", () => {
       const Model = types.model({
         m: types.snapshotProcessor(M, {
-          postProcessor(sn): number {
+          postProcessor(sn, node): number {
+            expect(node).toMatch(/5|6/)
             return Number(sn)
           }
         })
@@ -224,7 +261,9 @@ describe("snapshotProcessor", () => {
     test("post processor", () => {
       const Model = types.model({
         m: types.snapshotProcessor(M, {
-          postProcessor(sn): number[] {
+          postProcessor(sn, node): number[] {
+            expect(node).toBeDefined()
+            expect(node.length).toEqual(1)
             return sn.map((n) => Number(n))
           }
         })
@@ -308,7 +347,9 @@ describe("snapshotProcessor", () => {
     test("post processor", () => {
       const Model = types.model({
         m: types.snapshotProcessor(M, {
-          postProcessor(sn): { x: number } {
+          postProcessor(sn, node): { x: number } {
+            expect(node.size).toBe(1)
+
             return {
               ...sn,
               x: Number(sn.x)
