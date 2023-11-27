@@ -100,15 +100,15 @@
 <p>Central to MST is the concept of a living tree. The tree consists of mutable, but strictly protected objects enriched with run-time type information. In other words; each tree has a shape (type information) and state (data). From this living tree, immutable and structurally shared snapshots are generated automatically.</p>
 <p>This means that in order to make our application work, we need to describe to MST how our attributes are shaped. Knowing that, MST will be able to automatically generate all those boundaries, and help us avoid making silly mistakes, like putting a string in price field or a boolean where an array is expected.</p>
 <p>The simplest way to define a model for an entity in MST is to provide sample data that will be used as defaults for it, and pass it to the <code>types.model</code> function.</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { types } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-state-tree"</span>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { types } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-state-tree"</span> <span class="hljs-comment">// alternatively, `import { t } from "mobx-state-tree"`</span>
 
 <span class="hljs-keyword">const</span> Todo = types.model({
-    <span class="hljs-attr">name</span>: <span class="hljs-string">""</span>,
-    <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span>
+  <span class="hljs-attr">name</span>: <span class="hljs-string">""</span>,
+  <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span>
 })
 
 <span class="hljs-keyword">const</span> User = types.model({
-    <span class="hljs-attr">name</span>: <span class="hljs-string">""</span>
+  <span class="hljs-attr">name</span>: <span class="hljs-string">""</span>
 })
 </code></pre>
 <p><a href="https://codesandbox.io/s/235jykjp90">View sample in the playground</a></p>
@@ -118,12 +118,12 @@
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { types, getSnapshot } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-state-tree"</span>
 
 <span class="hljs-keyword">const</span> Todo = types.model({
-    <span class="hljs-attr">name</span>: <span class="hljs-string">""</span>,
-    <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span>
+  <span class="hljs-attr">name</span>: <span class="hljs-string">""</span>,
+  <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span>
 })
 
 <span class="hljs-keyword">const</span> User = types.model({
-    <span class="hljs-attr">name</span>: <span class="hljs-string">""</span>
+  <span class="hljs-attr">name</span>: <span class="hljs-string">""</span>
 })
 
 <span class="hljs-keyword">const</span> john = User.create()
@@ -148,35 +148,36 @@ at path <span class="hljs-string">"/done"</span> value `1` is <span class="hljs-
 </code></pre>
 <p>What does this mean? As I said before, MST nodes are type-enriched. This means that providing a value (number) of the wrong type (expected boolean) will make MST throw an error. This is very helpful when building applications, as it will keep your state consistent and avoid entering illegal states due to data of the wrong type. To be honest with you, I lied when I told you how to define models. The syntax you used was only a shortcut for the following syntax:</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> Todo = types.model({
-    <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>),
-    <span class="hljs-attr">done</span>: types.optional(types.boolean, <span class="hljs-literal">false</span>)
+  <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>),
+  <span class="hljs-attr">done</span>: types.optional(types.boolean, <span class="hljs-literal">false</span>)
 })
 
 <span class="hljs-keyword">const</span> User = types.model({
-    <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>)
+  <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>)
 })
 </code></pre>
 <p><a href="https://codesandbox.io/s/kx9x4973z3">View sample in the playground</a></p>
 <p>The <code>types</code> namespace provided in the MST package provides a lot of useful types and utility types like array, map, maybe, refinements and unions. If you are interested in them, feel free to check out the <a href="/overview/types">types overview</a> for the whole list and their parameters.</p>
+<p>In version <code>5.4.z</code> and above, MST also provides a namespace called <code>t</code>, which is the exact same export as <code>types</code>, but may offer some clarity when you are discussing things like TypeScript types and MobX-State-Tree &quot;types&quot; in the same context. We hope this gives user a tool to disambiguate their thoughts, both in code and person-to-person communication.</p>
 <p>We can now use this knowledge to combine models and define the root model of our store that will hold <code>Todo</code> and <code>User</code> instances in the <code>todos</code> and <code>users</code> maps.</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { types } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-state-tree"</span>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { types } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-state-tree"</span> <span class="hljs-comment">// alternatively, `import { t } from "mobx-state-tree"`</span>
 
 <span class="hljs-keyword">const</span> Todo = types.model({
-    <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>),
-    <span class="hljs-attr">done</span>: types.optional(types.boolean, <span class="hljs-literal">false</span>)
+  <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>),
+  <span class="hljs-attr">done</span>: types.optional(types.boolean, <span class="hljs-literal">false</span>)
 })
 
 <span class="hljs-keyword">const</span> User = types.model({
-    <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>)
+  <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>)
 })
 
 <span class="hljs-keyword">const</span> RootStore = types.model({
-    <span class="hljs-attr">users</span>: types.map(User),
-    <span class="hljs-attr">todos</span>: types.optional(types.map(Todo), {})
+  <span class="hljs-attr">users</span>: types.map(User),
+  <span class="hljs-attr">todos</span>: types.optional(types.map(Todo), {})
 })
 
 <span class="hljs-keyword">const</span> store = RootStore.create({
-    <span class="hljs-attr">users</span>: {} <span class="hljs-comment">// users is not required really since arrays and maps are optional by default since MST3</span>
+  <span class="hljs-attr">users</span>: {} <span class="hljs-comment">// users is not required really since arrays and maps are optional by default since MST3</span>
 })
 </code></pre>
 <p><a href="https://codesandbox.io/s/kk63vox225">View sample in the playground</a></p>
@@ -185,34 +186,34 @@ at path <span class="hljs-string">"/done"</span> value `1` is <span class="hljs-
 <p>MST tree nodes (model instances) can be modified using actions. Actions are collocated with your model and can easily be defined by declaring <code>.actions</code> over your model and passing it a function that accepts the model instance and returns an object with the functions that modify that tree node.</p>
 <p>For example, the following actions will be defined on the <code>Todo</code> model, and will allow you to toggle the <code>done</code> and set the <code>name</code> attribute of the provided <code>Todo</code> instance.</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> Todo = types
-    .model({
-        <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>),
-        <span class="hljs-attr">done</span>: types.optional(types.boolean, <span class="hljs-literal">false</span>)
-    })
-    .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
-        setName(newName) {
-            self.name = newName
-        },
+  .model({
+    <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>),
+    <span class="hljs-attr">done</span>: types.optional(types.boolean, <span class="hljs-literal">false</span>)
+  })
+  .actions(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
+    setName(newName) {
+      self.name = newName
+    },
 
-        toggle() {
-            self.done = !self.done
-        }
-    }))
+    toggle() {
+      self.done = !self.done
+    }
+  }))
 
 <span class="hljs-keyword">const</span> User = types.model({
-    <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>)
+  <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>)
 })
 
 <span class="hljs-keyword">const</span> RootStore = types
-    .model({
-        <span class="hljs-attr">users</span>: types.map(User),
-        <span class="hljs-attr">todos</span>: types.map(Todo)
-    })
-    .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
-        addTodo(id, name) {
-            self.todos.set(id, Todo.create({ name }))
-        }
-    }))
+  .model({
+    <span class="hljs-attr">users</span>: types.map(User),
+    <span class="hljs-attr">todos</span>: types.map(Todo)
+  })
+  .actions(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
+    addTodo(id, name) {
+      self.todos.set(id, Todo.create({ name }))
+    }
+  }))
 </code></pre>
 <p><a href="https://codesandbox.io/s/3xw9x060mp">View sample in the playground</a></p>
 <p>Please notice the use of <code>self</code>. <code>self</code> is the object being constructed when an instance of your model is created. Thanks to the <code>self</code> object, instance actions are &quot;this-free&quot;, allowing you to be sure that they are correctly bound.</p>
@@ -247,24 +248,24 @@ store.todos.get(<span class="hljs-number">1</span>).toggle()
 </ol>
 <pre><code class="hljs css language-javascript"><span class="hljs-comment">// 1st</span>
 <span class="hljs-keyword">const</span> store = RootStore.create({
-    <span class="hljs-attr">users</span>: {},
-    <span class="hljs-attr">todos</span>: {
-        <span class="hljs-string">"1"</span>: {
-            <span class="hljs-attr">name</span>: <span class="hljs-string">"Eat a cake"</span>,
-            <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span>
-        }
+  <span class="hljs-attr">users</span>: {},
+  <span class="hljs-attr">todos</span>: {
+    <span class="hljs-number">1</span>: {
+      <span class="hljs-attr">name</span>: <span class="hljs-string">"Eat a cake"</span>,
+      <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span>
     }
+  }
 })
 
 <span class="hljs-comment">// 2nd</span>
 applySnapshot(store, {
-    <span class="hljs-attr">users</span>: {},
-    <span class="hljs-attr">todos</span>: {
-        <span class="hljs-string">"1"</span>: {
-            <span class="hljs-attr">name</span>: <span class="hljs-string">"Eat a cake"</span>,
-            <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span>
-        }
+  <span class="hljs-attr">users</span>: {},
+  <span class="hljs-attr">todos</span>: {
+    <span class="hljs-number">1</span>: {
+      <span class="hljs-attr">name</span>: <span class="hljs-string">"Eat a cake"</span>,
+      <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span>
     }
+  }
 })
 </code></pre>
 <p><a href="https://codesandbox.io/s/3x3v5kl5mq">View sample in the playground</a></p>
@@ -276,63 +277,63 @@ applySnapshot(store, {
 <span class="hljs-keyword">var</span> states = []
 <span class="hljs-keyword">var</span> currentFrame = <span class="hljs-number">-1</span>
 
-onSnapshot(store, snapshot =&gt; {
-    <span class="hljs-keyword">if</span> (currentFrame === states.length - <span class="hljs-number">1</span>) {
-        currentFrame++
-        states.push(snapshot)
-    }
+onSnapshot(store, (snapshot) =&gt; {
+  <span class="hljs-keyword">if</span> (currentFrame === states.length - <span class="hljs-number">1</span>) {
+    currentFrame++
+    states.push(snapshot)
+  }
 })
 
 <span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">previousState</span>(<span class="hljs-params"></span>) </span>{
-    <span class="hljs-keyword">if</span> (currentFrame === <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span>
-    currentFrame--
-    applySnapshot(store, states[currentFrame])
+  <span class="hljs-keyword">if</span> (currentFrame === <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span>
+  currentFrame--
+  applySnapshot(store, states[currentFrame])
 }
 
 <span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">nextState</span>(<span class="hljs-params"></span>) </span>{
-    <span class="hljs-keyword">if</span> (currentFrame === states.length - <span class="hljs-number">1</span>) <span class="hljs-keyword">return</span>
-    currentFrame++
-    applySnapshot(store, states[currentFrame])
+  <span class="hljs-keyword">if</span> (currentFrame === states.length - <span class="hljs-number">1</span>) <span class="hljs-keyword">return</span>
+  currentFrame++
+  applySnapshot(store, states[currentFrame])
 }
 </code></pre>
 <h2><a class="anchor" aria-hidden="true" id="getting-to-the-ui"></a><a href="#getting-to-the-ui" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Getting to the UI</h2>
 <p>MST loves MobX, and is fully compatible with it's <code>autorun</code>, <code>reaction</code>, <code>observe</code> and other parts of the API. You can use the <code>mobx-react-lite</code> package to connect a MST store to a React component. More details can be found in the <code>mobx-react-lite</code> package documentation, but keep in mind that any view engine could be easily integrated with MST, just listen to <code>onSnapshot</code> and update accordingly!</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observer } <span class="hljs-keyword">from</span> <span class="hljs-string">'mobx-react-lite'</span>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observer } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-react-lite"</span>
 
-<span class="hljs-keyword">const</span> App = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
-    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{e</span> =&gt;</span> props.store.addTodo(randomId(), "New Task")}&gt;Add Task<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
-        {Array.from(props.store.todos.values()).map(todo =&gt; (
-            <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
-                <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"checkbox"</span> <span class="hljs-attr">checked</span>=<span class="hljs-string">{todo.done}</span> <span class="hljs-attr">onChange</span>=<span class="hljs-string">{e</span> =&gt;</span> todo.toggle()} /&gt;
-                <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text"</span> <span class="hljs-attr">value</span>=<span class="hljs-string">{todo.name}</span> <span class="hljs-attr">onChange</span>=<span class="hljs-string">{e</span> =&gt;</span> todo.setName(e.target.value)} /&gt;
-            <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
-        ))}
-    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+<span class="hljs-keyword">const</span> App = observer(<span class="hljs-function">(<span class="hljs-params">props</span>) =&gt;</span> (
+  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{(e)</span> =&gt;</span> props.store.addTodo(randomId(), "New Task")}&gt;Add Task<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    {Array.from(props.store.todos.values()).map((todo) =&gt; (
+      <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"checkbox"</span> <span class="hljs-attr">checked</span>=<span class="hljs-string">{todo.done}</span> <span class="hljs-attr">onChange</span>=<span class="hljs-string">{(e)</span> =&gt;</span> todo.toggle()} /&gt;
+        <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text"</span> <span class="hljs-attr">value</span>=<span class="hljs-string">{todo.name}</span> <span class="hljs-attr">onChange</span>=<span class="hljs-string">{(e)</span> =&gt;</span> todo.setName(e.target.value)} /&gt;
+      <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+    ))}
+  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
 ))
 </code></pre>
 <p><a href="https://codesandbox.io/s/310ol795x6">View sample in the playground</a></p>
 <h2><a class="anchor" aria-hidden="true" id="improving-render-performance"></a><a href="#improving-render-performance" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Improving render performance</h2>
 <p>If you have the React DevTools installed, enable the &quot;Highlight Updates&quot; check and you will see that the entire application will re-render whenever a <code>Todo</code> is toggled or a <code>name</code> is changed. That's a shame, as this can cause performance issues if there's a lot of <code>Todo</code>'s in our list!</p>
 <p>Thanks to the ability of MobX to emit granular updates, fixing that becomes pretty easy! You just need to split the rendering of a <code>Todo</code> into another component to only re-render that component whenever the <code>Todo</code> data changes.</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> TodoView = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
-    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"checkbox"</span> <span class="hljs-attr">checked</span>=<span class="hljs-string">{props.todo.done}</span> <span class="hljs-attr">onChange</span>=<span class="hljs-string">{e</span> =&gt;</span> props.todo.toggle()} /&gt;
-        <span class="hljs-tag">&lt;<span class="hljs-name">input</span>
-            <span class="hljs-attr">type</span>=<span class="hljs-string">"text"</span>
-            <span class="hljs-attr">value</span>=<span class="hljs-string">{props.todo.name}</span>
-            <span class="hljs-attr">onChange</span>=<span class="hljs-string">{e</span> =&gt;</span> props.todo.setName(e.target.value)}
-        /&gt;
-    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> TodoView = observer(<span class="hljs-function">(<span class="hljs-params">props</span>) =&gt;</span> (
+  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"checkbox"</span> <span class="hljs-attr">checked</span>=<span class="hljs-string">{props.todo.done}</span> <span class="hljs-attr">onChange</span>=<span class="hljs-string">{(e)</span> =&gt;</span> props.todo.toggle()} /&gt;
+    <span class="hljs-tag">&lt;<span class="hljs-name">input</span>
+      <span class="hljs-attr">type</span>=<span class="hljs-string">"text"</span>
+      <span class="hljs-attr">value</span>=<span class="hljs-string">{props.todo.name}</span>
+      <span class="hljs-attr">onChange</span>=<span class="hljs-string">{(e)</span> =&gt;</span> props.todo.setName(e.target.value)}
+    /&gt;
+  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
 ))
 
-<span class="hljs-keyword">const</span> AppView = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
-    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{e</span> =&gt;</span> props.store.addTodo(randomId(), "New Task")}&gt;Add Task<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
-        {Array.from(props.store.todos.values()).map(todo =&gt; (
-            <span class="hljs-tag">&lt;<span class="hljs-name">TodoView</span> <span class="hljs-attr">todo</span>=<span class="hljs-string">{todo}</span> /&gt;</span>
-        ))}
-    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+<span class="hljs-keyword">const</span> AppView = observer(<span class="hljs-function">(<span class="hljs-params">props</span>) =&gt;</span> (
+  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{(e)</span> =&gt;</span> props.store.addTodo(randomId(), "New Task")}&gt;Add Task<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    {Array.from(props.store.todos.values()).map((todo) =&gt; (
+      <span class="hljs-tag">&lt;<span class="hljs-name">TodoView</span> <span class="hljs-attr">todo</span>=<span class="hljs-string">{todo}</span> /&gt;</span>
+    ))}
+  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
 ))
 </code></pre>
 <p><a href="https://codesandbox.io/s/jvmw9oxyxv">View sample in the playground</a></p>
@@ -341,41 +342,41 @@ onSnapshot(store, snapshot =&gt; {
 <h2><a class="anchor" aria-hidden="true" id="computed-properties"></a><a href="#computed-properties" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Computed properties</h2>
 <p>We now want to display the count of TODOs to be done in our application, to help users know how many TODOs are left. That means that we need to count the number of TODOs with <code>done</code> set to <code>false</code>. To do this, we need to modify the <code>RootStore</code> declaration and add a getter property over our model by calling <code>.views</code> that will count how many TODOs are left.</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> RootStore = types
-    .model({
-        <span class="hljs-attr">users</span>: types.map(User),
-        <span class="hljs-attr">todos</span>: types.map(Todo),
-    })
-    .views(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
-        <span class="hljs-keyword">get</span> pendingCount() {
-            <span class="hljs-keyword">return</span> <span class="hljs-built_in">Array</span>.from(self.todos.values()).filter(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> !todo.done).length
-        },
-        <span class="hljs-keyword">get</span> completedCount() {
-            <span class="hljs-keyword">return</span> <span class="hljs-built_in">Array</span>.from(self.todos.values()).filter(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> todo.done).length
-        }
-    }))
-    .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
-        addTodo(id, name) {
-            self.todos.set(id, Todo.create({ name }))
-        }
-    }))
+  .model({
+    <span class="hljs-attr">users</span>: types.map(User),
+    <span class="hljs-attr">todos</span>: types.map(Todo)
+  })
+  .views(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
+    <span class="hljs-keyword">get</span> pendingCount() {
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">Array</span>.from(self.todos.values()).filter(<span class="hljs-function">(<span class="hljs-params">todo</span>) =&gt;</span> !todo.done).length
+    },
+    <span class="hljs-keyword">get</span> completedCount() {
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">Array</span>.from(self.todos.values()).filter(<span class="hljs-function">(<span class="hljs-params">todo</span>) =&gt;</span> todo.done).length
+    }
+  }))
+  .actions(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
+    addTodo(id, name) {
+      self.todos.set(id, Todo.create({ name }))
+    }
+  }))
 </code></pre>
 <p><a href="https://codesandbox.io/s/7z01y57no0">View sample in the playground</a></p>
 <p>These properties are called &quot;computed&quot; because they keep track of the changes to the observed attributes and recompute automatically if anything used by that attribute changes. This allows for performance savings; for example changing the <code>name</code> of a TODO won't affect the number of pending and completed count, as such it wont trigger a recalculation of those counters.</p>
 <p>We can easily see that by creating an additional component in our application that observes the store and renders those counters. Using the React DevTools and tracing updates, you'll see that changing the <code>name</code> of a TODO won't re-render the counters, while checking completed or uncompleted will re-render the <code>TodoView</code> and <code>TodoCounterView</code>.</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> TodoCounterView = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
-    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
-        {props.store.pendingCount} pending, {props.store.completedCount} completed
-    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> TodoCounterView = observer(<span class="hljs-function">(<span class="hljs-params">props</span>) =&gt;</span> (
+  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+    {props.store.pendingCount} pending, {props.store.completedCount} completed
+  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
 ))
 
-<span class="hljs-keyword">const</span> AppView = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
-    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{e</span> =&gt;</span> props.store.addTodo(randomId(), "New Task")}&gt;Add Task<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
-        {Array.from(props.store.todos.values()).map(todo =&gt; (
-            <span class="hljs-tag">&lt;<span class="hljs-name">TodoView</span> <span class="hljs-attr">todo</span>=<span class="hljs-string">{todo}</span> /&gt;</span>
-        ))}
-        <span class="hljs-tag">&lt;<span class="hljs-name">TodoCounterView</span> <span class="hljs-attr">store</span>=<span class="hljs-string">{props.store}</span> /&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+<span class="hljs-keyword">const</span> AppView = observer(<span class="hljs-function">(<span class="hljs-params">props</span>) =&gt;</span> (
+  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{(e)</span> =&gt;</span> props.store.addTodo(randomId(), "New Task")}&gt;Add Task<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    {Array.from(props.store.todos.values()).map((todo) =&gt; (
+      <span class="hljs-tag">&lt;<span class="hljs-name">TodoView</span> <span class="hljs-attr">todo</span>=<span class="hljs-string">{todo}</span> /&gt;</span>
+    ))}
+    <span class="hljs-tag">&lt;<span class="hljs-name">TodoCounterView</span> <span class="hljs-attr">store</span>=<span class="hljs-string">{props.store}</span> /&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
 ))
 </code></pre>
 <p><a href="https://codesandbox.io/s/k21ol780xr">View sample in the playground</a></p>
@@ -384,26 +385,26 @@ onSnapshot(store, snapshot =&gt; {
 <p>You may need to use the list of <code>todos</code> filtered by completion in various locations of your application. Even if accessing the list of <code>todos</code> and filtering them every time may look like a viable solution, if the filter logic is complex or changes over time you'll find out that it's not a viable solution.</p>
 <p>MST solves that by providing the ability to declare model views. A model's <code>.views</code> is declared as a function over the properties (first argument) of the model declaration. Model views can accept parameters and only read data from our store. If you try to change your store from a model view, MST will throw an error and prevent you from doing so.</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> RootStore = types
-    .model({
-        <span class="hljs-attr">users</span>: types.map(User),
-        <span class="hljs-attr">todos</span>: types.map(Todo)
-    })
-    .views(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
-        <span class="hljs-keyword">get</span> pendingCount() {
-            <span class="hljs-keyword">return</span> <span class="hljs-built_in">Array</span>.from(self.todos.values()).filter(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> !todo.done).length
-        },
-        <span class="hljs-keyword">get</span> completedCount() {
-            <span class="hljs-keyword">return</span> <span class="hljs-built_in">Array</span>.from(self.todos.values()).filter(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> todo.done).length
-        },
-        getTodosWhereDoneIs(done) {
-            <span class="hljs-keyword">return</span> <span class="hljs-built_in">Array</span>.from(self.todos.values()).filter(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> todo.done === done)
-        }
-    }))
-    .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
-        addTodo(id, name) {
-            self.todos.set(id, Todo.create({ name }))
-        }
-    }))
+  .model({
+    <span class="hljs-attr">users</span>: types.map(User),
+    <span class="hljs-attr">todos</span>: types.map(Todo)
+  })
+  .views(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
+    <span class="hljs-keyword">get</span> pendingCount() {
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">Array</span>.from(self.todos.values()).filter(<span class="hljs-function">(<span class="hljs-params">todo</span>) =&gt;</span> !todo.done).length
+    },
+    <span class="hljs-keyword">get</span> completedCount() {
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">Array</span>.from(self.todos.values()).filter(<span class="hljs-function">(<span class="hljs-params">todo</span>) =&gt;</span> todo.done).length
+    },
+    getTodosWhereDoneIs(done) {
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">Array</span>.from(self.todos.values()).filter(<span class="hljs-function">(<span class="hljs-params">todo</span>) =&gt;</span> todo.done === done)
+    }
+  }))
+  .actions(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
+    addTodo(id, name) {
+      self.todos.set(id, Todo.create({ name }))
+    }
+  }))
 </code></pre>
 <p><a href="https://codesandbox.io/s/x293k4q95o">View sample in the playground</a></p>
 <p>Notice that other views and View components may call <code>getTodosWhereDoneIs</code> outside of the store definition.</p>
@@ -412,23 +413,23 @@ onSnapshot(store, snapshot =&gt; {
 <p>We will focus on this feature; to do that let's assume that the list of users comes from an XHR request or another data source. Feel free to either implement it or add to the TODO application a user management feature.</p>
 <p>First, we need to populate the <code>users</code> map. To do so, we will simply pass in some users when creating the <code>users</code> map.</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> store = RootStore.create({
-    <span class="hljs-attr">users</span>: {
-        <span class="hljs-string">"1"</span>: {
-            <span class="hljs-attr">name</span>: <span class="hljs-string">"mweststrate"</span>
-        },
-        <span class="hljs-string">"2"</span>: {
-            <span class="hljs-attr">name</span>: <span class="hljs-string">"mattiamanzati"</span>
-        },
-        <span class="hljs-string">"3"</span>: {
-            <span class="hljs-attr">name</span>: <span class="hljs-string">"johndoe"</span>
-        }
+  <span class="hljs-attr">users</span>: {
+    <span class="hljs-number">1</span>: {
+      <span class="hljs-attr">name</span>: <span class="hljs-string">"mweststrate"</span>
     },
-    <span class="hljs-attr">todos</span>: {
-        <span class="hljs-string">"1"</span>: {
-            <span class="hljs-attr">name</span>: <span class="hljs-string">"Eat a cake"</span>,
-            <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span>
-        }
+    <span class="hljs-number">2</span>: {
+      <span class="hljs-attr">name</span>: <span class="hljs-string">"mattiamanzati"</span>
+    },
+    <span class="hljs-number">3</span>: {
+      <span class="hljs-attr">name</span>: <span class="hljs-string">"johndoe"</span>
     }
+  },
+  <span class="hljs-attr">todos</span>: {
+    <span class="hljs-number">1</span>: {
+      <span class="hljs-attr">name</span>: <span class="hljs-string">"Eat a cake"</span>,
+      <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span>
+    }
+  }
 })
 </code></pre>
 <p><a href="https://codesandbox.io/s/7wwn0x4xkq">View sample in the playground</a></p>
@@ -439,8 +440,8 @@ onSnapshot(store, snapshot =&gt; {
 <p>The identifier attribute cannot be mutated once the model instance has been created. That also means that if you try to apply a snapshot with a different identifier on that model, it will throw an error. On the other hand, providing an identifier helps MST understand elements in maps and arrays, and allows it to correctly reuse model instances in arrays and maps when possible.</p>
 <p>To define an identifier, you will need to define a property using the <code>types.identifier</code> type composer. For example, we want the identifier to be a string.</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> User = types.model({
-    <span class="hljs-attr">id</span>: types.identifier,
-    <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>)
+  <span class="hljs-attr">id</span>: types.identifier,
+  <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>)
 })
 </code></pre>
 <p>As I said before, identifiers are required upon creation of the element and cannot be mutated, so if you end up receiving an error like this, it's because you also have to provide ids for the users in the snapshot for the <code>.create</code> of <code>RootStore</code>.</p>
@@ -451,112 +452,112 @@ at path <span class="hljs-string">"/users/3/id"</span> value `undefined` is <spa
 </code></pre>
 <p>We can easily fix that by providing a correct snapshot.</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> store = RootStore.create({
-    <span class="hljs-attr">users</span>: {
-        <span class="hljs-string">"1"</span>: {
-            <span class="hljs-attr">id</span>: <span class="hljs-string">"1"</span>,
-            <span class="hljs-attr">name</span>: <span class="hljs-string">"mweststrate"</span>
-        },
-        <span class="hljs-string">"2"</span>: {
-            <span class="hljs-attr">id</span>: <span class="hljs-string">"2"</span>,
-            <span class="hljs-attr">name</span>: <span class="hljs-string">"mattiamanzati"</span>
-        },
-        <span class="hljs-string">"3"</span>: {
-            <span class="hljs-attr">id</span>: <span class="hljs-string">"3"</span>,
-            <span class="hljs-attr">name</span>: <span class="hljs-string">"johndoe"</span>
-        }
+  <span class="hljs-attr">users</span>: {
+    <span class="hljs-number">1</span>: {
+      <span class="hljs-attr">id</span>: <span class="hljs-string">"1"</span>,
+      <span class="hljs-attr">name</span>: <span class="hljs-string">"mweststrate"</span>
     },
-    <span class="hljs-attr">todos</span>: {
-        <span class="hljs-string">"1"</span>: {
-            <span class="hljs-attr">name</span>: <span class="hljs-string">"Eat a cake"</span>,
-            <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span>
-        }
+    <span class="hljs-number">2</span>: {
+      <span class="hljs-attr">id</span>: <span class="hljs-string">"2"</span>,
+      <span class="hljs-attr">name</span>: <span class="hljs-string">"mattiamanzati"</span>
+    },
+    <span class="hljs-number">3</span>: {
+      <span class="hljs-attr">id</span>: <span class="hljs-string">"3"</span>,
+      <span class="hljs-attr">name</span>: <span class="hljs-string">"johndoe"</span>
     }
+  },
+  <span class="hljs-attr">todos</span>: {
+    <span class="hljs-number">1</span>: {
+      <span class="hljs-attr">name</span>: <span class="hljs-string">"Eat a cake"</span>,
+      <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span>
+    }
+  }
 })
 </code></pre>
 <p><a href="https://codesandbox.io/s/44jn3pv2x">View sample in the playground</a></p>
 <h3><a class="anchor" aria-hidden="true" id="how-to-define-the-reference"></a><a href="#how-to-define-the-reference" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>How to define the reference</h3>
 <p>The reference we are looking for can be easily defined as <code>types.reference(User)</code>. Sometimes this can lead to circular references that may use a model before it's declared. To postpone the resolution of the model, you can use <code>types.late(() =&gt; User)</code> instead of just <code>User</code> and that will hoist the model and defer its evaluation. The <code>user</code> assignee for the <code>Todo</code> could also be omitted, so we will use <code>types.maybe(...)</code> to allow the <code>user</code> property to be <code>null</code> and be initialized as <code>null</code>.</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> Todo = types
-    .model({
-        <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>),
-        <span class="hljs-attr">done</span>: types.optional(types.boolean, <span class="hljs-literal">false</span>),
-        <span class="hljs-attr">user</span>: types.maybe(types.reference(types.late(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> User)))
-    })
-    .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
-        setName(newName) {
-            self.name = newName
-        },
-        toggle() {
-            self.done = !self.done
-        }
-    }))
+  .model({
+    <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>),
+    <span class="hljs-attr">done</span>: types.optional(types.boolean, <span class="hljs-literal">false</span>),
+    <span class="hljs-attr">user</span>: types.maybe(types.reference(types.late(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> User)))
+  })
+  .actions(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
+    setName(newName) {
+      self.name = newName
+    },
+    toggle() {
+      self.done = !self.done
+    }
+  }))
 </code></pre>
 <p><a href="https://codesandbox.io/s/xv1lkqw9oq">View sample in the playground</a></p>
 <h3><a class="anchor" aria-hidden="true" id="setting-a-reference-value"></a><a href="#setting-a-reference-value" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Setting a reference value</h3>
 <p>The reference value can be set by providing either the identifier or a model instance. First of all, we need to define an action that will allow you to change the <code>user</code> of the <code>Todo</code>.</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> Todo = types
-    .model({
-        <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>),
-        <span class="hljs-attr">done</span>: types.optional(types.boolean, <span class="hljs-literal">false</span>),
-        <span class="hljs-attr">user</span>: types.maybe(types.reference(types.late(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> User)))
-    })
-    .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
-        setName(newName) {
-            self.name = newName
-        },
-        setUser(user) {
-            <span class="hljs-keyword">if</span> (user === <span class="hljs-string">""</span>) {
-                <span class="hljs-comment">// When selected value is empty, set as undefined</span>
-                self.user = <span class="hljs-literal">undefined</span>
-            } <span class="hljs-keyword">else</span> {
-                self.user = user
-            }
-        },
-        toggle() {
-            self.done = !self.done
-        }
-    }))
+  .model({
+    <span class="hljs-attr">name</span>: types.optional(types.string, <span class="hljs-string">""</span>),
+    <span class="hljs-attr">done</span>: types.optional(types.boolean, <span class="hljs-literal">false</span>),
+    <span class="hljs-attr">user</span>: types.maybe(types.reference(types.late(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> User)))
+  })
+  .actions(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
+    setName(newName) {
+      self.name = newName
+    },
+    setUser(user) {
+      <span class="hljs-keyword">if</span> (user === <span class="hljs-string">""</span>) {
+        <span class="hljs-comment">// When selected value is empty, set as undefined</span>
+        self.user = <span class="hljs-literal">undefined</span>
+      } <span class="hljs-keyword">else</span> {
+        self.user = user
+      }
+    },
+    toggle() {
+      self.done = !self.done
+    }
+  }))
 </code></pre>
 <p>Now we need to edit our views to display a select along with each <code>TodoView</code>, where the user can choose the assignee for that task. To do so, we will create a separate component <code>UserPickerView</code> and use it inside the <code>TodoView</code> component to trigger the <code>setUser</code> call. That's it!</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> UserPickerView = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
-    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">value</span>=<span class="hljs-string">{props.user</span> ? <span class="hljs-attr">props.user.id</span> <span class="hljs-attr">:</span> ""} <span class="hljs-attr">onChange</span>=<span class="hljs-string">{e</span> =&gt;</span> props.onChange(e.target.value)}&gt;
-        <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">""</span>&gt;</span>-none-<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
-        {Array.from(props.store.users.values()).map(user =&gt; (
-            <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">{user.id}</span>&gt;</span>{user.name}<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
-        ))}
-    <span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span></span>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> UserPickerView = observer(<span class="hljs-function">(<span class="hljs-params">props</span>) =&gt;</span> (
+  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">value</span>=<span class="hljs-string">{props.user</span> ? <span class="hljs-attr">props.user.id</span> <span class="hljs-attr">:</span> ""} <span class="hljs-attr">onChange</span>=<span class="hljs-string">{(e)</span> =&gt;</span> props.onChange(e.target.value)}&gt;
+    <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">""</span>&gt;</span>-none-<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
+    {Array.from(props.store.users.values()).map((user) =&gt; (
+      <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">{user.id}</span>&gt;</span>{user.name}<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
+    ))}
+  <span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span></span>
 ))
 
-<span class="hljs-keyword">const</span> TodoView = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
-    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"checkbox"</span> <span class="hljs-attr">checked</span>=<span class="hljs-string">{props.todo.done}</span> <span class="hljs-attr">onChange</span>=<span class="hljs-string">{e</span> =&gt;</span> props.todo.toggle()} /&gt;
-        <span class="hljs-tag">&lt;<span class="hljs-name">input</span>
-            <span class="hljs-attr">type</span>=<span class="hljs-string">"text"</span>
-            <span class="hljs-attr">value</span>=<span class="hljs-string">{props.todo.name}</span>
-            <span class="hljs-attr">onChange</span>=<span class="hljs-string">{e</span> =&gt;</span> props.todo.setName(e.target.value)}
-        /&gt;
-        <span class="hljs-tag">&lt;<span class="hljs-name">UserPickerView</span>
-            <span class="hljs-attr">user</span>=<span class="hljs-string">{props.todo.user}</span>
-            <span class="hljs-attr">store</span>=<span class="hljs-string">{props.store}</span>
-            <span class="hljs-attr">onChange</span>=<span class="hljs-string">{userId</span> =&gt;</span> props.todo.setUser(userId)}
-        /&gt;
-    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+<span class="hljs-keyword">const</span> TodoView = observer(<span class="hljs-function">(<span class="hljs-params">props</span>) =&gt;</span> (
+  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"checkbox"</span> <span class="hljs-attr">checked</span>=<span class="hljs-string">{props.todo.done}</span> <span class="hljs-attr">onChange</span>=<span class="hljs-string">{(e)</span> =&gt;</span> props.todo.toggle()} /&gt;
+    <span class="hljs-tag">&lt;<span class="hljs-name">input</span>
+      <span class="hljs-attr">type</span>=<span class="hljs-string">"text"</span>
+      <span class="hljs-attr">value</span>=<span class="hljs-string">{props.todo.name}</span>
+      <span class="hljs-attr">onChange</span>=<span class="hljs-string">{(e)</span> =&gt;</span> props.todo.setName(e.target.value)}
+    /&gt;
+    <span class="hljs-tag">&lt;<span class="hljs-name">UserPickerView</span>
+      <span class="hljs-attr">user</span>=<span class="hljs-string">{props.todo.user}</span>
+      <span class="hljs-attr">store</span>=<span class="hljs-string">{props.store}</span>
+      <span class="hljs-attr">onChange</span>=<span class="hljs-string">{(userId)</span> =&gt;</span> props.todo.setUser(userId)}
+    /&gt;
+  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
 ))
 
-<span class="hljs-keyword">const</span> TodoCounterView = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
-    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
-        {props.store.pendingCount} pending, {props.store.completedCount} completed
-    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+<span class="hljs-keyword">const</span> TodoCounterView = observer(<span class="hljs-function">(<span class="hljs-params">props</span>) =&gt;</span> (
+  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+    {props.store.pendingCount} pending, {props.store.completedCount} completed
+  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
 ))
 
-<span class="hljs-keyword">const</span> AppView = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> (
-    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
-        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{e</span> =&gt;</span> props.store.addTodo(randomId(), "New Task")}&gt;Add Task<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
-        {Array.from(props.store.todos.values()).map(todo =&gt; (
-            <span class="hljs-tag">&lt;<span class="hljs-name">TodoView</span> <span class="hljs-attr">store</span>=<span class="hljs-string">{props.store}</span> <span class="hljs-attr">todo</span>=<span class="hljs-string">{todo}</span> /&gt;</span>
-        ))}
-        <span class="hljs-tag">&lt;<span class="hljs-name">TodoCounterView</span> <span class="hljs-attr">store</span>=<span class="hljs-string">{props.store}</span> /&gt;</span>
-    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+<span class="hljs-keyword">const</span> AppView = observer(<span class="hljs-function">(<span class="hljs-params">props</span>) =&gt;</span> (
+  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{(e)</span> =&gt;</span> props.store.addTodo(randomId(), "New Task")}&gt;Add Task<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    {Array.from(props.store.todos.values()).map((todo) =&gt; (
+      <span class="hljs-tag">&lt;<span class="hljs-name">TodoView</span> <span class="hljs-attr">store</span>=<span class="hljs-string">{props.store}</span> <span class="hljs-attr">todo</span>=<span class="hljs-string">{todo}</span> /&gt;</span>
+    ))}
+    <span class="hljs-tag">&lt;<span class="hljs-name">TodoCounterView</span> <span class="hljs-attr">store</span>=<span class="hljs-string">{props.store}</span> /&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
 ))
 </code></pre>
 <p><a href="https://codesandbox.io/s/6j3qy74kpw">View sample in the playground</a></p>

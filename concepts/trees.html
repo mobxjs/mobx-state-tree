@@ -66,16 +66,16 @@
 <h3><a class="anchor" aria-hidden="true" id="tree-type-state"></a><a href="#tree-type-state" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>tree = type + state</h3>
 <p>Each <strong>node</strong> in the tree is described by two things: Its <strong>type</strong> (the shape of the thing) and its <strong>data</strong> (the state it is currently in).</p>
 <p>The simplest tree possible:</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { types } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-state-tree"</span>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { types } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-state-tree"</span> <span class="hljs-comment">// alternatively, `import { t } from "mobx-state-tree"`</span>
 
 <span class="hljs-comment">// declaring the shape of a node with the type `Todo`</span>
 <span class="hljs-keyword">const</span> Todo = types.model({
-    <span class="hljs-attr">title</span>: types.string
+  <span class="hljs-attr">title</span>: types.string
 })
 
 <span class="hljs-comment">// creating a tree based on the "Todo" type, with initial data:</span>
 <span class="hljs-keyword">const</span> coffeeTodo = Todo.create({
-    <span class="hljs-attr">title</span>: <span class="hljs-string">"Get coffee"</span>
+  <span class="hljs-attr">title</span>: <span class="hljs-string">"Get coffee"</span>
 })
 </code></pre>
 <p>The <code>types.model</code> type declaration is used to describe the shape of an object.
@@ -92,35 +92,35 @@ Other built-in types include arrays, maps, primitives, etc. See the <a href="/ov
 <p>The most important type in MST is <code>types.model</code>, which can be used to describe the shape of an object.
 An example:</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> TodoStore = types
-    <span class="hljs-comment">// 1</span>
-    .model(<span class="hljs-string">"TodoStore"</span>, {
-        <span class="hljs-attr">loaded</span>: types.boolean, <span class="hljs-comment">// 2</span>
-        <span class="hljs-attr">endpoint</span>: <span class="hljs-string">"http://localhost"</span>, <span class="hljs-comment">// 3</span>
-        <span class="hljs-attr">todos</span>: types.array(Todo), <span class="hljs-comment">// 4</span>
-        <span class="hljs-attr">selectedTodo</span>: types.reference(Todo) <span class="hljs-comment">// 5</span>
-    })
-    .views(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> {
-        <span class="hljs-keyword">return</span> {
-            <span class="hljs-comment">// 6</span>
-            <span class="hljs-keyword">get</span> completedTodos() {
-                <span class="hljs-keyword">return</span> self.todos.filter(<span class="hljs-function"><span class="hljs-params">t</span> =&gt;</span> t.done)
-            },
-            <span class="hljs-comment">// 7</span>
-            findTodosByUser(user) {
-                <span class="hljs-keyword">return</span> self.todos.filter(<span class="hljs-function"><span class="hljs-params">t</span> =&gt;</span> t.assignee === user)
-            }
-        }
-    })
-    .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> {
-        <span class="hljs-keyword">return</span> {
-            addTodo(title) {
-                self.todos.push({
-                    <span class="hljs-attr">id</span>: <span class="hljs-built_in">Math</span>.random(),
-                    title
-                })
-            }
-        }
-    })
+  <span class="hljs-comment">// 1</span>
+  .model(<span class="hljs-string">"TodoStore"</span>, {
+    <span class="hljs-attr">loaded</span>: types.boolean, <span class="hljs-comment">// 2</span>
+    <span class="hljs-attr">endpoint</span>: <span class="hljs-string">"http://localhost"</span>, <span class="hljs-comment">// 3</span>
+    <span class="hljs-attr">todos</span>: types.array(Todo), <span class="hljs-comment">// 4</span>
+    <span class="hljs-attr">selectedTodo</span>: types.reference(Todo) <span class="hljs-comment">// 5</span>
+  })
+  .views(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> {
+    <span class="hljs-keyword">return</span> {
+      <span class="hljs-comment">// 6</span>
+      <span class="hljs-keyword">get</span> completedTodos() {
+        <span class="hljs-keyword">return</span> self.todos.filter(<span class="hljs-function">(<span class="hljs-params">t</span>) =&gt;</span> t.done)
+      },
+      <span class="hljs-comment">// 7</span>
+      findTodosByUser(user) {
+        <span class="hljs-keyword">return</span> self.todos.filter(<span class="hljs-function">(<span class="hljs-params">t</span>) =&gt;</span> t.assignee === user)
+      }
+    }
+  })
+  .actions(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> {
+    <span class="hljs-keyword">return</span> {
+      addTodo(title) {
+        self.todos.push({
+          <span class="hljs-attr">id</span>: <span class="hljs-built_in">Math</span>.random(),
+          title
+        })
+      }
+    }
+  })
 </code></pre>
 <p>When defining a model, it is advised to give the model a name for debugging purposes (see <code>// 1</code>).
 A model takes additionally object argument defining the properties.</p>
@@ -151,22 +151,22 @@ This has two advantages:</p>
 </ol>
 <p>Quick example:</p>
 <pre><code class="hljs css language-javascript">const TodoStore = types
-    .model("TodoStore", {
-        /* props */
-    })
-    .actions(self =&gt; {
-        const instantiationTime = Date.now()
+  .model("TodoStore", {
+    /* props */
+  })
+  .actions((self) =&gt; {
+    const instantiationTime = Date.now()
 
-        function addTodo(title) {
-            console.log(`Adding Todo ${title} after ${(Date.now() - instantiationTime) / 1000}s.`)
-            self.todos.push({
-                id: Math.random(),
-                title
-            })
-        }
+    function addTodo(title) {
+      console.log(`Adding Todo ${title} after ${(Date.now() - instantiationTime) / 1000}s.`)
+      self.todos.push({
+        id: Math.random(),
+        title
+      })
+    }
 
-        return { addTodo }
-    })
+    return { addTodo }
+  })
 </code></pre>
 <p>It is perfectly fine to chain multiple <code>views</code>, <code>props</code> calls etc in arbitrary order. This can be a great way to structure complex types, mix-in utility functions, etc. Each call in the chain creates a new, immutable type which can itself be stored and reused as part of other types, etc.</p>
 <p>It is also possible to define lifecycle hooks in the <em>actions</em> object. These are actions with a predefined name that are run at a specific moment. See <a href="/overview/hooks">Lifecycle hooks</a>.</p>
@@ -174,15 +174,15 @@ This has two advantages:</p>
 <p>In MST every node in the tree is a tree in itself.
 Trees can be composed by composing their types:</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> TodoStore = types.model({
-    <span class="hljs-attr">todos</span>: types.array(Todo)
+  <span class="hljs-attr">todos</span>: types.array(Todo)
 })
 
 <span class="hljs-keyword">const</span> storeInstance = TodoStore.create({
-    <span class="hljs-attr">todos</span>: [
-        {
-            <span class="hljs-attr">title</span>: <span class="hljs-string">"Get biscuit"</span>
-        }
-    ]
+  <span class="hljs-attr">todos</span>: [
+    {
+      <span class="hljs-attr">title</span>: <span class="hljs-string">"Get biscuit"</span>
+    }
+  ]
 })
 </code></pre>
 <p>The <em>snapshot</em> passed to the <code>create</code> method of a type will recursively be turned in MST nodes. So, you can safely call:</p>
