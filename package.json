@@ -17,7 +17,6 @@
   "scripts": {
     "clean": "shx rm -rf dist && shx rm -rf lib",
     "build": "yarn clean && tsc && cpr lib dist --filter=\\.js$ && rollup -c",
-    "jest": "jest --testPathPattern=/__tests__/core/",
     "jest:perf": "jest --testPathPattern=/__tests__/perf/",
     "test:perf": "yarn build && yarn jest:perf && TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' /usr/bin/time node --expose-gc --require ts-node/register __tests__/perf/report.ts",
     "test": "yarn test:dev && yarn test:prod",
