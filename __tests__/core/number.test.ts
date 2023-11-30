@@ -145,7 +145,7 @@ describe("types.number", () => {
         })
       })
     })
-    // TODO: we need to test this, but to be honest I'm not sure what the expected behavior is on single string noden.
+    // TODO: we need to test this, but to be honest I'm not sure what the expected behavior is on single number nodes.
     describe.skip("reconcile", () => {})
     describe("validate", () => {
       describe("with a number argument", () => {

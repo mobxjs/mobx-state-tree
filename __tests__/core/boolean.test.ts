@@ -147,7 +147,7 @@ describe("types.boolean", () => {
         })
       })
     })
-    // TODO: we need to test this, but to be honest I'm not sure what the expected behavior is on single string noden.
+    // TODO: we need to test this, but to be honest I'm not sure what the expected behavior is on single boolean nodes.
     describe.skip("reconcile", () => {})
     describe("validate", () => {
       describe("with a boolean argument", () => {
