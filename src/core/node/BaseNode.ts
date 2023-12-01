@@ -6,7 +6,8 @@ import {
   EventHandlers,
   IAnyType,
   IDisposer,
-  devMode
+  devMode,
+  fail
 } from "../../internal"
 import { createAtom, IAtom } from "mobx"
 
