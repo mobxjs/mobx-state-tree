@@ -12,22 +12,21 @@ Each **node** in the tree is described by two things: Its **type** (the shape of
 The simplest tree possible:
 
 ```javascript
-import { types } from "mobx-state-tree"
+import { types } from "mobx-state-tree" // alternatively, `import { t } from "mobx-state-tree"`
 
 // declaring the shape of a node with the type `Todo`
 const Todo = types.model({
-    title: types.string
+  title: types.string
 })
 
 // creating a tree based on the "Todo" type, with initial data:
 const coffeeTodo = Todo.create({
-    title: "Get coffee"
+  title: "Get coffee"
 })
 ```
 
 The `types.model` type declaration is used to describe the shape of an object.
 Other built-in types include arrays, maps, primitives, etc. See the [types overview](/overview/types).
-
 
 ### Creating models
 
@@ -45,35 +44,35 @@ An example:
 
 ```javascript
 const TodoStore = types
-    // 1
-    .model("TodoStore", {
-        loaded: types.boolean, // 2
-        endpoint: "http://localhost", // 3
-        todos: types.array(Todo), // 4
-        selectedTodo: types.reference(Todo) // 5
-    })
-    .views(self => {
-        return {
-            // 6
-            get completedTodos() {
-                return self.todos.filter(t => t.done)
-            },
-            // 7
-            findTodosByUser(user) {
-                return self.todos.filter(t => t.assignee === user)
-            }
-        }
-    })
-    .actions(self => {
-        return {
-            addTodo(title) {
-                self.todos.push({
-                    id: Math.random(),
-                    title
-                })
-            }
-        }
-    })
+  // 1
+  .model("TodoStore", {
+    loaded: types.boolean, // 2
+    endpoint: "http://localhost", // 3
+    todos: types.array(Todo), // 4
+    selectedTodo: types.reference(Todo) // 5
+  })
+  .views((self) => {
+    return {
+      // 6
+      get completedTodos() {
+        return self.todos.filter((t) => t.done)
+      },
+      // 7
+      findTodosByUser(user) {
+        return self.todos.filter((t) => t.assignee === user)
+      }
+    }
+  })
+  .actions((self) => {
+    return {
+      addTodo(title) {
+        self.todos.push({
+          id: Math.random(),
+          title
+        })
+      }
+    }
+  })
 ```
 
 When defining a model, it is advised to give the model a name for debugging purposes (see `// 1`).
@@ -91,12 +90,12 @@ For that reason a comma between each member of a model is mandatory, unlike clas
 
 `types.model` creates a chainable model type, where each chained method produces a new type:
 
--   `.named(name)` clones the current type, but gives it a new name
--   `.props(props)` produces a new type, based on the current one, and adds / overrides the specified properties
--   `.actions(self => object literal with actions)` produces a new type, based on the current one, and adds / overrides the specified actions
--   `.views(self => object literal with view functions)` produces a new type, based on the current one, and adds / overrides the specified view functions
--   `.preProcessSnapshot(snapshot => snapshot)` can be used to pre-process the raw JSON before instantiating a new model. See [Lifecycle hooks](/overview/hooks) or alternatively `types.snapshotProcessor`
--   `.postProcessSnapshot(snapshot => snapshot)` can be used to post-process the raw JSON before getting a model snapshot. See [Lifecycle hooks](/overview/hooks) or alternatively `types.snapshotProcessor`
+- `.named(name)` clones the current type, but gives it a new name
+- `.props(props)` produces a new type, based on the current one, and adds / overrides the specified properties
+- `.actions(self => object literal with actions)` produces a new type, based on the current one, and adds / overrides the specified actions
+- `.views(self => object literal with view functions)` produces a new type, based on the current one, and adds / overrides the specified view functions
+- `.preProcessSnapshot(snapshot => snapshot)` can be used to pre-process the raw JSON before instantiating a new model. See [Lifecycle hooks](/overview/hooks) or alternatively `types.snapshotProcessor`
+- `.postProcessSnapshot(snapshot => snapshot)` can be used to post-process the raw JSON before getting a model snapshot. See [Lifecycle hooks](/overview/hooks) or alternatively `types.snapshotProcessor`
 
 Note that `views` and `actions` don't define actions and views directly, but rather they should be given a function.
 The function will be invoked when a new model instance is created. The instance will be passed in as the first and only argument typically called `self`.
@@ -109,22 +108,22 @@ Quick example:
 
 ```javascript
 const TodoStore = types
-    .model("TodoStore", {
-        /* props */
-    })
-    .actions(self => {
-        const instantiationTime = Date.now()
+  .model("TodoStore", {
+    /* props */
+  })
+  .actions((self) => {
+    const instantiationTime = Date.now()
 
-        function addTodo(title) {
-            console.log(`Adding Todo ${title} after ${(Date.now() - instantiationTime) / 1000}s.`)
-            self.todos.push({
-                id: Math.random(),
-                title
-            })
-        }
+    function addTodo(title) {
+      console.log(`Adding Todo ${title} after ${(Date.now() - instantiationTime) / 1000}s.`)
+      self.todos.push({
+        id: Math.random(),
+        title
+      })
+    }
 
-        return { addTodo }
-    })
+    return { addTodo }
+  })
 ```
 
 It is perfectly fine to chain multiple `views`, `props` calls etc in arbitrary order. This can be a great way to structure complex types, mix-in utility functions, etc. Each call in the chain creates a new, immutable type which can itself be stored and reused as part of other types, etc.
@@ -138,15 +137,15 @@ Trees can be composed by composing their types:
 
 ```javascript
 const TodoStore = types.model({
-    todos: types.array(Todo)
+  todos: types.array(Todo)
 })
 
 const storeInstance = TodoStore.create({
-    todos: [
-        {
-            title: "Get biscuit"
-        }
-    ]
+  todos: [
+    {
+      title: "Get biscuit"
+    }
+  ]
 })
 ```
 

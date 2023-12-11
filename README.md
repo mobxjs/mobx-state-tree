@@ -28,51 +28,51 @@ See the [Getting started](https://mobx-state-tree.js.org/intro/getting-started) 
 There's nothing quite like looking at some code to get a feel for a library. Check out this small example of an author and list of tweets by that author.
 
 ```js
-import { types } from "mobx-state-tree"
+import { types } from "mobx-state-tree" // alternatively: import { t } from "mobx-state-tree"
 
 // Define a couple models
 const Author = types.model({
-    id: types.identifier,
-    firstName: types.string,
-    lastName: types.string
+  id: types.identifier,
+  firstName: types.string,
+  lastName: types.string
 })
 const Tweet = types.model({
-    id: types.identifier,
-    author: types.reference(Author), // stores just the `id` reference!
-    body: types.string,
-    timestamp: types.number
+  id: types.identifier,
+  author: types.reference(Author), // stores just the `id` reference!
+  body: types.string,
+  timestamp: types.number
 })
 
 // Define a store just like a model
 const RootStore = types.model({
-    authors: types.array(Author),
-    tweets: types.array(Tweet)
+  authors: types.array(Author),
+  tweets: types.array(Tweet)
 })
 
 // Instantiate a couple model instances
 const jamon = Author.create({
-    id: "jamon",
-    firstName: "Jamon",
-    lastName: "Holmgren"
+  id: "jamon",
+  firstName: "Jamon",
+  lastName: "Holmgren"
 })
 
 const tweet = Tweet.create({
-    id: "1",
-    author: jamon.id, // just the ID needed here
-    body: "Hello world!",
-    timestamp: Date.now()
+  id: "1",
+  author: jamon.id, // just the ID needed here
+  body: "Hello world!",
+  timestamp: Date.now()
 })
 
 // Now instantiate the store!
 const rootStore = RootStore.create({
-    authors: [jamon],
-    tweets: [tweet]
+  authors: [jamon],
+  tweets: [tweet]
 })
 
 // Ready to use in a React component, if that's your target.
 import { observer } from "mobx-react-lite"
 const MyComponent = observer((props) => {
-    return <div>Hello, {rootStore.authors[0].firstName}!</div>
+  return <div>Hello, {rootStore.authors[0].firstName}!</div>
 })
 
 // Note: since this component is "observed", any changes to rootStore.authors[0].firstName
@@ -82,9 +82,9 @@ const MyComponent = observer((props) => {
 
 ## Thanks!
 
--   [Michel Weststrate](https://twitter.com/mweststrate) for creating MobX, MobX-State-Tree, and MobX-React.
--   [Infinite Red](https://infinite.red) for supporting ongoing maintenance on MST.
--   [Mendix](https://mendix.com) for sponsoring and providing the opportunity to work on exploratory projects like MST.
--   [Dan Abramov](https://twitter.com/dan_abramov)'s work on [Redux](http://redux.js.org) has strongly influenced the idea of snapshots and transactional actions in MST.
--   [Giulio Canti](https://twitter.com/GiulioCanti)'s work on [tcomb](http://github.com/gcanti/tcomb) and type systems in general has strongly influenced the type system of MST.
--   All the early adopters encouraging to pursue this whole idea and proving it is something feasible.
+- [Michel Weststrate](https://twitter.com/mweststrate) for creating MobX, MobX-State-Tree, and MobX-React.
+- [Infinite Red](https://infinite.red) for supporting ongoing maintenance on MST.
+- [Mendix](https://mendix.com) for sponsoring and providing the opportunity to work on exploratory projects like MST.
+- [Dan Abramov](https://twitter.com/dan_abramov)'s work on [Redux](http://redux.js.org) has strongly influenced the idea of snapshots and transactional actions in MST.
+- [Giulio Canti](https://twitter.com/GiulioCanti)'s work on [tcomb](http://github.com/gcanti/tcomb) and type systems in general has strongly influenced the type system of MST.
+- All the early adopters encouraging to pursue this whole idea and proving it is something feasible.

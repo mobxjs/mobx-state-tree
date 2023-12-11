@@ -11,7 +11,6 @@ No, or not necessarily. An application can use both state trees and vanilla MobX
 State trees are primarily designed to store your domain data as this kind of state is often distributed and not very local.
 For local component state, for example, vanilla MobX observables might often be simpler to use.
 
-
 ### When not to use MST?
 
 MST provides access to snapshots, patches and interceptable actions. Also, it fixes the `this` problem.
@@ -21,7 +20,6 @@ If you have a performance critical application that handles a huge amount of mut
 off by using 'raw' MobX, which has a predictable and well-known performance and much less overhead.
 
 Likewise, if your application mainly processes stateless information (such as a logging system), MST won't add much value.
-
 
 ### Can I use Hot Module Reloading?
 
@@ -34,7 +32,7 @@ Likewise, if your application mainly processes stateless information (such as a 
     <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-restore-the-model-tree-state-using-hot-module-reloading-when-model-definitions-change">Hosted on egghead.io</a>
 </details>
 
-Yes, with MST it is pretty straight forward to setup hot reloading for your store definitions while preserving state. See the [todomvc example](https://github.com/mobxjs/mobx-state-tree/blob/745904101fdaeb51f16f40ebb80cd7fecf742572/packages/mst-example-todomvc/src/index.js#L60-L64).
+Yes, with MST it is pretty straight forward to setup hot reloading for your store definitions while preserving state. See the [todomvc example](https://github.com/coolsoftwaretyler/mst-example-todomvc/blob/main/src/index.js#L59C1-L64C1).
 
 ### How does MST compare to Redux
 

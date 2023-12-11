@@ -46,6 +46,7 @@
     ],
     "Interfaces": [
       "API/interfaces/customtypeoptions",
+      "API/interfaces/functionwithflag",
       "API/interfaces/iactioncontext",
       "API/interfaces/iactionrecorder",
       "API/interfaces/iactiontrackingmiddleware2call",

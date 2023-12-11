@@ -9,12 +9,16 @@
         "title": "API_header"
       },
       "API/index": {
-        "title": "mobx-state-tree - v5.0.5",
+        "title": "mobx-state-tree - v5.4.0",
         "sidebar_label": "Globals"
       },
       "API/interfaces/customtypeoptions": {
         "title": "CustomTypeOptions",
         "sidebar_label": "CustomTypeOptions"
+      },
+      "API/interfaces/functionwithflag": {
+        "title": "FunctionWithFlag",
+        "sidebar_label": "FunctionWithFlag"
       },
       "API/interfaces/iactioncontext": {
         "title": "IActionContext",
@@ -187,9 +191,6 @@
       "tips/circular-deps": {
         "title": "Handle circular dependencies between files and types using `late`",
         "sidebar_label": "Circular dependencies"
-      },
-      "tips/contributing": {
-        "title": "Contributing"
       },
       "tips/faq": {
         "title": "Frequently Asked Questions"
