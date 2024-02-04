@@ -20,7 +20,7 @@ Play around with a simple example of middleware in action with [this CodeSandbox
 
 Middlewares can be attached by using:
 
-`addMiddleware(target: IStateTreeNode, handler: IMiddlewareHandler, includeHooks: boolean = true) : void`
+`addMiddleware(target: IAnyStateTreeNode, handler: IMiddlewareHandler, includeHooks: boolean = true) : IDisposer`
 
 ### target
 
