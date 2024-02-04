@@ -131,7 +131,7 @@ Instead, this data could be better represented as a property right on the model,
 ```javascript
 const Todo = types.model("Todo", { 
   done: types.boolean,
-  createdAt: types.optioanl(types.Date, () => new Date())
+  createdAt: types.optional(types.Date, () => new Date())
 });
 
 const todo = Todo.create({ done: false })
