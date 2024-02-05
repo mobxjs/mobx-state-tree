@@ -844,13 +844,15 @@ describe("snapshotProcessor", () => {
     expect(store.prop).toBe("b")
   })
 
-  test("it should fail if given incorrect processor", () => {
-    expect(() => {
-      types.model({
-        m: types.snapshotProcessor(types.number, {
-          postProcessor: {} as any
+  if (process.env.NODE_ENV !== "production") {
+    test("it should fail if given incorrect processor", () => {
+      expect(() => {
+        types.model({
+          m: types.snapshotProcessor(types.number, {
+            postProcessor: {} as any
+          })
         })
-      })
-    }).toThrowError("[mobx-state-tree] postSnapshotProcessor must be a function")
-  })
+      }).toThrowError("[mobx-state-tree] postSnapshotProcessor must be a function")
+    })
+  }
 })
