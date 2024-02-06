@@ -4,7 +4,7 @@ title: "IJsonPatch"
 sidebar_label: "IJsonPatch"
 ---
 
-[mobx-state-tree - v5.4.0](../index.md) › [IJsonPatch](ijsonpatch.md)
+[mobx-state-tree - v5.4.1](../index.md) › [IJsonPatch](ijsonpatch.md)
 
 https://tools.ietf.org/html/rfc6902
 http://jsonpatch.com/
@@ -29,7 +29,7 @@ http://jsonpatch.com/
 
 • **op**: *"replace" | "add" | "remove"*
 
-*Defined in [src/core/json-patch.ts:8](https://github.com/mobxjs/mobx-state-tree/blob/68b756ba/src/core/json-patch.ts#L8)*
+*Defined in [src/core/json-patch.ts:8](https://github.com/mobxjs/mobx-state-tree/blob/66de1404/src/core/json-patch.ts#L8)*
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 • **path**: *string*
 
-*Defined in [src/core/json-patch.ts:9](https://github.com/mobxjs/mobx-state-tree/blob/68b756ba/src/core/json-patch.ts#L9)*
+*Defined in [src/core/json-patch.ts:9](https://github.com/mobxjs/mobx-state-tree/blob/66de1404/src/core/json-patch.ts#L9)*
 
 ___
 
@@ -45,4 +45,4 @@ ___
 
 • **value**? : *any*
 
-*Defined in [src/core/json-patch.ts:10](https://github.com/mobxjs/mobx-state-tree/blob/68b756ba/src/core/json-patch.ts#L10)*
+*Defined in [src/core/json-patch.ts:10](https://github.com/mobxjs/mobx-state-tree/blob/66de1404/src/core/json-patch.ts#L10)*
