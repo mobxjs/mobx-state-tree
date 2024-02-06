@@ -16,7 +16,8 @@ import {
   typeCheckFailure,
   isUnionType,
   Instance,
-  ObjectNode
+  ObjectNode,
+  fail
 } from "../../internal"
 
 /** @hidden */
