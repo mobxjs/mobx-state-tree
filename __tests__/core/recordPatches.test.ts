@@ -19,7 +19,7 @@ function testPatches<C, S, T>(
   expectedPatches: IJsonPatch[],
   expectedInversePatches: IJsonPatch[]
 ) {
-  const instance = type.create(snapshot)
+  const instance = type.create(snapshot) as IStateTreeNode
   const baseSnapshot = getSnapshot(instance)
   const recorder = recordPatches(instance)
   unprotect(instance)
@@ -27,7 +27,7 @@ function testPatches<C, S, T>(
   recorder.stop()
   expect(recorder.patches).toEqual(expectedPatches)
   expect(recorder.inversePatches).toEqual(expectedInversePatches)
-  const clone = type.create(snapshot)
+  const clone = type.create(snapshot) as IStateTreeNode
   recorder.replay(clone)
   expect(getSnapshot(clone)).toEqual(getSnapshot(instance))
   recorder.undo()
