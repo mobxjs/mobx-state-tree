@@ -23,16 +23,14 @@ function testPatches<C, S, T>(
   fn: any,
   expectedPatches: IJsonPatch[]
 ) {
-  // TODO: fix unknown
-  const instance = type.create(snapshot) as unknown as IStateTreeNode<IType<C, S, T>>
+  const instance = type.create(snapshot)
   const baseSnapshot = getSnapshot(instance)
   const recorder = recordPatches(instance)
   unprotect(instance)
   fn(instance)
   recorder.stop()
   expect(recorder.patches).toEqual(expectedPatches)
-  // TODO: fix unknown
-  const clone = type.create(snapshot) as unknown as IStateTreeNode<IType<C, S, T>>
+  const clone = type.create(snapshot)
   recorder.replay(clone)
   expect(getSnapshot(clone)).toEqual(getSnapshot(instance))
   recorder.undo()

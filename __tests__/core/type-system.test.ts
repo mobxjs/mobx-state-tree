@@ -1114,40 +1114,39 @@ test("#1330", () => {
   )
 })
 
-// TODO: Fix this test
-// test("maybe / optional type inference verification", () => {
-//   const T = types.model({
-//     a: types.string,
-//     b: "test",
-//     c: types.maybe(types.string),
-//     d: types.maybeNull(types.string),
-//     e: types.optional(types.string, "test")
-//   })
+test("maybe / optional type inference verification", () => {
+  const T = types.model({
+    a: types.string,
+    b: "test",
+    c: types.maybe(types.string),
+    d: types.maybeNull(types.string),
+    e: types.optional(types.string, "test")
+  })
 
-//   interface ITC extends SnapshotIn<typeof T> {}
-//   interface ITS extends SnapshotOut<typeof T> {}
+  interface ITC extends SnapshotIn<typeof T> {}
+  interface ITS extends SnapshotOut<typeof T> {}
 
-//   assert(
-//     _ as ITC,
-//     _ as {
-//       [$nonEmptyObject]?: any
-//       a: string
-//       b?: string
-//       c?: string | undefined
-//       d?: string | null
-//       e?: string
-//     }
-//   )
+  assert(
+    _ as ITC,
+    _ as {
+      [$nonEmptyObject]?: any
+      a: string
+      b?: string
+      c?: string | undefined
+      d?: string | null
+      e?: string
+    }
+  )
 
-//   assert(
-//     _ as ITS,
-//     _ as {
-//       [$nonEmptyObject]?: any
-//       a: string
-//       b: string
-//       c: string | undefined
-//       d: string | null
-//       e: string
-//     }
-//   )
-// })
+  assert(
+    _ as ITS,
+    _ as {
+      [$nonEmptyObject]?: any
+      a: string
+      b: string
+      c: string | undefined
+      d: string | null
+      e: string
+    }
+  )
+})
