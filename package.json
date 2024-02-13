@@ -86,7 +86,7 @@
     "tslint-config-prettier": "^1.18.0",
     "typedoc": "0.15.8",
     "typedoc-plugin-markdown": "2.2.11",
-    "typescript": "^5.2.2",
+    "typescript": "5.4.0-beta",
     "yarn-deduplicate": "^3.1.0"
   },
   "peerDependencies": {
