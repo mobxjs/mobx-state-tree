@@ -65,12 +65,12 @@
         </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx-state-tree/edit/master/docs/intro/welcome.md" target="_blank" rel="noreferrer noopener">Edit</a><h1 class="postHeaderTitle">Welcome to MobX-State-Tree!</h1></header><article><div><span><div id="codefund"></div>
 <p><strong><em>Full-featured reactive state management without the boilerplate.</em></strong></p>
 <h2><a class="anchor" aria-hidden="true" id="what-is-mobx-state-tree"></a><a href="#what-is-mobx-state-tree" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>What is MobX-State-Tree?</h2>
-<p>MobX-State-Tree (MST) is a <a href="https://en.wikipedia.org/wiki/Batteries_Included#:~:text=%22Batteries%20included%22%20(slang)%2C%20in%20a%20product%20usability%20(mostly%20in%20software)%20it%20states%20that%20the%20product%20comes%20together%20with%20all%20possible%20parts%20required%20for%20full%20usability">batteries included</a> state management library. It only requires <strong>one peer dependency</strong>, and will provide you with:</p>
+<p>MobX-State-Tree (MST) is a <a href="https://en.wikipedia.org/wiki/Batteries_Included#:~:text=%22Batteries%20included%22%20(slang)%252C%20in%20a%20product%20usability%20(mostly%20in%20software)%20it%20states%20that%20the%20product%20comes%20together%20with%20all%20possible%20parts%20required%20for%20full%20usability">batteries included</a> state management library. It only requires <strong>one peer dependency</strong>, and will provide you with:</p>
 <ol>
 <li><strong>Centralized stores</strong> for your data</li>
 <li><strong>Mutable, but protected data</strong>, which means it is easy to work with your data, but safe to modify.</li>
 <li><strong>Serializable and traceable updates</strong>. The mutable, protected nature of MobX-State-Tree data means you can <strong>generate snapshots</strong> and do <strong>time-travel debugging</strong>.</li>
-<li><strong>Side effect management</strong>, so you don't need to write <code>useEffect</code> hooks or their equivalents to manage the condequences of data mutations. You can do it all from MST itself.</li>
+<li><strong>Side effect management</strong>, so you don't need to write <code>useEffect</code> hooks or their equivalent to manage the consequences of data mutations. You can do it all from MST itself.</li>
 <li><strong>Runtime type checking</strong>, so you can't accidentally assign the wrong data type to a property</li>
 <li><strong>Static type checking</strong> with TypeScript inference from your runtime types - automatically!</li>
 <li><strong>Data normalization</strong> - MST has support for references, so you can normalize data across your application code.</li>
@@ -83,33 +83,33 @@
 
 <span class="hljs-comment">// A tweet has a body (which is text) and whether it's read or not</span>
 <span class="hljs-keyword">const</span> Tweet = t
-    .model(<span class="hljs-string">"Tweet"</span>, {
-        <span class="hljs-attr">body</span>: t.string,
-        <span class="hljs-attr">read</span>: <span class="hljs-literal">false</span> <span class="hljs-comment">// automatically inferred as type "boolean" with default "false"</span>
-    })
-    .actions(<span class="hljs-function">(<span class="hljs-params">tweet</span>) =&gt;</span> ({
-        toggle() {
-            tweet.read = !tweet.read
-        }
-    }))
+  .model(<span class="hljs-string">"Tweet"</span>, {
+    <span class="hljs-attr">body</span>: t.string,
+    <span class="hljs-attr">read</span>: <span class="hljs-literal">false</span> <span class="hljs-comment">// automatically inferred as type "boolean" with default "false"</span>
+  })
+  .actions(<span class="hljs-function">(<span class="hljs-params">tweet</span>) =&gt;</span> ({
+    toggle() {
+      tweet.read = !tweet.read
+    }
+  }))
 
 <span class="hljs-comment">// Define the Twitter "store" as having an array of tweets</span>
 <span class="hljs-keyword">const</span> TwitterStore = t.model(<span class="hljs-string">"TwitterStore"</span>, {
-    <span class="hljs-attr">tweets</span>: t.array(Tweet)
+  <span class="hljs-attr">tweets</span>: t.array(Tweet)
 })
 
 <span class="hljs-comment">// create your new Twitter store instance with some initial data</span>
 <span class="hljs-keyword">const</span> twitterStore = TwitterStore.create({
-    <span class="hljs-attr">tweets</span>: [
-        {
-            <span class="hljs-attr">body</span>: <span class="hljs-string">"Anyone tried MST?"</span>
-        }
-    ]
+  <span class="hljs-attr">tweets</span>: [
+    {
+      <span class="hljs-attr">body</span>: <span class="hljs-string">"Anyone tried MST?"</span>
+    }
+  ]
 })
 
 <span class="hljs-comment">// Listen to new snapshots, which are created anytime something changes</span>
 onSnapshot(twitterStore, (snapshot) =&gt; {
-    <span class="hljs-built_in">console</span>.log(snapshot)
+  <span class="hljs-built_in">console</span>.log(snapshot)
 })
 
 <span class="hljs-comment">// Let's mark the first tweet as "read" by invoking the "toggle" action</span>
@@ -123,8 +123,8 @@ twitterStore.tweets[<span class="hljs-number">0</span>].toggle()
 <h2><a class="anchor" aria-hidden="true" id="mobx-ecosystem"></a><a href="#mobx-ecosystem" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>MobX Ecosystem</h2>
 <p><a href="https://github.com/mobxjs/mobx">MobX</a> is <a href="https://2019.stateofjs.com/data-layer/mobx/">one of the most popular Redux alternatives</a> and is used (along with MobX-State-Tree) by companies all over the world, including Netflix, Grow, IBM, DAZN, Baidu, and more.</p>
 <p>If you're wondering how MobX-State-Tree is distinct from MobX, you can think of it like this: <strong>MobX is a state management &quot;engine&quot;, and MobX-State-Tree is a luxury car</strong>. MST gives you the structure, tools, and other features to get you where you're going. MST is valuable in a large team but also useful in smaller applications when you expect your code to scale rapidly. And if we compare it to Redux, MST offers better performance with much less boilerplate code than Redux!</p>
-<p>Since MST uses MobX under the hood, MobX-State-Tree has bindings for React, React Native, Vue, Angular, Svelte, and even barebones JavaScript apps.</p>
-<p><em>You don't need to know how to use MobX in order to use MST.</em> You don't need to know how your car's engine works to be an excellent driver. It helps, but it's not necessary.</p>
+<p>Since MST uses MobX under the hood, MobX-State-Tree works with the MobX bindings for React, React Native, Vue, Angular, Svelte, and even barebones JavaScript apps.</p>
+<p><em>You don't need to know how to use MobX in order to use MST.</em> Just like you don't need to know how your car's engine works to be an excellent driver. It can help, but it's not necessary.</p>
 <h2><a class="anchor" aria-hidden="true" id="next-steps"></a><a href="#next-steps" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Next Steps</h2>
 <ul>
 <li>Learn how to <a href="/intro/installation">install MobX-State-Tree</a> or jump straight to our <a href="/intro/getting-started">Getting Started</a> guide!</li>
