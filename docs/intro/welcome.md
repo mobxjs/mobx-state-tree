@@ -9,40 +9,30 @@ title: Welcome to MobX-State-Tree!
 
 ## What is MobX-State-Tree?
 
-Technically speaking, MobX-State-Tree (also known as MST) is a state container system built on [MobX](https://github.com/mobxjs/mobx), a functional reactive state library.
+MobX-State-Tree (MST) is a [batteries included](https://en.wikipedia.org/wiki/Batteries_Included#:~:text=%22Batteries%20included%22%20(slang)%2C%20in%20a%20product%20usability%20(mostly%20in%20software)%20it%20states%20that%20the%20product%20comes%20together%20with%20all%20possible%20parts%20required%20for%20full%20usability) state management library. It only requires **one peer dependency**, and will provide you with:
 
-This may not mean much to you, and that’s okay. I’ll explain it like this: **MobX is a state management "engine", and MobX-State-Tree gives it structure and common tools you need for your app.** MST is valuable in a large team but also useful in smaller applications when you expect your code to scale rapidly. And if we compare it to Redux, MST offers better performance and much less boilerplate code than Redux!
+1. **Centralized stores** for your data
+2. **Mutable, but protected data**, which means it is easy to work with your data, but safe to modify.
+3. **Serializable and traceable updates**. The mutable, protected nature of MobX-State-Tree data means you can **generate snapshots** and do **time-travel debugging**.
+4. **Side effect management**, so you don't need to write `useEffect` hooks or their equivalents to manage the condequences of data mutations. You can do it all from MST itself.
+5. **Runtime type checking**, so you can't accidentally assign the wrong data type to a property
+6. **Static type checking** with TypeScript inference from your runtime types - automatically!
+7. **Data normalization** - MST has support for references, so you can normalize data across your application code.
+8. **Warm, welcoming community**. We pride ourselves on a healthy and kind open source community.
 
-MobX is [one of the most popular Redux alternatives](https://2019.stateofjs.com/data-layer/mobx/) and is used (along with MobX-State-Tree) by companies all over the world, including Netflix, Grow, IBM, DAZN, Baidu, and more.
+## Basic Example
 
-It supports a full set of features for a modern state management system -- all in a package with _zero dependencies_ other than MobX itself.
-
-_Note: you don't need to know how to use MobX in order to use MST._
-
-### Ten reasons you should use MobX-State-Tree:
-
-1. **MST works great** in React, React Native, Vue, Angular, Svelte, and even barebones JavaScript apps
-2. Instead of being scattered throughout your app, MST provides **centralized stores** for your data
-3. Your data is **mutable**, but can only be mutated in "actions", so it's _easy to use_ but also _protected_
-4. Via **runtime type checking**, you can't accidentally assign the wrong data type to a property
-5. TypeScript can infer **static types** from your runtime types automatically
-6. Every update to your data is traced and you can quickly **generate snapshots** of your state at any time
-7. MST has built-in support for references so you can **normalize your data** across your whole app
-8. **Side effects** can be managed via async flows, which are basically long-running actions
-9. Using snapshots, you can do **time-travel debugging** or logging of state changes over time
-10. MST has a **robust community** and a large, active core team
-
-## Basic example
+Here's what MST code looks like:
 
 _You can play with it in [this CodeSandbox playground](https://codesandbox.io/s/boring-pond-cmooq?file=/src/index.js)._
 
 ```javascript
-import { types, onSnapshot } from "mobx-state-tree"
+import { t, onSnapshot } from "mobx-state-tree"
 
 // A tweet has a body (which is text) and whether it's read or not
-const Tweet = types
+const Tweet = t
     .model("Tweet", {
-        body: types.string,
+        body: t.string,
         read: false // automatically inferred as type "boolean" with default "false"
     })
     .actions((tweet) => ({
@@ -52,8 +42,8 @@ const Tweet = types
     }))
 
 // Define the Twitter "store" as having an array of tweets
-const TwitterStore = types.model("TwitterStore", {
-    tweets: types.array(Tweet)
+const TwitterStore = t.model("TwitterStore", {
+    tweets: t.array(Tweet)
 })
 
 // create your new Twitter store instance with some initial data
@@ -75,6 +65,22 @@ twitterStore.tweets[0].toggle()
 
 // In the console, you should see the result: `{ tweets: [{ body: "Anyone tried MST?", read: true }]}`
 ```
+
+## Video Demonstration
+
+Jamon Holmgren has an excellent introduction video with a more realistic, robust example of MobX-State-Tree and React. Check it out!
+
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/n_VjjJxyd8Q?si=RxMDaUi7ExERZQsx" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+## MobX Ecosystem
+
+[MobX](https://github.com/mobxjs/mobx) is [one of the most popular Redux alternatives](https://2019.stateofjs.com/data-layer/mobx/) and is used (along with MobX-State-Tree) by companies all over the world, including Netflix, Grow, IBM, DAZN, Baidu, and more.
+
+If you're wondering how MobX-State-Tree is distinct from MobX, you can think of it like this: **MobX is a state management "engine", and MobX-State-Tree is a luxury car**. MST gives you the structure, tools, and other features to get you where you're going. MST is valuable in a large team but also useful in smaller applications when you expect your code to scale rapidly. And if we compare it to Redux, MST offers better performance with much less boilerplate code than Redux!
+
+Since MST uses MobX under the hood, MobX-State-Tree has bindings for React, React Native, Vue, Angular, Svelte, and even barebones JavaScript apps.
+
+_You don't need to know how to use MobX in order to use MST._ You don't need to know how your car's engine works to be an excellent driver. It helps, but it's not necessary.
 
 ## Next Steps
 
