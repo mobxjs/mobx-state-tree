@@ -216,7 +216,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     const type = this.type
 
     try {
-      this.storedValue = type.createNewInstance(this._childNodes)
+      this.storedValue = type.createNewInstance(this._childNodes) as typeof this.storedValue
       this.preboot()
 
       this._isRunningAction = true
