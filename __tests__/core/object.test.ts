@@ -137,7 +137,7 @@ test("it should emit snapshots for children", () => {
     ]
   })
   let snapshotsP: SnapshotOut<typeof folder>[] = []
-  let snapshotsC: SnapshotOut<typeof folder.files[0]>[] = []
+  let snapshotsC: SnapshotOut<(typeof folder.files)[0]>[] = []
   onSnapshot(folder, (snapshot) => snapshotsP.push(snapshot))
   folder.rename("Vacation photos")
   expect(snapshotsP[0]).toEqual({
