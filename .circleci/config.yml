@@ -42,6 +42,12 @@ jobs:
       - attach_workspace:
           at: .
 
+      - run:
+          name: Install the latest version of bun
+          command: curl -fsSL https://bun.sh/install | bash
+      - run:
+          name: Link bun
+          command: sudo ln -s ~/.bun/bin/bun /usr/local/bin/
       - run: bun run test:dev -i --coverage
       - store_test_results:
           path: ./test-results
@@ -56,7 +62,12 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-
+      - run:
+          name: Install the latest version of bun
+          command: curl -fsSL https://bun.sh/install | bash
+      - run:
+          name: Link bun
+          command: sudo ln -s ~/.bun/bin/bun /usr/local/bin/
       - run: bun run test:prod -i
       - store_test_results:
           path: ./test-results
@@ -66,7 +77,12 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-
+      - run:
+          name: Install the latest version of bun
+          command: curl -fsSL https://bun.sh/install | bash
+      - run:
+          name: Link bun
+          command: sudo ln -s ~/.bun/bin/bun /usr/local/bin/
       - run: bun run size
 
   # upload coverage
