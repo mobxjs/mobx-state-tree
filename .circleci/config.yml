@@ -24,8 +24,8 @@ jobs:
           name: Link bun
           command: sudo ln -s ~/.bun/bin/bun /usr/local/bin/
       - run:
-        name: Install dependencies
-        command: bun install
+          name: Install dependencies
+          command: bun install
       - run:
           name: Build MST
           command: bun run build
@@ -57,7 +57,7 @@ jobs:
       - attach_workspace:
           at: .
 
-      - run: run run test:prod -i
+      - run: bun run test:prod -i
       - store_test_results:
           path: ./test-results
 
