@@ -1,4 +1,4 @@
-import { assert, _ } from "spec.ts"
+import { Exact } from "ts-essentials"
 
 import {
   types,
@@ -21,6 +21,28 @@ import {
   SnapshotOut
 } from "../../src"
 import { $nonEmptyObject } from "../../src/internal"
+
+type DifferingKeys<ActualT, ExpectedT> = {
+  [K in keyof ActualT | keyof ExpectedT]: K extends keyof ActualT
+    ? K extends keyof ExpectedT
+      ? Exact<ActualT[K], ExpectedT[K]> extends never
+        ? K
+        : never
+      : K
+    : K
+}[keyof ActualT | keyof ExpectedT] &
+  string
+
+type InexactErrorMessage<ActualT, ExpectedT> = `Mismatched property: ${DifferingKeys<
+  ActualT,
+  ExpectedT
+>}`
+
+const assertTypesEqual = <ActualT, ExpectedT>(
+  t: ActualT,
+  u: Exact<ActualT, ExpectedT> extends never ? InexactErrorMessage<ActualT, ExpectedT> : ExpectedT
+): [ActualT, ExpectedT] => [t, u] as [ActualT, ExpectedT]
+const _: unknown = undefined
 
 const createTestFactories = () => {
   const Box = types.model({
@@ -90,7 +112,7 @@ test("it should do typescript type inference correctly", () => {
   unprotect(a)
   // property can be used as proper type
   const z: number = a.x
-  // property can be assigned to crrectly
+  // property can be assigned to correctly
   a.x = 7
   // wrong type cannot be assigned
   // MANUAL TEST: not ok: a.x = "stuff"
@@ -113,7 +135,7 @@ test("it should do typescript type inference correctly", () => {
   // Manual test not assignable:
   // a.z = "test"
   b.sub.method()
-  expect(true).toBe(true) // supress no asserts warning
+  expect(true).toBe(true) // suppress no asserts warning
   // snapshots are of the proper type
   const snapshot = getSnapshot(a)
   const sx: number = snapshot.x
@@ -213,7 +235,7 @@ test("it is possible to refer to a type", () => {
   z.setTitle("bla")
   z.title = "bla"
   // z.title = 3 // Test manual: should give compile error
-  expect(true).toBe(true) // supress no asserts warning
+  expect(true).toBe(true) // suppress no asserts warning
 })
 test(".Type should not be callable", () => {
   const Todo = types
@@ -258,7 +280,7 @@ test("types instances with compatible snapshots should not be interchangeable", 
     x: types.maybe(A)
   })
   expect(A.is({})).toBe(true)
-  expect(A.is(B.create())).toBe(false) // if thies yielded true, then `B.create().doA()` should work!
+  expect(A.is(B.create())).toBe(false) // if this yielded true, then `B.create().doA()` should work!
   expect(A.is(getSnapshot(B.create()))).toBe(true)
   const c = C.create()
   unprotect(c)
@@ -311,10 +333,10 @@ test("it handles complex types correctly", () => {
         setAmount
       }
     })
-  expect(true).toBe(true) // supress no asserts warning
+  expect(true).toBe(true) // suppress no asserts warning
 })
 if (process.env.NODE_ENV !== "production") {
-  test("it should provide detailed reasons why the value is not appicable", () => {
+  test("it should provide detailed reasons why the value is not applicable", () => {
     const Todo = types
       .model({
         title: types.string
@@ -477,7 +499,7 @@ test("it should extend types correctly", () => {
 test("self referring views", () => {
   const Car = types.model({ x: 3 }).views((self) => {
     const views = {
-      get tripple() {
+      get triple() {
         return self.x + views.double
       },
       get double() {
@@ -486,7 +508,7 @@ test("self referring views", () => {
     }
     return views
   })
-  expect(Car.create().tripple).toBe(9)
+  expect(Car.create().triple).toBe(9)
 })
 
 test("#922", () => {
@@ -1029,11 +1051,11 @@ test("#1268", () => {
 test("#1307 optional can be omitted in .create", () => {
   const Model1 = types.model({ name: types.optional(types.string, "") })
   const model1 = Model1.create({})
-  assert(model1.name, _ as string)
+  assertTypesEqual(model1.name, _ as string)
 
   const Model2 = types.model({ name: "" })
   const model2 = Model2.create({})
-  assert(model2.name, _ as string)
+  assertTypesEqual(model2.name, _ as string)
 })
 
 test("#1307 custom types failing", () => {
@@ -1103,7 +1125,7 @@ test("#1330", () => {
     test: ""
   })
 
-  assert(
+  assertTypesEqual(
     RootStore.create({
       childStore: {
         foo: "a",
@@ -1126,7 +1148,7 @@ test("maybe / optional type inference verification", () => {
   interface ITC extends SnapshotIn<typeof T> {}
   interface ITS extends SnapshotOut<typeof T> {}
 
-  assert(
+  assertTypesEqual(
     _ as ITC,
     _ as {
       [$nonEmptyObject]?: any
@@ -1138,7 +1160,7 @@ test("maybe / optional type inference verification", () => {
     }
   )
 
-  assert(
+  assertTypesEqual(
     _ as ITS,
     _ as {
       [$nonEmptyObject]?: any

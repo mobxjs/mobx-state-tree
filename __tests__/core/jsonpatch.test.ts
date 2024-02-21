@@ -16,7 +16,7 @@ import {
   joinJsonPath
 } from "../../src"
 
-function testPatches<C, S, T>(
+function testPatches<C, S, T extends object>(
   type: IType<C, S, T>,
   snapshot: C,
   fn: any,
