@@ -39,7 +39,7 @@ sidebar_label: "FunctionWithFlag"
 
 • **Function**: *FunctionConstructor*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:316
+Defined in node_modules/typescript/lib/lib.es5.d.ts:319
 
 ___
 
@@ -47,7 +47,7 @@ ___
 
 • **_isFlowAction**? : *undefined | false | true*
 
-*Defined in [src/core/action.ts:42](https://github.com/mobxjs/mobx-state-tree/blob/3d89a4fa/src/core/action.ts#L42)*
+*Defined in [src/core/action.ts:42](https://github.com/mobxjs/mobx-state-tree/blob/0fa1c7d6/src/core/action.ts#L42)*
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 • **_isMSTAction**? : *undefined | false | true*
 
-*Defined in [src/core/action.ts:41](https://github.com/mobxjs/mobx-state-tree/blob/3d89a4fa/src/core/action.ts#L41)*
+*Defined in [src/core/action.ts:41](https://github.com/mobxjs/mobx-state-tree/blob/0fa1c7d6/src/core/action.ts#L41)*
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 *Inherited from void*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:302
+Defined in node_modules/typescript/lib/lib.es5.d.ts:305
 
 ___
 
@@ -75,7 +75,7 @@ ___
 
 *Inherited from void*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:303
+Defined in node_modules/typescript/lib/lib.es5.d.ts:306
 
 ___
 
@@ -85,7 +85,7 @@ ___
 
 *Inherited from void*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:299
+Defined in node_modules/typescript/lib/lib.es5.d.ts:302
 
 ___
 
@@ -95,7 +95,7 @@ ___
 
 *Inherited from void*
 
-Defined in node_modules/typescript/lib/lib.es2015.core.d.ts:97
+Defined in node_modules/typescript/lib/lib.es2015.core.d.ts:95
 
 Returns the name of the function. Function names are read-only and can not be changed.
 
@@ -107,7 +107,7 @@ ___
 
 *Inherited from void*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:298
+Defined in node_modules/typescript/lib/lib.es5.d.ts:301
 
 ## Methods
 
@@ -117,7 +117,7 @@ Defined in node_modules/typescript/lib/lib.es5.d.ts:298
 
 *Inherited from void*
 
-Defined in node_modules/typescript/lib/lib.es2015.symbol.wellknown.d.ts:157
+Defined in node_modules/typescript/lib/lib.es2015.symbol.wellknown.d.ts:164
 
 Determines whether the given value inherits from this function if this function was used
 as a constructor function.
@@ -141,7 +141,7 @@ ___
 
 *Inherited from void*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:278
+Defined in node_modules/typescript/lib/lib.es5.d.ts:281
 
 Calls the function, substituting the specified object for the this value of the function, and the specified array for the arguments of the function.
 
@@ -163,7 +163,7 @@ ___
 
 *Inherited from void*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:293
+Defined in node_modules/typescript/lib/lib.es5.d.ts:296
 
 For a given function, creates a bound function that has the same body as the original function.
 The this object of the bound function is associated with the specified object, and has the specified initial parameters.
@@ -186,7 +186,7 @@ ___
 
 *Inherited from void*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:285
+Defined in node_modules/typescript/lib/lib.es5.d.ts:288
 
 Calls a method of an object, substituting another object for the current object.
 
@@ -208,7 +208,7 @@ ___
 
 *Inherited from void*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:296
+Defined in node_modules/typescript/lib/lib.es5.d.ts:299
 
 Returns a string representation of a function.
 
