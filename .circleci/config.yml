@@ -17,10 +17,18 @@ jobs:
     steps:
       - checkout
 
-      - node/install-packages:
-          pkg-manager: yarn
-
-      - run: yarn build
+      - run:
+          name: Install the latest version of bun
+          command: curl -fsSL https://bun.sh/install | bash
+      - run:
+          name: Link bun
+          command: sudo ln -s ~/.bun/bin/bun /usr/local/bin/
+      - run:
+        name: Install dependencies
+        command: bun install
+      - run:
+          name: Build MST
+          command: bun run build
 
       - persist_to_workspace:
           root: .
@@ -34,7 +42,7 @@ jobs:
       - attach_workspace:
           at: .
 
-      - run: yarn test:dev -i --coverage
+      - run: bun run test:dev -i --coverage
       - store_test_results:
           path: ./test-results
 
@@ -49,7 +57,7 @@ jobs:
       - attach_workspace:
           at: .
 
-      - run: yarn test:prod -i
+      - run: run run test:prod -i
       - store_test_results:
           path: ./test-results
 
@@ -59,7 +67,7 @@ jobs:
       - attach_workspace:
           at: .
 
-      - run: yarn size
+      - run: bun run size
 
   # upload coverage
   upload-codecov:
