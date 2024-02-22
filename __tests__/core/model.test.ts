@@ -1,4 +1,3 @@
-// TODO: fix for bun
 import { applySnapshot, getSnapshot, types } from "../../src"
 import { Hook } from "../../src/internal"
 
