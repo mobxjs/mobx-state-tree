@@ -13,6 +13,7 @@ import {
   ISerializedActionCall,
   Instance
 } from "../../src"
+import { expect, test } from "bun:test"
 
 /// Simple action replay and invocation
 const Task = types
@@ -169,7 +170,7 @@ if (process.env.NODE_ENV !== "production") {
     const store = createTestStore()
     expect(() => {
       store.orders[0].setCustomer(store.orders[0] as any)
-    }).toThrowError(
+    }).toThrow(
       "Error while converting <Order@/orders/0> to `(reference(Customer) | null)`:\n\n    " +
         "value of type Order: <Order@/orders/0> is not assignable to type: `(reference(Customer) | null)`, expected an instance of `(reference(Customer) | null)` or a snapshot like `(reference(Customer) | null?)` instead."
     ) // wrong type!
@@ -345,7 +346,7 @@ test("middleware events are correct", () => {
     type: "action",
     parentEvent: undefined,
     parentActionEvent: undefined
-  }
+  } as IMiddlewareEvent
   const event2 = {
     args: [14],
     context: {},
@@ -358,7 +359,7 @@ test("middleware events are correct", () => {
     type: "action",
     parentEvent: event1,
     parentActionEvent: event1
-  }
+  } as IMiddlewareEvent
   expect(events).toEqual([event1, event2])
 })
 
@@ -385,12 +386,12 @@ test("actions are mockable", () => {
       m.method = function () {
         return 3
       }
-    }).toThrowError(TypeError)
+    }).toThrow(TypeError)
     expect(() => {
       m.view = function () {
         return 3
       }
-    }).toThrowError(TypeError)
+    }).toThrow(TypeError)
   } else {
     m.method = function () {
       return 4
