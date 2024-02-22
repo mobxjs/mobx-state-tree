@@ -1,5 +1,6 @@
 import { applySnapshot, getSnapshot, types } from "../../src"
 import { Hook } from "../../src/internal"
+import { describe, expect, it, jest, test } from "bun:test"
 
 test("it should call preProcessSnapshot with the correct argument", () => {
   const onSnapshot = jest.fn((snapshot: any) => {
@@ -16,7 +17,7 @@ test("it should call preProcessSnapshot with the correct argument", () => {
 
   const model = Model.create({ val: 0 })
   applySnapshot(model, { val: 1 })
-  expect(onSnapshot).lastCalledWith({ val: 1 })
+  expect(onSnapshot).toHaveBeenLastCalledWith({ val: 1 })
 })
 describe("Model instantiation", () => {
   describe("Model name", () => {
@@ -152,6 +153,7 @@ describe("Model instantiation", () => {
         })
 
         const modelSnapshot = getSnapshot(Model.create())
+        // @ts-expect-error - we explicitly allowed an invalid input, so we expect an empty object, but TS doesn't.
         expect(modelSnapshot).toEqual({})
       })
     } else {
