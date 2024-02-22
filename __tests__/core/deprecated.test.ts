@@ -1,6 +1,7 @@
 import { deprecated } from "../../src/utils"
 import { flow, createFlowSpawner } from "../../src/core/flow"
 import { process as mstProcess, createProcessSpawner } from "../../src/core/process"
+import { expect, jest, test } from "bun:test"
 
 function createDeprecationListener() {
   // clear previous deprecation dedupe keys
