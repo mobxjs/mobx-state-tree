@@ -1,4 +1,5 @@
 import { types, typecheck, IAnyModelType } from "../../src"
+import { expect, spyOn, test } from "bun:test"
 
 if (process.env.NODE_ENV !== "production") {
   test("it should throw if late doesnt received a function as parameter", () => {
@@ -19,7 +20,7 @@ test("it should accept a type and infer it correctly", () => {
   expect(() => Before.create({ after: { name: "Hello, it's me." } })).not.toThrow()
 })
 test("late should allow circular references", () => {
-  // TypeScript is'nt smart enough to infer self referencing types.
+  // TypeScript isn't smart enough to infer self referencing types.
   const Node = types.model({
     childs: types.optional(types.array(types.late((): IAnyModelType => Node)), [])
   })
@@ -27,7 +28,7 @@ test("late should allow circular references", () => {
   expect(() => Node.create({ childs: [{}, { childs: [] }] })).not.toThrow()
 })
 test("late should describe correctly circular references", () => {
-  // TypeScript is'nt smart enough to infer self referencing types.
+  // TypeScript isn't smart enough to infer self referencing types.
   const Node = types.model("Node", {
     childs: types.array(types.late((): IAnyModelType => Node))
   })
@@ -49,7 +50,7 @@ test("should typecheck", () => {
 })
 
 test("typecheck should throw an Error when called at runtime, but not log the error", () => {
-  const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+  const consoleSpy = spyOn(console, "error")
 
   const NodeObject = types.model("NodeObject", {
     id: types.identifierNumber,
