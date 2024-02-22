@@ -9,7 +9,6 @@ import {
   SnapshotIn,
   getNodeId,
   Instance,
-  getType,
   onSnapshot
 } from "../../src"
 
