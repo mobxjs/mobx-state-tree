@@ -1,4 +1,5 @@
 import { getSnapshot, types } from "../../src"
+import { expect, test } from "bun:test"
 
 test("it should allow if type and predicate is correct", () => {
   const Factory = types.model({
@@ -22,12 +23,12 @@ if (process.env.NODE_ENV !== "production") {
     })
     expect(() => {
       Factory.create({ number: "givenStringInstead" } as any)
-    }).toThrowError(
+    }).toThrow(
       `[mobx-state-tree] Error while converting \`{\"number\":\"givenStringInstead\"}\` to \`AnonymousModel\`:\n\n    at path \"/number\" value \`\"givenStringInstead\"\` is not assignable to type: \`positive number\` (Value is not a number).`
     )
     expect(() => {
       Factory.create({ number: -4 })
-    }).toThrowError(
+    }).toThrow(
       `[mobx-state-tree] Error while converting \`{\"number\":-4}\` to \`AnonymousModel\`:\n\n    at path \"/number\" value \`-4\` is not assignable to type: \`positive number\` (Value does not respect the refinement predicate).`
     )
   })
@@ -41,12 +42,12 @@ if (process.env.NODE_ENV !== "production") {
     })
     expect(() => {
       Factory.create({ number: "givenStringInstead" } as any)
-    }).toThrowError(
+    }).toThrow(
       `[mobx-state-tree] Error while converting \`{\"number\":\"givenStringInstead\"}\` to \`AnonymousModel\`:\n\n    at path \"/number\" value \`\"givenStringInstead\"\` is not assignable to type: \`number\` (Value is not a number).`
     )
     expect(() => {
       Factory.create({ number: -4 })
-    }).toThrowError(
+    }).toThrow(
       `[mobx-state-tree] Error while converting \`{\"number\":-4}\` to \`AnonymousModel\`:\n\n    at path "/number" value \`-4\` is not assignable to type: \`number\` (A positive number was expected).`
     )
   })
