@@ -1,3 +1,4 @@
+// todo: fix for bun
 import { Exact } from "ts-essentials"
 
 import {
@@ -465,7 +466,7 @@ test("it should extend {pre,post}ProcessSnapshot on compose", () => {
   expect(x.composedOf).toContain("CompositionTracker")
   expect(x.composedOf).toContain("Car")
   expect(x.composedOf).toContain("CarLogger")
-  expect(x.composedOf).toEqual(["CompositionTracker", "Car", "CarLogger"])
+  expect(x.composedOf.toJSON()).toEqual(["CompositionTracker", "Car", "CarLogger"])
   expect(getSnapshot(x).composedWith).toContain("WagonTracker")
   expect(getSnapshot(x).composedWith).toContain("Wagon")
   expect(getSnapshot(x).composedWith).toContain("WagonLogger")
