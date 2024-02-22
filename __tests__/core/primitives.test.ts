@@ -1,5 +1,6 @@
 import { isFinite, isFloat, isInteger } from "../../src/utils"
 import { types, applySnapshot, getSnapshot } from "../../src"
+import { expect, test } from "bun:test"
 
 test("Date instance can be reused", () => {
   const Model = types.model({
