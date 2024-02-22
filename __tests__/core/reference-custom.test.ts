@@ -12,6 +12,7 @@ import {
   Instance,
   resolveIdentifier
 } from "../../src"
+import { expect, test } from "bun:test"
 
 test("it should support custom references - basics", () => {
   const User = types.model({
@@ -52,6 +53,7 @@ test("it should support custom references - basics", () => {
   s.selection = null
   expect(getSnapshot(s).selection).toBe(null)
   applySnapshot(s, Object.assign({}, getSnapshot(s), { selection: "Mattia" }))
+  // @ts-expect-error - typescript doesn't know that applySnapshot will update the selection
   expect(s.selection).toBe(s.users[1])
   applySnapshot(s, Object.assign({}, getSnapshot(s), { selection: "Unknown" }))
   expect(s.selection).toBe(null)
@@ -102,10 +104,13 @@ test("it should support custom references - adv", () => {
   expect(s.selection === s.users.get("1")).toBe(true)
   expect(getSnapshot(s).selection).toBe("Michel")
   applySnapshot(s, Object.assign({}, getSnapshot(s), { selection: "Mattia" }))
+  // @ts-expect-error - typescript doesn't know that applySnapshot will update the selection
   expect(s.selection).toBe(s.users.get("2"))
   applyPatch(s, { op: "replace", path: "/selection", value: "Michel" })
+  // @ts-expect-error - typescript doesn't know that applyPatch will update the selection
   expect(s.selection).toBe(s.users.get("1"))
   s.users.delete("1")
+  // @ts-expect-error - typescript doesn't know how delete will affect the selection
   expect(s.selection).toBe(null)
   s.users.put({ id: "3", name: "Michel" })
   expect(s.selection.id).toBe("3")
@@ -168,6 +173,7 @@ test("it should support dynamic loading", (done) => {
   unprotect(s)
   expect(events).toEqual([])
   expect(s.users.length).toBe(0)
+  // @ts-expect-error - typescript doesn't know that the user will be loaded
   expect(s.selection).toBe(null)
   when(
     () => s.users.length === 1 && s.users[0].age === 18 && s.users[0].name === "Mattia",
@@ -246,5 +252,5 @@ test("custom reference / safe custom reference to another store works", () => {
   // and be set to undefined on safe ones
   todos.todos.splice(2, 1)
   expect(() => otherStore.todoRef).toThrow("Invalid ref")
-  expect(otherStore.safeRef).toBe(undefined)
+  expect(otherStore.safeRef).toBeUndefined()
 })
