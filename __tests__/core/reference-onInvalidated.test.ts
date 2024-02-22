@@ -11,6 +11,7 @@ import {
   clone,
   destroy
 } from "../../src"
+import { describe, expect, test } from "bun:test"
 
 const Todo = types.model({ id: types.identifier })
 
@@ -82,7 +83,7 @@ for (const customRef of [false, true]) {
       expect(oldRefId).toBe("1")
       expect(ev!.removeRef).toBeTruthy()
       expect(ev!.replaceRef).toBeTruthy()
-      expect(store.onInv).toBe(undefined)
+      expect(store.onInv).toBeUndefined()
       expect(getSnapshot(store).onInv).toBeUndefined()
 
       store.onInv = store.todos[0]
@@ -93,7 +94,7 @@ for (const customRef of [false, true]) {
       expect(oldRefId).toBe("2")
       expect(ev!.removeRef).toBeTruthy()
       expect(ev!.replaceRef).toBeTruthy()
-      expect(store.onInv).toBe(undefined)
+      expect(store.onInv).toBeUndefined()
       expect(getSnapshot(store).onInv).toBeUndefined()
     })
 
@@ -118,7 +119,7 @@ for (const customRef of [false, true]) {
       expect(oldRefId).toBe("1")
       expect(ev!.removeRef).toBeTruthy()
       expect(ev!.replaceRef).toBeTruthy()
-      expect(store.onInv).toBe(undefined)
+      expect(store.onInv).toBeUndefined()
       expect(getSnapshot(store).onInv).toBeUndefined()
 
       store.onInv = store.todos[0]
@@ -129,7 +130,7 @@ for (const customRef of [false, true]) {
       expect(oldRefId).toBe("2")
       expect(ev!.removeRef).toBeTruthy()
       expect(ev!.replaceRef).toBeTruthy()
-      expect(store.onInv).toBe(undefined)
+      expect(store.onInv).toBeUndefined()
       expect(getSnapshot(store).onInv).toBeUndefined()
     })
 
@@ -157,7 +158,7 @@ for (const customRef of [false, true]) {
       expect(oldRefId).toBe("1")
       expect(ev!.removeRef).toBeTruthy()
       expect(ev!.replaceRef).toBeTruthy()
-      expect(store.onInv).toBe(undefined)
+      expect(store.onInv).toBeUndefined()
       expect(getSnapshot(store).onInv).toBeUndefined()
 
       store.onInv = store.todos[0]
@@ -168,7 +169,7 @@ for (const customRef of [false, true]) {
       expect(oldRefId).toBe("2")
       expect(ev!.removeRef).toBeTruthy()
       expect(ev!.replaceRef).toBeTruthy()
-      expect(store.onInv).toBe(undefined)
+      expect(store.onInv).toBeUndefined()
       expect(getSnapshot(store).onInv).toBeUndefined()
     })
 
@@ -226,7 +227,7 @@ for (const customRef of [false, true]) {
       expect(oldRefId).toBe("1")
       expect(ev!.removeRef).toBeTruthy()
       expect(ev!.replaceRef).toBeTruthy()
-      expect(store.onInv).toBe(undefined)
+      expect(store.onInv).toBeUndefined()
       expect(getSnapshot(store).onInv).toBeUndefined()
       // make sure other ref stil points to the right one
       expect(store1.onInv).toBe(store1.todos[0])
