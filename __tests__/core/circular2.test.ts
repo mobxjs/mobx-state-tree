@@ -1,5 +1,6 @@
 import { types } from "../../src"
 import { LateTodo1, LateStore1 } from "./circular1.test"
+import { expect, test } from "bun:test"
 // combine function hosting with types.late to support circular refs between files!
 export function LateTodo2() {
   return types.model({
@@ -11,6 +12,7 @@ export function LateStore2() {
     todo: types.late(LateTodo1)
   })
 }
+
 test("circular test 2 should work", () => {
   const Store1 = types.late(LateStore1)
   const Store2 = types.late(LateStore2)
