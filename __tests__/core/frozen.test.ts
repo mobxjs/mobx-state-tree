@@ -55,7 +55,7 @@ test("it should type strongly", () => {
   if (process.env.NODE_ENV !== "production") {
     expect(() => {
       m.moveABit()
-    }).toThrow("Cannot assign to read only property 'x'")
+    }).toThrow("Attempted to assign to readonly property.")
   }
 })
 
