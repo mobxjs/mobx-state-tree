@@ -7,6 +7,7 @@ import {
   applyPatch,
   SnapshotOut
 } from "../../src"
+import { expect, jest, test } from "bun:test"
 
 class Decimal {
   public number: number
@@ -111,7 +112,7 @@ class Decimal {
   test("passes environment to fromSnapshot", () => {
     const env = { test: jest.fn() }
     Wallet.create({ balance: "3.0" }, env)
-    expect(env.test).toBeCalledWith("3.0")
+    expect(env.test).toHaveBeenCalledWith("3.0")
   })
 }
 
