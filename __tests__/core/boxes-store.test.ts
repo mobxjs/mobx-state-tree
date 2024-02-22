@@ -8,6 +8,7 @@ import {
   getSnapshot,
   Instance
 } from "../../src"
+import { expect, test } from "bun:test"
 
 export const Box = types
   .model("Box", {
