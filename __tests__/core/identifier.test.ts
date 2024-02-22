@@ -9,6 +9,7 @@ import {
   getIdentifier,
   detach
 } from "../../src"
+import { expect, test } from "bun:test"
 
 if (process.env.NODE_ENV !== "production") {
   test("#275 - Identifiers should check refinement", () => {
@@ -76,7 +77,7 @@ if (process.env.NODE_ENV !== "production") {
         pk: types.identifierNumber
       })
       Model.create({ id: 1, pk: 2 })
-    }).toThrowError(
+    }).toThrow(
       `[mobx-state-tree] Cannot define property 'pk' as object identifier, property 'id' is already defined as identifier property`
     )
   })
@@ -84,7 +85,7 @@ if (process.env.NODE_ENV !== "production") {
     expect(() => {
       const Model = types.model("Model", { id: types.identifier })
       Model.create({ id: 1 as any as string })
-    }).toThrowError(
+    }).toThrow(
       'at path "/id" value `1` is not assignable to type: `identifier` (Value is not a valid identifier, expected a string).'
     )
   })
@@ -92,7 +93,7 @@ if (process.env.NODE_ENV !== "production") {
     expect(() => {
       const Model = types.identifierNumber
       Model.create(1)
-    }).toThrowError(
+    }).toThrow(
       `[mobx-state-tree] Identifier types can only be instantiated as direct child of a model type`
     )
   })
@@ -247,7 +248,7 @@ test("#1019", () => {
         self.items.push(comment)
         const item = resolveIdentifier(CommentModel, self.items, comment.uid)
         const item2 = self.items.find((i) => i.uid === comment.uid)
-        expect(item).toBe(item2)
+        expect(item).toBe(item2!)
       }
     }))
 
@@ -265,7 +266,7 @@ test("#1019-2", () => {
 
 test("identifierAttribute of the type", () => {
   const M1 = types.model({})
-  expect(M1.identifierAttribute).toBe(undefined)
+  expect(M1.identifierAttribute).toBeUndefined()
 
   const M2 = types.model({ myId: types.identifier })
   expect(M2.identifierAttribute).toBe("myId")
