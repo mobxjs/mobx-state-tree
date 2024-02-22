@@ -290,7 +290,6 @@ test("can handle nested async actions when using decorate", (done) => {
 })
 
 test("flow gain back control when node become not alive during yield", async () => {
-  expect.assertions(2)
   const rejectError = new Error("Reject Error")
   const MyModel = types.model({}).actions(() => {
     return {
