@@ -1,8 +1,6 @@
 import { t } from "../../src/index"
 import { Hook, ObjectNode, onPatch, unprotect } from "../../src/internal"
-
-const warnMock = jest.fn()
-jest.spyOn(console, "warn").mockImplementation(warnMock)
+import { beforeEach, describe, expect, jest, it, spyOn } from "bun:test"
 
 const TestModel = t.model("TestModel", {
   title: t.string
@@ -30,7 +28,7 @@ const TestModelWithIdentifier = t.model("TestModelWithIdentifier", {
  */
 describe("ObjectNode", () => {
   beforeEach(() => {
-    jest.resetAllMocks()
+    jest.restoreAllMocks()
   })
   describe("constructor", () => {
     // Since ObjectNode is not exported as part of the MST API, we don't have tests for invalid parameters, but we expect an error in this scenario.
@@ -52,7 +50,7 @@ describe("ObjectNode", () => {
           const hook = jest.fn()
           node.registerHook(Hook.beforeDestroy, hook)
           node.aboutToDie()
-          expect(hook).not.toBeCalled()
+          expect(hook).not.toHaveBeenCalled()
         })
       })
       describe("if the observable node is initialized", () => {
@@ -62,7 +60,7 @@ describe("ObjectNode", () => {
           node.registerHook(Hook.beforeDestroy, hook)
           node.createObservableInstance() // createObservableInstance calls finalizeCreation internally, and marks the observable node as being created.
           node.aboutToDie()
-          expect(hook).toBeCalled()
+          expect(hook).toHaveBeenCalled()
         })
       })
     })
@@ -84,7 +82,7 @@ describe("ObjectNode", () => {
         node.addMiddleWare(middleware)
         node.createObservableInstance()
         node.applySnapshot({ title: "hello" } as any)
-        expect(middleware).toBeCalled()
+        expect(middleware).toHaveBeenCalled()
       })
     })
     describe("applyPatchLocally", () => {
@@ -104,6 +102,7 @@ describe("ObjectNode", () => {
       })
       describe("when the node is not alive", () => {
         it("warns by default", () => {
+          const warnSpy = spyOn(console, "warn")
           const node = new ObjectNode(TestModel as any, null, "", {}, { title: "hello" })
           unprotect(node.root.value) // In order to call applyPatchLocally, the node must be unprotected
           node.die()
@@ -113,7 +112,7 @@ describe("ObjectNode", () => {
             value: { title: "hello" }
           })
 
-          expect(console.warn).toBeCalled()
+          expect(warnSpy).toHaveBeenCalled()
         })
       })
       describe("when the node is alive and not protected", () => {
@@ -264,18 +263,19 @@ describe("ObjectNode", () => {
     describe("assertAlive", () => {
       describe("when the node is alive", () => {
         it("does not warn", () => {
+          const warnSpy = spyOn(console, "warn")
           const node = new ObjectNode(TestModel as any, null, "", {}, { title: "hello" })
           node.assertAlive({})
-          expect(console.warn).not.toBeCalled()
+          expect(warnSpy).not.toHaveBeenCalled()
         })
       })
       describe("when the node is not alive", () => {
         it("warns about liveliness", () => {
+          const warnSpy = spyOn(console, "warn")
           const node = new ObjectNode(TestModel as any, null, "", {}, { title: "hello" })
           node.die()
           node.assertAlive({})
-          // @ts-ignore
-          const receivedErrorMessage = console.warn.mock.calls[0][0].toString()
+          const receivedErrorMessage = warnSpy.mock.calls[0][0].toString()
           expect(receivedErrorMessage).toBe(
             "Error: [mobx-state-tree] You are trying to read or write to an object that is no longer part of a state tree. (Object type: 'TestModel', Path upon death: '', Subpath: '', Action: ''). Either detach nodes first, or don't use objects after removing / replacing them in the tree."
           )
@@ -435,7 +435,7 @@ describe("ObjectNode", () => {
           const hook = jest.fn()
           node.registerHook(Hook.beforeDestroy, hook)
           node.die()
-          expect(hook).not.toBeCalled()
+          expect(hook).not.toHaveBeenCalled()
         })
       })
       describe("if the die method gets past lifecycle checks", () => {
@@ -445,7 +445,7 @@ describe("ObjectNode", () => {
           node.registerHook(Hook.beforeDestroy, hook)
           node.createObservableInstance()
           node.die()
-          expect(hook).toBeCalled()
+          expect(hook).toHaveBeenCalled()
         })
         it("finalizes the death of its children", () => {
           const parent = Parent.create({ child: { title: "hello" } })
@@ -461,11 +461,11 @@ describe("ObjectNode", () => {
           const node = new ObjectNode(TestModel as any, null, "", {}, { title: "hello" })
           const identifierCache = node.root.identifierCache
           const identifierCacheNotifySpy = identifierCache
-            ? jest.spyOn(identifierCache, "notifyDied")
+            ? spyOn(identifierCache, "notifyDied")
             : jest.fn()
           node.createObservableInstance()
           node.die()
-          expect(identifierCacheNotifySpy).toBeCalledWith(node)
+          expect(identifierCacheNotifySpy).toHaveBeenCalledWith(node)
         })
         it("stores the snapshot upon death", () => {
           const node = new ObjectNode(TestModel as any, null, "", {}, { title: "hello" })
@@ -527,7 +527,7 @@ describe("ObjectNode", () => {
           node
         )
 
-        expect(patchMock).toBeCalledWith(
+        expect(patchMock).toHaveBeenCalledWith(
           {
             op: "replace",
             path: "/title",
@@ -554,7 +554,7 @@ describe("ObjectNode", () => {
           parent.child!.$treenode
         )
 
-        expect(patchMock).toBeCalledWith(
+        expect(patchMock).toHaveBeenCalledWith(
           {
             op: "replace",
             path: "/child/title",
@@ -587,12 +587,13 @@ describe("ObjectNode", () => {
           node.registerHook(Hook.afterCreationFinalization, hook)
           node.state = 1 // Force the state to CREATED so we don't bail out in the isAlive check as per the prior test
           node.finalizeCreation()
-          expect(hook).toBeCalled()
+          expect(hook).toHaveBeenCalled()
         })
         it('sets the state to "FINALIZED"', () => {
           const node = new ObjectNode(TestModel as any, null, "", {}, { title: "hello" })
           node.state = 1 // Force the state to CREATED so we don't bail out in the isAlive check as per the prior test
           node.finalizeCreation()
+          // @ts-expect-error - We're testing the internal state here
           expect(node.state).toBe(2)
         })
       })
@@ -606,7 +607,7 @@ describe("ObjectNode", () => {
             child.setParent(parent, "child")
             child.state = 1 // Force the state to CREATED in the child so we don't bail out in the isAlive check as per the prior test
             child.finalizeCreation()
-            expect(hook).not.toBeCalled()
+            expect(hook).not.toHaveBeenCalled()
           })
           it('does not set the state to "FINALIZED"', () => {
             const parent = new ObjectNode(Parent as any, null, "", {}, {})
@@ -627,7 +628,7 @@ describe("ObjectNode", () => {
             child.state = 1 // Force the state to CREATED in the child so we don't bail out in the isAlive check as per the prior test
             parent.state = 2 // Force the state to FINALIZED so we don't bail out during the baseFinalizeCreation on child
             child.finalizeCreation()
-            expect(hook).toBeCalled()
+            expect(hook).toHaveBeenCalled()
           })
           it('sets the state to "FINALIZED"', () => {
             const parent = new ObjectNode(Parent as any, null, "", {}, {})
@@ -636,6 +637,7 @@ describe("ObjectNode", () => {
             child.state = 1 // Force the state to CREATED in the child so we don't bail out in the isAlive check as per the prior test
             parent.state = 2 // Force the state to FINALIZED so we don't bail out during the baseFinalizeCreation on child
             child.finalizeCreation()
+            // @ts-expect-error - We're testing the internal state here
             expect(child.state).toBe(2)
           })
         })
@@ -649,10 +651,10 @@ describe("ObjectNode", () => {
           const hook = jest.fn()
           parent.registerHook(Hook.afterCreationFinalization, hook)
           child.state = 1
-          expect(hook).not.toBeCalled()
+          expect(hook).not.toHaveBeenCalled()
           parent.state = 1 // Force the state to CREATED so we don't bail out in the isAlive check as per the prior test
           parent.finalizeCreation()
-          expect(hook).toBeCalled()
+          expect(hook).toHaveBeenCalled()
         })
         it("fires the afterAttach hook on the child", () => {
           const env = {}
@@ -663,10 +665,10 @@ describe("ObjectNode", () => {
           const hook = jest.fn()
           c.registerHook(Hook.afterAttach, hook)
           c.state = 1
-          expect(hook).not.toBeCalled()
+          expect(hook).not.toHaveBeenCalled()
           parent.state = 1 // Force the state to CREATED so we don't bail out in the isAlive check as per the prior test
           parent.finalizeCreation()
-          expect(hook).toBeCalled()
+          expect(hook).toHaveBeenCalled()
         })
         it("sets both child and parent states to finalized", () => {
           const env = {}
@@ -677,7 +679,9 @@ describe("ObjectNode", () => {
           c.state = 1
           parent.state = 1 // Force the state to CREATED so we don't bail out in the isAlive check as per the prior test
           parent.finalizeCreation()
+          // @ts-expect-error - We're testing the internal state here
           expect(c.state).toBe(2)
+          // @ts-expect-error - We're testing the internal state here
           expect(parent.state).toBe(2)
         })
       })
@@ -689,7 +693,7 @@ describe("ObjectNode", () => {
         node.registerHook(Hook.beforeDestroy, hook)
         node.createObservableInstance()
         node.finalizeDeath()
-        expect(hook).not.toBeCalled()
+        expect(hook).not.toHaveBeenCalled()
         expect(node.state).toBe(4)
       })
     })
@@ -697,11 +701,11 @@ describe("ObjectNode", () => {
       if (process.env.NODE_ENV !== "production") {
         describe("when the node is not alive", () => {
           it("fails", () => {
+            const warnSpy = spyOn(console, "warn")
             const node = new ObjectNode(TestModel as any, null, "", {}, { title: "hello" })
             node.die()
             node.getChildNode("title")
-            // @ts-ignore
-            const receivedErrorMessage = console.warn.mock.calls[0][0].toString()
+            const receivedErrorMessage = warnSpy.mock.calls[0][0].toString()
             expect(receivedErrorMessage).toBe(
               "Error: [mobx-state-tree] You are trying to read or write to an object that is no longer part of a state tree. (Object type: 'TestModel', Path upon death: '', Subpath: 'title', Action: ''). Either detach nodes first, or don't use objects after removing / replacing them in the tree."
             )
@@ -728,11 +732,11 @@ describe("ObjectNode", () => {
     describe("getChildren", () => {
       describe("when the node is not alive", () => {
         it("fails", () => {
+          const warnSpy = spyOn(console, "warn")
           const node = new ObjectNode(TestModel as any, null, "", {}, { title: "hello" })
           node.die()
           node.getChildren()
-          // @ts-ignore
-          const receivedErrorMessage = console.warn.mock.calls[0][0].toString()
+          const receivedErrorMessage = warnSpy.mock.calls[0][0].toString()
           expect(receivedErrorMessage).toBe(
             "Error: [mobx-state-tree] You are trying to read or write to an object that is no longer part of a state tree. (Object type: 'TestModel', Path upon death: '', Subpath: '', Action: ''). Either detach nodes first, or don't use objects after removing / replacing them in the tree."
           )
@@ -816,7 +820,7 @@ describe("ObjectNode", () => {
           node.registerHook(Hook.afterCreate, hook)
           // We call afterCreate during observable instance creation
           node.createObservableInstance()
-          expect(hook).toBeCalled()
+          expect(hook).toHaveBeenCalled()
         })
       })
       describe("afterAttach", () => {
@@ -827,7 +831,7 @@ describe("ObjectNode", () => {
             node.registerHook(Hook.afterAttach, hook)
             // We call afterAttach during observable instance creation
             node.createObservableInstance()
-            expect(hook).not.toBeCalled()
+            expect(hook).not.toHaveBeenCalled()
           })
         })
         describe("for a non-root node", () => {
@@ -842,7 +846,7 @@ describe("ObjectNode", () => {
             const hook = jest.fn()
             c.registerHook(Hook.afterAttach, hook)
             parent.createObservableInstance()
-            expect(hook).toBeCalled()
+            expect(hook).toHaveBeenCalled()
           })
         })
       })
@@ -853,7 +857,7 @@ describe("ObjectNode", () => {
           node.registerHook(Hook.afterCreationFinalization, hook)
           // We call afterCreationFinalization during observable instance creation
           node.createObservableInstance()
-          expect(hook).toBeCalled()
+          expect(hook).toHaveBeenCalled()
         })
       })
       describe("beforeDetach", () => {
@@ -864,7 +868,7 @@ describe("ObjectNode", () => {
             node.registerHook(Hook.beforeDetach, hook)
             node.createObservableInstance()
             node.detach()
-            expect(hook).not.toBeCalled()
+            expect(hook).not.toHaveBeenCalled()
           })
         })
         describe("for a non-root node", () => {
@@ -880,7 +884,7 @@ describe("ObjectNode", () => {
             parent.createObservableInstance()
             unprotect(parent.storedValue) // In order to detach a child node directly, we need to unprotect the root here
             child.detach()
-            expect(hook).toBeCalled()
+            expect(hook).toHaveBeenCalled()
           })
         })
       })
@@ -892,7 +896,7 @@ describe("ObjectNode", () => {
           // We need to create an observable instance before we can destroy it and get the hook to fire
           node.createObservableInstance()
           node.die()
-          expect(hook).toBeCalled()
+          expect(hook).toHaveBeenCalled()
         })
       })
     })
@@ -1027,7 +1031,7 @@ describe("ObjectNode", () => {
           const hook = jest.fn()
           node.registerHook(Hook.afterAttach, hook)
           node.setParent(parent, "child")
-          expect(hook).toBeCalled()
+          expect(hook).toHaveBeenCalled()
         })
       })
       describe("if the parent is the same but the subpath has changed", () => {
@@ -1051,9 +1055,13 @@ describe("ObjectNode", () => {
       describe("when given some falsy value", () => {
         it("returns the value", () => {
           const node = new ObjectNode(TestModel as any, null, "", {}, { title: "hello" })
+          // @ts-expect-error - we're testing the behavior of unbox with non-undefined values
           expect(node.unbox(undefined)).toBe(undefined)
+          // @ts-expect-error - we're testing the behavior of unbox with non-undefined values
           expect(node.unbox(null as any)).toBe(null)
+          // @ts-expect-error - we're testing the behavior of unbox with non-undefined values
           expect(node.unbox(false as any)).toBe(false)
+          // @ts-expect-error - we're testing the behavior of unbox with non-undefined values
           expect(node.unbox(0 as any)).toBe(0)
         })
       })
@@ -1061,6 +1069,7 @@ describe("ObjectNode", () => {
         it("gives back the value", () => {
           const node = new ObjectNode(TestModel as any, null, "", {}, { title: "hello" })
           const childNode = node.getChildNode("title")
+          // @ts-expect-error - we're testing the behavior of unbox with non-undefined values
           expect(node.unbox(childNode)).toBe("hello")
         })
       })
@@ -1167,6 +1176,7 @@ describe("ObjectNode", () => {
     describe("when the type does not have an identifier", () => {
       it("returns undefined", () => {
         const node = new ObjectNode(TestModel as any, null, "", {}, { title: "hello" })
+        // @ts-expect-error - we're testing the behavior of identifierAttribute with a type that doesn't have one
         expect(node.identifierAttribute).toBe(undefined)
       })
     })
@@ -1403,7 +1413,7 @@ describe("ObjectNode", () => {
     describe("type", () => {
       it("returns the given type of the objectnode", () => {
         const node = new ObjectNode(TestModel as any, null, "", {}, { title: "hello" })
-        expect(node.type).toBe(TestModel)
+        expect(node.type).toBe(TestModel as any)
       })
     })
     describe("value", () => {
