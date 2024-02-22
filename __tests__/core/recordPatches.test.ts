@@ -10,6 +10,7 @@ import {
   IAnyModelType,
   IMSTMap
 } from "../../src"
+import { expect, test } from "bun:test"
 
 function testPatches<C, S, T extends object>(
   type: IType<C, S, T>,
