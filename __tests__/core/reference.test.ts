@@ -54,7 +54,7 @@ test("it should support prefixed paths in maps", () => {
   } as SnapshotOut<typeof store>)
 })
 
-test.skip("it should support prefixed paths in arrays", () => {
+test("it should support prefixed paths in arrays", () => {
   const User = types.model({
     id: types.identifier,
     name: types.string
@@ -99,7 +99,7 @@ if (process.env.NODE_ENV !== "production") {
     )
   })
 
-  test.skip("identifiers cannot be modified", () => {
+  test("identifiers cannot be modified", () => {
     const Todo = types.model({
       id: types.identifier
     })
@@ -114,7 +114,7 @@ if (process.env.NODE_ENV !== "production") {
   })
 }
 
-test.skip("it should resolve refs during creation, when using path", () => {
+test("it should resolve refs during creation, when using path", () => {
   const values: number[] = []
   const Book = types.model({
     id: types.identifier,
@@ -151,7 +151,7 @@ test.skip("it should resolve refs during creation, when using path", () => {
   expect(values).toEqual([4, 8])
 })
 
-test.skip("it should resolve refs over late types", () => {
+test("it should resolve refs over late types", () => {
   const Book = types.model({
     id: types.identifier,
     price: types.number
@@ -178,7 +178,7 @@ test.skip("it should resolve refs over late types", () => {
   expect(s.entries.reduce((a, e) => a + e.price, 0)).toBe(4)
 })
 
-test.skip("it should resolve refs during creation, when using generic reference", () => {
+test("it should resolve refs during creation, when using generic reference", () => {
   const values: number[] = []
   const Book = types.model({
     id: types.identifier,
@@ -262,7 +262,7 @@ test("122 - identifiers should support numbers as well", () => {
   expect(F.is({ id: "bla" })).toBe(false)
 })
 
-test.skip("self reference with a late type", () => {
+test("self reference with a late type", () => {
   const Book = types.model("Book", {
     id: types.identifier,
     genre: types.string,
@@ -292,7 +292,7 @@ test.skip("self reference with a late type", () => {
   expect((s.books[1].reference as Instance<typeof Book>).genre).toBe("thriller")
 })
 
-test.skip("when applying a snapshot, reference should resolve correctly if value added after", () => {
+test("when applying a snapshot, reference should resolve correctly if value added after", () => {
   const Box = types.model({
     id: types.identifierNumber,
     name: types.string
@@ -312,7 +312,7 @@ test.skip("when applying a snapshot, reference should resolve correctly if value
   ).not.toThrow()
 })
 
-test.skip("it should fail when reference snapshot is ambiguous", () => {
+test("it should fail when reference snapshot is ambiguous", () => {
   const Box = types.model("Box", {
     id: types.identifierNumber,
     name: types.string
@@ -358,7 +358,7 @@ test.skip("it should fail when reference snapshot is ambiguous", () => {
   )
 })
 
-test.skip("it should support array of references", () => {
+test("it should support array of references", () => {
   const Box = types.model({
     id: types.identifierNumber,
     name: types.string
@@ -385,7 +385,7 @@ test.skip("it should support array of references", () => {
   expect(getSnapshot(store.selected)).toEqual([1, 2])
 })
 
-test.skip("it should restore array of references from snapshot", () => {
+test("it should restore array of references from snapshot", () => {
   const Box = types.model({
     id: types.identifierNumber,
     name: types.string
@@ -406,7 +406,7 @@ test.skip("it should restore array of references from snapshot", () => {
   expect(store.selected[1] === store.boxes[1]).toEqual(true)
 })
 
-test.skip("it should support map of references", () => {
+test("it should support map of references", () => {
   const Box = types.model({
     id: types.identifierNumber,
     name: types.string
@@ -433,7 +433,7 @@ test.skip("it should support map of references", () => {
   expect(getSnapshot(store.selected)).toEqual({ from: 1, to: 2 })
 })
 
-test.skip("it should restore map of references from snapshot", () => {
+test("it should restore map of references from snapshot", () => {
   const Box = types.model({
     id: types.identifierNumber,
     name: types.string
@@ -454,7 +454,7 @@ test.skip("it should restore map of references from snapshot", () => {
   expect(store.selected.get("to") === store.boxes[1]).toEqual(true)
 })
 
-test.skip("it should support relative lookups", () => {
+test("it should support relative lookups", () => {
   const Node = types.model({
     id: types.identifierNumber,
     children: types.optional(types.array(types.late((): IAnyModelType => Node)), [])
@@ -558,7 +558,7 @@ test("References are described properly", () => {
   )
 })
 
-test.skip("References in recursive structures", () => {
+test("References in recursive structures", () => {
   const Folder = types.model("Folder", {
     id: types.identifierNumber,
     name: types.string,
@@ -645,7 +645,7 @@ test.skip("References in recursive structures", () => {
   expect(store.objects.get("2")).toBe(store.tree.children[0].children[0].data)
 })
 
-test.skip("it should applyPatch references in array", () => {
+test("it should applyPatch references in array", () => {
   const Item = types.model("Item", {
     id: types.identifier,
     name: types.string
@@ -704,7 +704,7 @@ test.skip("it should applyPatch references in array", () => {
   })
 })
 
-test.skip("it should applySnapshot references in array", () => {
+test("it should applySnapshot references in array", () => {
   const Item = types.model("Item", {
     id: types.identifier,
     name: types.string
@@ -761,7 +761,7 @@ test.skip("it should applySnapshot references in array", () => {
   })
 })
 
-test.skip("array of references should work fine", () => {
+test("array of references should work fine", () => {
   const B = types.model("Block", { id: types.identifier })
   const S = types
     .model("Store", {
@@ -832,7 +832,7 @@ test("should serialize references correctly", () => {
   expect(getSnapshot(s).ref).toBe("9") // ref serialized as string (number would be ok as well)
 })
 
-test.skip("#1052 - Reference returns destroyed model after subtree replacing", () => {
+test("#1052 - Reference returns destroyed model after subtree replacing", () => {
   const Todo = types.model("Todo", {
     id: types.identifierNumber,
     title: types.string
@@ -906,7 +906,7 @@ test.skip("#1052 - Reference returns destroyed model after subtree replacing", (
   }
 })
 
-test.skip("#1080 - does not crash trying to resolve a reference to a destroyed+recreated model", () => {
+test("#1080 - does not crash trying to resolve a reference to a destroyed+recreated model", () => {
   configure({
     useProxies: "never"
   })
@@ -989,7 +989,7 @@ test.skip("#1080 - does not crash trying to resolve a reference to a destroyed+r
   })
 })
 
-test.skip("tryReference / isValidReference", () => {
+test("tryReference / isValidReference", () => {
   const Todo = types.model({ id: types.identifier })
 
   const TodoStore = types
@@ -1059,7 +1059,7 @@ test.skip("tryReference / isValidReference", () => {
   )
 })
 
-test.skip("#1162 - reference to union", () => {
+test("#1162 - reference to union", () => {
   const M1 = types.model({ id: types.identifier, type: types.string, sum: types.string })
   const M2 = types.model({
     id: types.identifier,
