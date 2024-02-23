@@ -108,7 +108,3 @@ workflows:
       - test-size:
           requires:
             - build
-
-      - upload-codecov:
-          requires:
-            - test-mst-dev
