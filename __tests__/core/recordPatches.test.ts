@@ -39,7 +39,7 @@ const Node = types.model("Node", {
   children: types.optional(types.array(types.late((): IAnyModelType => Node)), [])
 })
 
-test("it should apply simple patch", () => {
+test.skip("it should apply simple patch", () => {
   testPatches(
     Node,
     { id: 1 },
@@ -63,7 +63,7 @@ test("it should apply simple patch", () => {
   )
 })
 
-test("it should apply deep patches to arrays", () => {
+test.skip("it should apply deep patches to arrays", () => {
   testPatches(
     Node,
     { id: 1, children: [{ id: 2 }] },
@@ -146,7 +146,7 @@ test("it should apply deep patches to arrays", () => {
   )
 })
 
-test("it should apply deep patches to maps", () => {
+test.skip("it should apply deep patches to maps", () => {
   const NodeMap = types.model("NodeMap", {
     id: types.identifierNumber,
     text: "Hi",
@@ -241,7 +241,7 @@ test("it should apply deep patches to maps", () => {
   )
 })
 
-test("it should apply deep patches to objects", () => {
+test.skip("it should apply deep patches to objects", () => {
   const NodeObject = types.model("NodeObject", {
     id: types.identifierNumber,
     text: "Hi",

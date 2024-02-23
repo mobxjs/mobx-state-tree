@@ -13,7 +13,7 @@ import {
   IAnyModelType,
   detach
 } from "../../src"
-import { describe, expect, test } from "bun:test"
+import { describe, expect, it, test } from "bun:test"
 
 const createTestFactories = () => {
   const ItemFactory = types.model({

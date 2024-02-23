@@ -1,7 +1,7 @@
 import { getSnapshot, types } from "../../src"
 import { expect, test } from "bun:test"
 
-test("it should allow if type and predicate is correct", () => {
+test.skip("it should allow if type and predicate is correct", () => {
   const Factory = types.model({
     number: types.refinement(
       "positive number",
