@@ -1,5 +1,6 @@
 import { types, getSnapshot, recordPatches, unprotect } from "../../src"
 import { reaction, isObservableProp, isObservable, autorun, observable } from "mobx"
+import { expect, test } from "bun:test"
 
 const Todo = types
   .model({
@@ -79,7 +80,7 @@ test("VS should not be modifiable without action", () => {
   const i = Todo.create()
   expect(() => {
     i.state = Promise.resolve(4)
-  }).toThrowError(/the object is protected and can only be modified by using an action/)
+  }).toThrow(/the object is protected and can only be modified by using an action/)
 })
 
 test("VS should expect a function as an argument", () => {
@@ -89,9 +90,7 @@ test("VS should expect a function as an argument", () => {
       // @ts-ignore
       .volatile({ state: 1 })
       .create()
-  }).toThrowError(
-    `You passed an object to volatile state as an argument, when function is expected`
-  )
+  }).toThrow(`You passed an object to volatile state as an argument, when function is expected`)
 })
 
 test("VS should not be modifiable when unprotected", () => {
