@@ -1,5 +1,6 @@
 import { types } from "../../src"
 import { isObservableProp, isComputedProp } from "mobx"
+import { expect, test } from "bun:test"
 
 // MWE: disabled test, `this` isn't supposed to work, and afaik nowhere advertised
 test.skip("this support", () => {
