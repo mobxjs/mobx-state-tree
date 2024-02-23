@@ -11,7 +11,7 @@ import {
   clone,
   destroy
 } from "../../src"
-import { describe, expect, test } from "bun:test"
+import { describe, expect, it, test } from "bun:test"
 
 const Todo = types.model({ id: types.identifier })
 
