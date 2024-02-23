@@ -1,4 +1,3 @@
-// todo: fix for bun
 import { Exact } from "ts-essentials"
 
 import {
@@ -22,6 +21,7 @@ import {
   SnapshotOut
 } from "../../src"
 import { $nonEmptyObject } from "../../src/internal"
+import { expect, test } from "bun:test"
 
 type DifferingKeys<ActualT, ExpectedT> = {
   [K in keyof ActualT | keyof ExpectedT]: K extends keyof ActualT
@@ -191,7 +191,7 @@ test("#66 - it should pick the correct type of defaulted fields", () => {
   unprotect(a)
   expect(a.name).toBe("boo")
   if (process.env.NODE_ENV !== "production") {
-    expect(() => ((a as any).name = 3)).toThrowError(
+    expect(() => ((a as any).name = 3)).toThrow(
       `[mobx-state-tree] Error while converting \`3\` to \`string\`:\n\n    value \`3\` is not assignable to type: \`string\` (Value is not a string).`
     )
   }
@@ -374,7 +374,7 @@ if (process.env.NODE_ENV !== "production") {
         amount: 1,
         getAmount: "hello"
       } as any)
-    ).toThrowError(
+    ).toThrow(
       // MWE: TODO: Ideally (like in MST =< 0.9):
       // at path "/todos/1/setTitle" value \`"hello"\` is not assignable  (Action properties should not be provided in the snapshot).
       // at path "/amount" value \`1\` is not assignable  (Computed properties should not be provided in the snapshot).
