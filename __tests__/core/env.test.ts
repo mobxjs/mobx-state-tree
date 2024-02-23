@@ -143,7 +143,7 @@ test("clone preserves environnment", () => {
   }
 })
 
-test.skip("#1231", () => {
+test("#1231", () => {
   configure({
     useProxies: "never"
   })

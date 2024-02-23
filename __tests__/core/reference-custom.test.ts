@@ -14,7 +14,7 @@ import {
 } from "../../src"
 import { expect, test } from "bun:test"
 
-test.skip("it should support custom references - basics", () => {
+test("it should support custom references - basics", () => {
   const User = types.model({
     id: types.identifier,
     name: types.string
@@ -59,7 +59,7 @@ test.skip("it should support custom references - basics", () => {
   expect(s.selection).toBe(null)
 })
 
-test.skip("it should support custom references - adv", () => {
+test("it should support custom references - adv", () => {
   const User = types.model({
     id: types.identifier,
     name: types.string
@@ -120,7 +120,7 @@ test.skip("it should support custom references - adv", () => {
   expect(p.inversePatches).toMatchSnapshot()
 })
 
-test.skip("it should support dynamic loading", (done) => {
+test("it should support dynamic loading", (done) => {
   const events: string[] = []
   const User = types.model({
     name: types.string,
@@ -185,7 +185,7 @@ test.skip("it should support dynamic loading", (done) => {
   )
 })
 
-test.skip("custom reference / safe custom reference to another store works", () => {
+test("custom reference / safe custom reference to another store works", () => {
   const Todo = types.model({ id: types.identifier })
   const TodoStore = types.model({ todos: types.array(Todo) })
   const OtherStore = types.model({

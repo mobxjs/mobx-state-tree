@@ -1,7 +1,7 @@
 import { getSnapshot, applySnapshot, unprotect, types } from "../../src"
 import { expect, test } from "bun:test"
 
-test.skip("it should avoid processing patch if is exactly the current one in applySnapshot", () => {
+test("it should avoid processing patch if is exactly the current one in applySnapshot", () => {
   const Model = types.model({
     a: types.number,
     b: types.string

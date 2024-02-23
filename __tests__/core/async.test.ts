@@ -13,7 +13,10 @@ import {
   toGeneratorFunction,
   types
 } from "../../src"
+import { resetActionId } from "../../src/core/action"
 import { expect, test } from "bun:test"
+
+resetActionId()
 
 function delay<TV>(time: number, value: TV, shouldThrow = false): Promise<TV> {
   return new Promise((resolve, reject) => {
@@ -71,7 +74,7 @@ function testCoffeeTodo(
     }
   )
 }
-test.skip("flow happens in single ticks", (done) => {
+test("flow happens in single ticks", (done) => {
   const X = types
     .model({
       y: 1
@@ -97,7 +100,7 @@ test.skip("flow happens in single ticks", (done) => {
     done()
   })
 })
-test.skip("can handle async actions", (done) => {
+test("can handle async actions", (done) => {
   testCoffeeTodo(
     done,
     (self) =>
@@ -111,7 +114,7 @@ test.skip("can handle async actions", (done) => {
     ["getting coffee black", "drinking coffee"]
   )
 })
-test.skip("can handle erroring actions", (done) => {
+test("can handle erroring actions", (done) => {
   testCoffeeTodo(
     done,
     (self) =>
@@ -123,7 +126,7 @@ test.skip("can handle erroring actions", (done) => {
     []
   )
 })
-test.skip("can handle try catch", (t) => {
+test("can handle try catch", (t) => {
   testCoffeeTodo(
     t,
     (self) =>
@@ -141,10 +144,10 @@ test.skip("can handle try catch", (t) => {
     ["tea"]
   )
 })
-test.skip("empty sequence works", (t) => {
+test("empty sequence works", (t) => {
   testCoffeeTodo(t, () => function* fetchData(kind: string) {}, false, undefined, [])
 })
-test.skip("can handle throw from yielded promise works", (t) => {
+test("can handle throw from yielded promise works", (t) => {
   testCoffeeTodo(
     t,
     () =>
@@ -156,7 +159,7 @@ test.skip("can handle throw from yielded promise works", (t) => {
     []
   )
 })
-test.skip("typings", (done) => {
+test("typings", (done) => {
   const M = types.model({ title: types.string }).actions((self) => {
     function* a(x: string) {
       yield delay(10, "x", false)
@@ -180,7 +183,7 @@ test.skip("typings", (done) => {
     done()
   })
 })
-test.skip("typings", (done) => {
+test("typings", (done) => {
   const M = types.model({ title: types.string }).actions((self) => {
     function* a(x: string) {
       yield delay(10, "x", false)
@@ -204,7 +207,7 @@ test.skip("typings", (done) => {
     done()
   })
 })
-test.skip("recordActions should only emit invocation", (done) => {
+test("recordActions should only emit invocation", (done) => {
   let calls = 0
   const M = types
     .model({
@@ -239,7 +242,7 @@ test.skip("recordActions should only emit invocation", (done) => {
     }, 50)
   })
 })
-test.skip("can handle nested async actions", (t) => {
+test("can handle nested async actions", (t) => {
   // tslint:disable-next-line:no-shadowed-variable
   const uppercase = flow(function* uppercase(value: string) {
     const res = yield delay(20, value.toUpperCase())
@@ -257,7 +260,7 @@ test.skip("can handle nested async actions", (t) => {
     ["DRINKING BLACK"]
   )
 })
-test.skip("can handle nested async actions when using decorate", (done) => {
+test("can handle nested async actions when using decorate", (done) => {
   const events: [IMiddlewareEventType, string][] = []
   const middleware: IMiddlewareHandler = (call, next) => {
     events.push([call.type, call.name])
@@ -290,7 +293,7 @@ test.skip("can handle nested async actions when using decorate", (done) => {
     })
 })
 
-test.skip("flow gain back control when node become not alive during yield", async () => {
+test("flow gain back control when node become not alive during yield", async () => {
   const rejectError = new Error("Reject Error")
   const MyModel = types.model({}).actions(() => {
     return {
@@ -325,7 +328,7 @@ function filterRelevantStuff(stuff: IMiddlewareEvent[]) {
   })
 }
 
-test.skip("flow typings", async () => {
+test("flow typings", async () => {
   const promise = Promise.resolve()
 
   const M = types.model({ x: 5 }).actions((self) => ({
@@ -369,7 +372,7 @@ type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N
  */
 function ensureNotAnyType<TExpected, TActual>(value: IfAny<TActual, never, TExpected>) {}
 
-test.skip("yield* typings for toGeneratorFunction", async () => {
+test("yield* typings for toGeneratorFunction", async () => {
   const voidPromise = () => Promise.resolve()
   const numberPromise = () => Promise.resolve(7)
   const stringWithArgsPromise = (input1: string, input2: boolean) => Promise.resolve("test-result")
@@ -404,7 +407,7 @@ test.skip("yield* typings for toGeneratorFunction", async () => {
   expect(result).toBe("test-result")
 })
 
-test.skip("yield* typings for toGenerator", async () => {
+test("yield* typings for toGenerator", async () => {
   const voidPromise = () => Promise.resolve()
   const numberPromise = () => Promise.resolve(7)
   const stringWithArgsPromise = (input1: string, input2: boolean) => Promise.resolve("test-result")
