@@ -1,5 +1,6 @@
 import { when } from "mobx"
 import { getRoot, types } from "../../src"
+import { expect, test } from "bun:test"
 
 interface IRootModel {
   shouldLoad: boolean

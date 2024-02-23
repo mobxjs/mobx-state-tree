@@ -1,4 +1,5 @@
 import { types } from "../../src"
+import { expect, test } from "bun:test"
 
 if (process.env.NODE_ENV !== "production") {
   test("it should allow only primitives", () => {
@@ -6,7 +7,7 @@ if (process.env.NODE_ENV !== "production") {
       types.model({
         complexArg: types.literal({ a: 1 } as any)
       })
-    }).toThrowError("expected primitive as argument")
+    }).toThrow("expected primitive as argument")
   })
   test("it should fail if not optional and no default provided", () => {
     const Factory = types.literal("hello")

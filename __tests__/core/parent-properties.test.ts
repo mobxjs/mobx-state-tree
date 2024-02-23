@@ -1,4 +1,5 @@
-import { types, getEnv, getParent, getPath, cast, Instance } from "../../src"
+import { types, getEnv, getParent, getPath, Instance } from "../../src"
+import { expect, test } from "bun:test"
 
 const ChildModel = types
   .model("Child", {

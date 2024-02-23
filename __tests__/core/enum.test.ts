@@ -1,4 +1,5 @@
 import { types, unprotect } from "../../src"
+import { expect, test } from "bun:test"
 
 enum ColorEnum {
   Red = "Red",
@@ -17,9 +18,7 @@ test("should support enums", () => {
   l.color = ColorEnum.Red
   expect(TrafficLight.describe()).toBe('{ color: ("Red" | "Orange" | "Green") }')
   if (process.env.NODE_ENV !== "production") {
-    expect(() => (l.color = "Blue" as any)).toThrowError(
-      /Error while converting `"Blue"` to `Color`/
-    )
+    expect(() => (l.color = "Blue" as any)).toThrow(/Error while converting `"Blue"` to `Color`/)
   }
 })
 test("should support anonymous enums", () => {
@@ -29,7 +28,7 @@ test("should support anonymous enums", () => {
   l.color = ColorEnum.Red
   expect(TrafficLight.describe()).toBe('{ color: ("Red" | "Orange" | "Green") }')
   if (process.env.NODE_ENV !== "production") {
-    expect(() => (l.color = "Blue" as any)).toThrowError(
+    expect(() => (l.color = "Blue" as any)).toThrow(
       /Error while converting `"Blue"` to `"Red" | "Orange" | "Green"`/
     )
   }
@@ -54,7 +53,7 @@ test("should support plain string[] arrays", () => {
   l.color = "Red"
   expect(TrafficLight.describe()).toBe('{ color: ("Red" | "Orange" | "Green") }')
   if (process.env.NODE_ENV !== "production") {
-    expect(() => (l.color = "Blue" as any)).toThrowError(
+    expect(() => (l.color = "Blue" as any)).toThrow(
       /Error while converting `"Blue"` to `"Red" | "Orange" | "Green"`/
     )
   }
@@ -67,7 +66,7 @@ test("should support readonly enums as const", () => {
   l.color = "Red"
   expect(TrafficLight.describe()).toBe('{ color: ("Red" | "Orange" | "Green") }')
   if (process.env.NODE_ENV !== "production") {
-    expect(() => (l.color = "Blue" as any)).toThrowError(
+    expect(() => (l.color = "Blue" as any)).toThrow(
       /Error while converting `"Blue"` to `"Red" | "Orange" | "Green"`/
     )
   }

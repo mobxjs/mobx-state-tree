@@ -1,4 +1,5 @@
 import { getSnapshot, types, unprotect } from "../../src"
+import { describe, expect, test } from "bun:test"
 
 describe("null as default", () => {
   describe("basic tests", () => {
@@ -71,7 +72,7 @@ describe("null as default", () => {
         a: null,
         b: null
       })
-      expect(m.a).toBe(undefined)
+      expect(m.a).toBeUndefined()
       expect(m.b).toBe(5)
       expect(getSnapshot(m)).toEqual({
         a: undefined,
@@ -97,8 +98,8 @@ describe("null as default", () => {
         a: undefined,
         b: undefined
       })
-      expect(m.a).toBe(undefined)
-      expect(m.b).toBe(undefined)
+      expect(m.a).toBeUndefined()
+      expect(m.b).toBeUndefined()
       expect(getSnapshot(m)).toEqual({
         a: undefined,
         b: undefined
@@ -127,14 +128,14 @@ describe("null as default", () => {
           a: null,
           b: undefined as any // undefined is not valid
         })
-      }).toThrowError("value `undefined` is not assignable to type: `number`")
+      }).toThrow("value `undefined` is not assignable to type: `number`")
 
       expect(() => {
         M.create({
           a: null
           // b: null missing, but should be there
         } as any)
-      }).toThrowError("value `undefined` is not assignable to type: `number`")
+      }).toThrow("value `undefined` is not assignable to type: `number`")
     }
   })
 })
@@ -210,7 +211,7 @@ describe("'empty' or false as default", () => {
         a: "empty",
         b: false
       })
-      expect(m.a).toBe(undefined)
+      expect(m.a).toBeUndefined()
       expect(m.b).toBe(5)
       expect(getSnapshot(m)).toEqual({
         a: undefined,
@@ -236,8 +237,8 @@ describe("'empty' or false as default", () => {
         a: undefined,
         b: undefined
       })
-      expect(m.a).toBe(undefined)
-      expect(m.b).toBe(undefined)
+      expect(m.a).toBeUndefined()
+      expect(m.b).toBeUndefined()
       expect(getSnapshot(m)).toEqual({
         a: undefined,
         b: undefined
@@ -266,7 +267,7 @@ describe("'empty' or false as default", () => {
           a: undefined as any,
           b: undefined as any
         })
-      }).toThrowError("value `undefined` is not assignable to type: `number`")
+      }).toThrow("value `undefined` is not assignable to type: `number`")
     }
   })
 })

@@ -9,6 +9,7 @@ import {
   IModelReflectionPropertiesData,
   flow
 } from "../../src"
+import { expect, test } from "bun:test"
 
 const User = types.model("User", {
   id: types.identifier,
@@ -115,16 +116,16 @@ if (process.env.NODE_ENV !== "production") {
     const node = Model.create({
       users: { "1": { id: "1", name: "Test" } }
     })
-    expect(() => (node.users ? getMembers(node.users) : {})).toThrowError()
+    expect(() => (node.users ? getMembers(node.users) : {})).toThrow()
   })
 
   test("reflection - throw on non model type/node for getMembers", () => {
-    expect(() => getPropertyMembers(types.array(types.number) as any)).toThrowError()
+    expect(() => getPropertyMembers(types.array(types.number) as any)).toThrow()
 
     const node = Model.create({
       users: { "1": { id: "1", name: "Test" } }
     })
-    expect(() => getPropertyMembers(node.users)).toThrowError()
+    expect(() => getPropertyMembers(node.users)).toThrow()
   })
 }
 test("reflection - can retrieve property names", () => {

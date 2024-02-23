@@ -21,6 +21,7 @@ import {
 } from "../../src"
 
 import { autorun, reaction, observable, configure, getDebugName } from "mobx"
+import { expect, test } from "bun:test"
 
 const createTestFactories = () => {
   const Factory = types
@@ -688,10 +689,10 @@ if (process.env.NODE_ENV !== "production") {
     unprotect(b)
     expect(() => {
       detach(b.a)
-    }).toThrowError(/Error while converting `undefined` to `A`/)
+    }).toThrow(/Error while converting `undefined` to `A`/)
     expect(() => {
       destroy(b.a)
-    }).toThrowError(/Error while converting `undefined` to `A`/)
+    }).toThrow(/Error while converting `undefined` to `A`/)
   })
   test("it should be possible to remove a node from a parent if it is defined as type maybe ", () => {
     const A = types.model("A", { x: 3 })
@@ -703,8 +704,8 @@ if (process.env.NODE_ENV !== "production") {
       detach(a)
       destroy(a)
     }).not.toThrow()
-    expect(b.a).toBe(undefined)
-    expect(getSnapshot(b).a).toBe(undefined)
+    expect(b.a).toBeUndefined()
+    expect(getSnapshot(b).a).toBeUndefined()
   })
   test("it should be possible to remove a node from a parent if it is defined as type maybeNull ", () => {
     const A = types.model("A", { x: 3 })
@@ -751,7 +752,7 @@ test("it should be possible to share states between views and actions using enha
 })
 test("It should throw if any other key is returned from extend", () => {
   const A = types.model({}).extend(() => ({ stuff() {} } as any))
-  expect(() => A.create()).toThrowError(/stuff/)
+  expect(() => A.create()).toThrow(/stuff/)
 })
 
 test("782, TS + compose", () => {
@@ -1174,9 +1175,9 @@ test("#1173 - detaching a model should not screw it", () => {
 
   const detachedItem = detach(s.item!)
   expect(s.item).not.toBe(detachedItem)
-  expect(s.item).toBe(undefined)
+  expect(s.item).toBeUndefined()
   expect(detachedItem.x).toBe(6)
-  expect(detachedItem).toBe(n0)
+  expect(detachedItem).toBe(n0!)
 })
 
 test("#1702 - should not throw with useProxies: 'ifavailable'", () => {

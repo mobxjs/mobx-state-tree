@@ -1,4 +1,5 @@
 import { getSnapshot, types, unprotect, applySnapshot, cast } from "../../src"
+import { expect, test } from "bun:test"
 
 test("it should provide a default value, if no snapshot is provided", () => {
   const Row = types.model({
@@ -62,7 +63,7 @@ test("it should accept a function to provide dynamic values", () => {
   expect(getSnapshot(Factory.create())).toEqual({ a: 2 })
   defaultValue = "hello world!" as any
   if (process.env.NODE_ENV !== "production") {
-    expect(() => Factory.create()).toThrowError(
+    expect(() => Factory.create()).toThrow(
       `[mobx-state-tree] Error while converting \`"hello world!"\` to \`number\`:\n\n    value \`"hello world!"\` is not assignable to type: \`number\` (Value is not a number).`
     )
   }
@@ -142,7 +143,7 @@ test("undefined can work as a missing value", () => {
   const m1 = M.create({ x: 5 })
   expect(m1.x).toBe(5)
   const m2 = M.create({ x: undefined })
-  expect(m2.x).toBe(undefined)
+  expect(m2.x).toBeUndefined()
   const m3 = M.create({}) // is ok as well (even in TS)
-  expect(m3.x).toBe(undefined)
+  expect(m3.x).toBeUndefined()
 })

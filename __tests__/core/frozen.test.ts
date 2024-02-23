@@ -1,4 +1,5 @@
 import { getSnapshot, types, unprotect } from "../../src"
+import { expect, test } from "bun:test"
 
 test("it should accept any serializable value", () => {
   const Factory = types.model({
@@ -19,7 +20,7 @@ if (process.env.NODE_ENV !== "production") {
     unprotect(doc)
     expect(() => {
       doc.value = function IAmUnserializable() {}
-    }).toThrowError(/Error while converting <function IAmUnserializable> to `frozen`/)
+    }).toThrow(/Error while converting <function IAmUnserializable> to `frozen`/)
   })
 }
 
@@ -55,7 +56,7 @@ test("it should type strongly", () => {
   if (process.env.NODE_ENV !== "production") {
     expect(() => {
       m.moveABit()
-    }).toThrow("Cannot assign to read only property 'x'")
+    }).toThrow("Attempted to assign to readonly property.")
   }
 })
 

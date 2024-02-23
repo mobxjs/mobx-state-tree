@@ -1,4 +1,5 @@
 import { types, unprotect, IAnyModelType, castToReferenceSnapshot } from "../../src"
+import { expect, test } from "bun:test"
 
 function Pointer<IT extends IAnyModelType>(Model: IT) {
   return types.model("PointerOf" + Model.name, {

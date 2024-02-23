@@ -1,5 +1,6 @@
 import * as mst from "../../src"
 import { readFileSync } from "fs"
+import { expect, test } from "bun:test"
 
 function stringToArray(s: string): string[] {
   return s.split(",").map((str) => str.trim())
