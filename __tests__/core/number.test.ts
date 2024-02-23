@@ -1,6 +1,6 @@
 import { t } from "../../src"
 import { Hook, NodeLifeCycle } from "../../src/internal"
-import { describe, it, expect } from "bun:test"
+import { describe, it, expect, test } from "bun:test"
 
 describe("types.number", () => {
   describe("methods", () => {
