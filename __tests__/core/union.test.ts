@@ -76,7 +76,7 @@ test("it should be smart enough to discriminate by keys", () => {
   expect(Box.is(doc)).toEqual(false)
   expect(Square.is(doc)).toEqual(true)
 })
-test.skip("it should discriminate by value type", () => {
+test("it should discriminate by value type", () => {
   const Size = types.model("Size", {
     width: 0,
     height: 0
@@ -93,12 +93,12 @@ test.skip("it should discriminate by value type", () => {
   expect(Picture.is(doc)).toEqual(true)
   expect(Square.is(doc)).toEqual(false)
 })
-test.skip("it should compute exact union types", () => {
+test("it should compute exact union types", () => {
   const { Box, Plane, Square } = createTestFactories()
   expect(Plane.is(Box.create({ width: 3, height: 2 }))).toEqual(true)
   expect(Plane.is(Square.create({ width: 3 }))).toEqual(true)
 })
-test.skip("it should compute exact union types - 2", () => {
+test("it should compute exact union types - 2", () => {
   const { Box, DispatchPlane, Square } = createTestFactories()
   expect(DispatchPlane.is(Box.create({ width: 3, height: 2 }))).toEqual(true)
   expect(
@@ -107,7 +107,7 @@ test.skip("it should compute exact union types - 2", () => {
     )
   ).toEqual(true)
 })
-test.skip("it should use dispatch to discriminate", () => {
+test("it should use dispatch to discriminate", () => {
   const { Box, DispatchPlane, Square } = createTestFactories()
   const a = DispatchPlane.create({ width: 3 })
   expect(getSnapshot(a)).toEqual({ width: 3 })

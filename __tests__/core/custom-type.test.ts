@@ -117,7 +117,7 @@ class Decimal {
 }
 
 {
-  test.skip("complex representation", () => {})
+  test("complex representation", () => {})
 
   const DecimalTuple = types.custom<[number, number], Decimal>({
     name: "DecimalTuple",
