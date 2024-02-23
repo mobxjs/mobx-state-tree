@@ -8,8 +8,10 @@ import {
   getType,
   setLivelinessChecking,
   SnapshotIn,
-  Instance
+  Instance,
+  IAnyType
 } from "../../src"
+import { describe, expect, it, test } from "bun:test"
 
 const createTestFactories = () => {
   const Box = types.model("Box", {
@@ -263,7 +265,9 @@ describe("1045 - secondary union types with applySnapshot and ids", () => {
 
         expect(store.length).toBe(1)
         expect(store[0]).toEqual(expected)
-        expect(getType(store[0])).toBe(useSnapshot ? submodel.getSubTypes() : submodel)
+        expect(getType(store[0])).toBe(
+          useSnapshot ? (submodel.getSubTypes() as IAnyType) : submodel
+        )
       }
     }
   }
