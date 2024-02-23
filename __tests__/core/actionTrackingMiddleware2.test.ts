@@ -105,7 +105,7 @@ async function syncTest(mode: "success" | "fail") {
 /**
  * This test checks that the middleware is called and
  */
-test.skip("sync action", async () => {
+test("sync action", async () => {
   await syncTest("success")
   await syncTest("fail")
 })
@@ -161,12 +161,12 @@ async function flowTest(mode: "success" | "fail") {
   }
 }
 
-test.skip("flow action", async () => {
+test("flow action", async () => {
   await flowTest("success")
   await flowTest("fail")
 })
 
-test.skip("#1250", async () => {
+test("#1250", async () => {
   const M = types
     .model({
       x: 0,
@@ -241,7 +241,7 @@ test.skip("#1250", async () => {
 /**
  * Test that when createActionTrackingMiddleware2 is called with valid hooks and a synchronous action, it runs onStart and onFinish hooks.
  */
-test.skip("successful execution", () => {
+test("successful execution", () => {
   const M = types.model({}).actions((self) => ({
     test() {}
   }))
@@ -272,7 +272,7 @@ test.skip("successful execution", () => {
 /**
  * Test that when createActionTrackingMiddleware2 is called with valid hooks and an asynchronous action, it runs onStart and onFinish hooks.
  */
-test.skip("successful execution with async action", async () => {
+test("successful execution with async action", async () => {
   const M = types.model({}).actions((self) => ({
     async test() {}
   }))
@@ -305,7 +305,7 @@ test.skip("successful execution with async action", async () => {
  * this by checking that the onStart and onFinish hooks are called for `runThisOne`,
  * which is the name provided to the `filter` function.
  */
-it.skip("calls onStart and onFinish hooks for actions that pass the filter", () => {
+it("calls onStart and onFinish hooks for actions that pass the filter", () => {
   const M2 = types.model({}).actions((self) => ({
     trackThisOne() {},
     doNotTrackThisOne() {}
@@ -338,7 +338,7 @@ it.skip("calls onStart and onFinish hooks for actions that pass the filter", () 
  * Test that when the filter returns false, the action is not tracked. We check
  * this by checking that the onStart and onFinish hooks are not called for `doNotTrackThisOne`,
  */
-it.skip("does not call onStart and onFinish hooks for actions that do not pass the filter", () => {
+it("does not call onStart and onFinish hooks for actions that do not pass the filter", () => {
   const M = types.model({}).actions((self) => ({
     trackThisOne() {},
     doNotTrackThisOne() {}
@@ -382,7 +382,7 @@ it.skip("does not call onStart and onFinish hooks for actions that do not pass t
  *
  * See https://mobx-state-tree.js.org/API/#createactiontrackingmiddleware2
  */
-test.skip("complete in the expected recursive order", () => {
+test("complete in the expected recursive order", () => {
   const M = types
     .model({})
     .actions((self) => ({
