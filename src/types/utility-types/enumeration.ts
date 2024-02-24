@@ -31,7 +31,10 @@ export function enumeration<T extends string>(
  * @param options possible values this enumeration can have
  * @returns
  */
-export function enumeration(name: string | string[], options?: any): ISimpleType<string> {
+export function enumeration<OptionsT extends any[]>(
+  name: string | string[],
+  options?: OptionsT
+): ISimpleType<string> {
   const realOptions: string[] = typeof name === "string" ? options! : name
   // check all options
   if (devMode()) {
