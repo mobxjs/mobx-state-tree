@@ -1179,11 +1179,49 @@ test("object creation with no props", () => {
 
   MyType.create()
   MyType.create({})
-  MyType.create({ [Symbol("test")]: 5 })
 
-  // @ts-expect-error
-  MyType.create({ test: 5 })
+  // Instances can be created with their own instance type
+  MyType.create(MyType.create())
 
-  // @ts-expect-error
-  MyType.create({ another: 5 })
+  // TODO @ts-expect-error -- symbols aren't props (but may be one day)
+  // This currently is allowed, because excess property checking doesn't happen against symbols.
+  // See https://github.com/microsoft/TypeScript/issues/44794
+  true || MyType.create({ [Symbol("test")]: 5 })
+
+  // @ts-expect-error -- this is a view, not a prop
+  true || MyType.create({ test: 5 })
+
+  // @ts-expect-error -- unknown prop
+  true || MyType.create({ another: 5 })
+})
+
+test("object creation when composing with a model with no props", () => {
+  const EmptyType = types.model().views((_self) => ({
+    get test() {
+      return 5
+    }
+  }))
+
+  const NonEmptyType = types.model({
+    value: types.optional(types.number, 0),
+    negate: types.boolean
+  })
+
+  const Composed = types.compose(EmptyType, NonEmptyType)
+
+  Composed.create({ negate: true })
+  Composed.create({ negate: false })
+  Composed.create({ value: 5, negate: true })
+
+  // Instances can be created with their own instance type
+  Composed.create(Composed.create({ negate: true }))
+
+  // @ts-expect-error -- symbols aren't props (but may be one day)
+  true || Composed.create({ [Symbol("test")]: 5 })
+
+  // @ts-expect-error -- this is a view, not a prop
+  true || Composed.create({ test: 5 })
+
+  // @ts-expect-error -- unknown prop
+  true || Composed.create({ another: 5 })
 })

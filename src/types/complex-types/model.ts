@@ -54,7 +54,8 @@ import {
   devMode,
   assertIsString,
   assertArg,
-  FunctionWithFlag
+  FunctionWithFlag,
+  type IStateTreeNode
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -128,11 +129,6 @@ export type ExtractCFromProps<P extends ModelProperties> = { [k in keyof P]: P[k
 /** @hidden */
 export type ModelCreationType<PC> = { [P in DefinablePropsNames<PC>]: PC[P] } & Partial<PC>
 
-// Ensures a type only accepts an empty object.
-//
-// This is needed because the TS type `{}` will accept pretty much any object, and we'd rather not allow that on creates.
-type EmptyObjectIfNoKeys<T> = keyof T extends never ? Record<string, never> : T
-
 // Ensure an object can be given additional properties.
 //
 // For the empty object type, `Record<string, never>`, we need to convert into a record type that will allow us to
@@ -140,9 +136,16 @@ type EmptyObjectIfNoKeys<T> = keyof T extends never ? Record<string, never> : T
 type WithAdditionalProperties<T> = T extends Record<string, never> ? Record<string, unknown> : T // & Record<string, unknown>
 
 /** @hidden */
-export type ModelCreationType2<P extends ModelProperties, CustomC> = EmptyObjectIfNoKeys<
-  _CustomOrOther<CustomC, ModelCreationType<ExtractCFromProps<P>>>
->
+export type ModelCreationType2<P extends ModelProperties, CustomC> = keyof P extends never
+  ? // When there are no props, we want to prevent passing in any object. We have two objects we want to allow:
+    //  1. The empty object
+    //  2. An instance of this model
+    //
+    // The `IStateTreeNode` interface allows both. For (1), these props are optional so an empty object is allowed.
+    // For (2), an instance will contain these two props, including the "secret" `$stateTreeNodeType` prop. TypeScript's
+    // excess property checking will then ensure no other props are passed in.
+    IStateTreeNode
+  : _CustomOrOther<CustomC, ModelCreationType<ExtractCFromProps<P>>>
 
 /** @hidden */
 export type ModelSnapshotType<P extends ModelProperties> = {
