@@ -1201,14 +1201,15 @@ test("union type inference verification for a large number of types", () => {
     types.literal("g"),
     types.literal("h"),
     types.literal("i"),
-    types.literal("j")
+    types.literal("j"),
+    types.literal("k")
   )
 
   type ITC = SnapshotIn<typeof T>
   type ITS = SnapshotOut<typeof T>
 
-  assertTypesEqual(_ as ITC, _ as "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j")
-  assertTypesEqual(_ as ITS, _ as "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j")
+  assertTypesEqual(_ as ITC, _ as "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k")
+  assertTypesEqual(_ as ITS, _ as "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k")
 })
 
 test("enumeration type inference verification", () => {
