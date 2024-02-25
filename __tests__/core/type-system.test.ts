@@ -20,7 +20,6 @@ import {
   ModelPropertiesDeclaration,
   SnapshotOut
 } from "../../src"
-import { $nonEmptyObject } from "../../src/internal"
 
 type DifferingKeys<ActualT, ExpectedT> = {
   [K in keyof ActualT | keyof ExpectedT]: K extends keyof ActualT
@@ -1151,7 +1150,6 @@ test("maybe / optional type inference verification", () => {
   assertTypesEqual(
     _ as ITC,
     _ as {
-      [$nonEmptyObject]?: any
       a: string
       b?: string
       c?: string | undefined
@@ -1163,7 +1161,6 @@ test("maybe / optional type inference verification", () => {
   assertTypesEqual(
     _ as ITS,
     _ as {
-      [$nonEmptyObject]?: any
       a: string
       b: string
       c: string | undefined
@@ -1171,4 +1168,22 @@ test("maybe / optional type inference verification", () => {
       e: string
     }
   )
+})
+
+test("object creation with no props", () => {
+  const MyType = types.model().views((_self) => ({
+    get test() {
+      return 5
+    }
+  }))
+
+  MyType.create()
+  MyType.create({})
+  MyType.create({ [Symbol("test")]: 5 })
+
+  // @ts-expect-error
+  MyType.create({ test: 5 })
+
+  // @ts-expect-error
+  MyType.create({ another: 5 })
 })
