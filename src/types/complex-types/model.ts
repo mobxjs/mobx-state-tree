@@ -54,9 +54,9 @@ import {
   devMode,
   assertIsString,
   assertArg,
-  FunctionWithFlag
+  FunctionWithFlag,
+  type IStateTreeNode
 } from "../../internal"
-import { ComputedValue } from "mobx/dist/internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
 const POST_PROCESS_SNAPSHOT = "postProcessSnapshot"
@@ -124,30 +124,33 @@ type IsOptionalValue<C, TV, FV> = undefined extends C ? TV : FV
 type DefinablePropsNames<T> = { [K in keyof T]: IsOptionalValue<T[K], never, K> }[keyof T]
 
 /** @hidden */
-export declare const $nonEmptyObject: unique symbol
-
-/** @hidden */
-export interface NonEmptyObject {
-  [$nonEmptyObject]?: any
-}
-
-/** @hidden */
 export type ExtractCFromProps<P extends ModelProperties> = { [k in keyof P]: P[k]["CreationType"] }
 
 /** @hidden */
-export type ModelCreationType<PC> = { [P in DefinablePropsNames<PC>]: PC[P] } & Partial<PC> &
-  NonEmptyObject
+export type ModelCreationType<PC> = { [P in DefinablePropsNames<PC>]: PC[P] } & Partial<PC>
+
+// Ensure an object can be given additional properties.
+//
+// For the empty object type, `Record<string, never>`, we need to convert into a record type that will allow us to
+// assign new values. Any other type should allow additional properties by default.
+type WithAdditionalProperties<T> = T extends Record<string, never> ? Record<string, unknown> : T // & Record<string, unknown>
 
 /** @hidden */
-export type ModelCreationType2<P extends ModelProperties, CustomC> = _CustomOrOther<
-  CustomC,
-  ModelCreationType<ExtractCFromProps<P>>
->
+export type ModelCreationType2<P extends ModelProperties, CustomC> = keyof P extends never
+  ? // When there are no props, we want to prevent passing in any object. We have two objects we want to allow:
+    //  1. The empty object
+    //  2. An instance of this model
+    //
+    // The `IStateTreeNode` interface allows both. For (1), these props are optional so an empty object is allowed.
+    // For (2), an instance will contain these two props, including the "secret" `$stateTreeNodeType` prop. TypeScript's
+    // excess property checking will then ensure no other props are passed in.
+    IStateTreeNode
+  : _CustomOrOther<CustomC, ModelCreationType<ExtractCFromProps<P>>>
 
 /** @hidden */
 export type ModelSnapshotType<P extends ModelProperties> = {
   [K in keyof P]: P[K]["SnapshotType"]
-} & NonEmptyObject
+}
 
 /** @hidden */
 export type ModelSnapshotType2<P extends ModelProperties, CustomS> = _CustomOrOther<
@@ -161,7 +164,7 @@ export type ModelSnapshotType2<P extends ModelProperties, CustomS> = _CustomOrOt
  */
 export type ModelInstanceTypeProps<P extends ModelProperties> = {
   [K in keyof P]: P[K]["Type"]
-} & NonEmptyObject
+}
 
 /**
  * @hidden
@@ -211,7 +214,7 @@ export interface IModelType<
   ): IModelType<PROPS, OTHERS & A & V & VS, CustomC, CustomS>
 
   preProcessSnapshot<NewC = ModelCreationType2<PROPS, CustomC>>(
-    fn: (snapshot: NewC) => ModelCreationType2<PROPS, CustomC>
+    fn: (snapshot: NewC) => WithAdditionalProperties<ModelCreationType2<PROPS, CustomC>>
   ): IModelType<PROPS, OTHERS, NewC, CustomS>
 
   postProcessSnapshot<NewS = ModelSnapshotType2<PROPS, CustomS>>(
