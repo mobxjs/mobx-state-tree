@@ -28,7 +28,8 @@ import {
   lazy,
   undefinedType,
   nullType,
-  snapshotProcessor
+  snapshotProcessor,
+  object
 } from "../internal"
 
 export const types = {
@@ -60,5 +61,6 @@ export const types = {
   lazy,
   undefined: undefinedType,
   null: nullType,
-  snapshotProcessor
+  snapshotProcessor,
+  object
 }

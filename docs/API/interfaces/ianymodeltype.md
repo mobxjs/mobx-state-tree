@@ -45,7 +45,7 @@ Any model type.
 
 *Inherited from [IType](itype.md).[identifierAttribute](itype.md#optional-identifierattribute)*
 
-*Defined in [src/core/type/type.ts:89](https://github.com/mobxjs/mobx-state-tree/blob/0fa1c7d6/src/core/type/type.ts#L89)*
+*Defined in [src/core/type/type.ts:89](https://github.com/mobxjs/mobx-state-tree/blob/6c83a998/src/core/type/type.ts#L89)*
 
 Name of the identifier attribute or null if none.
 
@@ -57,7 +57,7 @@ ___
 
 *Inherited from [IType](itype.md).[name](itype.md#name)*
 
-*Defined in [src/core/type/type.ts:84](https://github.com/mobxjs/mobx-state-tree/blob/0fa1c7d6/src/core/type/type.ts#L84)*
+*Defined in [src/core/type/type.ts:84](https://github.com/mobxjs/mobx-state-tree/blob/6c83a998/src/core/type/type.ts#L84)*
 
 Friendly type name.
 
@@ -69,7 +69,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[properties](imodeltype.md#properties)*
 
-*Defined in [src/types/complex-types/model.ts:187](https://github.com/mobxjs/mobx-state-tree/blob/0fa1c7d6/src/types/complex-types/model.ts#L187)*
+*Defined in [src/types/complex-types/model.ts:190](https://github.com/mobxjs/mobx-state-tree/blob/6c83a998/src/types/complex-types/model.ts#L190)*
 
 ## Methods
 
@@ -79,7 +79,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[actions](imodeltype.md#actions)*
 
-*Defined in [src/types/complex-types/model.ts:201](https://github.com/mobxjs/mobx-state-tree/blob/0fa1c7d6/src/types/complex-types/model.ts#L201)*
+*Defined in [src/types/complex-types/model.ts:204](https://github.com/mobxjs/mobx-state-tree/blob/6c83a998/src/types/complex-types/model.ts#L204)*
 
 **Type parameters:**
 
@@ -107,7 +107,7 @@ ___
 
 *Inherited from [IType](itype.md).[create](itype.md#create)*
 
-*Defined in [src/core/type/type.ts:96](https://github.com/mobxjs/mobx-state-tree/blob/0fa1c7d6/src/core/type/type.ts#L96)*
+*Defined in [src/core/type/type.ts:96](https://github.com/mobxjs/mobx-state-tree/blob/6c83a998/src/core/type/type.ts#L96)*
 
 Creates an instance for the type given an snapshot input.
 
@@ -130,7 +130,7 @@ ___
 
 *Inherited from [IType](itype.md).[describe](itype.md#describe)*
 
-*Defined in [src/core/type/type.ts:118](https://github.com/mobxjs/mobx-state-tree/blob/0fa1c7d6/src/core/type/type.ts#L118)*
+*Defined in [src/core/type/type.ts:118](https://github.com/mobxjs/mobx-state-tree/blob/6c83a998/src/core/type/type.ts#L118)*
 
 Gets the textual representation of the type as a string.
 
@@ -144,7 +144,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[extend](imodeltype.md#extend)*
 
-*Defined in [src/types/complex-types/model.ts:209](https://github.com/mobxjs/mobx-state-tree/blob/0fa1c7d6/src/types/complex-types/model.ts#L209)*
+*Defined in [src/types/complex-types/model.ts:212](https://github.com/mobxjs/mobx-state-tree/blob/6c83a998/src/types/complex-types/model.ts#L212)*
 
 **Type parameters:**
 
@@ -176,7 +176,7 @@ ___
 
 *Inherited from [IType](itype.md).[is](itype.md#is)*
 
-*Defined in [src/core/type/type.ts:104](https://github.com/mobxjs/mobx-state-tree/blob/0fa1c7d6/src/core/type/type.ts#L104)*
+*Defined in [src/core/type/type.ts:104](https://github.com/mobxjs/mobx-state-tree/blob/6c83a998/src/core/type/type.ts#L104)*
 
 Checks if a given snapshot / instance is of the given type.
 
@@ -198,7 +198,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[named](imodeltype.md#named)*
 
-*Defined in [src/types/complex-types/model.ts:189](https://github.com/mobxjs/mobx-state-tree/blob/0fa1c7d6/src/types/complex-types/model.ts#L189)*
+*Defined in [src/types/complex-types/model.ts:192](https://github.com/mobxjs/mobx-state-tree/blob/6c83a998/src/types/complex-types/model.ts#L192)*
 
 **Parameters:**
 
@@ -216,7 +216,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[postProcessSnapshot](imodeltype.md#postprocesssnapshot)*
 
-*Defined in [src/types/complex-types/model.ts:217](https://github.com/mobxjs/mobx-state-tree/blob/0fa1c7d6/src/types/complex-types/model.ts#L217)*
+*Defined in [src/types/complex-types/model.ts:220](https://github.com/mobxjs/mobx-state-tree/blob/6c83a998/src/types/complex-types/model.ts#L220)*
 
 **Type parameters:**
 
@@ -244,7 +244,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[preProcessSnapshot](imodeltype.md#preprocesssnapshot)*
 
-*Defined in [src/types/complex-types/model.ts:213](https://github.com/mobxjs/mobx-state-tree/blob/0fa1c7d6/src/types/complex-types/model.ts#L213)*
+*Defined in [src/types/complex-types/model.ts:216](https://github.com/mobxjs/mobx-state-tree/blob/6c83a998/src/types/complex-types/model.ts#L216)*
 
 **Type parameters:**
 
@@ -254,7 +254,7 @@ ___
 
 ▪ **fn**: *function*
 
-▸ (`snapshot`: NewC): *ModelCreationType2‹any, any›*
+▸ (`snapshot`: NewC): *WithAdditionalProperties‹ModelCreationType2‹any, any››*
 
 **Parameters:**
 
@@ -272,7 +272,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[props](imodeltype.md#props)*
 
-*Defined in [src/types/complex-types/model.ts:193](https://github.com/mobxjs/mobx-state-tree/blob/0fa1c7d6/src/types/complex-types/model.ts#L193)*
+*Defined in [src/types/complex-types/model.ts:196](https://github.com/mobxjs/mobx-state-tree/blob/6c83a998/src/types/complex-types/model.ts#L196)*
 
 **Type parameters:**
 
@@ -294,7 +294,7 @@ ___
 
 *Inherited from [IType](itype.md).[validate](itype.md#validate)*
 
-*Defined in [src/core/type/type.ts:113](https://github.com/mobxjs/mobx-state-tree/blob/0fa1c7d6/src/core/type/type.ts#L113)*
+*Defined in [src/core/type/type.ts:113](https://github.com/mobxjs/mobx-state-tree/blob/6c83a998/src/core/type/type.ts#L113)*
 
 Run's the type's typechecker on the given value with the given validation context.
 
@@ -317,7 +317,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[views](imodeltype.md#views)*
 
-*Defined in [src/types/complex-types/model.ts:197](https://github.com/mobxjs/mobx-state-tree/blob/0fa1c7d6/src/types/complex-types/model.ts#L197)*
+*Defined in [src/types/complex-types/model.ts:200](https://github.com/mobxjs/mobx-state-tree/blob/6c83a998/src/types/complex-types/model.ts#L200)*
 
 **Type parameters:**
 
@@ -345,7 +345,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[volatile](imodeltype.md#volatile)*
 
-*Defined in [src/types/complex-types/model.ts:205](https://github.com/mobxjs/mobx-state-tree/blob/0fa1c7d6/src/types/complex-types/model.ts#L205)*
+*Defined in [src/types/complex-types/model.ts:208](https://github.com/mobxjs/mobx-state-tree/blob/6c83a998/src/types/complex-types/model.ts#L208)*
 
 **Type parameters:**
 
