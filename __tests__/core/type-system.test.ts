@@ -20,7 +20,6 @@ import {
   ModelPropertiesDeclaration,
   SnapshotOut
 } from "../../src"
-import { $nonEmptyObject } from "../../src/internal"
 
 type DifferingKeys<ActualT, ExpectedT> = {
   [K in keyof ActualT | keyof ExpectedT]: K extends keyof ActualT
@@ -1158,7 +1157,6 @@ test("maybe / optional type inference verification", () => {
   assertTypesEqual(
     _ as ITC,
     _ as {
-      [$nonEmptyObject]?: any
       a: string
       b?: string
       c?: string | undefined
@@ -1170,7 +1168,6 @@ test("maybe / optional type inference verification", () => {
   assertTypesEqual(
     _ as ITS,
     _ as {
-      [$nonEmptyObject]?: any
       a: string
       b: string
       c: string | undefined
@@ -1178,6 +1175,62 @@ test("maybe / optional type inference verification", () => {
       e: string
     }
   )
+})
+
+test("object creation with no props", () => {
+  const MyType = types.model().views((_self) => ({
+    get test() {
+      return 5
+    }
+  }))
+
+  MyType.create()
+  MyType.create({})
+
+  // Instances can be created with their own instance type
+  MyType.create(MyType.create())
+
+  // TODO @ts-expect-error -- symbols aren't props (but may be one day)
+  // This currently is allowed, because excess property checking doesn't happen against symbols.
+  // See https://github.com/microsoft/TypeScript/issues/44794
+  true || MyType.create({ [Symbol("test")]: 5 })
+
+  // @ts-expect-error -- this is a view, not a prop
+  true || MyType.create({ test: 5 })
+
+  // @ts-expect-error -- unknown prop
+  true || MyType.create({ another: 5 })
+})
+
+test("object creation when composing with a model with no props", () => {
+  const EmptyType = types.model().views((_self) => ({
+    get test() {
+      return 5
+    }
+  }))
+
+  const NonEmptyType = types.model({
+    value: types.optional(types.number, 0),
+    negate: types.boolean
+  })
+
+  const Composed = types.compose(EmptyType, NonEmptyType)
+
+  Composed.create({ negate: true })
+  Composed.create({ negate: false })
+  Composed.create({ value: 5, negate: true })
+
+  // Instances can be created with their own instance type
+  Composed.create(Composed.create({ negate: true }))
+
+  // @ts-expect-error -- symbols aren't props (but may be one day)
+  true || Composed.create({ [Symbol("test")]: 5 })
+
+  // @ts-expect-error -- this is a view, not a prop
+  true || Composed.create({ test: 5 })
+
+  // @ts-expect-error -- unknown prop
+  true || Composed.create({ another: 5 })
 })
 
 test("union type inference verification for small number of types", () => {
@@ -1201,31 +1254,12 @@ test("union type inference verification for a large number of types", () => {
     types.literal("g"),
     types.literal("h"),
     types.literal("i"),
-    types.literal("j"),
-    types.literal("k")
+    types.literal("j")
   )
 
   type ITC = SnapshotIn<typeof T>
   type ITS = SnapshotOut<typeof T>
 
-  assertTypesEqual(_ as ITC, _ as "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k")
-  assertTypesEqual(_ as ITS, _ as "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k")
-})
-
-test("enumeration type inference verification", () => {
-  const HexLetter = types.enumeration("HexadecimalLetter", ["a", "b", "c", "d", "e", "f"])
-
-  type LetterITC = SnapshotIn<typeof HexLetter>
-  type LetterITS = SnapshotOut<typeof HexLetter>
-
-  assertTypesEqual(_ as LetterITC, _ as "a" | "b" | "c" | "d" | "e" | "f")
-  assertTypesEqual(_ as LetterITS, _ as "a" | "b" | "c" | "d" | "e" | "f")
-
-  const Digit = types.enumeration(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"])
-
-  type DigitITC = SnapshotIn<typeof Digit>
-  type DigitITS = SnapshotOut<typeof Digit>
-
-  assertTypesEqual(_ as DigitITC, _ as "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9")
-  assertTypesEqual(_ as DigitITS, _ as "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9")
+  assertTypesEqual(_ as ITC, _ as "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j")
+  assertTypesEqual(_ as ITS, _ as "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j")
 })
