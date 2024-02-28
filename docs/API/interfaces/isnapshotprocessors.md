@@ -33,7 +33,7 @@ Snapshot processors.
 
 ▸ **postProcessor**(`snapshot`: IT["SnapshotType"], `node`: [Instance](../index.md#instance)‹IT›): *CustomS*
 
-*Defined in [src/types/utility-types/snapshotProcessor.ts:211](https://github.com/mobxjs/mobx-state-tree/blob/0fa1c7d6/src/types/utility-types/snapshotProcessor.ts#L211)*
+*Defined in [src/types/utility-types/snapshotProcessor.ts:211](https://github.com/mobxjs/mobx-state-tree/blob/46334b6d/src/types/utility-types/snapshotProcessor.ts#L211)*
 
 Function that transforms an output snapshot.
 
@@ -52,7 +52,7 @@ ___
 
 ▸ **preProcessor**(`snapshot`: CustomC): *IT["CreationType"]*
 
-*Defined in [src/types/utility-types/snapshotProcessor.ts:206](https://github.com/mobxjs/mobx-state-tree/blob/0fa1c7d6/src/types/utility-types/snapshotProcessor.ts#L206)*
+*Defined in [src/types/utility-types/snapshotProcessor.ts:206](https://github.com/mobxjs/mobx-state-tree/blob/46334b6d/src/types/utility-types/snapshotProcessor.ts#L206)*
 
 Function that transforms an input snapshot.
 
