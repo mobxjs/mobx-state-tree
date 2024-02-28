@@ -448,9 +448,9 @@ export class ObjectType<IT extends IAnyType, OTHERS = {}> extends ComplexType<
 ObjectType.prototype.applySnapshot = action(ObjectType.prototype.applySnapshot)
 
 /**
- * `types.object` - Creates a dyanmic object type
+ * `types.object` - Creates a dynamic object type
  *
- * See the https://github.com/mobxjs/mobx-state-tree/pull/1859
+ * See the https://github.com/mobxjs/mobx-state-tree/pull/1859 and https://github.com/mobxjs/mobx-state-tree/pull/2157
  */
 export function object<IT extends IAnyType>(subtype: IT): IObjectType<IT> {
   return new ObjectType<IT>(`{[key:string] ${subtype.name}}`, subtype) as any

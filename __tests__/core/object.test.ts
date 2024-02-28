@@ -1,3 +1,8 @@
+/**
+ * This test has a confusing file name. It was written before we had `src/types/complex-types/object.ts`.
+ *
+ * For tests for that, see `object-type.test.ts`.
+ */
 import {
   destroy,
   detach,
