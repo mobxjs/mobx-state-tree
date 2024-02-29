@@ -1,0 +1,398 @@
+---
+id: context-reducer-vs-mobx-state-tree
+title: React Context vs. MobX-State-Tree
+---
+
+If you're using React, you have the option to manage application state with built in hooks, like [`useContext`](https://react.dev/reference/react/useContext) and [`useReducer`](https://react.dev/reference/react/useReducer). The React docs have [a great example showing how to combine these two hooks to manage more complex state](https://react.dev/learn/scaling-up-with-reducer-and-context).
+
+React built-ins are a great choice if you're strongly opposed to adding new dependencies to your project, or if you want to write flexible JavaScript code with your own set of conventions and choices.
+
+MobX-State-Tree can provide you with the same features as React's built-in state management hooks, but with the added benefits of:
+
+- Better performance out of the box due to our reactive, observable state as opposed to context's parent/child data flow through React components.
+- Built-in immutability with [snapshots](../concepts/snapshots.md), great for common operations like "undo/redo", time travel debugging, or synchronizing with external systems
+- [JSON-patch data](../concepts/patches.md), which you can use for use cases like multiplayer editing.
+- Clearer data modeling with our rich runtime type system as opposed to writing plain JS objects.
+- Runtime type safety for your state, which helps keep your aplication bug free as your codebase and team grows.
+- Automatic TypeScript inference of your state, which makes your state management discoverable, and statically verifiable to prevent author-time bugs.
+- Less boilerplate, since many common state management patterns have been abstracted into our [API](../API/index.md)
+- Easy persistence with utilities like [mst-persist](https://www.npmjs.com/package/mst-persist)
+- Easy asynchronous data management with utilties like [mst-query](https://github.com/ConrabOpto/mst-query) and [mst-gql](https://github.com/mobxjs/mst-gql)
+
+## Code Review
+
+If you haven't worked with complex contexts and reducers in React, you should definitely read through [their guide on advanced usage](https://react.dev/learn/scaling-up-with-reducer-and-context). It will help you make a fair assessment between React state hooks and MobX-State-Tree.
+
+[Here is the CodeSandbox of their final product in that article](https://codesandbox.io/p/sandbox/react-dev-wy7lfd?file=%2Fsrc%2FTasksContext.js%3A54%2C4&utm_medium=sandpack).
+
+For your reference, [here is the same set of features, built with MobX-State-Tree instead of Context/Reducers](https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-8824l8?file=%2Fsrc%2FViewModel.ts%3A15%2C24.).
+
+Let's focus on comparing just the state-management code in React's `src/TasksContext.js`, and MST's `src/ViewModel.ts`. To start, we'll compare code, and then we'll move on to feature comparisons.
+
+### React Context/Reducer
+
+```js
+// React context/reducer in `src/TasksContext.js`
+// https://codesandbox.io/p/sandbox/react-dev-wy7lfd?file=%2Fsrc%2FTasksContext.js%3A43%2C17&utm_medium=sandpack
+import { createContext, useContext, useReducer } from "react"
+
+const TasksContext = createContext(null)
+
+const TasksDispatchContext = createContext(null)
+
+export function TasksProvider({ children }) {
+  const [tasks, dispatch] = useReducer(tasksReducer, initialTasks)
+
+  return (
+    <TasksContext.Provider value={tasks}>
+      <TasksDispatchContext.Provider value={dispatch}>{children}</TasksDispatchContext.Provider>
+    </TasksContext.Provider>
+  )
+}
+
+export function useTasks() {
+  return useContext(TasksContext)
+}
+
+export function useTasksDispatch() {
+  return useContext(TasksDispatchContext)
+}
+
+function tasksReducer(tasks, action) {
+  switch (action.type) {
+    case "added": {
+      return [
+        ...tasks,
+        {
+          id: action.id,
+          text: action.text,
+          done: false
+        }
+      ]
+    }
+    case "changed": {
+      return tasks.map((t) => {
+        if (t.id === action.task.id) {
+          return action.task
+        } else {
+          return t
+        }
+      })
+    }
+    case "deleted": {
+      return tasks.filter((t) => t.id !== action.id)
+    }
+    default: {
+      throw Error("Unknown action: " + action.type)
+    }
+  }
+}
+
+const initialTasks = [
+  { id: 0, text: "Philosopher’s Path", done: true },
+  { id: 1, text: "Visit the temple", done: false },
+  { id: 2, text: "Drink matcha", done: false }
+]
+```
+
+#### React Code is Tightly Coupled
+
+The Context/Reducer code is, understandably, very coupled to React. It exports JSX directly:
+
+```js
+export function TasksProvider({ children }) {
+  const [tasks, dispatch] = useReducer(tasksReducer, initialTasks)
+
+  return (
+    <TasksContext.Provider value={tasks}>
+      <TasksDispatchContext.Provider value={dispatch}>{children}</TasksDispatchContext.Provider>
+    </TasksContext.Provider>
+  )
+}
+```
+
+It also mixes concerns. Note how in `TasksProvider`, the reducer, initial tasks, and dispatch value have to come together with the UI code to become useful. It's not entirely clear from a top-to-bottom glance where the source of truth for state is.
+
+#### Reducer Function is Unwieldy
+
+Check out the reducer function:
+
+```js
+function tasksReducer(tasks, action) {
+  switch (action.type) {
+    case "added": {
+      return [
+        ...tasks,
+        {
+          id: action.id,
+          text: action.text,
+          done: false
+        }
+      ]
+    }
+    case "changed": {
+      return tasks.map((t) => {
+        if (t.id === action.task.id) {
+          return action.task
+        } else {
+          return t
+        }
+      })
+    }
+    case "deleted": {
+      return tasks.filter((t) => t.id !== action.id)
+    }
+    default: {
+      throw Error("Unknown action: " + action.type)
+    }
+  }
+}
+```
+
+With three actions, this feels somewhat manageable. But what if your state mutations are more numerous or more complex? Of course you can split those out into other files, but then your codebase gets fragmented, and it's becomes more difficult to reason about it overtime.
+
+Moreover, the `action` argument is opaque. What types are valid? What other data will come along with it? You could write these out in TypeScript and define valid shapes, but that's more work and boilerplate for you.
+
+#### Unclear Initial State in Context/Reducer
+
+The reducer/context example provides `initialTasks`, like this:
+
+```js
+const initialTasks = [
+  { id: 0, text: "Philosopher’s Path", done: true },
+  { id: 1, text: "Visit the temple", done: false },
+  { id: 2, text: "Drink matcha", done: false }
+]
+```
+
+But those are just the initial tasks. If you followed the React tutorial, you might be wondering:
+
+1. How do we know if an item is being edited?
+2. Where are we storing `nextId`?
+
+Turns out, the item being edited is managed as local state with `useState` in [`src/TaskList.js`](https://codesandbox.io/p/sandbox/react-dev-wy7lfd?file=%2Fsrc%2FTaskList.js%3A15%2C2&utm_medium=sandpack):
+
+```js
+// ...
+function Task({ task }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const dispatch = useTasksDispatch();
+  let taskContent;
+  if (isEditing) {
+    taskContent = (
+      <>
+        <input
+          value={task.text}
+          onChange={e => {
+            dispatch({
+              type: 'changed',
+              task: {
+                ...task,
+                text: e.target.value
+              }
+            });
+          }} />
+        <button onClick={() => setIsEditing(false)}>
+          Save
+        </button>
+      </>
+    );
+  } else {
+    taskContent = (
+      <>
+        {task.text}
+        <button onClick={() => setIsEditing(true)}>
+          Edit
+        </button>
+      </>
+    );
+  }
+// ...
+```
+
+We use an auto-incrementing number for IDs. In the React example, this is stored and initialized in [`src/AddTask.js`](https://codesandbox.io/p/sandbox/react-dev-wy7lfd?file=%2Fsrc%2FAddTask.js%3A27%2C1&utm_medium=sandpack):
+
+```js
+// At the bottom of `src/AddTask.js`:
+let nextId = 3
+```
+
+### MobX-State-Tree ViewModel
+
+```ts
+// MST's viewmodel in `src/ViewModel.ts`.
+// https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-8824l8?file=%2Fsrc%2FViewModel.ts%3A88%2C1
+import { t, Instance } from "mobx-state-tree"
+
+const Task = t
+  .model("Task", {
+    id: t.identifierNumber,
+    text: t.string,
+    done: t.optional(t.boolean, false),
+    isBeingEdited: t.optional(t.boolean, false)
+  })
+  .actions((self) => ({
+    setText(text: string) {
+      self.text = text
+    },
+    setDone(done: boolean) {
+      self.done = done
+    },
+    setIsBeingEdited(beingEdited: boolean) {
+      self.isBeingEdited = beingEdited
+    }
+  }))
+
+export interface ITask extends Instance<typeof Task> {}
+
+const ViewModel = t
+  .model("ViewModel", {
+    taskInputText: t.maybe(t.string),
+    nextId: 0,
+    tasks: t.array(Task)
+  })
+  .actions((self) => ({
+    addTask() {
+      const { nextId, taskInputText } = self
+
+      if (!taskInputText) {
+        return
+      }
+
+      const newTask = Task.create({
+        id: nextId,
+        text: taskInputText
+      })
+
+      self.tasks.push(newTask)
+
+      self.nextId += 1
+
+      self.taskInputText = ""
+    },
+    deleteTask(id: number) {
+      const task = self.tasks.find((t) => t.id === id)
+      if (task) {
+        self.tasks.remove(task)
+      }
+    },
+    setInputText(text: string | undefined) {
+      self.taskInputText = text
+    }
+  }))
+
+export const ViewModelSingleton = ViewModel.create({
+  nextId: 3,
+  tasks: [
+    { id: 0, text: "Philosopher’s Path", done: true },
+    { id: 1, text: "Visit the temple", done: false },
+    { id: 2, text: "Drink matcha", done: false }
+  ]
+})
+```
+
+#### MobX-State-Tree Decouples State from UI
+
+The MobX-State-Tree code doesn't really "know" anything about React (or Vue, or Angular, or Solid, or Svelte, or any other library you might be using). It is Just TypeScript. Which means it does not suffer from the [coupling problems of React state built-ins](#react-code-is-tightly-coupled). We can't really fault React tools for being coupled to React, but using MST will provide you with more flexibility to change your UI code, and even your entire UI library if you ever choose to.
+
+#### Actions vs. Reducer
+
+The `.actions` block in our MST code replaces the React reducer. Rather than managing our actions with dispatches and a switch statement, we can write state mutations as regular TypeScript functions. Each aciton gets its own set of parameters. You can call those actions like regular functions, rather than "dispatching" the action boilerplate. This is the code we're talking about:
+
+```ts
+  .actions((self) => ({
+    addTask() {
+      const { nextId, taskInputText } = self;
+
+      if (!taskInputText) {
+        return;
+      }
+
+      const newTask = Task.create({
+        id: nextId,
+        text: taskInputText,
+      });
+
+      self.tasks.push(newTask);
+
+      self.nextId += 1;
+
+      self.taskInputText = "";
+    },
+    deleteTask(id: number) {
+      const task = self.tasks.find((t) => t.id === id);
+      if (task) {
+        self.tasks.remove(task);
+      }
+    },
+    setInputText(text: string | undefined) {
+      self.taskInputText = text;
+    },
+  }));
+```
+
+If you want to add a task, you'd call:
+
+```ts
+ViewModelSingleton.addtask()
+```
+
+And we'd create a task based on the current state of the `taskInputText`. State would update, and the UI would respond to the granular updates. Simple and lovely to work with!
+
+#### Single Source of Truth for State
+
+It's easier to clarify initial state in MobX-State-Tree. In our example, we provide it much like the [initial state in Context](#unclear-initial-state-in-contextreducer):
+
+```ts
+export const ViewModelSingleton = ViewModel.create({
+  nextId: 3,
+  tasks: [
+    { id: 0, text: "Philosopher’s Path", done: true },
+    { id: 1, text: "Visit the temple", done: false },
+    { id: 2, text: "Drink matcha", done: false }
+  ]
+})
+```
+
+This code is creating a new instance of a ViewModel, and it's providing it with all of the initial state we need. If we gave an invalid initial state, MobX-State-Tree would warn us:
+
+```ts
+export const ViewModelSingleton = ViewModel.create({
+  nextId: "3", // We use numbers for IDs, not strings. This will give you a TypeScript error if you're using TS
+  tasks: [
+    { id: 0, text: "Philosopher’s Path", done: true },
+    { id: 1, text: "Visit the temple", done: false },
+    { id: 2, text: "Drink matcha", done: false }
+  ]
+})
+```
+
+If we use the wrong kind of value for our `nextId`, we'll get a TypeScript error like:
+
+```
+Type 'string' is not assignable to type 'number'.typescript(2322)
+```
+
+And if you're not using TypeScript, MST will let you know about it in the runtime:
+
+```
+[mobx-state-tree] Error while converting `{"nextId":"3","tasks":[{"id":0,"text":"Philosopher’s Path","done":true},{"id":1,"text":"Visit the temple","done":false},{"id":2,"text":"Drink matcha","done":false}]}` to `ViewModel`: at path "/nextId" value `"3"` is not assignable to type: `number` (Value is not a number).
+```
+
+If you want to avoid even this much initial code, you're free to initialize the view model with no tasks. Since we wrote the `nextId` value as a literal, MST will assume it's optional, and the provided value is the default. So this code:
+
+```ts
+const ViewModel = t.model("ViewModel", {
+  taskInputText: t.maybe(t.string),
+  nextId: 0,
+  tasks: t.array(Task)
+})
+```
+
+Allows us to write:
+
+```ts
+export const ViewModelSingleton = ViewModel.create({})
+```
+
+It _also_ keeps all of this state in one central place. We can read the file top-to-bottom and understand the entirety of our state at a glance.

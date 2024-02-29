@@ -124,6 +124,9 @@
         "title": "UnionOptions",
         "sidebar_label": "UnionOptions"
       },
+      "compare/context-reducer-vs-mobx-state-tree": {
+        "title": "React Context vs. MobX-State-Tree"
+      },
       "concepts/actions": {
         "title": "Actions"
       },
@@ -224,6 +227,7 @@
       "Advanced Concepts": "Advanced Concepts",
       "API Overview": "API Overview",
       "Tips": "Tips",
+      "Compare": "Compare",
       "Interfaces": "Interfaces"
     }
   },
