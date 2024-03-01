@@ -32,14 +32,21 @@ type DifferingKeys<ActualT, ExpectedT> = {
 }[keyof ActualT | keyof ExpectedT] &
   string
 
-type InexactErrorMessage<ActualT, ExpectedT> = `Mismatched property: ${DifferingKeys<
-  ActualT,
-  ExpectedT
->}`
+type NotExactErrorMessage<ActualT, ExpectedT> = ActualT extends Record<string, unknown>
+  ? ExpectedT extends Record<string, unknown>
+    ? `Mismatched property: ${DifferingKeys<ActualT, ExpectedT>}`
+    : "Expected a non-object type, but received an object"
+  : ExpectedT extends Record<string, unknown>
+  ? "Expected an object type, but received a non-object type"
+  : "Types are not exactly equal"
+
+type IsExact<T1, T2> = [T1] extends [T2] ? ([T2] extends [T1] ? Exact<T1, T2> : never) : never
 
 const assertTypesEqual = <ActualT, ExpectedT>(
   t: ActualT,
-  u: Exact<ActualT, ExpectedT> extends never ? InexactErrorMessage<ActualT, ExpectedT> : ExpectedT
+  u: IsExact<ActualT, ExpectedT> extends never
+    ? NotExactErrorMessage<ActualT, ExpectedT>
+    : ExpectedT
 ): [ActualT, ExpectedT] => [t, u] as [ActualT, ExpectedT]
 const _: unknown = undefined
 
@@ -1224,4 +1231,35 @@ test("object creation when composing with a model with no props", () => {
 
   // @ts-expect-error -- unknown prop
   true || Composed.create({ another: 5 })
+})
+
+test("union type inference verification for small number of types", () => {
+  const T = types.union(types.boolean, types.literal("test"), types.maybe(types.number))
+
+  type ITC = SnapshotIn<typeof T>
+  type ITS = SnapshotOut<typeof T>
+
+  assertTypesEqual(_ as ITC, _ as boolean | "test" | number | undefined)
+  assertTypesEqual(_ as ITS, _ as boolean | "test" | number | undefined)
+})
+
+test("union type inference verification for a large number of types", () => {
+  const T = types.union(
+    types.literal("a"),
+    types.literal("b"),
+    types.literal("c"),
+    types.literal("d"),
+    types.literal("e"),
+    types.literal("f"),
+    types.literal("g"),
+    types.literal("h"),
+    types.literal("i"),
+    types.literal("j")
+  )
+
+  type ITC = SnapshotIn<typeof T>
+  type ITS = SnapshotOut<typeof T>
+
+  assertTypesEqual(_ as ITC, _ as "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j")
+  assertTypesEqual(_ as ITS, _ as "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j")
 })
