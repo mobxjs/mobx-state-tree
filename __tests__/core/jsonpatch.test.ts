@@ -477,3 +477,47 @@ test("relativePath with a different base than the root works correctly", () => {
     expect(resolvePath(store.map, "/../map/2/model")).toBe(target)
   }
 })
+test("it should emit one patch for array clear", () => {
+  testPatches(
+    Node,
+    { id: 1, children: [{ id: 2 }, { id: 3 }] },
+    (n: Instance<typeof Node>) => {
+      n.children.clear()
+    },
+    [
+      {
+        op: "replace",
+        path: "/children",
+        value: []
+      }
+    ]
+  )
+})
+
+test("it should emit one patch for array replace", () => {
+  testPatches(
+    Node,
+    { id: 1, children: [{ id: 2 }, { id: 3 }] },
+    (n: Instance<typeof Node>) => {
+      n.children.replace([{ id: 4 }, { id: 5 }])
+    },
+    [
+      {
+        op: "replace",
+        path: "/children",
+        value: [
+          {
+            id: 4,
+            text: "Hi",
+            children: []
+          },
+          {
+            id: 5,
+            text: "Hi",
+            children: []
+          }
+        ]
+      }
+    ]
+  )
+})
