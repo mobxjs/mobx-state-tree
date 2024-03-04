@@ -9,13 +9,12 @@ React built-ins are a great choice if you're strongly opposed to adding new depe
 
 MobX-State-Tree can provide you with the same features as React's built-in state management hooks, but with the added benefits of:
 
-- Better performance out of the box due to our reactive, observable state as opposed to context's parent/child data flow through React components.
+- Better performance out of the box due to MST's reactive, observable state as opposed to context's data flow through the React component tree.
+- Automatic TypeScript inference of your state, which makes your state management discoverable, and statically verifiable to prevent author-time bugs.
+- Runtime type safety for your state, which helps keep your application bug free as your codebase and team grows.
+- Clearer data modeling with our rich runtime type system as opposed to writing plain JS objects.
 - Built-in immutability with [snapshots](../concepts/snapshots.md), great for common operations like "undo/redo", time travel debugging, or synchronizing with external systems
 - [JSON-patch data](../concepts/patches.md), which you can use for use cases like multiplayer editing.
-- Clearer data modeling with our rich runtime type system as opposed to writing plain JS objects.
-- Runtime type safety for your state, which helps keep your aplication bug free as your codebase and team grows.
-- Automatic TypeScript inference of your state, which makes your state management discoverable, and statically verifiable to prevent author-time bugs.
-- Less boilerplate, since many common state management patterns have been abstracted into our [API](../API/index.md)
 - Easy persistence with utilities like [mst-persist](https://www.npmjs.com/package/mst-persist)
 - Easy asynchronous data management with utilties like [mst-query](https://github.com/ConrabOpto/mst-query) and [mst-gql](https://github.com/mobxjs/mst-gql)
 
@@ -501,4 +500,106 @@ export default function TaskApp() {
 
 ### Handles Granular Updates Automatically
 
-[Try the same set of actions in CodeSandbox](https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-with-middle-component-y2h558?file=%2Fsrc%2FMiddleComponent.tsx%3A9%2C1), and you'll see that the `MiddleComponent` does _not_ get re-evaluated. MobX-State-Tree does this for you with its [observer higher-order-component](https://mobx-state-tree.js.org/intro/getting-started#getting-to-the-ui), which [only re-renders components when their observed data changes](https://mobx-state-tree.js.org/intro/getting-started#improving-render-performance).
+[Try the same set of actions in CodeSandbox](https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-with-middle-component-y2h558?file=%2Fsrc%2FMiddleComponent.tsx%3A9%2C1), and you'll see that the `MiddleComponent` does _not_ get re-evaluated. MobX-State-Tree does this for you with its [observer higher-order-component](../intro/getting-started#getting-to-the-ui), which [only re-renders components when their observed data changes](../intro/getting-started#improving-render-performance).
+
+## Automatic TypeScript Types with MobX-State-Tree
+
+So far we've been comparing React's [JavaScript only example](https://codesandbox.io/p/sandbox/react-dev-wy7lfd?file=%2Fsrc%2Findex.js%3A28%2C30&utm_medium=sandpack) against a MobX-State-Tree example [written in TypeScript](https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-8824l8?file=%2Fsrc%2FViewModel.ts%3A11%2C22).
+
+The TypeScript story for MobX-State-Tree is very straightforward. In [`src/ViewModel.ts`](https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-8824l8?file=%2Fsrc%2FViewModel.ts%3A69%2C20) you can write `ViewModelSingleton.` and get auto-complete for all its properties and actions.
+
+If you want to do more with these types, we [have a recommended set of type helpers](../tips/typescript#using-a-mst-type-at-design-time). In our example, you can see we use:
+
+```ts
+export interface ITask extends Instance<typeof Task> {}
+```
+
+To tell the [Task component](https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-8824l8?file=%2Fsrc%2FTaskList.tsx%3A27%2C19) what to expect in its props.
+
+You don't have to make any choices about the TypeScript design. Model out your state with MST, and we'll give you an opinionated set of TypeScript types back. You trade off some control for quicker development overall, much like the performance management.
+
+## Write Your Own Types for React Context/Reducer
+
+If you want to use React Context/Reducer with TypeScript, you'll need to specify your types from the ground up. Many teams might like this approach, but it does require you to take the time. Here's one way you might type the context:
+
+```tsx
+import React, { createContext, useContext, useReducer, ReactNode, Dispatch, JSX } from "react"
+
+export interface Task {
+  id: number
+  text: string
+  done: boolean
+}
+
+type Action =
+  | { type: "added"; id: number; text: string }
+  | { type: "changed"; task: Task }
+  | { type: "deleted"; id: number }
+
+const TasksContext = createContext<Task[] | null>(null)
+const TasksDispatchContext = createContext<Dispatch<Action> | null>(null)
+
+export function TasksProvider({ children }: { children: ReactNode }): JSX.Element {
+  const [tasks, dispatch] = useReducer(tasksReducer, initialTasks)
+
+  return (
+    <TasksContext.Provider value={tasks}>
+      <TasksDispatchContext.Provider value={dispatch}>{children}</TasksDispatchContext.Provider>
+    </TasksContext.Provider>
+  )
+}
+
+export function useTasks(): Task[] {
+  const context = useContext(TasksContext)
+  if (!context) {
+    throw new Error("useTasks must be used within a TasksProvider")
+  }
+  return context
+}
+
+export function useTasksDispatch(): Dispatch<Action> {
+  const context = useContext(TasksDispatchContext)
+  if (!context) {
+    throw new Error("useTasksDispatch must be used within a TasksProvider")
+  }
+  return context
+}
+
+function tasksReducer(tasks: Task[], action: Action): Task[] {
+  switch (action.type) {
+    case "added": {
+      return [
+        ...tasks,
+        {
+          id: action.id,
+          text: action.text,
+          done: false
+        }
+      ]
+    }
+    case "changed": {
+      return tasks.map((t) => {
+        if (t.id === action.task.id) {
+          return action.task
+        } else {
+          return t
+        }
+      })
+    }
+    case "deleted": {
+      return tasks.filter((t) => t.id !== action.id)
+    }
+    default: {
+      throw Error("Unknown action: " + action)
+    }
+  }
+}
+
+const initialTasks = [
+  { id: 0, text: "Philosopher’s Path", done: true },
+  { id: 1, text: "Visit the temple", done: false },
+  { id: 2, text: "Drink matcha", done: false }
+]
+```
+
+[See the whole example converted to TypeScript in CodeSandbox](https://codesandbox.io/p/sandbox/react-dev-context-reducer-example-with-typescript-l8ym3t?file=%2Fsrc%2FTasksContext.tsx%3A91%2C1)
