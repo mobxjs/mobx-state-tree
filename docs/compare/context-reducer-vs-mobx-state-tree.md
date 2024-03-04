@@ -19,7 +19,7 @@ MobX-State-Tree can provide you with the same features as React's built-in state
 - Easy persistence with utilities like [mst-persist](https://www.npmjs.com/package/mst-persist)
 - Easy asynchronous data management with utilties like [mst-query](https://github.com/ConrabOpto/mst-query) and [mst-gql](https://github.com/mobxjs/mst-gql)
 
-## Code Review
+## React Context/Reducer Code Review
 
 If you haven't worked with complex contexts and reducers in React, you should definitely read through [their guide on advanced usage](https://react.dev/learn/scaling-up-with-reducer-and-context). It will help you make a fair assessment between React state hooks and MobX-State-Tree.
 
@@ -28,8 +28,6 @@ If you haven't worked with complex contexts and reducers in React, you should de
 For your reference, [here is the same set of features, built with MobX-State-Tree instead of Context/Reducers](https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-8824l8?file=%2Fsrc%2FViewModel.ts%3A15%2C24.).
 
 Let's focus on comparing just the state-management code in React's `src/TasksContext.js`, and MST's `src/ViewModel.ts`. To start, we'll compare code, and then we'll move on to feature comparisons.
-
-### React Context/Reducer
 
 ```js
 // React context/reducer in `src/TasksContext.js`
@@ -95,7 +93,7 @@ const initialTasks = [
 ]
 ```
 
-#### React Code is Tightly Coupled
+### React Code is Tightly Coupled
 
 The Context/Reducer code is, understandably, very coupled to React. It exports JSX directly:
 
@@ -113,7 +111,7 @@ export function TasksProvider({ children }) {
 
 It also mixes concerns. Note how in `TasksProvider`, the reducer, initial tasks, and dispatch value have to come together with the UI code to become useful. It's not entirely clear from a top-to-bottom glance where the source of truth for state is.
 
-#### Reducer Function is Unwieldy
+### Reducer Functions Lack Convention
 
 Check out the reducer function:
 
@@ -153,7 +151,7 @@ With three actions, this feels somewhat manageable. But what if your state mutat
 
 Moreover, the `action` argument is opaque. What types are valid? What other data will come along with it? You could write these out in TypeScript and define valid shapes, but that's more work and boilerplate for you.
 
-#### Unclear Initial State in Context/Reducer
+### Unclear Initial State in Context/Reducer
 
 The reducer/context example provides `initialTasks`, like this:
 
@@ -217,7 +215,7 @@ We use an auto-incrementing number for IDs. In the React example, this is stored
 let nextId = 3
 ```
 
-### MobX-State-Tree ViewModel
+## MobX-State-Tree Code Review
 
 ```ts
 // MST's viewmodel in `src/ViewModel.ts`.
@@ -247,7 +245,7 @@ export interface ITask extends Instance<typeof Task> {}
 
 const ViewModel = t
   .model("ViewModel", {
-    taskInputText: t.maybe(t.string),
+    taskInputText: "",
     nextId: 0,
     tasks: t.array(Task)
   })
@@ -276,7 +274,7 @@ const ViewModel = t
         self.tasks.remove(task)
       }
     },
-    setInputText(text: string | undefined) {
+    setInputText(text: string) {
       self.taskInputText = text
     }
   }))
@@ -291,11 +289,11 @@ export const ViewModelSingleton = ViewModel.create({
 })
 ```
 
-#### MobX-State-Tree Decouples State from UI
+### MobX-State-Tree Decouples State from UI
 
 The MobX-State-Tree code doesn't really "know" anything about React (or Vue, or Angular, or Solid, or Svelte, or any other library you might be using). It is Just TypeScript. Which means it does not suffer from the [coupling problems of React state built-ins](#react-code-is-tightly-coupled). We can't really fault React tools for being coupled to React, but using MST will provide you with more flexibility to change your UI code, and even your entire UI library if you ever choose to.
 
-#### Actions vs. Reducer
+### Conventional State Change with Actions
 
 The `.actions` block in our MST code replaces the React reducer. Rather than managing our actions with dispatches and a switch statement, we can write state mutations as regular TypeScript functions. Each aciton gets its own set of parameters. You can call those actions like regular functions, rather than "dispatching" the action boilerplate. This is the code we're talking about:
 
@@ -325,7 +323,7 @@ The `.actions` block in our MST code replaces the React reducer. Rather than man
         self.tasks.remove(task);
       }
     },
-    setInputText(text: string | undefined) {
+    setInputText(text: string) {
       self.taskInputText = text;
     },
   }));
@@ -339,7 +337,7 @@ ViewModelSingleton.addtask()
 
 And we'd create a task based on the current state of the `taskInputText`. State would update, and the UI would respond to the granular updates. Simple and lovely to work with!
 
-#### Single Source of Truth for State
+### MST is a Single Source of Truth for State
 
 It's easier to clarify initial state in MobX-State-Tree. In our example, we provide it much like the [initial state in Context](#unclear-initial-state-in-contextreducer):
 
@@ -396,3 +394,111 @@ export const ViewModelSingleton = ViewModel.create({})
 ```
 
 It _also_ keeps all of this state in one central place. We can read the file top-to-bottom and understand the entirety of our state at a glance.
+
+## React Context/Reducer Rendering Performance
+
+Imagine you want to use React Context in a large React application with many layers of nesting. As a placeholder for a complex app, we can wrap our code in some `MiddleComponent`:
+
+```js
+// src/MiddleComponent.js
+export default function MiddleComponent(props) {
+  const { children } = props;
+  console.log("MiddleComponent evaluated");
+
+  return <div>{children}</div>;
+}
+
+// src/App.js
+
+import AddTask from "./AddTask.js";
+import TaskList from "./TaskList.js";
+import MiddleComponent from "./MiddleComponent.js";
+import { TasksProvider } from "./TasksContext.js";
+
+export default function TaskApp() {
+  return (
+    <TasksProvider>
+      <MiddleComponent>
+        <h1>Day off in Kyoto</h1>
+        <AddTask />
+        <TaskList />
+      </MiddleComponent>
+    </TasksProvider>
+  );
+}
+```
+
+[Play around with this in CodeSandbox and pay attention to the console](https://codesandbox.io/p/sandbox/react-dev-reducer-context-with-middle-component-cjgg72?file=%2Fsrc%2FMiddleComponent.js%3A11%2C1). Add some to-dos, delete some, check some off. You'll see this output in the console:
+
+```
+MiddleComponent evaluated
+MiddleComponent evaluated
+MiddleComponent evaluated
+MiddleComponent evaluated
+MiddleComponent evaluated
+MiddleComponent evaluated
+MiddleComponent evaluated
+MiddleComponent evaluated
+MiddleComponent evaluated
+```
+
+And so on, for as many times as you change the values in the context provider.
+
+### Requires You to Manage Optimizations
+
+Of course, you can fix this in React with memoization:
+
+```jsx
+// src/MiddleComponent.js
+import React from "react"
+
+const MiddleComponent = React.memo(function MiddleComponent(props) {
+  const { children } = props
+  console.log("MiddleComponent evaluated")
+
+  return <div>{children}</div>
+})
+
+export default MiddleComponent
+```
+
+Or you can split context into many sub-contexts and provide them to children more granularly.
+
+But all that said, _you_ still have to manage this complexity in some way. This is advantageous if you and your team are adept at performance work, and want to have fine-grained control of the primitive building blocks provided by React. But many teams lack the expertise, time, or interest in managing this themselves. MobX-State-Tree can solve this pain point for you out-of-the-box.
+
+## MobX-State-Tree Performance
+
+Given a similar component and setup:
+
+```tsx
+// src/MiddleComponent.tsx
+import React from "react"
+
+export default function MiddleComponent(props) {
+  const { children } = props
+  console.log("MiddleComponent evaluated")
+
+  return <div>{children}</div>
+}
+
+// src/App.tsx
+import AddTask from "./AddTask"
+import TaskList from "./TaskList"
+import MiddleComponent from "./MiddleComponent"
+
+export default function TaskApp() {
+  return (
+    <>
+      <MiddleComponent>
+        <h1>Day off in Kyoto</h1>
+        <AddTask />
+        <TaskList />
+      </MiddleComponent>
+    </>
+  )
+}
+```
+
+### Handles Granular Updates Automatically
+
+[Try the same set of actions in CodeSandbox](https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-with-middle-component-y2h558?file=%2Fsrc%2FMiddleComponent.tsx%3A9%2C1), and you'll see that the `MiddleComponent` does _not_ get re-evaluated. MobX-State-Tree does this for you with its [observer higher-order-component](https://mobx-state-tree.js.org/intro/getting-started#getting-to-the-ui), which [only re-renders components when their observed data changes](https://mobx-state-tree.js.org/intro/getting-started#improving-render-performance).
