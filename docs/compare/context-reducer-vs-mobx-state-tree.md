@@ -14,9 +14,8 @@ MobX-State-Tree can provide you with the same features as React's built-in state
 - Runtime type safety for your state, which helps keep your application bug free as your codebase and team grows.
 - Clearer data modeling with our rich runtime type system as opposed to writing plain JS objects.
 - Built-in immutability with [snapshots](../concepts/snapshots.md), great for common operations like "undo/redo", time travel debugging, or synchronizing with external systems
-- [JSON-patch data](../concepts/patches.md), which you can use for use cases like multiplayer editing.
 - Easy persistence with utilities like [mst-persist](https://www.npmjs.com/package/mst-persist)
-- Easy asynchronous data management with utilties like [mst-query](https://github.com/ConrabOpto/mst-query) and [mst-gql](https://github.com/mobxjs/mst-gql)
+- Much more
 
 ## React Context/Reducer Code Review
 
@@ -520,7 +519,7 @@ You don't have to make any choices about the TypeScript design. Model out your s
 
 ## Write Your Own Types for React Context/Reducer
 
-If you want to use React Context/Reducer with TypeScript, you'll need to specify your types from the ground up. Many teams might like this approach, but it does require you to take the time. Here's one way you might type the context:
+If you want to use React Context/Reducer with TypeScript, you'll need to specify your types from the ground up. Many teams might like this approach, but it does require you to take the time to do so. Here's one way you might type the context:
 
 ```tsx
 import React, { createContext, useContext, useReducer, ReactNode, Dispatch, JSX } from "react"
@@ -603,3 +602,164 @@ const initialTasks = [
 ```
 
 [See the whole example converted to TypeScript in CodeSandbox](https://codesandbox.io/p/sandbox/react-dev-context-reducer-example-with-typescript-l8ym3t?file=%2Fsrc%2FTasksContext.tsx%3A91%2C1)
+
+## Context/Reducer Cannot Guarantee Type Safety at Runtime
+
+In the React Context/Reducer example, you are required to understand the kinds of initial data that satisfy your requirements. You must remember how to write them, and write them consistently. The example provides initial tasks like this:
+
+```js
+const initialTasks = [
+  { id: 0, text: "Philosopher’s Path", done: true },
+  { id: 1, text: "Visit the temple", done: false },
+  { id: 2, text: "Drink matcha", done: false }
+]
+```
+
+But if you write an invalid task, React won't stop you:
+
+```js
+const initialTasks = [
+  { id: 0, text: "Philosopher’s Path", done: true },
+  { id: 1, text: "Visit the temple", done: false },
+  { id: 2, text: "Drink matcha", done: false },
+  {
+    something: "else",
+    works: false,
+    id: () => {
+      console.log("here")
+    }
+  }
+]
+```
+
+In fact, React _almost_ does the right thing here. If you check out the [CodeSandbox with this incorrect data](https://codesandbox.io/p/sandbox/react-dev-context-reducer-with-incorrect-task-data-nqw67d?file=%2Fsrc%2FTasksContext.js%3A56%2C1), you'll see that a fourth item shows up. You can even edit/delete/check it off. The React components themselves are pretty resilient.
+
+But if you check off the task, or edit its name, you'll get a warning in the console:
+
+```
+Warning: A component is changing an uncontrolled input to be controlled. This is likely caused by the value changing from undefined to a defined value, which should not happen. Decide between using a controlled or uncontrolled input element for the lifetime of the component. More info: https://reactjs.org/link/controlled-components
+```
+
+This is because we've left `text` and `done` to be `undefined`, and then the reducer is modifying those values.
+
+In the small, toy React example, this isn't a huge deal. But this kind of unexpected behavior can lead to serious bugs in a larger application.
+
+## MobX-State-Tree Provides Runtime Type Safety by Default
+
+[Open up the MST example in CodeSandbox](https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-8824l8?file=%2Fsrc%2FViewModel.ts%3A15%2C24.) and change the ViewModel instantiation to be:
+
+```ts
+export const ViewModelSingleton = ViewModel.create({
+  nextId: 3,
+  tasks: [
+    { id: 0, text: "Philosopher’s Path", done: true },
+    { id: 1, text: "Visit the temple", done: false },
+    { id: 2, text: "Drink matcha", done: false },
+    {
+      something: "else",
+      works: false,
+      id: () => {
+        console.log("here")
+      }
+    }
+  ]
+})
+```
+
+You'll _immediately receive an error from MobX-State-Tree_:
+
+```
+[mobx-state-tree] Error while converting `{"nextId":3,"tasks":[{"id":0,"text":"Philosopher’s Path","done":true},{"id":1,"text":"Visit the temple","done":false},{"id":2,"text":"Drink matcha","done":false},{"something":"else","works":false}]}` to `ViewModel`:
+
+    at path "/tasks/3/id" snapshot <function id> is not assignable to type: `identifierNumber` (Value is not a valid identifierNumber, expected a number), expected an instance of `identifierNumber` or a snapshot like `identifierNumber` instead.
+    at path "/tasks/3/text" value `undefined` is not assignable to type: `string` (Value is not a string).
+```
+
+This error will both prevent you from making costly mistakes in the future, and it even attempts to give you information about _precisely what's wrong_, which makes debugging things easier.
+
+_(Note: by default, MST will not run this check in production mode, which improves performance and prevents your app from crashing in real-world scenarios with untrusted data/inputs)_
+
+## MobX-State-Tree Gives you Building Blocks for Advanced Data Modeling
+
+In the Reducer/Context example, we arbitrarily decide that a task looks like this:
+
+```js
+{ id: 0, text: "Philosopher’s Path", done: true },
+```
+
+With TypeScript, we can annotate the types of these objects. But if you're building a complex app, sometimes you want to enforce your data modeling beyond conventions and static types.
+
+In MobX-State-Tree, we turned that object syntax into a model itself:
+
+```ts
+const Task = t
+  .model("Task", {
+    id: t.identifierNumber,
+    text: t.string,
+    done: t.optional(t.boolean, false),
+    isBeingEdited: t.optional(t.boolean, false)
+  })
+  .actions((self) => ({
+    setText(text: string) {
+      self.text = text
+    },
+    setDone(done: boolean) {
+      self.done = done
+    },
+    setIsBeingEdited(beingEdited: boolean) {
+      self.isBeingEdited = beingEdited
+    }
+  }))
+```
+
+Now our program understands that a `Task` is a real entity with a defined set of properties, and well defined actions it can take at runtime. This is a clearer way to communicate your intention to other programmers, and to enforce rules for your data modeling in your application.
+
+There are [many different types](../overview/types.md) you can extend and build with to provide this same kind of structure and safety to your application at all levels. This is another tradeoff: MST primitives and models have rules that plain JavaScript objects do not. But if you learn those rules, you can improve your developer experience, and more rigorously model your application state for your future self and the rest of your team to work with correctly.
+
+## React Context/Reducer Needs Custom Code for Time Travel Debugging
+
+[Time travel debugging](https://medium.com/the-web-tub/time-travel-in-react-redux-apps-using-the-redux-devtools-5e94eba5e7c0) is a popular tool used to observe how application state changes over time, and diagnose any errors or inaccuracies. The idea is to keep a record of the state and its mutations over time, and then play it back through some dev tooling or observability that understands how to represent the state.
+
+Building this kind of functionality is possible with Reducers and Context, but you have to build it yourself, from the ground up.
+
+## MobX-State-Tree Has Built-in Time Travel Primitives
+
+MobX-State-Tree generates [snapshots](../concepts/snapshots.md), which are immutable, serialized versions of the state at each point it gets changes. You can listen to the snapshots with the `onSnapshot` listener, like this:
+
+```ts
+const initialSnapshot = JSON.stringify(getSnapshot(ViewModelSingleton))
+const timeTravel: string[] = [initialSnapshot]
+onSnapshot(ViewModelSingleton, (snapshot) => {
+  timeTravel.push(JSON.stringify(snapshot))
+})
+```
+
+In this code, we take an inital snapshot of the `ViewModelSingleton`, and then store each subsequent snapshot. You can play around with this in [CodeSandbox](https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-snapshots-qvr529?file=%2Fsrc%2FViewModel.ts%3A54%2C31). Open up the console, and store the `timeTravel` variable as a global variable. Log it out after you make some changes, and you'll see a series of snapshots.
+
+Snapshots like this make time travel debugging easy to implement, with very little custom code. It also makes it easy to do things like persistence, re-hydrating state from the server, and other operations where serialized state can be deserialized into something more useful. The following section is a great example of this.
+
+## Persist State Easily with mst-persist
+
+Since MobX-State-Tree state is always serializable and we have utilities like snapshot listeners, libraries like [mst-persist](https://www.npmjs.com/package/mst-persist) are readily available.
+
+With one import and one line of code, we can persist our application state to localStorage:
+
+```
+import { persist } from "mst-persist";
+
+persist("ViewModelSingleton", ViewModelSingleton)
+```
+
+[Open this CodeSandbox example](https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-persistence-hjmrzg?file=%2Fsrc%2FViewModel.ts%3A70%2C59), make some changes, and then reload it. You'll see your changes have persisted.
+
+React Context can also be persisted to localStorage, but again, it requires you to write the logic from the ground up. If you need this kind of functionality in a large project, the MST community has already taken care of it for you, and we have conventions and maintainers behind the code to do solve your problems.
+
+## MST is State Management on Easy Mode
+
+At this point, we hope the benefits of MobX-State-Tree are clear. If you have a complex application, or if your application is going to become complex over time, MST offers a pre-built set of tools and conventions that will allow you to focus on building features and solving user problems, rather than reinventing the wheel for your state management system.
+
+There are many more MST-specific utilities available, like [data normalization](../concepts/references.md), [JSON patches](../concepts/patches.md), [middleware](../concepts/middleware.md), and libraries like [mst-query](https://github.com/ConrabOpto/mst-query) and [mst-gql](https://github.com/mobxjs/mst-gql) to help you manage asynchronous state. Much like the prior examples in this article, using these tools will save you a lot of work building and maintaining your own bespoke solutions.
+
+If you've been working with React Reducer and Context, MobX-State-Tree will feel like easy-mode for state management. On top of that, you'll join a [welcoming, active community](https://github.com/mobxjs/mobx-state-tree/discussions) where we can help you with state modeling questions, and any learning curve you experience while getting used to MobX-State-Tree.
+
+Questions? Comments? [Let us know in the forum](https://github.com/mobxjs/mobx-state-tree/discussions)
