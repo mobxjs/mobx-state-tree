@@ -108,7 +108,7 @@ test("it should emit remove patches", () => {
   let patches: IJsonPatch[] = []
   onPatch(doc, (patch) => patches.push(patch))
   doc.splice(0)
-  expect(patches).toEqual([{ op: "remove", path: "/0" }])
+  expect(patches).toEqual([{ op: "replace", path: "", value: [] }])
 })
 test("it should apply a remove patch", () => {
   const { Factory, ItemFactory } = createTestFactories()

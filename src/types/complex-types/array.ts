@@ -2,7 +2,6 @@ import {
   _getAdministration,
   action,
   IArrayDidChange,
-  IArraySplice,
   IArrayWillChange,
   IArrayWillSplice,
   intercept,
@@ -43,7 +42,6 @@ import {
   IValidationContext,
   IValidationResult,
   mobxShallow,
-  normalizeIdentifier,
   ObjectNode,
   typeCheckFailure,
   typecheckInternal,
@@ -221,7 +219,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     return processed
   }
 
-  didChange(change: IArrayDidChange<AnyNode> | IArraySplice<AnyNode>): void {
+  didChange(change: IArrayDidChange<AnyNode>): void {
     const node = getStateTreeNode(change.object as IAnyStateTreeNode)
     switch (change.type) {
       case "update":
@@ -235,6 +233,19 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
           node
         )
       case "splice":
+        // Perf: emit one patch for clear and replace ops.
+        if (change.removedCount && change.addedCount === change.object.length) {
+          return void node.emitPatch(
+            {
+              op: "replace",
+              path: "",
+              value: node.snapshot,
+              oldValue: change.removed.map((node) => node.snapshot)
+            },
+            node
+          )
+        }
+
         for (let i = change.removedCount - 1; i >= 0; i--)
           node.emitPatch(
             {
@@ -249,7 +260,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
             {
               op: "add",
               path: "" + (change.index + i),
-              value: node.getChildNode("" + (change.index + i)).snapshot,
+              value: change.added[i].snapshot,
               oldValue: undefined
             },
             node
