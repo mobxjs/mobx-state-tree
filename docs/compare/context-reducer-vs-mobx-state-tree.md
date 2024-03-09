@@ -3,27 +3,26 @@ id: context-reducer-vs-mobx-state-tree
 title: React Context vs. MobX-State-Tree
 ---
 
-If you're using React, you have the option to manage application state with built in hooks, like [`useContext`](https://react.dev/reference/react/useContext) and [`useReducer`](https://react.dev/reference/react/useReducer). The React docs have [a great example showing how to combine these two hooks to manage more complex state](https://react.dev/learn/scaling-up-with-reducer-and-context).
+If you're using React, you have the option to manage application state with built in hooks, like [`useContext`](https://react.dev/reference/react/useContext) and [`useReducer`](https://react.dev/reference/react/useReducer). The React docs have [an example showing how to combine these two hooks to manage more complex state](https://react.dev/learn/scaling-up-with-reducer-and-context).
 
-React built-ins are a great choice if you're strongly opposed to adding new dependencies to your project, or if you want to write flexible JavaScript code with your own set of conventions and choices.
+React built-ins are a great choice if you're opposed to adding dependencies to your project, or if you want to write flexible JavaScript code with your own set of conventions.
 
 MobX-State-Tree can provide you with the same features as React's built-in state management hooks, but with the added benefits of:
 
-- Better performance out of the box due to MST's reactive, observable state as opposed to context's data flow through the React component tree.
-- Automatic TypeScript inference of your state, which makes your state management discoverable, and statically verifiable to prevent author-time bugs.
-- Runtime type safety for your state, which helps keep your application bug free as your codebase and team grows.
+- Better performance out of the box due to MST's reactive, observable state.
+- Automatic TypeScript inference of your state, which makes your code easier to write (with auto-completions) and harder to break (with static analysis of TypeScript).
+- Runtime type safety for your state, which also helps keep your application bug free as your codebase and team grows.
 - Clearer data modeling with our rich runtime type system as opposed to writing plain JS objects.
-- Built-in immutability with [snapshots](../concepts/snapshots.md), great for common operations like "undo/redo", time travel debugging, or synchronizing with external systems
+- Built-in immutability with [snapshots](../concepts/snapshots.md). This makes it easy to build common requirements like "undo/redo", time travel debugging, or synchronizing with external systems
 - Easy persistence with utilities like [mst-persist](https://www.npmjs.com/package/mst-persist)
-- Much more
 
 ## React Context/Reducer Code Review
 
-If you haven't worked with complex contexts and reducers in React, you should definitely read through [their guide on advanced usage](https://react.dev/learn/scaling-up-with-reducer-and-context). It will help you make a fair assessment between React state hooks and MobX-State-Tree.
+If you haven't worked with complex contexts and reducers in React, you should read through [their guide on advanced usage](https://react.dev/learn/scaling-up-with-reducer-and-context). It will help you make a fair assessment between React state hooks and MobX-State-Tree.
 
 [Here is the CodeSandbox of their final product in that article](https://codesandbox.io/p/sandbox/react-dev-wy7lfd?file=%2Fsrc%2FTasksContext.js%3A54%2C4&utm_medium=sandpack).
 
-For your reference, [here is the same set of features, built with MobX-State-Tree instead of Context/Reducers](https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-8824l8?file=%2Fsrc%2FViewModel.ts%3A15%2C24.).
+[And here is the same set of features, built with MobX-State-Tree instead of Context/Reducers](https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-8824l8?file=%2Fsrc%2FViewModel.ts%3A15%2C24.).
 
 Let's focus on comparing just the state-management code in React's `src/TasksContext.js`, and MST's `src/ViewModel.ts`. To start, we'll compare code, and then we'll move on to feature comparisons.
 
@@ -354,7 +353,7 @@ This code is creating a new instance of a ViewModel, and it's providing it with 
 
 ```ts
 export const ViewModelSingleton = ViewModel.create({
-  nextId: "3", // We use numbers for IDs, not strings. This will give you a TypeScript error if you're using TS
+  nextId: "3", // In this example, we're using numbers for IDs, not strings. TS will error.
   tasks: [
     { id: 0, text: "Philosopher’s Path", done: true },
     { id: 1, text: "Visit the temple", done: false },
@@ -369,13 +368,13 @@ If we use the wrong kind of value for our `nextId`, we'll get a TypeScript error
 Type 'string' is not assignable to type 'number'.typescript(2322)
 ```
 
-And if you're not using TypeScript, MST will let you know about it in the runtime:
+Even if you're not using TypeScript, MST will let you know about it in the runtime:
 
 ```
 [mobx-state-tree] Error while converting `{"nextId":"3","tasks":[{"id":0,"text":"Philosopher’s Path","done":true},{"id":1,"text":"Visit the temple","done":false},{"id":2,"text":"Drink matcha","done":false}]}` to `ViewModel`: at path "/nextId" value `"3"` is not assignable to type: `number` (Value is not a number).
 ```
 
-If you want to avoid even this much initial code, you're free to initialize the view model with no tasks. Since we wrote the `nextId` value as a literal, MST will assume it's optional, and the provided value is the default. So this code:
+If you want to avoid even this much initial code, you can initialize the ViewModel with no tasks. Since we wrote the `nextId` value as a literal, MST will assume it's optional, and the provided value is the default. So this code:
 
 ```ts
 const ViewModel = t.model("ViewModel", {
@@ -395,7 +394,7 @@ It _also_ keeps all of this state in one central place. We can read the file top
 
 ## React Context/Reducer Rendering Performance
 
-Imagine you want to use React Context in a large React application with many layers of nesting. As a placeholder for a complex app, we can wrap our code in some `MiddleComponent`:
+Imagine you want to use React Context in a large React application with many layers of nesting. As a simple demonstration, consider what happens if we wrap our code in some `MiddleComponent`:
 
 ```js
 // src/MiddleComponent.js
@@ -442,9 +441,9 @@ MiddleComponent evaluated
 
 And so on, for as many times as you change the values in the context provider.
 
-### Requires You to Manage Optimizations
+### React Makes You Manage Optimization Yourself
 
-Of course, you can fix this in React with memoization:
+You can improve this in React with memoization:
 
 ```jsx
 // src/MiddleComponent.js
@@ -462,7 +461,7 @@ export default MiddleComponent
 
 Or you can split context into many sub-contexts and provide them to children more granularly.
 
-But all that said, _you_ still have to manage this complexity in some way. This is advantageous if you and your team are adept at performance work, and want to have fine-grained control of the primitive building blocks provided by React. But many teams lack the expertise, time, or interest in managing this themselves. MobX-State-Tree can solve this pain point for you out-of-the-box.
+But all that said, _you_ still have to manage this complexity in some way. This is advantageous if you and your team are adept at performance work, and want to have fine-grained control of the primitive building blocks provided by React. But many teams lack the expertise, time, or interest in managing this themselves. MobX-State-Tree solves this performance issue for you by default.
 
 ## MobX-State-Tree Performance
 
@@ -515,7 +514,7 @@ export interface ITask extends Instance<typeof Task> {}
 
 To tell the [Task component](https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-8824l8?file=%2Fsrc%2FTaskList.tsx%3A27%2C19) what to expect in its props.
 
-You don't have to make any choices about the TypeScript design. Model out your state with MST, and we'll give you an opinionated set of TypeScript types back. You trade off some control for quicker development overall, much like the performance management.
+You don't have to make any choices about the TypeScript design. Model out your state with MST, and we'll give you an opinionated set of TypeScript types back. You trade off control for quicker development overall, much like the performance management tradeoffs. If you want good, sensible defaults for rapid development, choose MobX-State-Tree.
 
 ## Write Your Own Types for React Context/Reducer
 
@@ -640,7 +639,7 @@ But if you check off the task, or edit its name, you'll get a warning in the con
 Warning: A component is changing an uncontrolled input to be controlled. This is likely caused by the value changing from undefined to a defined value, which should not happen. Decide between using a controlled or uncontrolled input element for the lifetime of the component. More info: https://reactjs.org/link/controlled-components
 ```
 
-This is because we've left `text` and `done` to be `undefined`, and then the reducer is modifying those values.
+This is because we've left `text` and `done` to be `undefined`, and then the reducer modifies those values.
 
 In the small, toy React example, this isn't a huge deal. But this kind of unexpected behavior can lead to serious bugs in a larger application.
 
@@ -677,7 +676,7 @@ You'll _immediately receive an error from MobX-State-Tree_:
 
 This error will both prevent you from making costly mistakes in the future, and it even attempts to give you information about _precisely what's wrong_, which makes debugging things easier.
 
-_(Note: by default, MST will not run this check in production mode, which improves performance and prevents your app from crashing in real-world scenarios with untrusted data/inputs)_
+_(Note: by default, MST will not run this check in production mode for performance reasons)_
 
 ## MobX-State-Tree Gives you Building Blocks for Advanced Data Modeling
 
@@ -687,7 +686,7 @@ In the Reducer/Context example, we arbitrarily decide that a task looks like thi
 { id: 0, text: "Philosopher’s Path", done: true },
 ```
 
-With TypeScript, we can annotate the types of these objects. But if you're building a complex app, sometimes you want to enforce your data modeling beyond conventions and static types.
+With TypeScript, we can annotate the types of these objects. But if you're building a complex app, you may want to enforce your data modeling beyond conventions and static types.
 
 In MobX-State-Tree, we turned that object syntax into a model itself:
 
@@ -712,7 +711,7 @@ const Task = t
   }))
 ```
 
-Now our program understands that a `Task` is a real entity with a defined set of properties, and well defined actions it can take at runtime. This is a clearer way to communicate your intention to other programmers, and to enforce rules for your data modeling in your application.
+Now our program understands that a `Task` is a real entity with a well-defined set of properties, and well-defined actions it can take at runtime. This is a clearer way to communicate your intention to other programmers, and to enforce rules for your data modeling in your application.
 
 There are [many different types](../overview/types.md) you can extend and build with to provide this same kind of structure and safety to your application at all levels. This is another tradeoff: MST primitives and models have rules that plain JavaScript objects do not. But if you learn those rules, you can improve your developer experience, and more rigorously model your application state for your future self and the rest of your team to work with correctly.
 
@@ -752,7 +751,7 @@ persist("ViewModelSingleton", ViewModelSingleton)
 
 [Open this CodeSandbox example](https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-persistence-hjmrzg?file=%2Fsrc%2FViewModel.ts%3A70%2C59), make some changes, and then reload it. You'll see your changes have persisted.
 
-React Context can also be persisted to localStorage, but again, it requires you to write the logic from the ground up. If you need this kind of functionality in a large project, the MST community has already taken care of it for you, and we have conventions and maintainers behind the code to do solve your problems.
+React Context can also be persisted to localStorage, but again, it requires you to write the logic from the ground up. If you need this kind of functionality in a large project, the MST community has already taken care of it for you, and we have conventions and maintainers behind the code, so you're never really on your own.
 
 ## MST is State Management on Easy Mode
 
