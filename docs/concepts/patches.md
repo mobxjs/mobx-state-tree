@@ -1,7 +1,6 @@
 ---
 id: patches
 title: Patches
-
 ---
 
 <div id="codefund"></div>
@@ -24,14 +23,14 @@ Patches have the following signature:
         value?: any
     }
 
--   Patches are constructed according to JSON-Patch, RFC 6902
--   Patches are emitted immediately when a mutation is made and don't respect transaction boundaries (like snapshots)
--   Patch listeners can be used to achieve deep observing
--   The `path` attribute of a patch contains the path of the event relative to the place where the event listener is attached
--   A single mutation can result in multiple patches, for example when splicing an array
--   Patches can be reverse applied, which enables many powerful patterns like undo / redo
+- Patches are constructed according to JSON-Patch, RFC 6902
+- Patches are emitted immediately when a mutation is made and don't respect transaction boundaries (like snapshots)
+- Patch listeners can be used to achieve deep observing
+- The `path` attribute of a patch contains the path of the event relative to the place where the event listener is attached
+- A single mutation can result in multiple patches, for example when splicing an array
+- Patches can be reverse applied, which enables many powerful patterns like undo / redo
 
 Useful methods:
 
--   `onPatch(model, listener)` attaches a patch listener to the provided model, which will be invoked whenever the model or any of its descendants is mutated
--   `applyPatch(model, patch)` applies a patch (or array of patches) to the provided model
+- `onPatch(model, listener)` attaches a patch listener to the provided model, which will be invoked whenever the model or any of its descendants is mutated
+- `applyPatch(model, patch)` applies a patch (or array of patches) to the provided model
