@@ -1,0 +1,694 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>React Context vs. MobX-State-Tree · MobX-state-tree</title><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="generator" content="Docusaurus"/><meta name="description" content="If you&#x27;re using React, you have the option to manage application state with built in hooks, like [`useContext`](https://react.dev/reference/react/useContext) and [`useReducer`](https://react.dev/reference/react/useReducer). The React docs have [an example showing how to combine these two hooks to manage more complex state](https://react.dev/learn/scaling-up-with-reducer-and-context)."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="React Context vs. MobX-State-Tree · MobX-state-tree"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobx-state-tree.js.org//"/><meta property="og:description" content="If you&#x27;re using React, you have the option to manage application state with built in hooks, like [`useContext`](https://react.dev/reference/react/useContext) and [`useReducer`](https://react.dev/reference/react/useReducer). The React docs have [an example showing how to combine these two hooks to manage more complex state](https://react.dev/learn/scaling-up-with-reducer-and-context)."/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/dracula.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-65632006-4', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script type="text/javascript" src="https://codefund.io/properties/635/funder.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="MobX-state-tree"/><h2 class="headerTitleWithLogo">MobX-state-tree</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/intro/welcome" target="_self">Documentation</a></li><li class=""><a href="/API/" target="_self">TypeDocs</a></li><li class=""><a href="https://opencollective.com/mobx" target="_self">Sponsor</a></li><li class=""><a href="https://github.com/mobxjs/mobx-state-tree" target="_self">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Compare</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Introduction<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/intro/welcome">Welcome to MobX-State-Tree!</a></li><li class="navListItem"><a class="navItem" href="/intro/installation">Installation</a></li><li class="navListItem"><a class="navItem" href="/intro/getting-started">Getting Started Tutorial</a></li><li class="navListItem"><a class="navItem" href="/intro/examples">Examples</a></li><li class="navListItem"><a class="navItem" href="/intro/philosophy">Overview &amp; Philosophy</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Basic Concepts<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/concepts/trees">Types, models, trees &amp; state</a></li><li class="navListItem"><a class="navItem" href="/concepts/actions">Actions</a></li><li class="navListItem"><a class="navItem" href="/concepts/views">Derived values</a></li><li class="navListItem"><a class="navItem" href="/concepts/using-react">React and MST</a></li><li class="navListItem"><a class="navItem" href="/concepts/snapshots">Snapshots</a></li><li class="navListItem"><a class="navItem" href="/concepts/references">Identifiers and references</a></li><li class="navListItem"><a class="navItem" href="/concepts/async-actions">Asynchronous actions</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Advanced Concepts<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/concepts/patches">Patches</a></li><li class="navListItem"><a class="navItem" href="/concepts/listeners">Listening to changes</a></li><li class="navListItem"><a class="navItem" href="/concepts/dependency-injection">Dependency Injection</a></li><li class="navListItem"><a class="navItem" href="/concepts/middleware">Middleware</a></li><li class="navListItem"><a class="navItem" href="/concepts/reconciliation">Reconciliation</a></li><li class="navListItem"><a class="navItem" href="/concepts/volatiles">Volatile state</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">API Overview<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/overview/types">Types overview</a></li><li class="navListItem"><a class="navItem" href="/overview/api">API overview</a></li><li class="navListItem"><a class="navItem" href="/overview/hooks">Lifecycle hooks overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Tips<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/tips/resources">Talks &amp; Blogs</a></li><li class="navListItem"><a class="navItem" href="/tips/faq">Frequently Asked Questions</a></li><li class="navListItem"><a class="navItem" href="/tips/typescript">TypeScript and MST</a></li><li class="navListItem"><a class="navItem" href="/tips/circular-deps">Circular dependencies</a></li><li class="navListItem"><a class="navItem" href="/tips/inheritance">Simulating inheritance</a></li><li class="navListItem"><a class="navItem" href="/tips/snapshots-as-values">Using snapshots as values</a></li><li class="navListItem"><a class="navItem" href="/tips/more-tips">Miscellaneous Tips</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Compare<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem navListItemActive"><a class="navItem" href="/compare/context-reducer-vs-mobx-state-tree">React Context vs. MobX-State-Tree</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx-state-tree/edit/master/docs/compare/context-reducer-vs-mobx-state-tree.md" target="_blank" rel="noreferrer noopener">Edit</a><h1 id="__docusaurus" class="postHeaderTitle">React Context vs. MobX-State-Tree</h1></header><article><div><span><p>If you're using React, you have the option to manage application state with built in hooks, like <a href="https://react.dev/reference/react/useContext"><code>useContext</code></a> and <a href="https://react.dev/reference/react/useReducer"><code>useReducer</code></a>. The React docs have <a href="https://react.dev/learn/scaling-up-with-reducer-and-context">an example showing how to combine these two hooks to manage more complex state</a>.</p>
+<p>React built-ins are a great choice if you're opposed to adding dependencies to your project, or if you want to write flexible JavaScript code with your own set of conventions.</p>
+<p>MobX-State-Tree can provide you with the same features as React's built-in state management hooks, but with the added benefits of:</p>
+<ul>
+<li>Better performance out of the box due to MST's reactive, observable state.</li>
+<li>Automatic TypeScript inference of your state, which makes your code easier to write (with auto-completions) and harder to break (with static analysis of TypeScript).</li>
+<li>Runtime type safety for your state, which also helps keep your application bug free as your codebase and team grows.</li>
+<li>Clearer data modeling with our rich runtime type system as opposed to writing plain JS objects.</li>
+<li>Built-in immutability with <a href="/concepts/snapshots">snapshots</a>. This makes it easy to build common requirements like &quot;undo/redo&quot;, time travel debugging, or synchronizing with external systems</li>
+<li>Easy persistence with utilities like <a href="https://www.npmjs.com/package/mst-persist">mst-persist</a></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="react-contextreducer-code-review"></a><a href="#react-contextreducer-code-review" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>React Context/Reducer Code Review</h2>
+<p>If you haven't worked with complex contexts and reducers in React, you should read through <a href="https://react.dev/learn/scaling-up-with-reducer-and-context">their guide on advanced usage</a>. It will help you make a fair assessment between React state hooks and MobX-State-Tree.</p>
+<p><a href="https://codesandbox.io/p/sandbox/react-dev-wy7lfd?file=%2Fsrc%2FTasksContext.js%3A54%2C4&amp;utm_medium=sandpack">Here is the CodeSandbox of their final product in that article</a>.</p>
+<p><a href="https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-8824l8?file=%2Fsrc%2FViewModel.ts%3A15%2C24.">And here is the same set of features, built with MobX-State-Tree instead of Context/Reducers</a>.</p>
+<p>Let's focus on comparing just the state-management code in React's <code>src/TasksContext.js</code>, and MST's <code>src/ViewModel.ts</code>. To start, we'll compare code, and then we'll move on to feature comparisons.</p>
+<pre><code class="hljs css language-js"><span class="hljs-comment">// React context/reducer in `src/TasksContext.js`</span>
+<span class="hljs-comment">// https://codesandbox.io/p/sandbox/react-dev-wy7lfd?file=%2Fsrc%2FTasksContext.js%3A43%2C17&amp;utm_medium=sandpack</span>
+<span class="hljs-keyword">import</span> { createContext, useContext, useReducer } <span class="hljs-keyword">from</span> <span class="hljs-string">"react"</span>
+
+<span class="hljs-keyword">const</span> TasksContext = createContext(<span class="hljs-literal">null</span>)
+
+<span class="hljs-keyword">const</span> TasksDispatchContext = createContext(<span class="hljs-literal">null</span>)
+
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">TasksProvider</span>(<span class="hljs-params">{ children }</span>) </span>{
+  <span class="hljs-keyword">const</span> [tasks, dispatch] = useReducer(tasksReducer, initialTasks)
+
+  <span class="hljs-keyword">return</span> (
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">TasksContext.Provider</span> <span class="hljs-attr">value</span>=<span class="hljs-string">{tasks}</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">TasksDispatchContext.Provider</span> <span class="hljs-attr">value</span>=<span class="hljs-string">{dispatch}</span>&gt;</span>{children}<span class="hljs-tag">&lt;/<span class="hljs-name">TasksDispatchContext.Provider</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">TasksContext.Provider</span>&gt;</span></span>
+  )
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">useTasks</span>(<span class="hljs-params"></span>) </span>{
+  <span class="hljs-keyword">return</span> useContext(TasksContext)
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">useTasksDispatch</span>(<span class="hljs-params"></span>) </span>{
+  <span class="hljs-keyword">return</span> useContext(TasksDispatchContext)
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">tasksReducer</span>(<span class="hljs-params">tasks, action</span>) </span>{
+  <span class="hljs-keyword">switch</span> (action.type) {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"added"</span>: {
+      <span class="hljs-keyword">return</span> [
+        ...tasks,
+        {
+          <span class="hljs-attr">id</span>: action.id,
+          <span class="hljs-attr">text</span>: action.text,
+          <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span>
+        }
+      ]
+    }
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"changed"</span>: {
+      <span class="hljs-keyword">return</span> tasks.map(<span class="hljs-function">(<span class="hljs-params">t</span>) =&gt;</span> {
+        <span class="hljs-keyword">if</span> (t.id === action.task.id) {
+          <span class="hljs-keyword">return</span> action.task
+        } <span class="hljs-keyword">else</span> {
+          <span class="hljs-keyword">return</span> t
+        }
+      })
+    }
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"deleted"</span>: {
+      <span class="hljs-keyword">return</span> tasks.filter(<span class="hljs-function">(<span class="hljs-params">t</span>) =&gt;</span> t.id !== action.id)
+    }
+    <span class="hljs-attr">default</span>: {
+      <span class="hljs-keyword">throw</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"Unknown action: "</span> + action.type)
+    }
+  }
+}
+
+<span class="hljs-keyword">const</span> initialTasks = [
+  { <span class="hljs-attr">id</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">"Philosopher’s Path"</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span> },
+  { <span class="hljs-attr">id</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">"Visit the temple"</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span> },
+  { <span class="hljs-attr">id</span>: <span class="hljs-number">2</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">"Drink matcha"</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span> }
+]
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="react-code-is-tightly-coupled"></a><a href="#react-code-is-tightly-coupled" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>React Code is Tightly Coupled</h3>
+<p>The Context/Reducer code is, understandably, very coupled to React. It exports JSX directly:</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">TasksProvider</span>(<span class="hljs-params">{ children }</span>) </span>{
+  <span class="hljs-keyword">const</span> [tasks, dispatch] = useReducer(tasksReducer, initialTasks)
+
+  <span class="hljs-keyword">return</span> (
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">TasksContext.Provider</span> <span class="hljs-attr">value</span>=<span class="hljs-string">{tasks}</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">TasksDispatchContext.Provider</span> <span class="hljs-attr">value</span>=<span class="hljs-string">{dispatch}</span>&gt;</span>{children}<span class="hljs-tag">&lt;/<span class="hljs-name">TasksDispatchContext.Provider</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">TasksContext.Provider</span>&gt;</span></span>
+  )
+}
+</code></pre>
+<p>It also mixes concerns. Note how in <code>TasksProvider</code>, the reducer, initial tasks, and dispatch value have to come together with the UI code to become useful. It's not entirely clear from a top-to-bottom glance where the source of truth for state is.</p>
+<h3><a class="anchor" aria-hidden="true" id="reducer-functions-lack-convention"></a><a href="#reducer-functions-lack-convention" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Reducer Functions Lack Convention</h3>
+<p>Check out the reducer function:</p>
+<pre><code class="hljs css language-js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">tasksReducer</span>(<span class="hljs-params">tasks, action</span>) </span>{
+  <span class="hljs-keyword">switch</span> (action.type) {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"added"</span>: {
+      <span class="hljs-keyword">return</span> [
+        ...tasks,
+        {
+          <span class="hljs-attr">id</span>: action.id,
+          <span class="hljs-attr">text</span>: action.text,
+          <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span>
+        }
+      ]
+    }
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"changed"</span>: {
+      <span class="hljs-keyword">return</span> tasks.map(<span class="hljs-function">(<span class="hljs-params">t</span>) =&gt;</span> {
+        <span class="hljs-keyword">if</span> (t.id === action.task.id) {
+          <span class="hljs-keyword">return</span> action.task
+        } <span class="hljs-keyword">else</span> {
+          <span class="hljs-keyword">return</span> t
+        }
+      })
+    }
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"deleted"</span>: {
+      <span class="hljs-keyword">return</span> tasks.filter(<span class="hljs-function">(<span class="hljs-params">t</span>) =&gt;</span> t.id !== action.id)
+    }
+    <span class="hljs-attr">default</span>: {
+      <span class="hljs-keyword">throw</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"Unknown action: "</span> + action.type)
+    }
+  }
+}
+</code></pre>
+<p>With three actions, this feels somewhat manageable. But what if your state mutations are more numerous or more complex? Of course you can split those out into other files, but then your codebase gets fragmented, and it's becomes more difficult to reason about it overtime.</p>
+<p>Moreover, the <code>action</code> argument is opaque. What types are valid? What other data will come along with it? You could write these out in TypeScript and define valid shapes, but that's more work and boilerplate for you.</p>
+<h3><a class="anchor" aria-hidden="true" id="unclear-initial-state-in-contextreducer"></a><a href="#unclear-initial-state-in-contextreducer" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Unclear Initial State in Context/Reducer</h3>
+<p>The reducer/context example provides <code>initialTasks</code>, like this:</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">const</span> initialTasks = [
+  { <span class="hljs-attr">id</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">"Philosopher’s Path"</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span> },
+  { <span class="hljs-attr">id</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">"Visit the temple"</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span> },
+  { <span class="hljs-attr">id</span>: <span class="hljs-number">2</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">"Drink matcha"</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span> }
+]
+</code></pre>
+<p>But those are just the initial tasks. If you followed the React tutorial, you might be wondering:</p>
+<ol>
+<li>How do we know if an item is being edited?</li>
+<li>Where are we storing <code>nextId</code>?</li>
+</ol>
+<p>Turns out, the item being edited is managed as local state with <code>useState</code> in <a href="https://codesandbox.io/p/sandbox/react-dev-wy7lfd?file=%2Fsrc%2FTaskList.js%3A15%2C2&amp;utm_medium=sandpack"><code>src/TaskList.js</code></a>:</p>
+<pre><code class="hljs css language-js"><span class="hljs-comment">// ...</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Task</span>(<span class="hljs-params">{ task }</span>) </span>{
+  <span class="hljs-keyword">const</span> [isEditing, setIsEditing] = useState(<span class="hljs-literal">false</span>);
+  <span class="hljs-keyword">const</span> dispatch = useTasksDispatch();
+  <span class="hljs-keyword">let</span> taskContent;
+  <span class="hljs-keyword">if</span> (isEditing) {
+    taskContent = (
+      <span class="xml"><span class="hljs-tag">&lt;&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">input</span>
+          <span class="hljs-attr">value</span>=<span class="hljs-string">{task.text}</span>
+          <span class="hljs-attr">onChange</span>=<span class="hljs-string">{e</span> =&gt;</span> {
+            dispatch({
+              type: 'changed',
+              task: {
+                ...task,
+                text: e.target.value
+              }
+            });
+          }} /&gt;
+        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{()</span> =&gt;</span> setIsEditing(false)}&gt;
+          Save
+        <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+      <span class="hljs-tag">&lt;/&gt;</span></span>
+    );
+  } <span class="hljs-keyword">else</span> {
+    taskContent = (
+      <span class="xml"><span class="hljs-tag">&lt;&gt;</span>
+        {task.text}
+        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{()</span> =&gt;</span> setIsEditing(true)}&gt;
+          Edit
+        <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+      <span class="hljs-tag">&lt;/&gt;</span></span>
+    );
+  }
+<span class="hljs-comment">// ...</span>
+</code></pre>
+<p>We use an auto-incrementing number for IDs. In the React example, this is stored and initialized in <a href="https://codesandbox.io/p/sandbox/react-dev-wy7lfd?file=%2Fsrc%2FAddTask.js%3A27%2C1&amp;utm_medium=sandpack"><code>src/AddTask.js</code></a>:</p>
+<pre><code class="hljs css language-js"><span class="hljs-comment">// At the bottom of `src/AddTask.js`:</span>
+<span class="hljs-keyword">let</span> nextId = <span class="hljs-number">3</span>
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="mobx-state-tree-code-review"></a><a href="#mobx-state-tree-code-review" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>MobX-State-Tree Code Review</h2>
+<pre><code class="hljs css language-ts"><span class="hljs-comment">// MST's viewmodel in `src/ViewModel.ts`.</span>
+<span class="hljs-comment">// https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-8824l8?file=%2Fsrc%2FViewModel.ts%3A88%2C1</span>
+<span class="hljs-keyword">import</span> { t, Instance } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-state-tree"</span>
+
+<span class="hljs-keyword">const</span> Task = t
+  .model(<span class="hljs-string">"Task"</span>, {
+    id: t.identifierNumber,
+    text: t.string,
+    done: t.optional(t.boolean, <span class="hljs-literal">false</span>),
+    isBeingEdited: t.optional(t.boolean, <span class="hljs-literal">false</span>)
+  })
+  .actions(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
+    setText(text: <span class="hljs-built_in">string</span>) {
+      self.text = text
+    },
+    setDone(done: <span class="hljs-built_in">boolean</span>) {
+      self.done = done
+    },
+    setIsBeingEdited(beingEdited: <span class="hljs-built_in">boolean</span>) {
+      self.isBeingEdited = beingEdited
+    }
+  }))
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> ITask <span class="hljs-keyword">extends</span> Instance&lt;typeof Task&gt; {}
+
+<span class="hljs-keyword">const</span> ViewModel = t
+  .model(<span class="hljs-string">"ViewModel"</span>, {
+    taskInputText: <span class="hljs-string">""</span>,
+    nextId: <span class="hljs-number">0</span>,
+    tasks: t.array(Task)
+  })
+  .actions(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
+    addTask() {
+      <span class="hljs-keyword">const</span> { nextId, taskInputText } = self
+
+      <span class="hljs-keyword">if</span> (!taskInputText) {
+        <span class="hljs-keyword">return</span>
+      }
+
+      <span class="hljs-keyword">const</span> newTask = Task.create({
+        id: nextId,
+        text: taskInputText
+      })
+
+      self.tasks.push(newTask)
+
+      self.nextId += <span class="hljs-number">1</span>
+
+      self.taskInputText = <span class="hljs-string">""</span>
+    },
+    deleteTask(id: <span class="hljs-built_in">number</span>) {
+      <span class="hljs-keyword">const</span> task = self.tasks.find(<span class="hljs-function">(<span class="hljs-params">t</span>) =&gt;</span> t.id === id)
+      <span class="hljs-keyword">if</span> (task) {
+        self.tasks.remove(task)
+      }
+    },
+    setInputText(text: <span class="hljs-built_in">string</span>) {
+      self.taskInputText = text
+    }
+  }))
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> ViewModelSingleton = ViewModel.create({
+  nextId: <span class="hljs-number">3</span>,
+  tasks: [
+    { id: <span class="hljs-number">0</span>, text: <span class="hljs-string">"Philosopher’s Path"</span>, done: <span class="hljs-literal">true</span> },
+    { id: <span class="hljs-number">1</span>, text: <span class="hljs-string">"Visit the temple"</span>, done: <span class="hljs-literal">false</span> },
+    { id: <span class="hljs-number">2</span>, text: <span class="hljs-string">"Drink matcha"</span>, done: <span class="hljs-literal">false</span> }
+  ]
+})
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="mobx-state-tree-decouples-state-from-ui"></a><a href="#mobx-state-tree-decouples-state-from-ui" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>MobX-State-Tree Decouples State from UI</h3>
+<p>The MobX-State-Tree code doesn't really &quot;know&quot; anything about React (or Vue, or Angular, or Solid, or Svelte, or any other library you might be using). It is Just TypeScript. Which means it does not suffer from the <a href="#react-code-is-tightly-coupled">coupling problems of React state built-ins</a>. We can't really fault React tools for being coupled to React, but using MST will provide you with more flexibility to change your UI code, and even your entire UI library if you ever choose to.</p>
+<h3><a class="anchor" aria-hidden="true" id="conventional-state-change-with-actions"></a><a href="#conventional-state-change-with-actions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Conventional State Change with Actions</h3>
+<p>The <code>.actions</code> block in our MST code replaces the React reducer. Rather than managing our actions with dispatches and a switch statement, we can write state mutations as regular TypeScript functions. Each aciton gets its own set of parameters. You can call those actions like regular functions, rather than &quot;dispatching&quot; the action boilerplate. This is the code we're talking about:</p>
+<pre><code class="hljs css language-ts">  .actions(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
+    addTask() {
+      <span class="hljs-keyword">const</span> { nextId, taskInputText } = self;
+
+      <span class="hljs-keyword">if</span> (!taskInputText) {
+        <span class="hljs-keyword">return</span>;
+      }
+
+      <span class="hljs-keyword">const</span> newTask = Task.create({
+        id: nextId,
+        text: taskInputText,
+      });
+
+      self.tasks.push(newTask);
+
+      self.nextId += <span class="hljs-number">1</span>;
+
+      self.taskInputText = <span class="hljs-string">""</span>;
+    },
+    deleteTask(id: <span class="hljs-built_in">number</span>) {
+      <span class="hljs-keyword">const</span> task = self.tasks.find(<span class="hljs-function">(<span class="hljs-params">t</span>) =&gt;</span> t.id === id);
+      <span class="hljs-keyword">if</span> (task) {
+        self.tasks.remove(task);
+      }
+    },
+    setInputText(text: <span class="hljs-built_in">string</span>) {
+      self.taskInputText = text;
+    },
+  }));
+</code></pre>
+<p>If you want to add a task, you'd call:</p>
+<pre><code class="hljs css language-ts">ViewModelSingleton.addtask()
+</code></pre>
+<p>And we'd create a task based on the current state of the <code>taskInputText</code>. State would update, and the UI would respond to the granular updates. Simple and lovely to work with!</p>
+<h3><a class="anchor" aria-hidden="true" id="mst-is-a-single-source-of-truth-for-state"></a><a href="#mst-is-a-single-source-of-truth-for-state" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>MST is a Single Source of Truth for State</h3>
+<p>It's easier to clarify initial state in MobX-State-Tree. In our example, we provide it much like the <a href="#unclear-initial-state-in-contextreducer">initial state in Context</a>:</p>
+<pre><code class="hljs css language-ts"><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> ViewModelSingleton = ViewModel.create({
+  nextId: <span class="hljs-number">3</span>,
+  tasks: [
+    { id: <span class="hljs-number">0</span>, text: <span class="hljs-string">"Philosopher’s Path"</span>, done: <span class="hljs-literal">true</span> },
+    { id: <span class="hljs-number">1</span>, text: <span class="hljs-string">"Visit the temple"</span>, done: <span class="hljs-literal">false</span> },
+    { id: <span class="hljs-number">2</span>, text: <span class="hljs-string">"Drink matcha"</span>, done: <span class="hljs-literal">false</span> }
+  ]
+})
+</code></pre>
+<p>This code is creating a new instance of a ViewModel, and it's providing it with all of the initial state we need. If we gave an invalid initial state, MobX-State-Tree would warn us:</p>
+<pre><code class="hljs css language-ts"><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> ViewModelSingleton = ViewModel.create({
+  nextId: <span class="hljs-string">"3"</span>, <span class="hljs-comment">// In this example, we're using numbers for IDs, not strings. TS will error.</span>
+  tasks: [
+    { id: <span class="hljs-number">0</span>, text: <span class="hljs-string">"Philosopher’s Path"</span>, done: <span class="hljs-literal">true</span> },
+    { id: <span class="hljs-number">1</span>, text: <span class="hljs-string">"Visit the temple"</span>, done: <span class="hljs-literal">false</span> },
+    { id: <span class="hljs-number">2</span>, text: <span class="hljs-string">"Drink matcha"</span>, done: <span class="hljs-literal">false</span> }
+  ]
+})
+</code></pre>
+<p>If we use the wrong kind of value for our <code>nextId</code>, we'll get a TypeScript error like:</p>
+<pre><code class="hljs">Type <span class="hljs-string">'string'</span> is <span class="hljs-keyword">not</span> assignable <span class="hljs-keyword">to</span><span class="hljs-built_in"> type </span><span class="hljs-string">'number'</span>.typescript(2322)
+</code></pre>
+<p>Even if you're not using TypeScript, MST will let you know about it in the runtime:</p>
+<pre><code class="hljs">[mobx-state-tree] Error <span class="hljs-keyword">while</span> converting `{"nextId":"3","tasks":[{"id":<span class="hljs-number">0</span>,"text":"Philosopher’s Path","done":<span class="hljs-keyword">true</span>},{"id":<span class="hljs-number">1</span>,"text":"Visit the temple","done":<span class="hljs-keyword">false</span>},{"id":<span class="hljs-number">2</span>,"text":"Drink matcha","done":<span class="hljs-keyword">false</span>}]}` <span class="hljs-keyword">to</span> `ViewModel`: at <span class="hljs-type">path</span> "/nextId" <span class="hljs-keyword">value</span> `"3"` <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> assignable <span class="hljs-keyword">to</span> <span class="hljs-keyword">type</span>: `number` (<span class="hljs-keyword">Value</span> <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> a number).
+</code></pre>
+<p>If you want to avoid even this much initial code, you can initialize the ViewModel with no tasks. Since we wrote the <code>nextId</code> value as a literal, MST will assume it's optional, and the provided value is the default. So this code:</p>
+<pre><code class="hljs css language-ts"><span class="hljs-keyword">const</span> ViewModel = t.model(<span class="hljs-string">"ViewModel"</span>, {
+  taskInputText: t.maybe(t.string),
+  nextId: <span class="hljs-number">0</span>,
+  tasks: t.array(Task)
+})
+</code></pre>
+<p>Allows us to write:</p>
+<pre><code class="hljs css language-ts"><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> ViewModelSingleton = ViewModel.create({})
+</code></pre>
+<p>It <em>also</em> keeps all of this state in one central place. We can read the file top-to-bottom and understand the entirety of our state at a glance.</p>
+<h2><a class="anchor" aria-hidden="true" id="react-contextreducer-rendering-performance"></a><a href="#react-contextreducer-rendering-performance" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>React Context/Reducer Rendering Performance</h2>
+<p>Imagine you want to use React Context in a large React application with many layers of nesting. As a simple demonstration, consider what happens if we wrap our code in some <code>MiddleComponent</code>:</p>
+<pre><code class="hljs css language-js"><span class="hljs-comment">// src/MiddleComponent.js</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">MiddleComponent</span>(<span class="hljs-params">props</span>) </span>{
+  <span class="hljs-keyword">const</span> { children } = props;
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"MiddleComponent evaluated"</span>);
+
+  <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>{children}<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>;
+}
+
+<span class="hljs-comment">// src/App.js</span>
+
+<span class="hljs-keyword">import</span> AddTask <span class="hljs-keyword">from</span> <span class="hljs-string">"./AddTask.js"</span>;
+<span class="hljs-keyword">import</span> TaskList <span class="hljs-keyword">from</span> <span class="hljs-string">"./TaskList.js"</span>;
+<span class="hljs-keyword">import</span> MiddleComponent <span class="hljs-keyword">from</span> <span class="hljs-string">"./MiddleComponent.js"</span>;
+<span class="hljs-keyword">import</span> { TasksProvider } <span class="hljs-keyword">from</span> <span class="hljs-string">"./TasksContext.js"</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">TaskApp</span>(<span class="hljs-params"></span>) </span>{
+  <span class="hljs-keyword">return</span> (
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">TasksProvider</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">MiddleComponent</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Day off in Kyoto<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">AddTask</span> /&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">TaskList</span> /&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">MiddleComponent</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">TasksProvider</span>&gt;</span></span>
+  );
+}
+</code></pre>
+<p><a href="https://codesandbox.io/p/sandbox/react-dev-reducer-context-with-middle-component-cjgg72?file=%2Fsrc%2FMiddleComponent.js%3A11%2C1">Play around with this in CodeSandbox and pay attention to the console</a>. Add some to-dos, delete some, check some off. You'll see this output in the console:</p>
+<pre><code class="hljs"><span class="hljs-attr">MiddleComponent</span> <span class="hljs-string">evaluated</span>
+<span class="hljs-attr">MiddleComponent</span> <span class="hljs-string">evaluated</span>
+<span class="hljs-attr">MiddleComponent</span> <span class="hljs-string">evaluated</span>
+<span class="hljs-attr">MiddleComponent</span> <span class="hljs-string">evaluated</span>
+<span class="hljs-attr">MiddleComponent</span> <span class="hljs-string">evaluated</span>
+<span class="hljs-attr">MiddleComponent</span> <span class="hljs-string">evaluated</span>
+<span class="hljs-attr">MiddleComponent</span> <span class="hljs-string">evaluated</span>
+<span class="hljs-attr">MiddleComponent</span> <span class="hljs-string">evaluated</span>
+<span class="hljs-attr">MiddleComponent</span> <span class="hljs-string">evaluated</span>
+</code></pre>
+<p>And so on, for as many times as you change the values in the context provider.</p>
+<h3><a class="anchor" aria-hidden="true" id="react-makes-you-manage-optimization-yourself"></a><a href="#react-makes-you-manage-optimization-yourself" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>React Makes You Manage Optimization Yourself</h3>
+<p>You can improve this in React with memoization:</p>
+<pre><code class="hljs css language-jsx"><span class="hljs-comment">// src/MiddleComponent.js</span>
+<span class="hljs-keyword">import</span> React <span class="hljs-keyword">from</span> <span class="hljs-string">"react"</span>
+
+<span class="hljs-keyword">const</span> MiddleComponent = React.memo(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">MiddleComponent</span>(<span class="hljs-params">props</span>) </span>{
+  <span class="hljs-keyword">const</span> { children } = props
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"MiddleComponent evaluated"</span>)
+
+  <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>{children}<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+})
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> MiddleComponent
+</code></pre>
+<p>Or you can split context into many sub-contexts and provide them to children more granularly.</p>
+<p>But all that said, <em>you</em> still have to manage this complexity in some way. This is advantageous if you and your team are adept at performance work, and want to have fine-grained control of the primitive building blocks provided by React. But many teams lack the expertise, time, or interest in managing this themselves. MobX-State-Tree solves this performance issue for you by default.</p>
+<h2><a class="anchor" aria-hidden="true" id="mobx-state-tree-performance"></a><a href="#mobx-state-tree-performance" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>MobX-State-Tree Performance</h2>
+<p>Given a similar component and setup:</p>
+<pre><code class="hljs css language-tsx"><span class="hljs-comment">// src/MiddleComponent.tsx</span>
+<span class="hljs-keyword">import</span> React <span class="hljs-keyword">from</span> <span class="hljs-string">"react"</span>
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">MiddleComponent</span>(<span class="hljs-params">props</span>) </span>{
+  <span class="hljs-keyword">const</span> { children } = props
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"MiddleComponent evaluated"</span>)
+
+  <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>{children}<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+}
+
+<span class="hljs-comment">// src/App.tsx</span>
+<span class="hljs-keyword">import</span> AddTask <span class="hljs-keyword">from</span> <span class="hljs-string">"./AddTask"</span>
+<span class="hljs-keyword">import</span> TaskList <span class="hljs-keyword">from</span> <span class="hljs-string">"./TaskList"</span>
+<span class="hljs-keyword">import</span> MiddleComponent <span class="hljs-keyword">from</span> <span class="hljs-string">"./MiddleComponent"</span>
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">TaskApp</span>(<span class="hljs-params"></span>) </span>{
+  <span class="hljs-keyword">return</span> (
+    <span class="xml"><span class="hljs-tag">&lt;&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">MiddleComponent</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Day off in Kyoto<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">AddTask</span> /&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">TaskList</span> /&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">MiddleComponent</span>&gt;</span>
+    <span class="hljs-tag">&lt;/&gt;</span></span>
+  )
+}
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="handles-granular-updates-automatically"></a><a href="#handles-granular-updates-automatically" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Handles Granular Updates Automatically</h3>
+<p><a href="https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-with-middle-component-y2h558?file=%2Fsrc%2FMiddleComponent.tsx%3A9%2C1">Try the same set of actions in CodeSandbox</a>, and you'll see that the <code>MiddleComponent</code> does <em>not</em> get re-evaluated. MobX-State-Tree does this for you with its <a href="../intro/getting-started#getting-to-the-ui">observer higher-order-component</a>, which <a href="../intro/getting-started#improving-render-performance">only re-renders components when their observed data changes</a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="automatic-typescript-types-with-mobx-state-tree"></a><a href="#automatic-typescript-types-with-mobx-state-tree" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Automatic TypeScript Types with MobX-State-Tree</h2>
+<p>So far we've been comparing React's <a href="https://codesandbox.io/p/sandbox/react-dev-wy7lfd?file=%2Fsrc%2Findex.js%3A28%2C30&amp;utm_medium=sandpack">JavaScript only example</a> against a MobX-State-Tree example <a href="https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-8824l8?file=%2Fsrc%2FViewModel.ts%3A11%2C22">written in TypeScript</a>.</p>
+<p>The TypeScript story for MobX-State-Tree is very straightforward. In <a href="https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-8824l8?file=%2Fsrc%2FViewModel.ts%3A69%2C20"><code>src/ViewModel.ts</code></a> you can write <code>ViewModelSingleton.</code> and get auto-complete for all its properties and actions.</p>
+<p>If you want to do more with these types, we <a href="../tips/typescript#using-a-mst-type-at-design-time">have a recommended set of type helpers</a>. In our example, you can see we use:</p>
+<pre><code class="hljs css language-ts"><span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> ITask <span class="hljs-keyword">extends</span> Instance&lt;typeof Task&gt; {}
+</code></pre>
+<p>To tell the <a href="https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-8824l8?file=%2Fsrc%2FTaskList.tsx%3A27%2C19">Task component</a> what to expect in its props.</p>
+<p>You don't have to make any choices about the TypeScript design. Model out your state with MST, and we'll give you an opinionated set of TypeScript types back. You trade off control for quicker development overall, much like the performance management tradeoffs. If you want good, sensible defaults for rapid development, choose MobX-State-Tree.</p>
+<h2><a class="anchor" aria-hidden="true" id="write-your-own-types-for-react-contextreducer"></a><a href="#write-your-own-types-for-react-contextreducer" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Write Your Own Types for React Context/Reducer</h2>
+<p>If you want to use React Context/Reducer with TypeScript, you'll need to specify your types from the ground up. Many teams might like this approach, but it does require you to take the time to do so. Here's one way you might type the context:</p>
+<pre><code class="hljs css language-tsx"><span class="hljs-keyword">import</span> React, { createContext, useContext, useReducer, ReactNode, Dispatch, JSX } from <span class="hljs-string">"react"</span>
+
+<span class="hljs-keyword">export</span> interface <span class="hljs-built_in">Task</span> {
+  id: number
+  <span class="hljs-built_in">text</span>: <span class="hljs-built_in">string</span>
+  done: <span class="hljs-keyword">boolean</span>
+}
+
+type Action =
+  | { type: <span class="hljs-string">"added"</span>; id: number; <span class="hljs-built_in">text</span>: <span class="hljs-built_in">string</span> }
+  | { type: <span class="hljs-string">"changed"</span>; task: <span class="hljs-built_in">Task</span> }
+  | { type: <span class="hljs-string">"deleted"</span>; id: number }
+
+<span class="hljs-keyword">const</span> TasksContext = createContext&lt;<span class="hljs-built_in">Task</span>[] | null&gt;(null)
+<span class="hljs-keyword">const</span> TasksDispatchContext = createContext&lt;Dispatch&lt;Action&gt; | null&gt;(null)
+
+<span class="hljs-keyword">export</span> function TasksProvider({ children }: { children: ReactNode }): JSX.Element {
+  <span class="hljs-keyword">const</span> [tasks, dispatch] = useReducer(tasksReducer, initialTasks)
+
+  <span class="hljs-keyword">return</span> (
+    &lt;TasksContext.Provider value={tasks}&gt;
+      &lt;TasksDispatchContext.Provider value={dispatch}&gt;{children}&lt;/TasksDispatchContext.Provider&gt;
+    &lt;/TasksContext.Provider&gt;
+  )
+}
+
+<span class="hljs-keyword">export</span> function useTasks(): <span class="hljs-built_in">Task</span>[] {
+  <span class="hljs-keyword">const</span> context = useContext(TasksContext)
+  <span class="hljs-keyword">if</span> (!context) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"useTasks must be used within a TasksProvider"</span>)
+  }
+  <span class="hljs-keyword">return</span> context
+}
+
+<span class="hljs-keyword">export</span> function useTasksDispatch(): Dispatch&lt;Action&gt; {
+  <span class="hljs-keyword">const</span> context = useContext(TasksDispatchContext)
+  <span class="hljs-keyword">if</span> (!context) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"useTasksDispatch must be used within a TasksProvider"</span>)
+  }
+  <span class="hljs-keyword">return</span> context
+}
+
+function tasksReducer(tasks: <span class="hljs-built_in">Task</span>[], action: Action): <span class="hljs-built_in">Task</span>[] {
+  <span class="hljs-keyword">switch</span> (action.type) {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"added"</span>: {
+      <span class="hljs-keyword">return</span> [
+        ...tasks,
+        {
+          id: action.id,
+          <span class="hljs-built_in">text</span>: action.<span class="hljs-built_in">text</span>,
+          done: <span class="hljs-literal">false</span>
+        }
+      ]
+    }
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"changed"</span>: {
+      <span class="hljs-keyword">return</span> tasks.<span class="hljs-built_in">map</span>((t) =&gt; {
+        <span class="hljs-keyword">if</span> (t.id === action.task.id) {
+          <span class="hljs-keyword">return</span> action.task
+        } <span class="hljs-keyword">else</span> {
+          <span class="hljs-keyword">return</span> t
+        }
+      })
+    }
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"deleted"</span>: {
+      <span class="hljs-keyword">return</span> tasks.filter((t) =&gt; t.id !== action.id)
+    }
+    <span class="hljs-keyword">default</span>: {
+      <span class="hljs-keyword">throw</span> Error(<span class="hljs-string">"Unknown action: "</span> + action)
+    }
+  }
+}
+
+<span class="hljs-keyword">const</span> initialTasks = [
+  { id: <span class="hljs-number">0</span>, <span class="hljs-built_in">text</span>: <span class="hljs-string">"Philosopher’s Path"</span>, done: <span class="hljs-literal">true</span> },
+  { id: <span class="hljs-number">1</span>, <span class="hljs-built_in">text</span>: <span class="hljs-string">"Visit the temple"</span>, done: <span class="hljs-literal">false</span> },
+  { id: <span class="hljs-number">2</span>, <span class="hljs-built_in">text</span>: <span class="hljs-string">"Drink matcha"</span>, done: <span class="hljs-literal">false</span> }
+]
+</code></pre>
+<p><a href="https://codesandbox.io/p/sandbox/react-dev-context-reducer-example-with-typescript-l8ym3t?file=%2Fsrc%2FTasksContext.tsx%3A91%2C1">See the whole example converted to TypeScript in CodeSandbox</a></p>
+<h2><a class="anchor" aria-hidden="true" id="contextreducer-cannot-guarantee-type-safety-at-runtime"></a><a href="#contextreducer-cannot-guarantee-type-safety-at-runtime" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Context/Reducer Cannot Guarantee Type Safety at Runtime</h2>
+<p>In the React Context/Reducer example, you are required to understand the kinds of initial data that satisfy your requirements. You must remember how to write them, and write them consistently. The example provides initial tasks like this:</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">const</span> initialTasks = [
+  { <span class="hljs-attr">id</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">"Philosopher’s Path"</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span> },
+  { <span class="hljs-attr">id</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">"Visit the temple"</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span> },
+  { <span class="hljs-attr">id</span>: <span class="hljs-number">2</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">"Drink matcha"</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span> }
+]
+</code></pre>
+<p>But if you write an invalid task, React won't stop you:</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">const</span> initialTasks = [
+  { <span class="hljs-attr">id</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">"Philosopher’s Path"</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span> },
+  { <span class="hljs-attr">id</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">"Visit the temple"</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span> },
+  { <span class="hljs-attr">id</span>: <span class="hljs-number">2</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">"Drink matcha"</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span> },
+  {
+    <span class="hljs-attr">something</span>: <span class="hljs-string">"else"</span>,
+    <span class="hljs-attr">works</span>: <span class="hljs-literal">false</span>,
+    <span class="hljs-attr">id</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"here"</span>)
+    }
+  }
+]
+</code></pre>
+<p>In fact, React <em>almost</em> does the right thing here. If you check out the <a href="https://codesandbox.io/p/sandbox/react-dev-context-reducer-with-incorrect-task-data-nqw67d?file=%2Fsrc%2FTasksContext.js%3A56%2C1">CodeSandbox with this incorrect data</a>, you'll see that a fourth item shows up. You can even edit/delete/check it off. The React components themselves are pretty resilient.</p>
+<p>But if you check off the task, or edit its name, you'll get a warning in the console:</p>
+<pre><code class="hljs">Warning: A component is changing <span class="hljs-keyword">an</span> uncontrolled input <span class="hljs-built_in">to</span> be controlled. This is likely caused <span class="hljs-keyword">by</span> <span class="hljs-keyword">the</span> <span class="hljs-built_in">value</span> changing <span class="hljs-built_in">from</span> undefined <span class="hljs-built_in">to</span> <span class="hljs-keyword">a</span> defined <span class="hljs-built_in">value</span>, which should <span class="hljs-keyword">not</span> happen. Decide between <span class="hljs-keyword">using</span> <span class="hljs-keyword">a</span> controlled <span class="hljs-keyword">or</span> uncontrolled input <span class="hljs-keyword">element</span> <span class="hljs-keyword">for</span> <span class="hljs-keyword">the</span> lifetime <span class="hljs-keyword">of</span> <span class="hljs-keyword">the</span> component. More info: <span class="hljs-keyword">https</span>://reactjs.org/link/controlled-components
+</code></pre>
+<p>This is because we've left <code>text</code> and <code>done</code> to be <code>undefined</code>, and then the reducer modifies those values.</p>
+<p>In the small, toy React example, this isn't a huge deal. But this kind of unexpected behavior can lead to serious bugs in a larger application.</p>
+<h2><a class="anchor" aria-hidden="true" id="mobx-state-tree-provides-runtime-type-safety-by-default"></a><a href="#mobx-state-tree-provides-runtime-type-safety-by-default" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>MobX-State-Tree Provides Runtime Type Safety by Default</h2>
+<p><a href="https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-8824l8?file=%2Fsrc%2FViewModel.ts%3A15%2C24.">Open up the MST example in CodeSandbox</a> and change the ViewModel instantiation to be:</p>
+<pre><code class="hljs css language-ts"><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> ViewModelSingleton = ViewModel.create({
+  nextId: <span class="hljs-number">3</span>,
+  tasks: [
+    { id: <span class="hljs-number">0</span>, text: <span class="hljs-string">"Philosopher’s Path"</span>, done: <span class="hljs-literal">true</span> },
+    { id: <span class="hljs-number">1</span>, text: <span class="hljs-string">"Visit the temple"</span>, done: <span class="hljs-literal">false</span> },
+    { id: <span class="hljs-number">2</span>, text: <span class="hljs-string">"Drink matcha"</span>, done: <span class="hljs-literal">false</span> },
+    {
+      something: <span class="hljs-string">"else"</span>,
+      works: <span class="hljs-literal">false</span>,
+      id: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"here"</span>)
+      }
+    }
+  ]
+})
+</code></pre>
+<p>You'll <em>immediately receive an error from MobX-State-Tree</em>:</p>
+<pre><code class="hljs">[mobx-state-tree] Error <span class="hljs-keyword">while</span> converting `{"nextId":<span class="hljs-number">3</span>,"tasks":[{"id":<span class="hljs-number">0</span>,"text":"Philosopher’s Path","done":<span class="hljs-keyword">true</span>},{"id":<span class="hljs-number">1</span>,"text":"Visit the temple","done":<span class="hljs-keyword">false</span>},{"id":<span class="hljs-number">2</span>,"text":"Drink matcha","done":<span class="hljs-keyword">false</span>},{"something":"else","works":<span class="hljs-keyword">false</span>}]}` <span class="hljs-keyword">to</span> `ViewModel`:
+
+    at <span class="hljs-type">path</span> "/tasks/3/id" <span class="hljs-keyword">snapshot</span> &lt;<span class="hljs-keyword">function</span> id&gt; <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> assignable <span class="hljs-keyword">to</span> <span class="hljs-keyword">type</span>: `identifierNumber` (<span class="hljs-keyword">Value</span> <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> a <span class="hljs-keyword">valid</span> identifierNumber, expected a number), expected an instance <span class="hljs-keyword">of</span> `identifierNumber` <span class="hljs-keyword">or</span> a <span class="hljs-keyword">snapshot</span> <span class="hljs-keyword">like</span> `identifierNumber` <span class="hljs-keyword">instead</span>.
+    at <span class="hljs-type">path</span> "/tasks/3/text" <span class="hljs-keyword">value</span> `undefined` <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> assignable <span class="hljs-keyword">to</span> <span class="hljs-keyword">type</span>: `string` (<span class="hljs-keyword">Value</span> <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> a string).
+</code></pre>
+<p>This error will both prevent you from making costly mistakes in the future, and it even attempts to give you information about <em>precisely what's wrong</em>, which makes debugging things easier.</p>
+<p><em>(Note: by default, MST will not run this check in production mode for performance reasons)</em></p>
+<h2><a class="anchor" aria-hidden="true" id="mobx-state-tree-gives-you-building-blocks-for-advanced-data-modeling"></a><a href="#mobx-state-tree-gives-you-building-blocks-for-advanced-data-modeling" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>MobX-State-Tree Gives you Building Blocks for Advanced Data Modeling</h2>
+<p>In the Reducer/Context example, we arbitrarily decide that a task looks like this:</p>
+<pre><code class="hljs css language-js">{ <span class="hljs-attr">id</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">"Philosopher’s Path"</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span> },
+</code></pre>
+<p>With TypeScript, we can annotate the types of these objects. But if you're building a complex app, you may want to enforce your data modeling beyond conventions and static types.</p>
+<p>In MobX-State-Tree, we turned that object syntax into a model itself:</p>
+<pre><code class="hljs css language-ts"><span class="hljs-keyword">const</span> Task = t
+  .model(<span class="hljs-string">"Task"</span>, {
+    id: t.identifierNumber,
+    text: t.string,
+    done: t.optional(t.boolean, <span class="hljs-literal">false</span>),
+    isBeingEdited: t.optional(t.boolean, <span class="hljs-literal">false</span>)
+  })
+  .actions(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
+    setText(text: <span class="hljs-built_in">string</span>) {
+      self.text = text
+    },
+    setDone(done: <span class="hljs-built_in">boolean</span>) {
+      self.done = done
+    },
+    setIsBeingEdited(beingEdited: <span class="hljs-built_in">boolean</span>) {
+      self.isBeingEdited = beingEdited
+    }
+  }))
+</code></pre>
+<p>Now our program understands that a <code>Task</code> is a real entity with a well-defined set of properties, and well-defined actions it can take at runtime. This is a clearer way to communicate your intention to other programmers, and to enforce rules for your data modeling in your application.</p>
+<p>There are <a href="/overview/types">many different types</a> you can extend and build with to provide this same kind of structure and safety to your application at all levels. This is another tradeoff: MST primitives and models have rules that plain JavaScript objects do not. But if you learn those rules, you can improve your developer experience, and more rigorously model your application state for your future self and the rest of your team to work with correctly.</p>
+<h2><a class="anchor" aria-hidden="true" id="react-contextreducer-needs-custom-code-for-time-travel-debugging"></a><a href="#react-contextreducer-needs-custom-code-for-time-travel-debugging" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>React Context/Reducer Needs Custom Code for Time Travel Debugging</h2>
+<p><a href="https://medium.com/the-web-tub/time-travel-in-react-redux-apps-using-the-redux-devtools-5e94eba5e7c0">Time travel debugging</a> is a popular tool used to observe how application state changes over time, and diagnose any errors or inaccuracies. The idea is to keep a record of the state and its mutations over time, and then play it back through some dev tooling or observability that understands how to represent the state.</p>
+<p>Building this kind of functionality is possible with Reducers and Context, but you have to build it yourself, from the ground up.</p>
+<h2><a class="anchor" aria-hidden="true" id="mobx-state-tree-has-built-in-time-travel-primitives"></a><a href="#mobx-state-tree-has-built-in-time-travel-primitives" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>MobX-State-Tree Has Built-in Time Travel Primitives</h2>
+<p>MobX-State-Tree generates <a href="/concepts/snapshots">snapshots</a>, which are immutable, serialized versions of the state at each point it gets changes. You can listen to the snapshots with the <code>onSnapshot</code> listener, like this:</p>
+<pre><code class="hljs css language-ts"><span class="hljs-keyword">const</span> initialSnapshot = <span class="hljs-built_in">JSON</span>.stringify(getSnapshot(ViewModelSingleton))
+<span class="hljs-keyword">const</span> timeTravel: <span class="hljs-built_in">string</span>[] = [initialSnapshot]
+onSnapshot(ViewModelSingleton, <span class="hljs-function">(<span class="hljs-params">snapshot</span>) =&gt;</span> {
+  timeTravel.push(<span class="hljs-built_in">JSON</span>.stringify(snapshot))
+})
+</code></pre>
+<p>In this code, we take an inital snapshot of the <code>ViewModelSingleton</code>, and then store each subsequent snapshot. You can play around with this in <a href="https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-snapshots-qvr529?file=%2Fsrc%2FViewModel.ts%3A54%2C31">CodeSandbox</a>. Open up the console, and store the <code>timeTravel</code> variable as a global variable. Log it out after you make some changes, and you'll see a series of snapshots.</p>
+<p>Snapshots like this make time travel debugging easy to implement, with very little custom code. It also makes it easy to do things like persistence, re-hydrating state from the server, and other operations where serialized state can be deserialized into something more useful. The following section is a great example of this.</p>
+<h2><a class="anchor" aria-hidden="true" id="persist-state-easily-with-mst-persist"></a><a href="#persist-state-easily-with-mst-persist" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Persist State Easily with mst-persist</h2>
+<p>Since MobX-State-Tree state is always serializable and we have utilities like snapshot listeners, libraries like <a href="https://www.npmjs.com/package/mst-persist">mst-persist</a> are readily available.</p>
+<p>With one import and one line of code, we can persist our application state to localStorage:</p>
+<pre><code class="hljs"><span class="hljs-keyword">import</span> { persist } <span class="hljs-keyword">from</span> <span class="hljs-string">"mst-persist"</span>;
+
+persist(<span class="hljs-string">"ViewModelSingleton"</span>, ViewModelSingleton)
+</code></pre>
+<p><a href="https://codesandbox.io/p/sandbox/mobx-state-tree-instead-of-reducer-and-context-persistence-hjmrzg?file=%2Fsrc%2FViewModel.ts%3A70%2C59">Open this CodeSandbox example</a>, make some changes, and then reload it. You'll see your changes have persisted.</p>
+<p>React Context can also be persisted to localStorage, but again, it requires you to write the logic from the ground up. If you need this kind of functionality in a large project, the MST community has already taken care of it for you, and we have conventions and maintainers behind the code, so you're never really on your own.</p>
+<h2><a class="anchor" aria-hidden="true" id="mst-is-state-management-on-easy-mode"></a><a href="#mst-is-state-management-on-easy-mode" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>MST is State Management on Easy Mode</h2>
+<p>At this point, we hope the benefits of MobX-State-Tree are clear. If you have a complex application, or if your application is going to become complex over time, MST offers a pre-built set of tools and conventions that will allow you to focus on building features and solving user problems, rather than reinventing the wheel for your state management system.</p>
+<p>There are many more MST-specific utilities available, like <a href="/concepts/references">data normalization</a>, <a href="/concepts/patches">JSON patches</a>, <a href="/concepts/middleware">middleware</a>, and libraries like <a href="https://github.com/ConrabOpto/mst-query">mst-query</a> and <a href="https://github.com/mobxjs/mst-gql">mst-gql</a> to help you manage asynchronous state. Much like the prior examples in this article, using these tools will save you a lot of work building and maintaining your own bespoke solutions.</p>
+<p>If you've been working with React Reducer and Context, MobX-State-Tree will feel like easy-mode for state management. On top of that, you'll join a <a href="https://github.com/mobxjs/mobx-state-tree/discussions">welcoming, active community</a> where we can help you with state modeling questions, and any learning curve you experience while getting used to MobX-State-Tree.</p>
+<p>Questions? Comments? <a href="https://github.com/mobxjs/mobx-state-tree/discussions">Let us know in the forum</a></p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/tips/more-tips"><span class="arrow-prev">← </span><span>Miscellaneous Tips</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#react-contextreducer-code-review">React Context/Reducer Code Review</a><ul class="toc-headings"><li><a href="#react-code-is-tightly-coupled">React Code is Tightly Coupled</a></li><li><a href="#reducer-functions-lack-convention">Reducer Functions Lack Convention</a></li><li><a href="#unclear-initial-state-in-contextreducer">Unclear Initial State in Context/Reducer</a></li></ul></li><li><a href="#mobx-state-tree-code-review">MobX-State-Tree Code Review</a><ul class="toc-headings"><li><a href="#mobx-state-tree-decouples-state-from-ui">MobX-State-Tree Decouples State from UI</a></li><li><a href="#conventional-state-change-with-actions">Conventional State Change with Actions</a></li><li><a href="#mst-is-a-single-source-of-truth-for-state">MST is a Single Source of Truth for State</a></li></ul></li><li><a href="#react-contextreducer-rendering-performance">React Context/Reducer Rendering Performance</a><ul class="toc-headings"><li><a href="#react-makes-you-manage-optimization-yourself">React Makes You Manage Optimization Yourself</a></li></ul></li><li><a href="#mobx-state-tree-performance">MobX-State-Tree Performance</a><ul class="toc-headings"><li><a href="#handles-granular-updates-automatically">Handles Granular Updates Automatically</a></li></ul></li><li><a href="#automatic-typescript-types-with-mobx-state-tree">Automatic TypeScript Types with MobX-State-Tree</a></li><li><a href="#write-your-own-types-for-react-contextreducer">Write Your Own Types for React Context/Reducer</a></li><li><a href="#contextreducer-cannot-guarantee-type-safety-at-runtime">Context/Reducer Cannot Guarantee Type Safety at Runtime</a></li><li><a href="#mobx-state-tree-provides-runtime-type-safety-by-default">MobX-State-Tree Provides Runtime Type Safety by Default</a></li><li><a href="#mobx-state-tree-gives-you-building-blocks-for-advanced-data-modeling">MobX-State-Tree Gives you Building Blocks for Advanced Data Modeling</a></li><li><a href="#react-contextreducer-needs-custom-code-for-time-travel-debugging">React Context/Reducer Needs Custom Code for Time Travel Debugging</a></li><li><a href="#mobx-state-tree-has-built-in-time-travel-primitives">MobX-State-Tree Has Built-in Time Travel Primitives</a></li><li><a href="#persist-state-easily-with-mst-persist">Persist State Easily with mst-persist</a></li><li><a href="#mst-is-state-management-on-easy-mode">MST is State Management on Easy Mode</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="MobX-state-tree" width="66" height="58"/></a><div><h5>Docs</h5><a href="/intro/getting-started">Getting Started</a><a href="/concepts/trees">Basic concepts</a><a href="/concepts/patches">Advanced concepts</a><a href="/overview/types">API Reference</a></div><div><h5>Community</h5><a href="https://github.com/mobxjs/mobx-state-tree/discussions" target="_blank" rel="noreferrer noopener">GitHub Discussions</a><a href="https://stackoverflow.com/questions/tagged/mobx-state-tree" target="_blank" rel="noreferrer noopener">Stack Overflow</a></div><div><h5>More</h5><a href="/blog">Blog</a><a href="https://github.com/mobxjs/mobx-state-tree">GitHub</a><a class="github-button" href="https://github.com/mobxjs/mobx-state-tree" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2024 Michel Weststrate</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: 'b7b0cfe7d1c8fa6db6089df94a3128f1',
+                indexName: 'mobx-state-tree',
+                inputSelector: '#search_input_react'
+              });
+            </script></body></html>
