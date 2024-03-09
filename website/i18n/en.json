@@ -9,7 +9,7 @@
         "title": "API_header"
       },
       "API/index": {
-        "title": "mobx-state-tree - v5.4.1",
+        "title": "mobx-state-tree - v5.4.2-pre.1",
         "sidebar_label": "Globals"
       },
       "API/interfaces/customtypeoptions": {
@@ -124,6 +124,9 @@
         "title": "UnionOptions",
         "sidebar_label": "UnionOptions"
       },
+      "compare/context-reducer-vs-mobx-state-tree": {
+        "title": "React Context vs. MobX-State-Tree"
+      },
       "concepts/actions": {
         "title": "Actions"
       },
@@ -224,6 +227,7 @@
       "Advanced Concepts": "Advanced Concepts",
       "API Overview": "API Overview",
       "Tips": "Tips",
+      "Compare": "Compare",
       "Interfaces": "Interfaces"
     }
   },
