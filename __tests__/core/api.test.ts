@@ -53,6 +53,7 @@ const METHODS_AND_INTERNAL_TYPES = stringToArray(`
     isAlive,
     addDisposer,
     getEnv,
+    hasEnv,
     walk,
     getMembers,
     getPropertyMembers,
