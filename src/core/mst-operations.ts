@@ -760,7 +760,7 @@ export function addDisposer(target: IAnyStateTreeNode, disposer: IDisposer): IDi
 }
 
 /**
- * Returns the environment of the current state tree. For more info on environments,
+ * Returns the environment of the current state tree, or throws. For more info on environments,
  * see [Dependency injection](https://github.com/mobxjs/mobx-state-tree#dependency-injection)
  *
  * Please note that in child nodes access to the root is only possible
@@ -777,8 +777,28 @@ export function getEnv<T = any>(target: IAnyStateTreeNode): T {
 
   const node = getStateTreeNode(target)
   const env = node.root.environment
-  if (!env) return EMPTY_OBJECT as T
+  if (!env) throw fail(`Failed to find the environment of ${node} ${node.path}`)
   return env
+}
+
+/**
+ * Returns whether the current state tree has environment or not.
+ *
+ * @export
+ * @param {IStateTreeNode} target
+ * @return {boolean}
+ */
+export function hasEnv(target: IAnyStateTreeNode): boolean {
+  // check all arguments
+  if (process.env.NODE_ENV !== "production") {
+    if (!isStateTreeNode(target))
+      fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+  }
+
+  const node = getStateTreeNode(target)
+  const env = node.root.environment
+
+  return !!env
 }
 
 /**
