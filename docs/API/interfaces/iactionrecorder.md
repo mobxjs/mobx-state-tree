@@ -29,7 +29,7 @@ sidebar_label: "IActionRecorder"
 
 • **actions**: *ReadonlyArray‹[ISerializedActionCall](iserializedactioncall.md)›*
 
-*Defined in [src/middlewares/on-action.ts:37](https://github.com/mobxjs/mobx-state-tree/blob/0369392d/src/middlewares/on-action.ts#L37)*
+*Defined in [src/middlewares/on-action.ts:37](https://github.com/mobxjs/mobx-state-tree/blob/01dd4acf/src/middlewares/on-action.ts#L37)*
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 • **recording**: *boolean*
 
-*Defined in [src/middlewares/on-action.ts:38](https://github.com/mobxjs/mobx-state-tree/blob/0369392d/src/middlewares/on-action.ts#L38)*
+*Defined in [src/middlewares/on-action.ts:38](https://github.com/mobxjs/mobx-state-tree/blob/01dd4acf/src/middlewares/on-action.ts#L38)*
 
 ## Methods
 
@@ -45,7 +45,7 @@ ___
 
 ▸ **replay**(`target`: IAnyStateTreeNode): *void*
 
-*Defined in [src/middlewares/on-action.ts:41](https://github.com/mobxjs/mobx-state-tree/blob/0369392d/src/middlewares/on-action.ts#L41)*
+*Defined in [src/middlewares/on-action.ts:41](https://github.com/mobxjs/mobx-state-tree/blob/01dd4acf/src/middlewares/on-action.ts#L41)*
 
 **Parameters:**
 
@@ -61,7 +61,7 @@ ___
 
 ▸ **resume**(): *void*
 
-*Defined in [src/middlewares/on-action.ts:40](https://github.com/mobxjs/mobx-state-tree/blob/0369392d/src/middlewares/on-action.ts#L40)*
+*Defined in [src/middlewares/on-action.ts:40](https://github.com/mobxjs/mobx-state-tree/blob/01dd4acf/src/middlewares/on-action.ts#L40)*
 
 **Returns:** *void*
 
@@ -71,6 +71,6 @@ ___
 
 ▸ **stop**(): *void*
 
-*Defined in [src/middlewares/on-action.ts:39](https://github.com/mobxjs/mobx-state-tree/blob/0369392d/src/middlewares/on-action.ts#L39)*
+*Defined in [src/middlewares/on-action.ts:39](https://github.com/mobxjs/mobx-state-tree/blob/01dd4acf/src/middlewares/on-action.ts#L39)*
 
 **Returns:** *void*
