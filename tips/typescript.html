@@ -63,16 +63,16 @@
               }
             });
         </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx-state-tree/edit/master/docs/tips/typescript.md" target="_blank" rel="noreferrer noopener">Edit</a><h1 id="__docusaurus" class="postHeaderTitle">TypeScript and MST</h1></header><article><div><span><div id="codefund"></div>
-<p>TypeScript support is best-effort as not all patterns can be expressed in TypeScript. Except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy TypeScript features it is required to use TypeScript 3.0 or later with <code>noImplicitThis</code> and <code>strictNullChecks</code> enabled.
-Actually, the more strict options that are enabled, the better the type system will behave.</p>
+<p>TypeScript support is best-effort as not all patterns can be expressed in TypeScript. Except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy TypeScript features it is required to use TypeScript 3.0 or later with <code>noImplicitThis</code> and <code>strictNullChecks</code> enabled.</p>
+<p>The more strict options that are enabled, the better the type system will behave.</p>
 <h4><a class="anchor" aria-hidden="true" id="recommend-compiler-flags"></a><a href="#recommend-compiler-flags" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Recommend compiler flags</h4>
 <p>The recommended compiler flags (against which all our tests are written) are:</p>
 <pre><code class="hljs css language-json">{
-    <span class="hljs-attr">"strictNullChecks"</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-attr">"strictFunctionTypes"</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-attr">"noImplicitAny"</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-attr">"noImplicitReturns"</span>: <span class="hljs-literal">true</span>,
-    <span class="hljs-attr">"noImplicitThis"</span>: <span class="hljs-literal">true</span>
+  <span class="hljs-attr">"strictNullChecks"</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">"strictFunctionTypes"</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">"noImplicitAny"</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">"noImplicitReturns"</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">"noImplicitThis"</span>: <span class="hljs-literal">true</span>
 }
 </code></pre>
 <p>Or shorter by leveraging <code>strict</code>:</p>
@@ -94,17 +94,17 @@ What about compile time? You can use TypeScript interfaces to perform those chec
 <li><code>SnapshotOrInstance&lt;typeof TYPE&gt;</code> or <code>SnapshotOrInstance&lt;typeof VARIABLE&gt;</code> is <code>SnapshotIn&lt;T&gt; | Instance&lt;T&gt;</code>. This type is useful when you want to declare an input parameter that is able consume both types.</li>
 <li><code>TypeOfValue&lt;typeof VARIABLE&gt;</code> gets the original type for the given instance. Note that this only works for complex values (models, arrays, maps...) but not for simple values (number, string, boolean, string, undefined).</li>
 </ul>
-<pre><code class="hljs css language-typescript"><span class="hljs-keyword">import</span> { types, Instance, SnapshotIn, SnapshotOut } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-state-tree"</span>;
+<pre><code class="hljs css language-typescript"><span class="hljs-keyword">import</span> { types, Instance, SnapshotIn, SnapshotOut } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-state-tree"</span>
 
 <span class="hljs-keyword">const</span> Todo = types
-    .model({
-        title: <span class="hljs-string">"hello"</span>
-    })
-    .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
-        setTitle(v: <span class="hljs-built_in">string</span>) {
-            self.title = v
-        }
-    }))
+  .model({
+    title: <span class="hljs-string">"hello"</span>
+  })
+  .actions(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
+    setTitle(v: <span class="hljs-built_in">string</span>) {
+      self.title = v
+    }
+  }))
 
 <span class="hljs-keyword">interface</span> ITodo <span class="hljs-keyword">extends</span> Instance&lt;typeof Todo&gt; {} <span class="hljs-comment">// =&gt; { title: string; setTitle: (v: string) =&gt; void }</span>
 <span class="hljs-keyword">interface</span> ITodoSnapshotIn <span class="hljs-keyword">extends</span> SnapshotIn&lt;typeof Todo&gt; {} <span class="hljs-comment">// =&gt; { title?: string }</span>
@@ -117,26 +117,26 @@ What about compile time? You can use TypeScript interfaces to perform those chec
 <p>Sometimes you'll need to take into account where your typings are available and where they aren't. The code below will not compile: TypeScript will complain that <code>self.upperProp</code> is not a known property. Computed properties are only available after <code>.views</code> is evaluated.</p>
 <p>For example:</p>
 <pre><code class="hljs css language-typescript"><span class="hljs-keyword">const</span> Example = types
-    .model(<span class="hljs-string">"Example"</span>, {
-        prop: types.string
-    })
-    .views(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
-        <span class="hljs-keyword">get</span> upperProp(): <span class="hljs-built_in">string</span> {
-            <span class="hljs-keyword">return</span> self.prop.toUpperCase()
-        },
-        <span class="hljs-keyword">get</span> twiceUpperProp(): <span class="hljs-built_in">string</span> {
-            <span class="hljs-keyword">return</span> self.upperProp + self.upperProp <span class="hljs-comment">// Compile error: `self.upperProp` is not yet defined</span>
-        }
-    }))
-</code></pre>
-<p>You can circumvent this situation by using <code>this</code> whenever you intend to use the newly declared computed values that are local to the current object:</p>
-<pre><code class="hljs css language-typescript"><span class="hljs-keyword">const</span> Example = types.model(<span class="hljs-string">"Example"</span>, { prop: types.string }).views(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
+  .model(<span class="hljs-string">"Example"</span>, {
+    prop: types.string
+  })
+  .views(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
     <span class="hljs-keyword">get</span> upperProp(): <span class="hljs-built_in">string</span> {
-        <span class="hljs-keyword">return</span> self.prop.toUpperCase()
+      <span class="hljs-keyword">return</span> self.prop.toUpperCase()
     },
     <span class="hljs-keyword">get</span> twiceUpperProp(): <span class="hljs-built_in">string</span> {
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.upperProp + <span class="hljs-keyword">this</span>.upperProp
+      <span class="hljs-keyword">return</span> self.upperProp + self.upperProp <span class="hljs-comment">// Compile error: `self.upperProp` is not yet defined</span>
     }
+  }))
+</code></pre>
+<p>You can circumvent this situation by using <code>this</code> whenever you intend to use the newly declared computed values that are local to the current object:</p>
+<pre><code class="hljs css language-typescript"><span class="hljs-keyword">const</span> Example = types.model(<span class="hljs-string">"Example"</span>, { prop: types.string }).views(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
+  <span class="hljs-keyword">get</span> upperProp(): <span class="hljs-built_in">string</span> {
+    <span class="hljs-keyword">return</span> self.prop.toUpperCase()
+  },
+  <span class="hljs-keyword">get</span> twiceUpperProp(): <span class="hljs-built_in">string</span> {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.upperProp + <span class="hljs-keyword">this</span>.upperProp
+  }
 }))
 </code></pre>
 <p>Alternatively you can also declare multiple <code>.views</code> block, in which case the <code>self</code> parameter gets extended after each block.</p>
@@ -172,25 +172,27 @@ What about compile time? You can use TypeScript interfaces to perform those chec
 <p>Similarly, when writing actions or views one can use helper functions:</p>
 <pre><code class="hljs css language-typescript"><span class="hljs-keyword">import</span> { types, flow } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-state-tree"</span>
 
-<span class="hljs-keyword">const</span> Example = types.model(<span class="hljs-string">"Example"</span>, { prop: types.string }).actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> {
-    <span class="hljs-comment">// Don't forget that async operations HAVE</span>
-    <span class="hljs-comment">// to use `flow( ... )`.</span>
-    <span class="hljs-keyword">const</span> fetchData = flow(<span class="hljs-function"><span class="hljs-keyword">function</span>* <span class="hljs-title">fetchData</span>(<span class="hljs-params"></span>) </span>{
-        <span class="hljs-keyword">yield</span> doSomething()
-    })
+<span class="hljs-keyword">const</span> Example = types.model(<span class="hljs-string">"Example"</span>, { prop: types.string }).actions(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> {
+  <span class="hljs-comment">// Don't forget that async operations HAVE</span>
+  <span class="hljs-comment">// to use `flow( ... )`.</span>
+  <span class="hljs-keyword">const</span> fetchData = flow(<span class="hljs-function"><span class="hljs-keyword">function</span>* <span class="hljs-title">fetchData</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">yield</span> doSomething()
+  })
 
-    <span class="hljs-keyword">return</span> {
-        fetchData,
-        afterCreate() {
-            <span class="hljs-comment">// Notice that we call the function directly</span>
-            <span class="hljs-comment">// instead of using `self.fetchData()`. This is</span>
-            <span class="hljs-comment">// because Typescript doesn't know yet about `fetchData()`</span>
-            <span class="hljs-comment">// being part of `self` in this context.</span>
-            fetchData()
-        }
+  <span class="hljs-keyword">return</span> {
+    fetchData,
+    afterCreate() {
+      <span class="hljs-comment">// Notice that we call the function directly</span>
+      <span class="hljs-comment">// instead of using `self.fetchData()`. This is</span>
+      <span class="hljs-comment">// because Typescript doesn't know yet about `fetchData()`</span>
+      <span class="hljs-comment">// being part of `self` in this context.</span>
+      fetchData()
     }
+  }
 })
 </code></pre>
+<h4><a class="anchor" aria-hidden="true" id="using-cast"></a><a href="#using-cast" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Using cast</h4>
+<p>We provide a <code>cast</code> utility to <a href="https://mobx-state-tree.js.org/API/#cast">cast a node snapshot to an instance type for assignment</a>. <a href="https://coolsoftware.dev/blog/type-casting-in-mobx-state-tree/">Check out this blog post for details and examples on when to use it</a>.</p>
 </span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/tips/faq"><span class="arrow-prev">← </span><span>Frequently Asked Questions</span></a><a class="docs-next button" href="/tips/circular-deps"><span>Circular dependencies</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="MobX-state-tree" width="66" height="58"/></a><div><h5>Docs</h5><a href="/intro/getting-started">Getting Started</a><a href="/concepts/trees">Basic concepts</a><a href="/concepts/patches">Advanced concepts</a><a href="/overview/types">API Reference</a></div><div><h5>Community</h5><a href="https://github.com/mobxjs/mobx-state-tree/discussions" target="_blank" rel="noreferrer noopener">GitHub Discussions</a><a href="https://stackoverflow.com/questions/tagged/mobx-state-tree" target="_blank" rel="noreferrer noopener">Stack Overflow</a></div><div><h5>More</h5><a href="/blog">Blog</a><a href="https://github.com/mobxjs/mobx-state-tree">GitHub</a><a class="github-button" href="https://github.com/mobxjs/mobx-state-tree" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2024 Michel Weststrate</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
                 document.addEventListener('keyup', function(e) {
                   if (e.target !== document.body) {
