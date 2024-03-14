@@ -5,7 +5,7 @@ title: TypeScript and MST
 
 <div id="codefund"></div>
 
-TypeScript support is best-effort as not all patterns can be expressed in TypeScript. Except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy TypeScript features it is required to use TypeScript 5.3.3 or later with `noImplicitThis` and `strictNullChecks` enabled.
+TypeScript support is best-effort as not all patterns can be expressed in TypeScript. Except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy TypeScript features it is required to use TypeScript 3.0 or later with `noImplicitThis` and `strictNullChecks` enabled.
 
 The more strict options that are enabled, the better the type system will behave.
 
