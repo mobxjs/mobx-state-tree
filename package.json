@@ -17,8 +17,8 @@
   "scripts": {
     "clean": "shx rm -rf dist && shx rm -rf lib",
     "build": "bun run clean && tsc && cpr lib dist --filter=\\.js$ && rollup -c",
-    "test:dev": "cross-env NODE_ENV=development bun test",
-    "test:prod": "cross-env NODE_ENV=production bun test",
+    "test:dev": "cross-env NODE_ENV=development find . -wholename './__tests__/*test*' -exec bun test {} \\;",
+    "test:prod": "cross-env NODE_ENV=production find . -wholename './__tests__/*test*' -exec bun test {} \\;",
     "coverage": "bun test --coverage",
     "test:all": "bun run test:dev && bun run test:prod && bun run size && bun run coverage",
     "test:perf": "bun test ./__tests__/perf/",
