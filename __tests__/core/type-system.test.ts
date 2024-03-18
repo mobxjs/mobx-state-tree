@@ -874,8 +874,7 @@ test("castToSnapshot", () => {
   // appMod.create({ aaa: castToSnapshot(5) }) // should not compile
 })
 
-// disabled due to TS3.4 nesting issue
-test.skip("create correctly chooses if the snapshot is needed or not - #920", () => {
+test("create correctly chooses if the snapshot is needed or not - #920", () => {
   const X = types.model({
     test: types.string
   })

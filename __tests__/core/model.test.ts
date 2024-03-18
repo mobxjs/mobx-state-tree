@@ -194,7 +194,7 @@ describe("Model instantiation", () => {
   })
 
   describe("When a model has duplicate key in actions or views", () => {
-    test.skip("it should show friendly message", () => {
+    test("it should show friendly message", () => {
       const UserModel = types
         .model("UserModel", {
           id: types.identifier,

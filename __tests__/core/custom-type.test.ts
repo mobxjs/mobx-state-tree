@@ -52,7 +52,7 @@ class Decimal {
     lastTransaction: types.maybeNull(DecimalPrimitive)
   })
 
-  test.skip("it should allow for custom primitive types", () => {
+  test("it should allow for custom primitive types", () => {
     const w1 = Wallet.create({
       balance: new Decimal("2.5")
     })
@@ -71,7 +71,7 @@ class Decimal {
   })
 
   // test reassignment / reconcilation / conversion works
-  test.skip("reassignments will work", () => {
+  test("reassignments will work", () => {
     const w1 = Wallet.create({ balance: "2.5" })
     unprotect(w1)
 
@@ -109,7 +109,7 @@ class Decimal {
     expect(p.patches).toMatchSnapshot()
   })
 
-  test.skip("passes environment to fromSnapshot", () => {
+  test("passes environment to fromSnapshot", () => {
     const env = { test: jest.fn() }
     Wallet.create({ balance: "3.0" }, env)
     expect(env.test).toHaveBeenCalledWith("3.0")
@@ -138,7 +138,7 @@ class Decimal {
 
   const Wallet = types.model({ balance: DecimalTuple })
 
-  test.skip("it should allow for complex custom primitive types", () => {
+  test("it should allow for complex custom primitive types", () => {
     const w1 = Wallet.create({
       balance: new Decimal("2.5")
     })
@@ -157,7 +157,7 @@ class Decimal {
   })
 
   // test reassignment / reconcilation / conversion works
-  test.skip("complex reassignments will work", () => {
+  test("complex reassignments will work", () => {
     const w1 = Wallet.create({ balance: [2, 5] })
     unprotect(w1)
 
@@ -189,7 +189,7 @@ class Decimal {
     expect(p.patches).toMatchSnapshot()
   })
 
-  test.skip("can apply snapshot and patch", () => {
+  test("can apply snapshot and patch", () => {
     const w1 = Wallet.create({ balance: [3, 0] })
     applySnapshot(w1, { balance: [4, 5] })
     expect(w1.balance).toBeInstanceOf(Decimal)
