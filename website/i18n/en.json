@@ -191,6 +191,9 @@
       "overview/api": {
         "title": "API overview"
       },
+      "recipes/auto-generated-property-setter-actions": {
+        "title": "Auto-Generated Property Setter Actions"
+      },
       "tips/circular-deps": {
         "title": "Handle circular dependencies between files and types using `late`",
         "sidebar_label": "Circular dependencies"
@@ -228,6 +231,7 @@
       "API Overview": "API Overview",
       "Tips": "Tips",
       "Compare": "Compare",
+      "Recipes": "Recipes",
       "Interfaces": "Interfaces"
     }
   },
