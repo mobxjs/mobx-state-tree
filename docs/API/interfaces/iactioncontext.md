@@ -29,7 +29,7 @@ sidebar_label: "IActionContext"
 
 • **args**: *any[]*
 
-*Defined in [src/core/actionContext.ts:20](https://github.com/mobxjs/mobx-state-tree/blob/ebc464db/src/core/actionContext.ts#L20)*
+*Defined in [src/core/actionContext.ts:20](https://github.com/mobxjs/mobx-state-tree/blob/fb4f34de/src/core/actionContext.ts#L20)*
 
 Event arguments in an array (action arguments for actions)
 
@@ -39,7 +39,7 @@ ___
 
 • **context**: *IAnyStateTreeNode*
 
-*Defined in [src/core/actionContext.ts:15](https://github.com/mobxjs/mobx-state-tree/blob/ebc464db/src/core/actionContext.ts#L15)*
+*Defined in [src/core/actionContext.ts:15](https://github.com/mobxjs/mobx-state-tree/blob/fb4f34de/src/core/actionContext.ts#L15)*
 
 Event context (node where the action was invoked)
 
@@ -49,7 +49,7 @@ ___
 
 • **id**: *number*
 
-*Defined in [src/core/actionContext.ts:9](https://github.com/mobxjs/mobx-state-tree/blob/ebc464db/src/core/actionContext.ts#L9)*
+*Defined in [src/core/actionContext.ts:9](https://github.com/mobxjs/mobx-state-tree/blob/fb4f34de/src/core/actionContext.ts#L9)*
 
 Event unique id
 
@@ -59,7 +59,7 @@ ___
 
 • **name**: *string*
 
-*Defined in [src/core/actionContext.ts:6](https://github.com/mobxjs/mobx-state-tree/blob/ebc464db/src/core/actionContext.ts#L6)*
+*Defined in [src/core/actionContext.ts:6](https://github.com/mobxjs/mobx-state-tree/blob/fb4f34de/src/core/actionContext.ts#L6)*
 
 Event name (action name for actions)
 
@@ -69,7 +69,7 @@ ___
 
 • **parentActionEvent**: *[IMiddlewareEvent](imiddlewareevent.md) | undefined*
 
-*Defined in [src/core/actionContext.ts:12](https://github.com/mobxjs/mobx-state-tree/blob/ebc464db/src/core/actionContext.ts#L12)*
+*Defined in [src/core/actionContext.ts:12](https://github.com/mobxjs/mobx-state-tree/blob/fb4f34de/src/core/actionContext.ts#L12)*
 
 Parent action event object
 
@@ -79,6 +79,6 @@ ___
 
 • **tree**: *IAnyStateTreeNode*
 
-*Defined in [src/core/actionContext.ts:17](https://github.com/mobxjs/mobx-state-tree/blob/ebc464db/src/core/actionContext.ts#L17)*
+*Defined in [src/core/actionContext.ts:17](https://github.com/mobxjs/mobx-state-tree/blob/fb4f34de/src/core/actionContext.ts#L17)*
 
 Event tree (root node of the node where the action was invoked)
