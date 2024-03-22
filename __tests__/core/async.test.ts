@@ -13,10 +13,7 @@ import {
   toGeneratorFunction,
   types
 } from "../../src"
-import { resetActionId } from "../../src/core/action"
 import { expect, test } from "bun:test"
-
-resetActionId()
 
 function delay<TV>(time: number, value: TV, shouldThrow = false): Promise<TV> {
   return new Promise((resolve, reject) => {

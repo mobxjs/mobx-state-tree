@@ -76,10 +76,6 @@ export function getNextActionId() {
   return nextActionId++
 }
 
-export function resetActionId() {
-  nextActionId = 1
-}
-
 // TODO: optimize away entire action context if there is no middleware in tree?
 /**
  * @internal
