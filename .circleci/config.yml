@@ -48,7 +48,7 @@ jobs:
       - run:
           name: Link bun
           command: sudo ln -s ~/.bun/bin/bun /usr/local/bin/
-      - run: bun test
+      - run: bun test:all
 
   test-mst-prod:
     executor: my-executor
@@ -61,7 +61,7 @@ jobs:
       - run:
           name: Link bun
           command: sudo ln -s ~/.bun/bin/bun /usr/local/bin/
-      - run: NODE_ENV=production bun test --coverage
+      - run: bun test:prod
 
   test-size:
     executor: my-executor
@@ -105,6 +105,7 @@ workflows:
       - test-mst-prod:
           requires:
             - build
-      - test-size:
-          requires:
-            - build
+      # Temporarily disabled while we work to implement Bun testing
+      # - test-size:
+      #     requires:
+      #       - build
