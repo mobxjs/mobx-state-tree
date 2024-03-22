@@ -13,10 +13,7 @@ import {
   ISerializedActionCall,
   Instance
 } from "../../src"
-import { resetActionId } from "../../src/core/action"
 import { expect, test } from "bun:test"
-
-resetActionId()
 
 /// Simple action replay and invocation
 const Task = types
