@@ -24,7 +24,7 @@ const TodoStore = t
   })
   .volatile((self) => ({
     loadTodoState: "pending",
-    loadTodoError: null,
+    loadTodoError: null
   }))
   .actions((self) => ({
     loadTodo: flow(function* loadTodo(todoId: string) {
@@ -47,37 +47,35 @@ const TodoStore = t
         self.loadTodoError = err
         self.loadTodoState = "error"
       }
-    }),
+    })
   }))
 
 // After, with mst-query
-const TodoStore = createModelStore("TodoStore", Todo)
-  .props({
-    loadTodo: createQuery("LoadTodoQuery", {
-      data: types.reference(Todo),
-      request: types.model({ id: types.string }),
-      async endpoint({ request }) {
-        return api.fetchTodo(request.id)
-      }
-    }),
-  });
+const TodoStore = createModelStore("TodoStore", Todo).props({
+  loadTodo: createQuery("LoadTodoQuery", {
+    data: types.reference(Todo),
+    request: types.model({ id: types.string }),
+    async endpoint({ request }) {
+      return api.fetchTodo(request.id)
+    }
+  })
+})
 ```
 
 # Fetching data in React
+
 ```tsx
 // Before
-const Todo = ({ id }) => {
-    useEffect(() => {
-        // fires twice in strict mode
-        // doesn't refetch if data is stale
-       store.loadTodo(id);
-    }, [id]);
-}; 
-
+const Todo = observer(({ id }) => {
+  useEffect(() => {
+    // fires twice in strict mode
+    // doesn't refetch if data is stale
+    store.loadTodo(id)
+  }, [id])
+})
 
 // After
-const Todo = ({ id }) => {
-    const { data } = useQuery({ request: { id } });
-}; 
-
+const Todo = observer(({ id }) => {
+  const { data } = useQuery({ request: { id } })
+})
 ```
