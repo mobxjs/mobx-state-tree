@@ -1,5 +1,5 @@
 import {
-  fail,
+  MstError,
   ObjectNode,
   splitJsonPath,
   joinJsonPath,
@@ -89,7 +89,7 @@ export function assertIsStateTreeNode(
 export function getStateTreeNode(value: IAnyStateTreeNode): AnyObjectNode {
   if (!isStateTreeNode(value)) {
     // istanbul ignore next
-    throw fail(`Value ${value} is no MST Node`)
+    throw new MstError(`Value ${value} is no MST Node`)
   }
   return value.$treenode!
 }
@@ -119,7 +119,7 @@ const doubleDot = (_: any) => ".."
 export function getRelativePathBetweenNodes(base: AnyObjectNode, target: AnyObjectNode): string {
   // PRE condition target is (a child of) base!
   if (base.root !== target.root) {
-    throw fail(
+    throw new MstError(
       `Cannot calculate relative path: objects '${base}' and '${target}' are not part of the same object tree`
     )
   }
@@ -182,7 +182,7 @@ export function resolveNodeByPathParts(
           }
         }
       }
-      throw fail(
+      throw new MstError(
         `Could not resolve '${part}' in path '${
           joinJsonPath(pathParts.slice(0, i)) || "/"
         }' while resolving '${joinJsonPath(pathParts)}'`

@@ -44,8 +44,10 @@ export type IDisposer = () => void
  * @internal
  * @hidden
  */
-export function fail(message = "Illegal state"): Error {
-  return new Error("[mobx-state-tree] " + message)
+export class MstError extends Error {
+  constructor(message = "Illegal state") {
+    super(`[mobx-state-tree] ${message}`)
+  }
 }
 
 /**
@@ -439,7 +441,7 @@ export function assertArg<T>(
   if (devMode()) {
     if (!fn(value)) {
       // istanbul ignore next
-      throw fail(
+      throw new MstError(
         `expected ${typeName} as argument ${asArray(argNumber).join(" or ")}, got ${value} instead`
       )
     }

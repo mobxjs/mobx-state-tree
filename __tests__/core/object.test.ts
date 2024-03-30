@@ -21,6 +21,7 @@ import {
 } from "../../src"
 
 import { autorun, reaction, observable, configure, getDebugName } from "mobx"
+import { MstError } from "../../src/internal"
 
 const createTestFactories = () => {
   const Factory = types
@@ -887,7 +888,7 @@ test("#993-1 - after attach should have a parent when accesing a reference direc
     })
     .actions((self) => ({
       afterAttach() {
-        throw fail("should never be called")
+        throw new MstError("should never be called")
       }
     }))
 

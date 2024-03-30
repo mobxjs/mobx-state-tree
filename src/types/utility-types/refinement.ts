@@ -6,7 +6,6 @@ import {
   typeCheckSuccess,
   typeCheckFailure,
   isType,
-  fail,
   TypeFlags,
   IAnyType,
   AnyObjectNode,

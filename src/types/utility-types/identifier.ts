@@ -1,5 +1,5 @@
 import {
-  fail,
+  MstError,
   createScalarNode,
   SimpleType,
   TypeFlags,
@@ -29,7 +29,9 @@ abstract class BaseIdentifierType<T> extends SimpleType<T, T, T> {
     initialValue: this["C"]
   ): this["N"] {
     if (!parent || !(parent.type instanceof ModelType))
-      throw fail(`Identifier types can only be instantiated as direct child of a model type`)
+      throw new MstError(
+        `Identifier types can only be instantiated as direct child of a model type`
+      )
 
     return createScalarNode(this, parent, subpath, environment, initialValue)
   }
@@ -37,7 +39,7 @@ abstract class BaseIdentifierType<T> extends SimpleType<T, T, T> {
   reconcile(current: this["N"], newValue: this["C"], parent: AnyObjectNode, subpath: string) {
     // we don't consider detaching here since identifier are scalar nodes, and scalar nodes cannot be detached
     if (current.storedValue !== newValue)
-      throw fail(
+      throw new MstError(
         `Tried to change identifier from '${current.storedValue}' to '${newValue}'. Changing identifiers is not allowed.`
       )
     current.setParent(parent, subpath)
