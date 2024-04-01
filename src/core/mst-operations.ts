@@ -10,7 +10,7 @@ import {
   splitJsonPath,
   asArray,
   EMPTY_OBJECT,
-  fail,
+  MstError,
   IDisposer,
   resolveNodeByPath,
   getRelativePathBetweenNodes,
@@ -268,7 +268,7 @@ export function protect(target: IAnyStateTreeNode): void {
   assertIsStateTreeNode(target, 1)
 
   const node = getStateTreeNode(target)
-  if (!node.isRoot) throw fail("`protect` can only be invoked on root nodes")
+  if (!node.isRoot) throw new MstError("`protect` can only be invoked on root nodes")
   node.isProtectionEnabled = true
 }
 
@@ -301,7 +301,7 @@ export function unprotect(target: IAnyStateTreeNode): void {
   assertIsStateTreeNode(target, 1)
 
   const node = getStateTreeNode(target)
-  if (!node.isRoot) throw fail("`unprotect` can only be invoked on root nodes")
+  if (!node.isRoot) throw new MstError("`unprotect` can only be invoked on root nodes")
   node.isProtectionEnabled = false
 }
 
@@ -394,7 +394,7 @@ export function getParent<IT extends IAnyStateTreeNode | IAnyComplexType>(
     if (--d === 0) return parent.storedValue as any
     parent = parent.parent
   }
-  throw fail(`Failed to find the parent of ${getStateTreeNode(target)} at depth ${depth}`)
+  throw new MstError(`Failed to find the parent of ${getStateTreeNode(target)} at depth ${depth}`)
 }
 
 /**
@@ -437,7 +437,7 @@ export function getParentOfType<IT extends IAnyComplexType>(
     if (type.is(parent.storedValue)) return parent.storedValue
     parent = parent.parent
   }
-  throw fail(`Failed to find the parent of ${getStateTreeNode(target)} of a given type`)
+  throw new MstError(`Failed to find the parent of ${getStateTreeNode(target)} of a given type`)
 }
 
 /**
@@ -577,7 +577,7 @@ export function tryReference<N extends IAnyStateTreeNode>(
         return isAlive(node) ? node : undefined
       }
     } else {
-      throw fail("The reference to be checked is not one of node, null or undefined")
+      throw new MstError("The reference to be checked is not one of node, null or undefined")
     }
   } catch (e) {
     if (e instanceof InvalidReferenceError) {
@@ -605,7 +605,7 @@ export function isValidReference<N extends IAnyStateTreeNode>(
     } else if (isStateTreeNode(node)) {
       return checkIfAlive ? isAlive(node) : true
     } else {
-      throw fail("The reference to be checked is not one of node, null or undefined")
+      throw new MstError("The reference to be checked is not one of node, null or undefined")
     }
   } catch (e) {
     if (e instanceof InvalidReferenceError) {
@@ -777,7 +777,7 @@ export function getEnv<T = any>(target: IAnyStateTreeNode): T {
 
   const node = getStateTreeNode(target)
   const env = node.root.environment
-  if (!env) throw fail(`Failed to find the environment of ${node} ${node.path}`)
+  if (!env) throw new MstError(`Failed to find the environment of ${node} ${node.path}`)
   return env
 }
 

@@ -1,5 +1,5 @@
 import { IObservableArray, values, observable, entries } from "mobx"
-import { fail, ObjectNode, mobxShallow, AnyObjectNode, IAnyComplexType } from "../../internal"
+import { MstError, ObjectNode, mobxShallow, AnyObjectNode, IAnyComplexType } from "../../internal"
 
 let identifierCacheId = 0
 
@@ -37,7 +37,7 @@ export class IdentifierCache {
         this.cache.set(identifier, observable.array<AnyObjectNode>([], mobxShallow))
       }
       const set = this.cache.get(identifier)!
-      if (set.indexOf(node) !== -1) throw fail(`Already registered`)
+      if (set.indexOf(node) !== -1) throw new MstError(`Already registered`)
       set.push(node)
       if (lastCacheUpdate) {
         this.updateLastCacheModificationPerId(identifier)
@@ -114,7 +114,7 @@ export class IdentifierCache {
       case 1:
         return matches[0]
       default:
-        throw fail(
+        throw new MstError(
           `Cannot resolve a reference to type '${
             type.name
           }' with id: '${identifier}' unambigously, there are multiple candidates: ${matches

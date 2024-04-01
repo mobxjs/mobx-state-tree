@@ -1,5 +1,5 @@
 import {
-  fail,
+  MstError,
   freeze,
   NodeLifeCycle,
   Hook,
@@ -49,7 +49,7 @@ export class ScalarNode<C, S, T> extends BaseNode<C, S, T> {
 
   get root(): AnyObjectNode {
     // future optimization: store root ref in the node and maintain it
-    if (!this.parent) throw fail(`This scalar node is not part of a tree`)
+    if (!this.parent) throw new MstError(`This scalar node is not part of a tree`)
     return this.parent.root
   }
 
@@ -64,15 +64,15 @@ export class ScalarNode<C, S, T> extends BaseNode<C, S, T> {
     if (devMode()) {
       if (!subpath) {
         // istanbul ignore next
-        throw fail("assertion failed: subpath expected")
+        throw new MstError("assertion failed: subpath expected")
       }
       if (!newParent) {
         // istanbul ignore next
-        throw fail("assertion failed: parent expected")
+        throw new MstError("assertion failed: parent expected")
       }
       if (parentChanged) {
         // istanbul ignore next
-        throw fail("assertion failed: scalar nodes cannot change their parent")
+        throw new MstError("assertion failed: scalar nodes cannot change their parent")
       }
     }
 

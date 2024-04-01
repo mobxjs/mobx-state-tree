@@ -1,5 +1,4 @@
 import {
-  fail,
   isPrimitive,
   createScalarNode,
   ISimpleType,

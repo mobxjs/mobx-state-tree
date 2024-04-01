@@ -1,4 +1,4 @@
-import { argsToArray, fail, setImmediateWithFallback } from "../utils"
+import { argsToArray, MstError, setImmediateWithFallback } from "../utils"
 import {
   FunctionWithFlag,
   getCurrentActionContext,
@@ -98,11 +98,11 @@ export function createFlowSpawner(name: string, generator: FunctionWithFlag) {
     const runId = getNextActionId()
     const parentContext = getCurrentActionContext()!
     if (!parentContext) {
-      throw fail("a mst flow must always have a parent context")
+      throw new MstError("a mst flow must always have a parent context")
     }
     const parentActionContext = getParentActionContext(parentContext)
     if (!parentActionContext) {
-      throw fail("a mst flow must always have a parent action context")
+      throw new MstError("a mst flow must always have a parent action context")
     }
 
     const contextBase = {
@@ -193,7 +193,7 @@ export function createFlowSpawner(name: string, generator: FunctionWithFlag) {
         // TODO: support more type of values? See https://github.com/tj/co/blob/249bbdc72da24ae44076afd716349d2089b31c4c/index.js#L100
         if (!ret.value || typeof ret.value.then !== "function") {
           // istanbul ignore next
-          throw fail("Only promises can be yielded to `async`, got: " + ret)
+          throw new MstError("Only promises can be yielded to `async`, got: " + ret)
         }
         return ret.value.then(onFulfilled, onRejected)
       }
