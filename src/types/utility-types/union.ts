@@ -7,7 +7,7 @@ import {
   isType,
   TypeFlags,
   IType,
-  fail,
+  MstError,
   isPlainObject,
   IAnyType,
   IValidationError,
@@ -74,7 +74,7 @@ export class Union<Types extends IAnyType[]> extends BaseType<
     initialValue: this["C"] | this["T"]
   ): this["N"] {
     const type = this.determineType(initialValue, undefined)
-    if (!type) throw fail("No matching type for union " + this.describe()) // can happen in prod builds
+    if (!type) throw new MstError("No matching type for union " + this.describe()) // can happen in prod builds
     return type.instantiate(parent, subpath, environment, initialValue)
   }
 
@@ -85,7 +85,7 @@ export class Union<Types extends IAnyType[]> extends BaseType<
     subpath: string
   ): this["N"] {
     const type = this.determineType(newValue, current.getReconciliationType())
-    if (!type) throw fail("No matching type for union " + this.describe()) // can happen in prod builds
+    if (!type) throw new MstError("No matching type for union " + this.describe()) // can happen in prod builds
     return type.reconcile(current, newValue, parent, subpath)
   }
 

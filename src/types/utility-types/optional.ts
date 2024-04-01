@@ -7,7 +7,7 @@ import {
   IValidationResult,
   typecheckInternal,
   typeCheckSuccess,
-  fail,
+  MstError,
   IAnyType,
   AnyObjectNode,
   BaseType,
@@ -136,7 +136,7 @@ function checkOptionalPreconditions<IT extends IAnyType>(
 ) {
   // make sure we never pass direct instances
   if (typeof defaultValueOrFunction !== "function" && isStateTreeNode(defaultValueOrFunction)) {
-    throw fail(
+    throw new MstError(
       "default value cannot be an instance, pass a snapshot or a function that creates an instance/snapshot instead"
     )
   }

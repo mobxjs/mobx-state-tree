@@ -1,5 +1,5 @@
 import {
-  fail,
+  MstError,
   BaseType,
   IValidationContext,
   IValidationResult,
@@ -39,10 +39,14 @@ class Late<IT extends IAnyType> extends BaseType<
         else throw e
       }
       if (mustSucceed && t === undefined)
-        throw fail("Late type seems to be used too early, the definition (still) returns undefined")
+        throw new MstError(
+          "Late type seems to be used too early, the definition (still) returns undefined"
+        )
       if (t) {
         if (devMode() && !isType(t))
-          throw fail("Failed to determine subtype, make sure types.late returns a type definition.")
+          throw new MstError(
+            "Failed to determine subtype, make sure types.late returns a type definition."
+          )
         this._subType = t
       }
     }
@@ -120,7 +124,7 @@ export function late(nameOrType: any, maybeType?: () => IAnyType): IAnyType {
   // checks that the type is actually a late type
   if (devMode()) {
     if (!(typeof type === "function" && type.length === 0))
-      throw fail(
+      throw new MstError(
         "Invalid late type, expected a function with zero arguments that returns a type, got: " +
           type
       )

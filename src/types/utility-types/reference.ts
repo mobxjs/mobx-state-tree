@@ -8,7 +8,7 @@ import {
   IValidationResult,
   typeCheckSuccess,
   typeCheckFailure,
-  fail,
+  MstError,
   IAnyType,
   IAnyStateTreeNode,
   IAnyComplexType,
@@ -74,14 +74,14 @@ class StoredReference<IT extends IAnyType> {
     } else if (isStateTreeNode(value)) {
       const targetNode = getStateTreeNode(value)
       if (!targetNode.identifierAttribute)
-        throw fail(`Can only store references with a defined identifier attribute.`)
+        throw new MstError(`Can only store references with a defined identifier attribute.`)
       const id = targetNode.unnormalizedIdentifier
       if (id === null || id === undefined) {
-        throw fail(`Can only store references to tree nodes with a defined identifier.`)
+        throw new MstError(`Can only store references to tree nodes with a defined identifier.`)
       }
       this.identifier = id
     } else {
-      throw fail(`Can only store references to tree nodes or identifiers, got: '${value}'`)
+      throw new MstError(`Can only store references to tree nodes or identifiers, got: '${value}'`)
     }
   }
 
@@ -469,7 +469,9 @@ export function reference<IT extends IAnyComplexType>(
   if (devMode()) {
     if (arguments.length === 2 && typeof arguments[1] === "string") {
       // istanbul ignore next
-      throw fail("References with base path are no longer supported. Please remove the base path.")
+      throw new MstError(
+        "References with base path are no longer supported. Please remove the base path."
+      )
     }
   }
 
@@ -481,7 +483,7 @@ export function reference<IT extends IAnyComplexType>(
   if (getSetOptions && (getSetOptions.get || getSetOptions.set)) {
     if (devMode()) {
       if (!getSetOptions.get || !getSetOptions.set) {
-        throw fail(
+        throw new MstError(
           "reference options must either contain both a 'get' and a 'set' method or none of them"
         )
       }

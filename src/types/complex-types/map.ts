@@ -17,7 +17,7 @@ import {
   ComplexType,
   createObjectNode,
   escapeJsonPath,
-  fail,
+  MstError,
   flattenTypeErrors,
   getContextForPath,
   getStateTreeNode,
@@ -166,27 +166,27 @@ class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
   }
 
   put(value: ExtractCSTWithSTN<IT>): IT["Type"] {
-    if (!value) throw fail(`Map.put cannot be used to set empty values`)
+    if (!value) throw new MstError(`Map.put cannot be used to set empty values`)
     if (isStateTreeNode(value)) {
       const node = getStateTreeNode(value)
       if (devMode()) {
         if (!node.identifierAttribute) {
-          throw fail(needsIdentifierError)
+          throw new MstError(needsIdentifierError)
         }
       }
       if (node.identifier === null) {
-        throw fail(needsIdentifierError)
+        throw new MstError(needsIdentifierError)
       }
       this.set(node.identifier, value)
       return value as any
     } else if (!isMutable(value)) {
-      throw fail(`Map.put can only be used to store complex values`)
+      throw new MstError(`Map.put can only be used to store complex values`)
     } else {
       const mapNode = getStateTreeNode(this as IAnyStateTreeNode)
       const mapType = mapNode.type as MapType<any>
 
       if (mapType.identifierMode !== MapIdentifierMode.YES) {
-        throw fail(needsIdentifierError)
+        throw new MstError(needsIdentifierError)
       }
 
       const idAttr = mapType.mapIdentifierAttribute!
@@ -256,7 +256,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         (current: IAnyModelType["identifierAttribute"], type) => {
           if (!type.identifierAttribute) return current
           if (current && current !== type.identifierAttribute) {
-            throw fail(
+            throw new MstError(
               `The objects in a map should all have the same identifier attribute, expected '${current}', but child of type '${type.name}' declared attribute '${type.identifierAttribute}' as identifier`
             )
           }
@@ -316,7 +316,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
 
   getChildNode(node: this["N"], key: string): AnyNode {
     const childNode = node.storedValue.get("" + key)
-    if (!childNode) throw fail("Not a child " + key)
+    if (!childNode) throw new MstError("Not a child " + key)
     return childNode
   }
 
@@ -353,7 +353,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     if (this.identifierMode === MapIdentifierMode.YES && node instanceof ObjectNode) {
       const identifier = node.identifier!
       if (identifier !== expected)
-        throw fail(
+        throw new MstError(
           `A map of objects containing an identifier should always store the object under their own identifier. Trying to store key '${identifier}', but expected: '${expected}'`
         )
     }

@@ -10,7 +10,7 @@ import {
   applySnapshot,
   isRoot,
   isProtected,
-  fail,
+  MstError,
   isPlainObject,
   isPrimitive,
   IDisposer,
@@ -100,7 +100,7 @@ export function applyAction(
 
 function baseApplyAction(target: IAnyStateTreeNode, action: ISerializedActionCall): any {
   const resolvedTarget = tryResolve(target, action.path || "")
-  if (!resolvedTarget) throw fail(`Invalid action path: ${action.path || ""}`)
+  if (!resolvedTarget) throw new MstError(`Invalid action path: ${action.path || ""}`)
   const node = getStateTreeNode(resolvedTarget)
 
   // Reserved functions
@@ -112,7 +112,7 @@ function baseApplyAction(target: IAnyStateTreeNode, action: ISerializedActionCal
   }
 
   if (!(typeof resolvedTarget[action.name] === "function"))
-    throw fail(`Action '${action.name}' does not exist in '${node.path}'`)
+    throw new MstError(`Action '${action.name}' does not exist in '${node.path}'`)
   return resolvedTarget[action.name].apply(
     resolvedTarget,
     action.args ? action.args.map((v) => deserializeArgument(node, v)) : []

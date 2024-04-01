@@ -5,8 +5,9 @@ title: TypeScript and MST
 
 <div id="codefund"></div>
 
-TypeScript support is best-effort as not all patterns can be expressed in TypeScript. Except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy TypeScript features it is required to use TypeScript 3.0 or later with `noImplicitThis` and `strictNullChecks` enabled.
-Actually, the more strict options that are enabled, the better the type system will behave.
+TypeScript support is best-effort as not all patterns can be expressed in TypeScript. Except for assigning snapshots to properties we get pretty close! As MST uses the latest fancy TypeScript features it is required to use TypeScript 5.3.3 or later with `noImplicitThis` and `strictNullChecks` enabled.
+
+The more strict options that are enabled, the better the type system will behave.
 
 #### Recommend compiler flags
 
@@ -14,11 +15,11 @@ The recommended compiler flags (against which all our tests are written) are:
 
 ```json
 {
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true
+  "strictNullChecks": true,
+  "strictFunctionTypes": true,
+  "noImplicitAny": true,
+  "noImplicitReturns": true,
+  "noImplicitThis": true
 }
 ```
 
@@ -42,24 +43,24 @@ Good news! You don't need to write it twice!
 
 There are four kinds of types available, plus one helper type:
 
--   `Instance<typeof TYPE>` or `Instance<typeof VARIABLE>` is the node instance type. (Legacy form is `typeof MODEL.Type`).
--   `SnapshotIn<typeof TYPE>` or `SnapshotIn<typeof VARIABLE>` is the input (creation) snapshot type. (Legacy form is `typeof MODEL.CreationType`).
--   `SnapshotOut<typeof TYPE>` or `SnapshotOut<typeof VARIABLE>` is the output (creation) snapshot type. (Legacy form is `typeof MODEL.SnapshotType`).
--   `SnapshotOrInstance<typeof TYPE>` or `SnapshotOrInstance<typeof VARIABLE>` is `SnapshotIn<T> | Instance<T>`. This type is useful when you want to declare an input parameter that is able consume both types.
--   `TypeOfValue<typeof VARIABLE>` gets the original type for the given instance. Note that this only works for complex values (models, arrays, maps...) but not for simple values (number, string, boolean, string, undefined).
+- `Instance<typeof TYPE>` or `Instance<typeof VARIABLE>` is the node instance type. (Legacy form is `typeof MODEL.Type`).
+- `SnapshotIn<typeof TYPE>` or `SnapshotIn<typeof VARIABLE>` is the input (creation) snapshot type. (Legacy form is `typeof MODEL.CreationType`).
+- `SnapshotOut<typeof TYPE>` or `SnapshotOut<typeof VARIABLE>` is the output (creation) snapshot type. (Legacy form is `typeof MODEL.SnapshotType`).
+- `SnapshotOrInstance<typeof TYPE>` or `SnapshotOrInstance<typeof VARIABLE>` is `SnapshotIn<T> | Instance<T>`. This type is useful when you want to declare an input parameter that is able consume both types.
+- `TypeOfValue<typeof VARIABLE>` gets the original type for the given instance. Note that this only works for complex values (models, arrays, maps...) but not for simple values (number, string, boolean, string, undefined).
 
 ```typescript
-import { types, Instance, SnapshotIn, SnapshotOut } from "mobx-state-tree";
+import { types, Instance, SnapshotIn, SnapshotOut } from "mobx-state-tree"
 
 const Todo = types
-    .model({
-        title: "hello"
-    })
-    .actions(self => ({
-        setTitle(v: string) {
-            self.title = v
-        }
-    }))
+  .model({
+    title: "hello"
+  })
+  .actions((self) => ({
+    setTitle(v: string) {
+      self.title = v
+    }
+  }))
 
 interface ITodo extends Instance<typeof Todo> {} // => { title: string; setTitle: (v: string) => void }
 interface ITodoSnapshotIn extends SnapshotIn<typeof Todo> {} // => { title?: string }
@@ -80,29 +81,29 @@ For example:
 
 ```typescript
 const Example = types
-    .model("Example", {
-        prop: types.string
-    })
-    .views(self => ({
-        get upperProp(): string {
-            return self.prop.toUpperCase()
-        },
-        get twiceUpperProp(): string {
-            return self.upperProp + self.upperProp // Compile error: `self.upperProp` is not yet defined
-        }
-    }))
+  .model("Example", {
+    prop: types.string
+  })
+  .views((self) => ({
+    get upperProp(): string {
+      return self.prop.toUpperCase()
+    },
+    get twiceUpperProp(): string {
+      return self.upperProp + self.upperProp // Compile error: `self.upperProp` is not yet defined
+    }
+  }))
 ```
 
 You can circumvent this situation by using `this` whenever you intend to use the newly declared computed values that are local to the current object:
 
 ```typescript
-const Example = types.model("Example", { prop: types.string }).views(self => ({
-    get upperProp(): string {
-        return self.prop.toUpperCase()
-    },
-    get twiceUpperProp(): string {
-        return this.upperProp + this.upperProp
-    }
+const Example = types.model("Example", { prop: types.string }).views((self) => ({
+  get upperProp(): string {
+    return self.prop.toUpperCase()
+  },
+  get twiceUpperProp(): string {
+    return this.upperProp + this.upperProp
+  }
 }))
 ```
 
@@ -148,22 +149,26 @@ Similarly, when writing actions or views one can use helper functions:
 ```typescript
 import { types, flow } from "mobx-state-tree"
 
-const Example = types.model("Example", { prop: types.string }).actions(self => {
-    // Don't forget that async operations HAVE
-    // to use `flow( ... )`.
-    const fetchData = flow(function* fetchData() {
-        yield doSomething()
-    })
+const Example = types.model("Example", { prop: types.string }).actions((self) => {
+  // Don't forget that async operations HAVE
+  // to use `flow( ... )`.
+  const fetchData = flow(function* fetchData() {
+    yield doSomething()
+  })
 
-    return {
-        fetchData,
-        afterCreate() {
-            // Notice that we call the function directly
-            // instead of using `self.fetchData()`. This is
-            // because Typescript doesn't know yet about `fetchData()`
-            // being part of `self` in this context.
-            fetchData()
-        }
+  return {
+    fetchData,
+    afterCreate() {
+      // Notice that we call the function directly
+      // instead of using `self.fetchData()`. This is
+      // because Typescript doesn't know yet about `fetchData()`
+      // being part of `self` in this context.
+      fetchData()
     }
+  }
 })
 ```
+
+#### Using cast
+
+We provide a `cast` utility to [cast a node snapshot to an instance type for assignment](https://mobx-state-tree.js.org/API/#cast). [Check out this blog post for details and examples on when to use it](https://coolsoftware.dev/blog/type-casting-in-mobx-state-tree/).

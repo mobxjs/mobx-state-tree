@@ -1,4 +1,4 @@
-import { fail, stringStartsWith } from "../internal"
+import { MstError, stringStartsWith } from "../internal"
 
 /**
  * https://tools.ietf.org/html/rfc6902
@@ -19,7 +19,8 @@ export interface IReversibleJsonPatch extends IJsonPatch {
  * @hidden
  */
 export function splitPatch(patch: IReversibleJsonPatch): [IJsonPatch, IJsonPatch] {
-  if (!("oldValue" in patch)) throw fail(`Patches without \`oldValue\` field cannot be inversed`)
+  if (!("oldValue" in patch))
+    throw new MstError(`Patches without \`oldValue\` field cannot be inversed`)
   return [stripPatch(patch), invertPatch(patch)]
 }
 
@@ -127,7 +128,7 @@ export function splitJsonPath(path: string): string[] {
     stringStartsWith(path, "./") ||
     stringStartsWith(path, "../")
   if (!valid) {
-    throw fail(`a json path must be either rooted, empty or relative, but got '${path}'`)
+    throw new MstError(`a json path must be either rooted, empty or relative, but got '${path}'`)
   }
 
   // '/a/b/c' -> ["a", "b", "c"]

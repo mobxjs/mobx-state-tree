@@ -1,7 +1,7 @@
 import { action as mobxAction } from "mobx"
 import {
   getStateTreeNode,
-  fail,
+  MstError,
   argsToArray,
   IDisposer,
   getRoot,
@@ -292,12 +292,12 @@ function runMiddleWares(
     if (devMode()) {
       if (!nextInvoked && !abortInvoked) {
         const node2 = getStateTreeNode(call.tree)
-        throw fail(
+        throw new MstError(
           `Neither the next() nor the abort() callback within the middleware ${handler.name} for the action: "${call.name}" on the node: ${node2.type.name} was invoked.`
         )
       } else if (nextInvoked && abortInvoked) {
         const node2 = getStateTreeNode(call.tree)
-        throw fail(
+        throw new MstError(
           `The next() and abort() callback within the middleware ${handler.name} for the action: "${call.name}" on the node: ${node2.type.name} were invoked.`
         )
       }

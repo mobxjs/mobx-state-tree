@@ -23,7 +23,7 @@ import {
   EMPTY_ARRAY,
   EMPTY_OBJECT,
   escapeJsonPath,
-  fail,
+  MstError,
   flattenTypeErrors,
   freeze,
   getContextForPath,
@@ -264,7 +264,9 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
 
   keysList.forEach((key) => {
     if (alreadySeenKeys.has(key)) {
-      throw fail(`${key} is declared twice in the model. Model should not contain the same keys`)
+      throw new MstError(
+        `${key} is declared twice in the model. Model should not contain the same keys`
+      )
     }
     alreadySeenKeys.add(key)
   })
@@ -273,7 +275,7 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
   return keysList.reduce((props, key) => {
     // warn if user intended a HOOK
     if (key in Hook) {
-      throw fail(
+      throw new MstError(
         `Hook '${key}' was defined as property. Hooks should be defined as part of the actions`
       )
     }
@@ -281,12 +283,12 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
     // the user intended to use a view
     const descriptor = Object.getOwnPropertyDescriptor(declaredProps, key)!
     if ("get" in descriptor) {
-      throw fail("Getters are not supported as properties. Please use views instead")
+      throw new MstError("Getters are not supported as properties. Please use views instead")
     }
     // undefined and null are not valid
     const value = descriptor.value
     if (value === null || value === undefined) {
-      throw fail(
+      throw new MstError(
         "The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?"
       )
     }
@@ -306,17 +308,17 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
     }
     // its a function, maybe the user wanted a view?
     else if (devMode() && typeof value === "function") {
-      throw fail(
+      throw new MstError(
         `Invalid type definition for property '${key}', it looks like you passed a function. Did you forget to invoke it, or did you intend to declare a view / action?`
       )
     }
     // no other complex values
     else if (devMode() && typeof value === "object") {
-      throw fail(
+      throw new MstError(
         `Invalid type definition for property '${key}', it looks like you passed an object. Try passing another model type or a types.frozen.`
       )
     } else {
-      throw fail(
+      throw new MstError(
         `Invalid type definition for property '${key}', cannot infer a type from a value like '${value}' (${typeof value})`
       )
     }
@@ -370,7 +372,7 @@ export class ModelType<
     this.forAllProps((propName, propType) => {
       if (propType.flags & TypeFlags.Identifier) {
         if (identifierAttribute)
-          throw fail(
+          throw new MstError(
             `Cannot define property '${propName}' as object identifier, property '${identifierAttribute}' is already defined as identifier property`
           )
         identifierAttribute = propName
@@ -400,18 +402,18 @@ export class ModelType<
   private instantiateActions(self: this["T"], actions: ModelActions): void {
     // check if return is correct
     if (!isPlainObject(actions))
-      throw fail(`actions initializer should return a plain object containing actions`)
+      throw new MstError(`actions initializer should return a plain object containing actions`)
 
     // bind actions to the object created
     Object.keys(actions).forEach((name) => {
       // warn if preprocessor was given
       if (name === PRE_PROCESS_SNAPSHOT)
-        throw fail(
+        throw new MstError(
           `Cannot define action '${PRE_PROCESS_SNAPSHOT}', it should be defined using 'type.preProcessSnapshot(fn)' instead`
         )
       // warn if postprocessor was given
       if (name === POST_PROCESS_SNAPSHOT)
-        throw fail(
+        throw new MstError(
           `Cannot define action '${POST_PROCESS_SNAPSHOT}', it should be defined using 'type.postProcessSnapshot(fn)' instead`
         )
 
@@ -451,7 +453,7 @@ export class ModelType<
 
   volatile<TP extends object>(fn: (self: Instance<this>) => TP) {
     if (typeof fn !== "function") {
-      throw fail(
+      throw new MstError(
         `You passed an ${typeof fn} to volatile state as an argument, when function is expected`
       )
     }
@@ -470,7 +472,7 @@ export class ModelType<
   ): void {
     // check views return
     if (!isPlainObject(state))
-      throw fail(`volatile state initializer should return a plain object containing state`)
+      throw new MstError(`volatile state initializer should return a plain object containing state`)
     set(self, state)
   }
 
@@ -480,7 +482,7 @@ export class ModelType<
     const initializer = (self: Instance<this>) => {
       const { actions, views, state, ...rest } = fn(self)
       for (let key in rest)
-        throw fail(
+        throw new MstError(
           `The \`extend\` function should return an object with a subset of the fields 'actions', 'views' and 'state'. Found invalid key '${key}'`
         )
       if (state) this.instantiateVolatileState(self, state)
@@ -502,7 +504,7 @@ export class ModelType<
   private instantiateViews(self: this["T"], views: Object): void {
     // check views return
     if (!isPlainObject(views))
-      throw fail(`views initializer should return a plain object containing views`)
+      throw new MstError(`views initializer should return a plain object containing views`)
     Object.getOwnPropertyNames(views).forEach((key) => {
       // is this a computed property?
       const descriptor = Object.getOwnPropertyDescriptor(views, key)!
@@ -514,7 +516,7 @@ export class ModelType<
         // See #646, allow models to be mocked
         ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(self, key, descriptor.value)
       } else {
-        throw fail(`A view member should either be a function or getter based property`)
+        throw new MstError(`A view member should either be a function or getter based property`)
       }
     })
   }
@@ -629,10 +631,10 @@ export class ModelType<
   }
 
   getChildNode(node: this["N"], key: string): AnyNode {
-    if (!(key in this.properties)) throw fail("Not a value property: " + key)
+    if (!(key in this.properties)) throw new MstError("Not a value property: " + key)
     const adm = _getAdministration(node.storedValue, key)
     const childNode = adm.raw?.()
-    if (!childNode) throw fail("Node not available for property " + key)
+    if (!childNode) throw new MstError("Node not available for property " + key)
     return childNode
   }
 
@@ -644,7 +646,7 @@ export class ModelType<
         const atom = getAtom(node.storedValue, name)
         ;(atom as any).reportObserved()
       } catch (e) {
-        throw fail(`${name} property is declared twice`)
+        throw new MstError(`${name} property is declared twice`)
       }
       res[name] = this.getChildNode(node, name).snapshot
     })
@@ -664,7 +666,7 @@ export class ModelType<
 
   applyPatchLocally(node: this["N"], subpath: string, patch: IJsonPatch): void {
     if (!(patch.op === "replace" || patch.op === "add")) {
-      throw fail(`object does not support operation ${patch.op}`)
+      throw new MstError(`object does not support operation ${patch.op}`)
     }
     ;(node.storedValue as any)[subpath] = patch.value
   }
@@ -748,7 +750,7 @@ export function model<P extends ModelPropertiesDeclaration = {}>(
  */
 export function model(...args: any[]): any {
   if (devMode() && typeof args[0] !== "string" && args[1]) {
-    throw fail(
+    throw new MstError(
       "Model creation failed. First argument must be a string when two arguments are provided"
     )
   }
