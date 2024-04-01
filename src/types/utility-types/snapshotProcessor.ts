@@ -17,7 +17,7 @@ import {
   isUnionType,
   Instance,
   ObjectNode,
-  fail
+  MstError
 } from "../../internal"
 
 /** @hidden */
@@ -257,11 +257,11 @@ export function snapshotProcessor<
   if (devMode()) {
     if (processors.postProcessor && typeof processors.postProcessor !== "function") {
       // istanbul ignore next
-      throw fail("postSnapshotProcessor must be a function")
+      throw new MstError("postSnapshotProcessor must be a function")
     }
     if (processors.preProcessor && typeof processors.preProcessor !== "function") {
       // istanbul ignore next
-      throw fail("preSnapshotProcessor must be a function")
+      throw new MstError("preSnapshotProcessor must be a function")
     }
   }
 

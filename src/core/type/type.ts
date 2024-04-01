@@ -1,7 +1,7 @@
 import { action } from "mobx"
 
 import {
-  fail,
+  MstError,
   isMutable,
   isStateTreeNode,
   getStateTreeNode,
@@ -306,7 +306,7 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
 
   getSnapshot(node: N, applyPostProcess?: boolean): S {
     // istanbul ignore next
-    throw fail("unimplemented method")
+    throw new MstError("unimplemented method")
   }
 
   abstract reconcile(current: N, newValue: C | T, parent: AnyObjectNode, subpath: string): N
@@ -345,25 +345,25 @@ export abstract class BaseType<C, S, T, N extends BaseNode<any, any, any> = Base
 
   get Type(): any {
     // istanbul ignore next
-    throw fail(
+    throw new MstError(
       "Factory.Type should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.Type`"
     )
   }
   get TypeWithoutSTN(): any {
     // istanbul ignore next
-    throw fail(
+    throw new MstError(
       "Factory.TypeWithoutSTN should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.TypeWithoutSTN`"
     )
   }
   get SnapshotType(): any {
     // istanbul ignore next
-    throw fail(
+    throw new MstError(
       "Factory.SnapshotType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.SnapshotType`"
     )
   }
   get CreationType(): any {
     // istanbul ignore next
-    throw fail(
+    throw new MstError(
       "Factory.CreationType should not be actually called. It is just a Type signature that can be used at compile time with Typescript, by using `typeof type.CreationType`"
     )
   }

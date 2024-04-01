@@ -1,7 +1,7 @@
 import {
   SimpleType,
   isPrimitive,
-  fail,
+  MstError,
   identity,
   createScalarNode,
   ISimpleType,
@@ -229,7 +229,7 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
     case "object":
       if (value instanceof Date) return DatePrimitive
   }
-  throw fail("Cannot determine primitive type from value " + value)
+  throw new MstError("Cannot determine primitive type from value " + value)
 }
 
 /**

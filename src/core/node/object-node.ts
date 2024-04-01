@@ -7,7 +7,7 @@ import {
   createActionInvoker,
   EMPTY_OBJECT,
   extend,
-  fail,
+  MstError,
   freeze,
   IAnyType,
   IdentifierCache,
@@ -155,7 +155,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
       }
 
       if (typeof id !== "string" && typeof id !== "number") {
-        throw fail(
+        throw new MstError(
           `Instance identifier '${this.identifierAttribute}' for type '${this.type.name}' must be a string or a number`
         )
       }
@@ -182,7 +182,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     if (devMode()) {
       if (this.state !== NodeLifeCycle.INITIALIZING) {
         // istanbul ignore next
-        throw fail(
+        throw new MstError(
           "assertion failed: the creation of the observable instance must be done on the initializing phase"
         )
       }
@@ -294,25 +294,25 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     if (devMode()) {
       if (!subpath) {
         // istanbul ignore next
-        throw fail("assertion failed: subpath expected")
+        throw new MstError("assertion failed: subpath expected")
       }
       if (!newParent) {
         // istanbul ignore next
-        throw fail("assertion failed: new parent expected")
+        throw new MstError("assertion failed: new parent expected")
       }
 
       if (this.parent && parentChanged) {
-        throw fail(
+        throw new MstError(
           `A node cannot exists twice in the state tree. Failed to add ${this} to path '${newParent.path}/${subpath}'.`
         )
       }
       if (!this.parent && newParent.root === this) {
-        throw fail(
+        throw new MstError(
           `A state tree is not allowed to contain itself. Cannot assign ${this} to path '${newParent.path}/${subpath}'`
         )
       }
       if (!this.parent && !!this.environment && this.environment !== newParent.root.environment) {
-        throw fail(
+        throw new MstError(
           `A state tree cannot be made part of another state tree as long as their environments are different.`
         )
       }
@@ -394,7 +394,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
       const error = this._getAssertAliveError(context)
       switch (livelinessChecking) {
         case "error":
-          throw fail(error)
+          throw new MstError(error)
         case "warn":
           warnError(error)
       }
@@ -460,7 +460,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
   assertWritable(context: AssertAliveContext): void {
     this.assertAlive(context)
     if (!this.isRunningAction() && this.isProtected) {
-      throw fail(
+      throw new MstError(
         `Cannot modify '${this}', the object is protected and can only be modified by using an action.`
       )
     }
@@ -497,7 +497,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
   }
 
   detach(): void {
-    if (!this.isAlive) throw fail(`Error while detaching, node is not alive.`)
+    if (!this.isAlive) throw new MstError(`Error while detaching, node is not alive.`)
 
     this.clearParent()
   }
@@ -607,12 +607,12 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
       this._internalEventsRegister(InternalEvents.Dispose, disposer, true)
       return
     }
-    throw fail("cannot add a disposer when it is already registered for execution")
+    throw new MstError("cannot add a disposer when it is already registered for execution")
   }
 
   removeDisposer(disposer: () => void): void {
     if (!this._internalEventsHas(InternalEvents.Dispose, disposer)) {
-      throw fail("cannot remove a disposer which was never registered for execution")
+      throw new MstError("cannot remove a disposer which was never registered for execution")
     }
     this._internalEventsUnregister(InternalEvents.Dispose, disposer)
   }

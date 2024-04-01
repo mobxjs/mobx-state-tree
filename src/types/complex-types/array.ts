@@ -23,7 +23,7 @@ import {
   EMPTY_ARRAY,
   EMPTY_OBJECT,
   ExtractCSTWithSTN,
-  fail,
+  MstError,
   flattenTypeErrors,
   getContextForPath,
   getStateTreeNode,
@@ -152,7 +152,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
   getChildNode(node: this["N"], key: string): AnyNode {
     const index = Number(key)
     if (index < node.storedValue.length) return node.storedValue[index]
-    throw fail("Not a child: " + key)
+    throw new MstError("Not a child: " + key)
   }
 
   willChange(
@@ -384,7 +384,7 @@ function reconcileArrayChildren<TT>(
       // check if already belongs to the same parent. if so, avoid pushing item in. only swapping can occur.
       if (isStateTreeNode(newValue) && getStateTreeNode(newValue).parent === parent) {
         // this node is owned by this parent, but not in the reconcilable set, so it must be double
-        throw fail(
+        throw new MstError(
           `Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '${
             parent.path
           }/${newPath}', but it lives already at '${getStateTreeNode(newValue).path}'`

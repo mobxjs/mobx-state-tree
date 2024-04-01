@@ -7,7 +7,7 @@ import {
   IAnyType,
   IDisposer,
   devMode,
-  fail
+  MstError
 } from "../../internal"
 import { createAtom, IAtom } from "mobx"
 
@@ -164,7 +164,9 @@ export abstract class BaseNode<C, S, T> {
     if (devMode()) {
       if (!this.isAlive) {
         // istanbul ignore next
-        throw fail("assertion failed: cannot finalize the creation of a node that is already dead")
+        throw new MstError(
+          "assertion failed: cannot finalize the creation of a node that is already dead"
+        )
       }
     }
 

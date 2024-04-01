@@ -1,5 +1,5 @@
 import {
-  fail,
+  MstError,
   EMPTY_ARRAY,
   isPrimitive,
   getStateTreeNode,
@@ -165,7 +165,7 @@ export function typecheck<IT extends IAnyType>(type: IT, value: ExtractCSTWithST
   const errors = type.validate(value, [{ path: "", type }])
 
   if (errors.length > 0) {
-    throw fail(validationErrorsToString(type, value, errors))
+    throw new MstError(validationErrorsToString(type, value, errors))
   }
 }
 
