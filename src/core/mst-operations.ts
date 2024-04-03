@@ -9,7 +9,6 @@ import {
   IJsonPatch,
   splitJsonPath,
   asArray,
-  EMPTY_OBJECT,
   MstError,
   IDisposer,
   resolveNodeByPath,
@@ -792,7 +791,9 @@ export function hasEnv(target: IAnyStateTreeNode): boolean {
   // check all arguments
   if (process.env.NODE_ENV !== "production") {
     if (!isStateTreeNode(target))
-      fail("expected first argument to be a mobx-state-tree node, got " + target + " instead")
+      throw new MstError(
+        "expected first argument to be a mobx-state-tree node, got " + target + " instead"
+      )
   }
 
   const node = getStateTreeNode(target)
