@@ -76,23 +76,6 @@ jobs:
           command: sudo ln -s ~/.bun/bin/bun /usr/local/bin/
       - run: bun run size
 
-  # upload coverage
-  upload-codecov:
-    executor: my-executor
-    steps:
-      - attach_workspace:
-          at: .
-      # only run codecov if the token is present (it is not present for fork PRs for security reasons)
-      - run:
-          name: upload codecov
-          command: |
-            if [[ -v CODECOV_TOKEN ]]
-            then
-                ./node_modules/.bin/codecov
-            else
-                echo "Warning - Codecov info could NOT be uploaded since the CODECOV_TOKEN was not available"
-            fi
-
 workflows:
   version: 2
   build-and-test:
