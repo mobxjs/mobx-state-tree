@@ -36,7 +36,10 @@
       "tips/more-tips"
     ],
     "Compare": ["compare/context-reducer-vs-mobx-state-tree"],
-    "Recipes": ["recipes/auto-generated-property-setter-actions"]
+    "Recipes": [
+      "recipes/auto-generated-property-setter-actions",
+      "recipes/pre-built-form-types-with-mst-form-type"
+    ]
   },
   "mobx-state-tree": {
     "Introduction": ["API/index"],

@@ -1,10 +1,15 @@
+---
+id: pre-built-form-types-with-mst-form-type
+title: Pre-built Form Types with MST Form Type
+---
+
 # MST Form Type
 
 Find the `mst-form-type` library on npm: https://www.npmjs.com/package/mst-form-type.
 
 ## Introduction
 
-Libraries like [Ant Design](https://ant.design/) have a built-in `Form` component that holds field status and validation rules.  Integrating a `Form` component with MobX State Tree models can pose significant challenges as business logic become more complex.
+Libraries like [Ant Design](https://ant.design/) have a built-in `Form` component that holds field status and validation rules. Integrating a `Form` component with MobX State Tree models can pose significant challenges as business logic become more complex.
 
 That's where a solution like `mst-form-type` library comes into play. It models the Ant design field management like a conventional MobX-State-Tree type definition. Users can still use the UI of a component library and keep logic inside MobX-State-Tree, instead of syncing status changes between `Form` component and model.
 
@@ -168,78 +173,78 @@ Now, let's examine how the same example looks when using mst-form-type. The code
 
 ```typescript
 // model.ts
-import { types } from 'mobx-state-tree'
-import createForm from 'mst-form-type'
+import { types } from "mobx-state-tree"
+import createForm from "mst-form-type"
 
 // define form in schema
 export const FormSchema = {
   static: [
     {
-      id: 'name',
-      default: '',
-      validator: 'required',
+      id: "name",
+      default: "",
+      validator: "required"
     },
     {
-      id: 'plan',
-      default: 'A',
-    },
+      id: "plan",
+      default: "A"
+    }
   ],
   dynamic: [
     {
-      id: 'member',
+      id: "member",
       limit: 5,
       schema: [
         {
-          id: 'name',
-          default: '',
-          validator: 'required',
+          id: "name",
+          default: "",
+          validator: "required"
         },
         {
-          id: 'age',
-          default: '',
-          validator: 'required',
-        },
+          id: "age",
+          default: "",
+          validator: "required"
+        }
       ],
-      default: [{ name: 'John', age: 20 }],
-      onAdd: i => {
+      default: [{ name: "John", age: 20 }],
+      onAdd: (i) => {
         // hooks run when add dynamic fields
-        console.log('add', i)
+        console.log("add", i)
       },
-      onRemove: i => {
+      onRemove: (i) => {
         // hooks run when remove dynamic fields
-        console.log('remove', i)
+        console.log("remove", i)
       },
-      onEdit: i => {
+      onEdit: (i) => {
         // hooks run when edit dynamic fields, only be called when edit field by form action
-        console.log('edit', i)
-      },
-    },
-  ],
+        console.log("edit", i)
+      }
+    }
+  ]
 }
 
 // App model
 export const Example = types
-  .model('FormExample')
+  .model("FormExample")
   .props({
-    form: createForm(FormSchema), // form as a model type
+    form: createForm(FormSchema) // form as a model type
   })
-  .views(self => ({
+  .views((self) => ({
     get disableA() {
       return self.form.member.size > 1
     },
     get disableB() {
       return self.form.member.size > 3
-    },
+    }
   }))
-  .actions(self => ({
+  .actions((self) => ({
     onAddFields() {
       // field logic
-      if (self.form.member.size > 1 && self.form.plan.value === 'A') {
-        self.form.plan.setValue('B')
-      } else if (self.form.member.size > 3 && self.form.plan.value !== 'C') {
-        self.form.plan.setValue('C')
+      if (self.form.member.size > 1 && self.form.plan.value === "A") {
+        self.form.plan.setValue("B")
+      } else if (self.form.member.size > 3 && self.form.plan.value !== "C") {
+        self.form.plan.setValue("C")
       }
-    },
+    }
   }))
 ```
 
@@ -374,13 +379,13 @@ The library defines three model types under the hood:
 The default exported method will generate a new custom types.model with all the fields in the schema as props, based on a base model type. The newly created form type will automatically initialize with the schema upon creation. Optionally, a name can be passed for tracking purposes; otherwise, it will default to the base model name.
 
 ```typescript
-type TValidator = 'required' | ((...args: any[]) => boolean) | RegExp | undefined | null
+type TValidator = "required" | ((...args: any[]) => boolean) | RegExp | undefined | null
 
 type TValue = string | boolean | number | Record<string, string> | Array<any>
 
 interface FieldSchema {
   id: string
-  type?: 'string' | 'number' | 'boolean' | 'object' | 'array'
+  type?: "string" | "number" | "boolean" | "object" | "array"
   default: TValue
   validator?: TValidator
   msg?: string
@@ -392,13 +397,13 @@ interface FieldSchema {
 ##### schema
 
 ```typescript
-type TValidator = 'required' | ((...args: any[]) => boolean) | RegExp | undefined | null
+type TValidator = "required" | ((...args: any[]) => boolean) | RegExp | undefined | null
 
 type TValue = string | boolean | number | Record<string, string> | Array<any>
 
 interface FieldSchema {
   id: string
-  type?: 'string' | 'number' | 'boolean' | 'object' | 'array'
+  type?: "string" | "number" | "boolean" | "object" | "array"
   default: TValue
   validator?: TValidator
   msg?: string
@@ -476,7 +481,7 @@ Set field value to `null`
 ```typescript
 form[id].value
 form[id].invalid
-form[id].setValue('new-value')
+form[id].setValue("new-value")
 form[id].reset()
 form[id].valid()
 ```
@@ -523,7 +528,7 @@ Remove the field with specific `id`. This action will call the `onRemove` hook i
 
 **`editField(id: string, fieldKey: string, value)`**
 
-Edit `fieldKey`  field with `id` to `value`. This action will call the `onEdit` hook if passed.
+Edit `fieldKey` field with `id` to `value`. This action will call the `onEdit` hook if passed.
 
 > actions below will be less frequent to use.
 
@@ -566,7 +571,7 @@ interface FormSchema {
 
 **fields**
 
-Every field in `schema` will become a field `prop` of form type. The type of each field will be based on `default` value. 
+Every field in `schema` will become a field `prop` of form type. The type of each field will be based on `default` value.
 
 **`submission`**
 
