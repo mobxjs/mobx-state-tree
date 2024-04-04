@@ -456,8 +456,6 @@ Run field validator if it has.
 
 Reset field value to default value.
 
-> actions below will be less frequent to use.
-
 `setValidator(rawValidator: TValidator)`
 
 Change field validator after initialization
@@ -527,8 +525,6 @@ Remove the field with specific `id`. This action will call the `onRemove` hook i
 **`editField(id: string, fieldKey: string, value)`**
 
 Edit `fieldKey` field with `id` to `value`. This action will call the `onEdit` hook if passed.
-
-> actions below will be less frequent to use.
 
 `getValues()`
 
@@ -602,8 +598,6 @@ Set **dynamic** field value in a form type. Each dynamic field has a field group
 It will return all field values if passed validation in Key-Value format object. The last valid submission will be hold in `submission` props.
 
 **The method will not submit the form in any form of action. It only output the form current values. You need to handle to real submission action yourself.**
-
-> actions below will be less frequent to use.
 
 `init()`
 
