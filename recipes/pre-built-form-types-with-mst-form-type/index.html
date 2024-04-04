@@ -1,0 +1,568 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Pre-built Form Types with MST Form Type · MobX-state-tree</title><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="generator" content="Docusaurus"/><meta name="description" content="Find the `mst-form-type` library on npm: https://www.npmjs.com/package/mst-form-type."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Pre-built Form Types with MST Form Type · MobX-state-tree"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobx-state-tree.js.org//"/><meta property="og:description" content="Find the `mst-form-type` library on npm: https://www.npmjs.com/package/mst-form-type."/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/dracula.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-65632006-4', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script type="text/javascript" src="https://codefund.io/properties/635/funder.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="MobX-state-tree"/><h2 class="headerTitleWithLogo">MobX-state-tree</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/intro/welcome" target="_self">Documentation</a></li><li class=""><a href="/API/" target="_self">TypeDocs</a></li><li class=""><a href="https://opencollective.com/mobx" target="_self">Sponsor</a></li><li class=""><a href="https://github.com/mobxjs/mobx-state-tree" target="_self">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Recipes</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Introduction<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/intro/welcome">Welcome to MobX-State-Tree!</a></li><li class="navListItem"><a class="navItem" href="/intro/installation">Installation</a></li><li class="navListItem"><a class="navItem" href="/intro/getting-started">Getting Started Tutorial</a></li><li class="navListItem"><a class="navItem" href="/intro/examples">Examples</a></li><li class="navListItem"><a class="navItem" href="/intro/philosophy">Overview &amp; Philosophy</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Basic Concepts<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/concepts/trees">Types, models, trees &amp; state</a></li><li class="navListItem"><a class="navItem" href="/concepts/actions">Actions</a></li><li class="navListItem"><a class="navItem" href="/concepts/views">Derived values</a></li><li class="navListItem"><a class="navItem" href="/concepts/using-react">React and MST</a></li><li class="navListItem"><a class="navItem" href="/concepts/snapshots">Snapshots</a></li><li class="navListItem"><a class="navItem" href="/concepts/references">Identifiers and references</a></li><li class="navListItem"><a class="navItem" href="/concepts/async-actions">Asynchronous actions</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Advanced Concepts<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/concepts/patches">Patches</a></li><li class="navListItem"><a class="navItem" href="/concepts/listeners">Listening to changes</a></li><li class="navListItem"><a class="navItem" href="/concepts/dependency-injection">Dependency Injection</a></li><li class="navListItem"><a class="navItem" href="/concepts/middleware">Middleware</a></li><li class="navListItem"><a class="navItem" href="/concepts/reconciliation">Reconciliation</a></li><li class="navListItem"><a class="navItem" href="/concepts/volatiles">Volatile state</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">API Overview<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/overview/types">Types overview</a></li><li class="navListItem"><a class="navItem" href="/overview/api">API overview</a></li><li class="navListItem"><a class="navItem" href="/overview/hooks">Lifecycle hooks overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Tips<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/tips/resources">Talks &amp; Blogs</a></li><li class="navListItem"><a class="navItem" href="/tips/faq">Frequently Asked Questions</a></li><li class="navListItem"><a class="navItem" href="/tips/typescript">TypeScript and MST</a></li><li class="navListItem"><a class="navItem" href="/tips/circular-deps">Circular dependencies</a></li><li class="navListItem"><a class="navItem" href="/tips/inheritance">Simulating inheritance</a></li><li class="navListItem"><a class="navItem" href="/tips/snapshots-as-values">Using snapshots as values</a></li><li class="navListItem"><a class="navItem" href="/tips/more-tips">Miscellaneous Tips</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Compare<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/compare/context-reducer-vs-mobx-state-tree">React Context vs. MobX-State-Tree</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Recipes<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/recipes/auto-generated-property-setter-actions">Auto-Generated Property Setter Actions</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/recipes/pre-built-form-types-with-mst-form-type">Pre-built Form Types with MST Form Type</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx-state-tree/edit/master/docs/recipes/pre-built-form-types-with-mst-form-type.md" target="_blank" rel="noreferrer noopener">Edit</a><h1 id="__docusaurus" class="postHeaderTitle">Pre-built Form Types with MST Form Type</h1></header><article><div><span><p>Find the <code>mst-form-type</code> library on npm: <a href="https://www.npmjs.com/package/mst-form-type">https://www.npmjs.com/package/mst-form-type</a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="introduction"></a><a href="#introduction" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Introduction</h2>
+<p>Libraries like <a href="https://ant.design/">Ant Design</a> have a built-in <code>Form</code> component that holds field status and validation rules. Integrating a <code>Form</code> component with MobX State Tree models can pose significant challenges as business logic become more complex.</p>
+<p>That's where a solution like <code>mst-form-type</code> library comes into play. It models the Ant design field management like a conventional MobX-State-Tree type definition. Users can still use the UI of a component library and keep logic inside MobX-State-Tree, instead of syncing status changes between <code>Form</code> component and model.</p>
+<p>Please note: The <code>mst-form-type</code> library primarily provides model types for the form structure. It does not encompass business logic related to field interactions.</p>
+<h2><a class="anchor" aria-hidden="true" id="setup"></a><a href="#setup" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Setup</h2>
+<p>Setting up and utilizing the <code>mst-form-type</code> library is straightforward:</p>
+<ol>
+<li>Install the <code>mst-form-type</code> library via npm:</li>
+</ol>
+<pre><code class="hljs css language-sh">npm install mst-form-type
+</code></pre>
+<ol start="2">
+<li>Ensure you have <code>mobx-state-tree ^5.0.0</code> installed:</li>
+</ol>
+<pre><code class="hljs css language-sh">npm install mobx-state-tree@^5.0.0
+</code></pre>
+<p>Now that the general installation is complete, let's explore how to use it through a simple example. Although mobx-state-tree is designed to handle complex web application states, you might find the example a bit over-designed. However, the aim is to illustrate the idea of why using mst-form-type is helpful, so I've kept the logic as simple as possible.</p>
+<h2><a class="anchor" aria-hidden="true" id="example"></a><a href="#example" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Example</h2>
+<p>To demonstrate the difference between mst-form-type and the Form component, I've created a comparative example. The form is straightforward, featuring two static fields and a dynamic field group with two fields inside. Certain fields have validation rules to illustrate how validation functions. Additionally, the value of a static field changes when the number of dynamic fields reaches a certain threshold.</p>
+<h3><a class="anchor" aria-hidden="true" id="ant-design-form-component"></a><a href="#ant-design-form-component" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Ant Design <code>Form</code> component</h3>
+<p>I've utilized the <a href="https://ant.design/">Ant Design</a> <code>Form</code> component for the example, although other libraries should have very similar implementations. Let's take a look at the Ant Design version first.</p>
+<pre><code class="hljs css language-tsx"><span class="xml">import React, </span><span class="hljs-template-variable">{ useState, useEffect }</span><span class="xml"> from 'react'
+import </span><span class="hljs-template-variable">{ Form, Input, <span class="hljs-keyword">Select</span>, Button, InputNumber }</span><span class="xml"> from 'antd'
+
+const </span><span class="hljs-template-variable">{ Option }</span><span class="xml"> = Select
+
+const MyForm = () =&gt; </span><span class="hljs-template-variable">{
+  const [form] = Form.useForm()
+  // extra state to handle field interaction logic
+  const [members, setMembers] = useState([{ name: '', age: '' }</span><span class="xml">])
+  const [planValue, setPlanValue] = useState('')
+
+  useEffect(() =&gt; </span><span class="hljs-template-variable">{
+    // handle field interaction in effect
+    <span class="hljs-keyword">if</span> (members.length &gt; 1 &amp;&amp; planValue === 'A') {
+      form.setFieldsValue({ plan: 'B' }</span><span class="xml">)
+    }
+
+    if (members.length &gt; 3 &amp;&amp; planValue !== 'C') </span><span class="hljs-template-variable">{
+      form.setFieldsValue({ plan: 'C' }</span><span class="xml">)
+    }
+  }, [members, planValue, form])
+
+  const onFinish = values =&gt; </span><span class="hljs-template-variable">{
+    console.log('Received values:', values)
+  }</span><span class="xml">
+
+  // handle field interaction by another set of onChange events
+  const handleAddMember = cb =&gt; </span><span class="hljs-template-variable">{
+    <span class="hljs-keyword">if</span> (members.length &lt;= 5) {
+      setMembers([...members, { name: '', age: '' }</span><span class="xml">])
+      cb()
+    }
+  }
+
+  const handleRemoveMember = (index, cb) =&gt; </span><span class="hljs-template-variable">{
+    const updatedMembers = [...members]
+    updatedMembers.splice(index, 1)
+    setMembers(updatedMembers)
+    cb(index)
+  }</span><span class="xml">
+
+  const handlePlanChange = value =&gt; </span><span class="hljs-template-variable">{
+    setPlanValue(value)
+  }</span><span class="xml">
+
+  return (
+    </span><span class="hljs-template-tag">{/* <span class="hljs-name">useForm</span> hook provides a form instance to hold field status */}</span><span class="xml">
+    <span class="hljs-tag">&lt;<span class="hljs-name">Form</span> <span class="hljs-attr">form</span>=</span></span><span class="hljs-template-variable">{form}</span><span class="xml"><span class="hljs-tag"> <span class="hljs-attr">onFinish</span>=</span></span><span class="hljs-template-variable">{onFinish}</span><span class="xml"><span class="hljs-tag">&gt;</span>
+      </span><span class="hljs-template-tag">{/* <span class="hljs-name">field</span> need name props for form instance */}</span><span class="xml">
+      <span class="hljs-tag">&lt;<span class="hljs-name">Form.Item</span>
+        <span class="hljs-attr">name</span>=<span class="hljs-string">"name"</span>
+        <span class="hljs-attr">label</span>=<span class="hljs-string">"Name"</span>
+        <span class="hljs-attr">rules</span>=</span></span><span class="hljs-template-variable">{[{ required: true, message: 'Please input your name!' }</span><span class="xml"><span class="hljs-tag">]}
+      &gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">Input</span> /&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">Form.Item</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">Form.Item</span>
+        <span class="hljs-attr">name</span>=<span class="hljs-string">"plan"</span>
+        <span class="hljs-attr">label</span>=<span class="hljs-string">"Plan"</span>
+        <span class="hljs-attr">rules</span>=</span></span><span class="hljs-template-variable">{[{ required: true, message: 'Please <span class="hljs-keyword">select</span> a plan!' }</span><span class="xml"><span class="hljs-tag">]}
+      &gt;</span>
+        </span><span class="hljs-template-tag">{/* <span class="hljs-name">extra</span> event handler for field logic */}</span><span class="xml">
+        <span class="hljs-tag">&lt;<span class="hljs-name">Select</span> <span class="hljs-attr">onChange</span>=</span></span><span class="hljs-template-variable">{handlePlanChange}</span><span class="xml"><span class="hljs-tag">&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">Option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">"A"</span> <span class="hljs-attr">disabled</span>=</span></span><span class="hljs-template-variable">{members.length &gt; 1}</span><span class="xml"><span class="hljs-tag">&gt;</span>
+            A
+          <span class="hljs-tag">&lt;/<span class="hljs-name">Option</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">Option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">"B"</span> <span class="hljs-attr">disabled</span>=</span></span><span class="hljs-template-variable">{members.length &gt;= 3}</span><span class="xml"><span class="hljs-tag">&gt;</span>
+            B
+          <span class="hljs-tag">&lt;/<span class="hljs-name">Option</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">Option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">"C"</span>&gt;</span>C<span class="hljs-tag">&lt;/<span class="hljs-name">Option</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">Select</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">Form.Item</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">Form.List</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"members"</span>&gt;</span>
+        </span><span class="hljs-template-variable">{(fields, { add, remove }</span><span class="xml">) =&gt; (
+          <span class="hljs-tag">&lt;&gt;</span>
+            </span><span class="hljs-template-variable">{fields.map(({ key, name, ...restField }</span><span class="xml">, index) =&gt; (
+              <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">key</span>=</span></span><span class="hljs-template-variable">{key}</span><span class="xml"><span class="hljs-tag">&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-name">Form.Item</span>
+                  </span></span><span class="hljs-template-variable">{...restField}</span><span class="xml"><span class="hljs-tag">
+                  <span class="hljs-attr">name</span>=</span></span><span class="hljs-template-variable">{[name, 'name']}</span><span class="xml"><span class="hljs-tag">
+                  <span class="hljs-attr">label</span>=<span class="hljs-string">"Member Name"</span>
+                  <span class="hljs-attr">rules</span>=</span></span><span class="hljs-template-variable">{[{ required: true, message: 'Please input member name!' }</span><span class="xml"><span class="hljs-tag">]}
+                &gt;</span>
+                  <span class="hljs-tag">&lt;<span class="hljs-name">Input</span> /&gt;</span>
+                <span class="hljs-tag">&lt;/<span class="hljs-name">Form.Item</span>&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-name">Form.Item</span> </span></span><span class="hljs-template-variable">{...restField}</span><span class="xml"><span class="hljs-tag"> <span class="hljs-attr">name</span>=</span></span><span class="hljs-template-variable">{[name, 'age']}</span><span class="xml"><span class="hljs-tag"> <span class="hljs-attr">label</span>=<span class="hljs-string">"Member Age"</span>&gt;</span>
+                  <span class="hljs-tag">&lt;<span class="hljs-name">InputNumber</span> /&gt;</span>
+                <span class="hljs-tag">&lt;/<span class="hljs-name">Form.Item</span>&gt;</span>
+                </span><span class="hljs-template-tag">{/* <span class="hljs-name">extra</span> event handler for field logic */}</span><span class="xml">
+                <span class="hljs-tag">&lt;<span class="hljs-name">Button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"link"</span> <span class="hljs-attr">onClick</span>=</span></span><span class="hljs-template-variable">{() =&gt; handleRemoveMember(index, remove)}</span><span class="xml"><span class="hljs-tag">&gt;</span>
+                  Remove
+                <span class="hljs-tag">&lt;/<span class="hljs-name">Button</span>&gt;</span>
+              <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+            ))}
+            <span class="hljs-tag">&lt;<span class="hljs-name">Form.Item</span>&gt;</span>
+              <span class="hljs-tag">&lt;<span class="hljs-name">Button</span>
+                <span class="hljs-attr">type</span>=<span class="hljs-string">"dashed"</span>
+                <span class="hljs-attr">onClick</span>=</span></span><span class="hljs-template-variable">{() =&gt; {
+                  // pass form instance method as callback
+                  handleAddMember(add)
+                }</span><span class="xml"><span class="hljs-tag">}
+                <span class="hljs-attr">style</span>=</span></span><span class="hljs-template-variable">{{ width: '100%' }</span><span class="xml"><span class="hljs-tag">}
+              &gt;</span>
+                Add Member
+              <span class="hljs-tag">&lt;/<span class="hljs-name">Button</span>&gt;</span>
+            <span class="hljs-tag">&lt;/<span class="hljs-name">Form.Item</span>&gt;</span>
+          <span class="hljs-tag">&lt;/&gt;</span>
+        )}
+      <span class="hljs-tag">&lt;/<span class="hljs-name">Form.List</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">Form.Item</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">Button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"primary"</span> <span class="hljs-attr">htmlType</span>=<span class="hljs-string">"submit"</span>&gt;</span>
+          Submit
+        <span class="hljs-tag">&lt;/<span class="hljs-name">Button</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">Form.Item</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">Form</span>&gt;</span>
+  )
+}
+
+export default MyForm
+</span></code></pre>
+<p>The code reveals that to manage field logic, we need to maintain a second copy of the field value in React state and attach additional event handlers to Input or other components. Subsequently, we handle the logic within useEffect hooks using form instance APIs.</p>
+<p>However, this approach can quickly become unmaintainable as the logic complexity increases. Furthermore, it is challenging to integrate with other application states in MST. This is because MST does not inherently manage field statuses; instead, the form instance does so.</p>
+<h3><a class="anchor" aria-hidden="true" id="mst-form-type"></a><a href="#mst-form-type" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>mst-form-type</h3>
+<p>Now, let's examine how the same example looks when using mst-form-type. The code can be split into two files: one for the UI and the other for the model. Let's start by reviewing the model file.</p>
+<pre><code class="hljs css language-typescript"><span class="hljs-comment">// model.ts</span>
+<span class="hljs-keyword">import</span> { types } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-state-tree"</span>
+<span class="hljs-keyword">import</span> createForm <span class="hljs-keyword">from</span> <span class="hljs-string">"mst-form-type"</span>
+
+<span class="hljs-comment">// define form in schema</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> FormSchema = {
+  <span class="hljs-keyword">static</span>: [
+    {
+      id: <span class="hljs-string">"name"</span>,
+      <span class="hljs-keyword">default</span>: <span class="hljs-string">""</span>,
+      validator: <span class="hljs-string">"required"</span>
+    },
+    {
+      id: <span class="hljs-string">"plan"</span>,
+      <span class="hljs-keyword">default</span>: <span class="hljs-string">"A"</span>
+    }
+  ],
+  dynamic: [
+    {
+      id: <span class="hljs-string">"member"</span>,
+      limit: <span class="hljs-number">5</span>,
+      schema: [
+        {
+          id: <span class="hljs-string">"name"</span>,
+          <span class="hljs-keyword">default</span>: <span class="hljs-string">""</span>,
+          validator: <span class="hljs-string">"required"</span>
+        },
+        {
+          id: <span class="hljs-string">"age"</span>,
+          <span class="hljs-keyword">default</span>: <span class="hljs-string">""</span>,
+          validator: <span class="hljs-string">"required"</span>
+        }
+      ],
+      <span class="hljs-keyword">default</span>: [{ name: <span class="hljs-string">"John"</span>, age: <span class="hljs-number">20</span> }],
+      onAdd: <span class="hljs-function">(<span class="hljs-params">i</span>) =&gt;</span> {
+        <span class="hljs-comment">// hooks run when add dynamic fields</span>
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"add"</span>, i)
+      },
+      onRemove: <span class="hljs-function">(<span class="hljs-params">i</span>) =&gt;</span> {
+        <span class="hljs-comment">// hooks run when remove dynamic fields</span>
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"remove"</span>, i)
+      },
+      onEdit: <span class="hljs-function">(<span class="hljs-params">i</span>) =&gt;</span> {
+        <span class="hljs-comment">// hooks run when edit dynamic fields, only be called when edit field by form action</span>
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"edit"</span>, i)
+      }
+    }
+  ]
+}
+
+<span class="hljs-comment">// App model</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> Example = types
+  .model(<span class="hljs-string">"FormExample"</span>)
+  .props({
+    form: createForm(FormSchema) <span class="hljs-comment">// form as a model type</span>
+  })
+  .views(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
+    <span class="hljs-keyword">get</span> disableA() {
+      <span class="hljs-keyword">return</span> self.form.member.size &gt; <span class="hljs-number">1</span>
+    },
+    <span class="hljs-keyword">get</span> disableB() {
+      <span class="hljs-keyword">return</span> self.form.member.size &gt; <span class="hljs-number">3</span>
+    }
+  }))
+  .actions(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
+    onAddFields() {
+      <span class="hljs-comment">// field logic</span>
+      <span class="hljs-keyword">if</span> (self.form.member.size &gt; <span class="hljs-number">1</span> &amp;&amp; self.form.plan.value === <span class="hljs-string">"A"</span>) {
+        self.form.plan.setValue(<span class="hljs-string">"B"</span>)
+      } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (self.form.member.size &gt; <span class="hljs-number">3</span> &amp;&amp; self.form.plan.value !== <span class="hljs-string">"C"</span>) {
+        self.form.plan.setValue(<span class="hljs-string">"C"</span>)
+      }
+    }
+  }))
+</code></pre>
+<p>In the model file, we declare a form schema and create the form model. Subsequently, all relevant field models are created within the form model. An action is added to the model to handle field logic, illustrating that mst-form-type doesn't manage business logic but solely holds form and field statuses.</p>
+<p>Now, let's examine how the model is utilized by the UI, which is still built using Ant Design.</p>
+<pre><code class="hljs css language-tsx"><span class="xml">// model.ts
+import React, </span><span class="hljs-template-variable">{ useContext }</span><span class="xml"> from 'react'
+import </span><span class="hljs-template-variable">{ Form, Input, <span class="hljs-keyword">Select</span>, Button, InputNumber }</span><span class="xml"> from 'antd'
+import </span><span class="hljs-template-variable">{ model, ModelContext }</span><span class="xml"> from '~/models'
+import </span><span class="hljs-template-variable">{ observer }</span><span class="xml"> from 'mobx-react-lite'
+
+const </span><span class="hljs-template-variable">{ Option }</span><span class="xml"> = Select
+
+const MyForm = () =&gt; </span><span class="hljs-template-variable">{
+  // get model instance via context
+  const model = useContext(ModelContext)
+
+  const onFinish = values =&gt; {
+    // 在这里计算价格
+    console.log('Received values:', model.form.submit())
+  }</span><span class="xml">
+
+  return (
+    </span><span class="hljs-template-tag">{/* <span class="hljs-name">no</span> form instance need */}</span><span class="xml">
+    <span class="hljs-tag">&lt;<span class="hljs-name">Form</span> <span class="hljs-attr">onFinish</span>=</span></span><span class="hljs-template-variable">{onFinish}</span><span class="xml"><span class="hljs-tag">&gt;</span>
+      </span><span class="hljs-template-tag">{/* <span class="hljs-name">get</span> field status from MST */}</span><span class="xml">
+      <span class="hljs-tag">&lt;<span class="hljs-name">Form.Item</span>
+        <span class="hljs-attr">label</span>=<span class="hljs-string">"Name"</span>
+        <span class="hljs-attr">validateStatus</span>=</span></span><span class="hljs-template-variable">{model.form.name.invalid &amp;&amp; 'error'}</span><span class="xml"><span class="hljs-tag">
+        <span class="hljs-attr">help</span>=</span></span><span class="hljs-template-variable">{model.form.name.invalid &amp;&amp; model.form.name.msg}</span><span class="xml"><span class="hljs-tag">
+      &gt;</span>
+        </span><span class="hljs-template-tag">{/* <span class="hljs-name">controlled</span> component using MST props and action */}</span><span class="xml">
+        <span class="hljs-tag">&lt;<span class="hljs-name">Input</span>
+          <span class="hljs-attr">value</span>=</span></span><span class="hljs-template-variable">{model.form.name.value}</span><span class="xml"><span class="hljs-tag">
+          <span class="hljs-attr">onChange</span>=</span></span><span class="hljs-template-variable">{e =&gt; model.form.name.setValue(e.target.value)}</span><span class="xml"><span class="hljs-tag">
+        /&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">Form.Item</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">Form.Item</span> <span class="hljs-attr">label</span>=<span class="hljs-string">"Plan"</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">Select</span> <span class="hljs-attr">value</span>=</span></span><span class="hljs-template-variable">{model.form.plan.value}</span><span class="xml"><span class="hljs-tag"> <span class="hljs-attr">onChange</span>=</span></span><span class="hljs-template-variable">{value =&gt; model.form.plan.setValue(value)}</span><span class="xml"><span class="hljs-tag">&gt;</span>
+        </span><span class="hljs-template-tag">{/* <span class="hljs-name">computed</span> value */}</span><span class="xml">
+          <span class="hljs-tag">&lt;<span class="hljs-name">Option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">"A"</span> <span class="hljs-attr">disabled</span>=</span></span><span class="hljs-template-variable">{model.disableA}</span><span class="xml"><span class="hljs-tag">&gt;</span>
+            A
+          <span class="hljs-tag">&lt;/<span class="hljs-name">Option</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">Option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">"B"</span> <span class="hljs-attr">disabled</span>=</span></span><span class="hljs-template-variable">{model.disableB}</span><span class="xml"><span class="hljs-tag">&gt;</span>
+            B
+          <span class="hljs-tag">&lt;/<span class="hljs-name">Option</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">Option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">"C"</span>&gt;</span>C<span class="hljs-tag">&lt;/<span class="hljs-name">Option</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">Select</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">Form.Item</span>&gt;</span>
+      <span class="hljs-tag">&lt;&gt;</span>
+        </span><span class="hljs-template-tag">{/* <span class="hljs-name">render</span> dynamic fields */}</span><span class="xml">
+        </span><span class="hljs-template-variable">{model.form.member.fields.map(({ id, ...field }</span><span class="xml">) =&gt; </span><span class="hljs-template-variable">{
+          return (
+            &lt;div key={id}</span><span class="xml">&gt;
+              </span><span class="hljs-template-tag">{/* <span class="hljs-name">access</span> individual dynamic fields */}</span><span class="xml">
+              <span class="hljs-tag">&lt;<span class="hljs-name">Form.Item</span> <span class="hljs-attr">label</span>=<span class="hljs-string">"Member Name"</span>&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-name">Input</span>
+                  <span class="hljs-attr">value</span>=</span></span><span class="hljs-template-variable">{field.name.value}</span><span class="xml"><span class="hljs-tag">
+                  <span class="hljs-attr">onChange</span>=</span></span><span class="hljs-template-variable">{e =&gt; {
+                    field.name.setValue(e.target.value)
+                  }</span><span class="xml"><span class="hljs-tag">}
+                /&gt;</span>
+              <span class="hljs-tag">&lt;/<span class="hljs-name">Form.Item</span>&gt;</span>
+              <span class="hljs-tag">&lt;<span class="hljs-name">Form.Item</span> <span class="hljs-attr">label</span>=<span class="hljs-string">"Member Age"</span>&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-name">InputNumber</span>
+                  <span class="hljs-attr">value</span>=</span></span><span class="hljs-template-variable">{field.age.value}</span><span class="xml"><span class="hljs-tag">
+                  <span class="hljs-attr">onChange</span>=</span></span><span class="hljs-template-variable">{e =&gt; field.age.setValue(e.target.value)}</span><span class="xml"><span class="hljs-tag">
+                /&gt;</span>
+              <span class="hljs-tag">&lt;/<span class="hljs-name">Form.Item</span>&gt;</span>
+              <span class="hljs-tag">&lt;<span class="hljs-name">Button</span>
+                <span class="hljs-attr">type</span>=<span class="hljs-string">"link"</span>
+                <span class="hljs-attr">onClick</span>=</span></span><span class="hljs-template-variable">{() =&gt; {
+                  // dynamic fields built-in action
+                  model.form.member.removeFields(id)
+                }</span><span class="xml"><span class="hljs-tag">}
+              &gt;</span>
+                Remove
+              <span class="hljs-tag">&lt;/<span class="hljs-name">Button</span>&gt;</span>
+            <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+          )
+        })}
+        <span class="hljs-tag">&lt;<span class="hljs-name">Form.Item</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">Button</span>
+            <span class="hljs-attr">type</span>=<span class="hljs-string">"dashed"</span>
+            <span class="hljs-attr">onClick</span>=</span></span><span class="hljs-template-variable">{() =&gt; {
+              model.form.member.addFields({ name: '', age: 20 }</span><span class="xml"><span class="hljs-tag">)
+              // <span class="hljs-attr">handle</span> <span class="hljs-attr">business</span> <span class="hljs-attr">logic</span>
+              <span class="hljs-attr">model.onAddFields</span>()
+            }}
+          &gt;</span>
+            Add Member
+          <span class="hljs-tag">&lt;/<span class="hljs-name">Button</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">Form.Item</span>&gt;</span>
+      <span class="hljs-tag">&lt;/&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">Form.Item</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">Button</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"primary"</span> <span class="hljs-attr">htmlType</span>=<span class="hljs-string">"submit"</span>&gt;</span>
+          Submit
+        <span class="hljs-tag">&lt;/<span class="hljs-name">Button</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">Form.Item</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">Form</span>&gt;</span>
+  )
+}
+// wrap the component by mobx observer
+export default observer(MyForm)
+</span></code></pre>
+<p>Essentially, <code>mst-form-type</code> eliminates the need for a form instance, allowing us to have only one copy of field status, which resides within the MST. Components no longer need to manage form-related states; instead, they simply read state from the MST and render accordingly.</p>
+<p>There are two methods to retrieve or set field values. One involves using actions on each field instance, as demonstrated in the example code. The other method utilizes actions on the form type instance, specifying the field id defined in the form schema. Refer to the &quot;APIs&quot; section below for more details.</p>
+<h2><a class="anchor" aria-hidden="true" id="how-it-works"></a><a href="#how-it-works" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>How It Works</h2>
+<p>The <code>mst-form-type</code> library exports a function which creates a form model (based on the base form model under the hood) using the provided schema and an optional name. Each form type model create its own type, and then instance by MST, which makes every attribute and method independent. So that you can have multiple form type <code>props</code> in a single MST model. User can conveniently interact with the form field via form props, or apply the form model actions to directly get or set field values. Let's see the architecture of <code>mst-form-type</code> first, and then we will go through most of the useful APIs</p>
+<h3><a class="anchor" aria-hidden="true" id="architecture"></a><a href="#architecture" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Architecture</h3>
+<p>The library defines three model types under the hood:</p>
+<ul>
+<li><p><strong>Field Model</strong>: Contains props and actions of a form field, such as <code>value</code>, <code>default</code>, <code>id</code>, <code>valid()</code>, etc.</p></li>
+<li><p><strong>Group Model</strong>: Built for handling a collection of field models as dynamic fields. Each dynamic field group should maintain uniformity in structure. The model also provides actions as life cycle hooks for adding, editing, and removing dynamic fields.</p></li>
+<li><p><strong>Base Form Model</strong>: Encapsulates all field and group models and the associated form methods. The exported function will build a form model with fields defined in schema on top of the base form model.</p></li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="apis"></a><a href="#apis" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>APIs</h3>
+<p><strong>default export</strong></p>
+<p>The default exported method will generate a new custom types.model with all the fields in the schema as props, based on a base model type. The newly created form type will automatically initialize with the schema upon creation. Optionally, a name can be passed for tracking purposes; otherwise, it will default to the base model name.</p>
+<pre><code class="hljs css language-typescript"><span class="hljs-keyword">type</span> TValidator = <span class="hljs-string">"required"</span> | <span class="hljs-function">(<span class="hljs-params">(<span class="hljs-params">...args: <span class="hljs-built_in">any</span>[]</span>) =&gt; <span class="hljs-built_in">boolean</span></span>) | <span class="hljs-params">RegExp</span> | <span class="hljs-params">undefined</span> | <span class="hljs-params">null</span>
+
+<span class="hljs-params">type</span> <span class="hljs-params">TValue</span> = <span class="hljs-params">string</span> | <span class="hljs-params">boolean</span> | <span class="hljs-params">number</span> | <span class="hljs-params">Record</span>&lt;<span class="hljs-params">string</span>, <span class="hljs-params">string</span>&gt; | <span class="hljs-params">Array</span>&lt;<span class="hljs-params">any</span>&gt;
+
+<span class="hljs-params">interface</span> <span class="hljs-params">FieldSchema</span> {
+  <span class="hljs-params">id</span>: <span class="hljs-params">string</span>
+  <span class="hljs-params">type</span>?: "<span class="hljs-params">string</span>" | "<span class="hljs-params">number</span>" | "<span class="hljs-params">boolean</span>" | "<span class="hljs-params">object</span>" | "<span class="hljs-params">array</span>"
+  <span class="hljs-params">default</span>: <span class="hljs-params">TValue</span>
+  <span class="hljs-params">validator</span>?: <span class="hljs-params">TValidator</span>
+  <span class="hljs-params">msg</span>?: <span class="hljs-params">string</span>
+}
+</span></code></pre>
+<h4><a class="anchor" aria-hidden="true" id="field"></a><a href="#field" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Field</h4>
+<h5><a class="anchor" aria-hidden="true" id="schema"></a><a href="#schema" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>schema</h5>
+<pre><code class="hljs css language-typescript"><span class="hljs-keyword">type</span> TValidator = <span class="hljs-string">"required"</span> | <span class="hljs-function">(<span class="hljs-params">(<span class="hljs-params">...args: <span class="hljs-built_in">any</span>[]</span>) =&gt; <span class="hljs-built_in">boolean</span></span>) | <span class="hljs-params">RegExp</span> | <span class="hljs-params">undefined</span> | <span class="hljs-params">null</span>
+
+<span class="hljs-params">type</span> <span class="hljs-params">TValue</span> = <span class="hljs-params">string</span> | <span class="hljs-params">boolean</span> | <span class="hljs-params">number</span> | <span class="hljs-params">Record</span>&lt;<span class="hljs-params">string</span>, <span class="hljs-params">string</span>&gt; | <span class="hljs-params">Array</span>&lt;<span class="hljs-params">any</span>&gt;
+
+<span class="hljs-params">interface</span> <span class="hljs-params">FieldSchema</span> {
+  <span class="hljs-params">id</span>: <span class="hljs-params">string</span>
+  <span class="hljs-params">type</span>?: "<span class="hljs-params">string</span>" | "<span class="hljs-params">number</span>" | "<span class="hljs-params">boolean</span>" | "<span class="hljs-params">object</span>" | "<span class="hljs-params">array</span>"
+  <span class="hljs-params">default</span>: <span class="hljs-params">TValue</span>
+  <span class="hljs-params">validator</span>?: <span class="hljs-params">TValidator</span>
+  <span class="hljs-params">msg</span>?: <span class="hljs-params">string</span>
+}
+</span></code></pre>
+<h5><a class="anchor" aria-hidden="true" id="props"></a><a href="#props" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>props</h5>
+<p><code>id</code></p>
+<p><code>types.identifier</code>. The key of each field in a form, and will become the form type props key. It should be unique and will be used to access field value and in <code>setValue()</code> form action.</p>
+<p><code>value</code></p>
+<p>The props hold the field value. The value type can be <code>string</code>, <code>boolean</code>, <code>number</code>, <code>object</code>, <code>array</code>. <code>object</code> and <code>array</code> will be tranform to <code>types.frozen</code> as a MST leaf.</p>
+<p><code>default</code></p>
+<p>The default value of a field. The Mobx State Tree will decide <code>prop</code> type based on the type of this value.</p>
+<p><code>validator</code></p>
+<p>Optional &amp; Private. All validators will be called in <code>valid()</code> before <code>submit()</code>.</p>
+<p><code>'required'</code> means this field cannot be falsy values, like <code>0</code>, <code>''</code>, or <code>undefined</code>.</p>
+<p><code>((...args: any[]) =&gt; boolean)</code> means a function return a boolean value. If returned <code>true</code>, the validation will be treated passed.</p>
+<p><code>RegExp</code> means the value will be used in <code>RegExp.test()</code>. If returned <code>true</code>, the validation will be treated passed.</p>
+<p><code>undefined | null</code> will not be processed.</p>
+<p><code>msg</code></p>
+<p>Optional. Message shows when field is invalid. The default message is <code>'The input is invalid'</code></p>
+<p><code>invalid</code></p>
+<p>Compute value. Return revert value of <code>invalid()</code> result</p>
+<h5><a class="anchor" aria-hidden="true" id="actions"></a><a href="#actions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>actions</h5>
+<p><strong><code>setValue(value)</code></strong></p>
+<p>Update field value.</p>
+<p><strong><code>valid()</code></strong></p>
+<p>Run field validator if it has.</p>
+<p><strong><code>reset()</code></strong></p>
+<p>Reset field value to default value.</p>
+<p><code>setValidator(rawValidator: TValidator)</code></p>
+<p>Change field validator after initialization</p>
+<p><code>init(field: IField)</code></p>
+<p>Rerun field initialization</p>
+<p><code>setErrorMsg(msg: string)</code></p>
+<p>Change invalid message</p>
+<p><code>clear()</code></p>
+<p>Set field value to <code>null</code></p>
+<h5><a class="anchor" aria-hidden="true" id="code-example"></a><a href="#code-example" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>code example</h5>
+<pre><code class="hljs css language-typescript">form[id].value
+form[id].invalid
+form[id].setValue(<span class="hljs-string">"new-value"</span>)
+form[id].reset()
+form[id].valid()
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="dynamic-field-group"></a><a href="#dynamic-field-group" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Dynamic Field Group</h4>
+<h5><a class="anchor" aria-hidden="true" id="schema-1"></a><a href="#schema-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>schema</h5>
+<pre><code class="hljs css language-typescript"><span class="hljs-keyword">interface</span> DynamicFields {
+  id: <span class="hljs-built_in">string</span>
+  limit: <span class="hljs-built_in">number</span>
+  schema: FieldSchema | FieldSchema[]
+  <span class="hljs-keyword">default</span>?: <span class="hljs-built_in">Array</span>&lt;Record&lt;<span class="hljs-built_in">string</span>, TValue&gt;&gt;
+  onAdd?: <span class="hljs-function">(<span class="hljs-params">field</span>) =&gt;</span> <span class="hljs-built_in">any</span>
+  onRemove?: <span class="hljs-function">(<span class="hljs-params">field</span>) =&gt;</span> <span class="hljs-built_in">any</span>
+  onEdit?: <span class="hljs-function">(<span class="hljs-params">field</span>) =&gt;</span> <span class="hljs-built_in">void</span>
+}
+</code></pre>
+<h5><a class="anchor" aria-hidden="true" id="props-1"></a><a href="#props-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>props</h5>
+<p><code>id</code></p>
+<p><code>types.identifier</code>. The key of each dynamic field group in a form, and will become the form type props key. It should be unique and will be used to access field value and in <code>setDynamicValue()</code> form action.</p>
+<p><code>fields</code></p>
+<p>An array holds all dynamic field models. <code>schema</code> in the interface is to define field schema here. Object in <code>default</code> array will be used to create dynamic fields when form initializing.</p>
+<p><code>limit</code></p>
+<p>Optional. Maxium dynamic field allowed. default is <code>-1</code>, means unlimited.</p>
+<h5><a class="anchor" aria-hidden="true" id="actions-1"></a><a href="#actions-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>actions</h5>
+<p><strong><code>addFields(i, isInit = false)</code></strong></p>
+<p>Add new dynamic field <code>i</code>. You don't need to pass isInit flag when calling the action. It is used for not calling <code>onAdd</code> hooks in schema when initialization.</p>
+<p><strong><code>removeFields(id: string)</code></strong></p>
+<p>Remove the field with specific <code>id</code>. This action will call the <code>onRemove</code> hook if passed.</p>
+<p><strong><code>editField(id: string, fieldKey: string, value)</code></strong></p>
+<p>Edit <code>fieldKey</code> field with <code>id</code> to <code>value</code>. This action will call the <code>onEdit</code> hook if passed.</p>
+<p><code>getValues()</code></p>
+<p>Get all dynamic field values/</p>
+<p><code>valid()</code></p>
+<p>Valid all dynamic field.</p>
+<p><code>reset()</code></p>
+<p>Reset all dynamic fields.</p>
+<h5><a class="anchor" aria-hidden="true" id="code-example-1"></a><a href="#code-example-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>code example</h5>
+<pre><code class="hljs css language-typescript">form[id].fields.map(<span class="hljs-function"><span class="hljs-params">field</span> =&gt;</span> { ... })
+form[id].addFields(field)
+form[id].removeFields(<span class="hljs-string">'id'</span>)
+form[id].editField(<span class="hljs-string">'id'</span>, <span class="hljs-string">'key'</span>, <span class="hljs-string">'value'</span>)
+form[id].getValues() <span class="hljs-comment">// get all dynamic field values, rarely used</span>
+form[id].valid() <span class="hljs-comment">// valid all dynamic field, rarely used</span>
+form[id].reset() <span class="hljs-comment">// reset all dynamic field, rarely used</span>
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="form"></a><a href="#form" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Form</h4>
+<h5><a class="anchor" aria-hidden="true" id="schema-2"></a><a href="#schema-2" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>schema</h5>
+<pre><code class="hljs css language-typescript"><span class="hljs-keyword">interface</span> FormSchema {
+  <span class="hljs-keyword">static</span>: FieldSchema[]
+  dynamic?: DynamicFields[]
+}
+</code></pre>
+<h5><a class="anchor" aria-hidden="true" id="props-2"></a><a href="#props-2" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>props</h5>
+<p><strong>fields</strong></p>
+<p>Every field in <code>schema</code> will become a field <code>prop</code> of form type. The type of each field will be based on <code>default</code> value.</p>
+<p><strong><code>submission</code></strong></p>
+<p>A snapshot of last success submitted form values, in Key-Value object format.</p>
+<p><code>error</code></p>
+<p>An object in Key-Value format contains validation error of each field. This will be cleared on every <code>valid()</code> call.</p>
+<p><code>_internalStatus</code></p>
+<p>Indicate the form status, has 4 values: <code>'init', 'pending', 'success', 'error'</code>. Usually you don't need it, it will change according to form status.</p>
+<p><code>loading</code></p>
+<p>Compute value. Return <code>true</code> when form status is 'pending'. Designed for avoiding duplicated submission.</p>
+<h5><a class="anchor" aria-hidden="true" id="actions-2"></a><a href="#actions-2" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>actions</h5>
+<p><strong><code>setValue({ key, value })</code></strong></p>
+<p>Set <strong>static</strong> field value in a form type. <code>_internalStatus</code> is reserved.</p>
+<p><strong><code>setDynamicValue({ groupId, id, key, value })</code></strong></p>
+<p>Set <strong>dynamic</strong> field value in a form type. Each dynamic field has a field group id and a field id. Or you can use the <code>setValue</code> action on instance to do the same job.</p>
+<p><strong><code>submit()</code></strong></p>
+<p>It will return all field values if passed validation in Key-Value format object. The last valid submission will be hold in <code>submission</code> props.</p>
+<p><strong>The method will not submit the form in any form of action. It only output the form current values. You need to handle to real submission action yourself.</strong></p>
+<p><code>init()</code></p>
+<p>It will be called after new custom type created with schema. It will process the schema to get default values and validators.</p>
+<p><code>valid()</code></p>
+<p>It will run all validators in schema with current field values. It will be called in <code>submit()</code>, and produce <code>error</code> if any error happens.</p>
+<p><code>reset()</code></p>
+<p>It will set the form type to <code>init</code> status, clearing submissions and errors. All fields will be set to default values passed by schema.</p>
+<h5><a class="anchor" aria-hidden="true" id="code-example-2"></a><a href="#code-example-2" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>code example</h5>
+<pre><code class="hljs css language-typescript">form.setValue({ key, value })
+form.setDynamicValue({ groupId, id, key, value })
+form.submit()
+form.rest()
+form.onAdd(id, field)
+form.onRemove(groupId, fieldId)
+form.onEdit(groupId, fieldId, key, value)
+form.clear(groupId)
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/recipes/auto-generated-property-setter-actions"><span class="arrow-prev">← </span><span>Auto-Generated Property Setter Actions</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#introduction">Introduction</a></li><li><a href="#setup">Setup</a></li><li><a href="#example">Example</a><ul class="toc-headings"><li><a href="#ant-design-form-component">Ant Design <code>Form</code> component</a></li><li><a href="#mst-form-type">mst-form-type</a></li></ul></li><li><a href="#how-it-works">How It Works</a><ul class="toc-headings"><li><a href="#architecture">Architecture</a></li><li><a href="#apis">APIs</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="MobX-state-tree" width="66" height="58"/></a><div><h5>Docs</h5><a href="/intro/getting-started">Getting Started</a><a href="/concepts/trees">Basic concepts</a><a href="/concepts/patches">Advanced concepts</a><a href="/overview/types">API Reference</a></div><div><h5>Community</h5><a href="https://github.com/mobxjs/mobx-state-tree/discussions" target="_blank" rel="noreferrer noopener">GitHub Discussions</a><a href="https://stackoverflow.com/questions/tagged/mobx-state-tree" target="_blank" rel="noreferrer noopener">Stack Overflow</a></div><div><h5>More</h5><a href="/blog">Blog</a><a href="https://github.com/mobxjs/mobx-state-tree">GitHub</a><a class="github-button" href="https://github.com/mobxjs/mobx-state-tree" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2024 Michel Weststrate</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: 'b7b0cfe7d1c8fa6db6089df94a3128f1',
+                indexName: 'mobx-state-tree',
+                inputSelector: '#search_input_react'
+              });
+            </script></body></html>
