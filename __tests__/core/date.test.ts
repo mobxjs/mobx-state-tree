@@ -1,5 +1,6 @@
 import { t } from "../../src"
 import { Hook, NodeLifeCycle } from "../../src/internal"
+import { describe, expect, it, test } from "bun:test"
 
 describe("types.date", () => {
   describe("methods", () => {
@@ -226,6 +227,7 @@ describe("types.date", () => {
       // We don't have a way to set the identifierAttribute on a primitive type, so this should return undefined.
       test("returns undefined", () => {
         const identifierAttribute = t.Date.identifierAttribute
+        // @ts-expect-error - we're testing the value of identifierAttribute and expect undefined here
         expect(identifierAttribute).toBe(undefined)
       })
     })

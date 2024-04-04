@@ -1,12 +1,12 @@
 {
-    "extends": "../tsconfig.json",
-    "compilerOptions": {
-        "rootDir": "../",
-        "module": "commonjs",
-        "lib": ["es2017", "dom"],
-        "target": "es6",
-        "sourceMap": false,
-        "noEmit": true
-    },
-    "include": ["**/*.ts"]
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "../",
+    "module": "commonjs",
+    "lib": ["es2017", "dom"],
+    "target": "es6",
+    "sourceMap": false,
+    "noEmit": true
+  },
+  "include": ["**/*.ts"]
 }

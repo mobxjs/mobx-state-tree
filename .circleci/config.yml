@@ -48,14 +48,7 @@ jobs:
       - run:
           name: Link bun
           command: sudo ln -s ~/.bun/bin/bun /usr/local/bin/
-      - run: bun run test:dev -i --coverage
-      - store_test_results:
-          path: ./test-results
-
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./coverage/*
+      - run: bun test:all
 
   test-mst-prod:
     executor: my-executor
@@ -68,9 +61,7 @@ jobs:
       - run:
           name: Link bun
           command: sudo ln -s ~/.bun/bin/bun /usr/local/bin/
-      - run: bun run test:prod -i
-      - store_test_results:
-          path: ./test-results
+      - run: bun test:prod
 
   test-size:
     executor: my-executor
@@ -85,23 +76,6 @@ jobs:
           command: sudo ln -s ~/.bun/bin/bun /usr/local/bin/
       - run: bun run size
 
-  # upload coverage
-  upload-codecov:
-    executor: my-executor
-    steps:
-      - attach_workspace:
-          at: .
-      # only run codecov if the token is present (it is not present for fork PRs for security reasons)
-      - run:
-          name: upload codecov
-          command: |
-            if [[ -v CODECOV_TOKEN ]]
-            then
-                ./node_modules/.bin/codecov
-            else
-                echo "Warning - Codecov info could NOT be uploaded since the CODECOV_TOKEN was not available"
-            fi
-
 workflows:
   version: 2
   build-and-test:
@@ -114,10 +88,7 @@ workflows:
       - test-mst-prod:
           requires:
             - build
-      - test-size:
-          requires:
-            - build
-
-      - upload-codecov:
-          requires:
-            - test-mst-dev
+      # Temporarily disabled while we work to implement Bun testing
+      # - test-size:
+      #     requires:
+      #       - build

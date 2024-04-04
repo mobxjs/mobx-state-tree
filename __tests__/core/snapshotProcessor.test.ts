@@ -9,9 +9,9 @@ import {
   SnapshotIn,
   getNodeId,
   Instance,
-  getType,
   onSnapshot
 } from "../../src"
+import { describe, expect, jest, test } from "bun:test"
 
 describe("snapshotProcessor", () => {
   describe("over a model type", () => {
@@ -509,6 +509,7 @@ describe("snapshotProcessor", () => {
 
       s.b.push(n)
       expect(s.b.length).toBe(1)
+      // @ts-expect-error - post processor gets applied here and messes up the types
       expect(getSnapshot(s.b)).toEqual([{ x: "1" }])
     })
 
@@ -852,7 +853,7 @@ describe("snapshotProcessor", () => {
             postProcessor: {} as any
           })
         })
-      }).toThrowError("[mobx-state-tree] postSnapshotProcessor must be a function")
+      }).toThrow("[mobx-state-tree] postSnapshotProcessor must be a function")
     })
   }
 })

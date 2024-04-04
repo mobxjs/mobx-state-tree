@@ -17,6 +17,7 @@ import {
   isStateTreeNode,
   isAlive
 } from "../../src"
+import { expect, test } from "bun:test"
 
 // tslint:disable: no-unused-expression
 
@@ -56,7 +57,7 @@ test("it should be possible to inherit environments", () => {
 test("getEnv throws error without environment", () => {
   const todo = Todo.create()
   expect(hasEnv(todo)).toBe(false)
-  expect(() => getEnv(todo)).toThrowError("Failed to find the environment of AnonymousModel@<root>")
+  expect(() => getEnv(todo)).toThrow("Failed to find the environment of AnonymousModel@<root>")
 })
 test("detach should preserve environment", () => {
   const env = createEnvironment()
@@ -85,7 +86,7 @@ test("it is not possible to assign instance with a different environment than th
     const store = Store.create({ todos: [] }, env1)
     const todo = Todo.create({}, env2)
     unprotect(store)
-    expect(() => store.todos.push(todo)).toThrowError(
+    expect(() => store.todos.push(todo)).toThrow(
       "[mobx-state-tree] A state tree cannot be made part of another state tree as long as their environments are different."
     )
   }
@@ -133,7 +134,7 @@ test("clone preserves environnment", () => {
     expect(hasEnv(todo)).toBe(false)
     expect(() => {
       getEnv(todo)
-    }).toThrowError("Failed to find the environment of AnonymousModel@<root>")
+    }).toThrow("Failed to find the environment of AnonymousModel@<root>")
   }
   {
     const env2 = createEnvironment()

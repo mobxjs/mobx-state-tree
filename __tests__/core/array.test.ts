@@ -15,6 +15,7 @@ import {
   cast
 } from "../../src"
 import { observable, autorun, configure } from "mobx"
+import { expect, test } from "bun:test"
 
 const createTestFactories = () => {
   const ItemFactory = types.optional(
@@ -196,7 +197,7 @@ test("items should be reconciled correctly when splicing - 1", () => {
   expect(isAlive(c)).toBe(false)
 
   setLivelinessChecking("error")
-  expect(() => store.todos.splice(0, 1, a, c, d)).toThrowError(
+  expect(() => store.todos.splice(0, 1, a, c, d)).toThrow(
     "You are trying to read or write to an object that is no longer part of a state tree. (Object type: 'Task', Path upon death: '/todos/1', Subpath: '', Action: ''). Either detach nodes first, or don't use objects after removing / replacing them in the tree."
   )
   store.todos.splice(0, 1, clone(a), clone(c), clone(d))
@@ -332,13 +333,13 @@ test("it should not be allowed to add the same item twice to the same store", ()
   s.todos.push(a)
   expect(() => {
     s.todos.push(a)
-  }).toThrowError(
+  }).toThrow(
     "Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '/todos/1', but it lives already at '/todos/0'"
   )
   const b = Task.create()
   expect(() => {
     s.todos.push(b, b)
-  }).toThrowError(
+  }).toThrow(
     "Cannot add an object to a state tree if it is already part of the same or another state tree. Tried to assign an object to '/todos/2', but it lives already at '/todos/1'"
   )
 })

@@ -13,6 +13,7 @@ import {
   resolvePath,
   getParent
 } from "../../src"
+import { expect, jest, test } from "bun:test"
 
 function createTestStore(listener: (s: string) => void) {
   const Todo = types
@@ -262,6 +263,7 @@ test("it should not apply postprocessor to snapshot on getSnapshot", () => {
     error = true
   })
   expect(getSnapshot(car)).toEqual({ id: "1" })
+  // @ts-expect-error - we are testing what happens when we explicitly do not want to apply the postprocessor, expect incorrect types
   expect(getSnapshot(car, false)).toEqual({ id: 2 })
   expect(error).toBeFalsy()
 })

@@ -22,6 +22,7 @@ import {
   isStateTreeNode,
   addDisposer
 } from "../../src"
+import { expect, jest, test } from "bun:test"
 
 test("it should support prefixed paths in maps", () => {
   const User = types.model({
@@ -93,7 +94,7 @@ if (process.env.NODE_ENV !== "production") {
     })
     expect(Todo.is({})).toBe(false)
     expect(Todo.is({ id: "x" })).toBe(true)
-    expect(() => (Todo.create as any)()).toThrowError(
+    expect(() => (Todo.create as any)()).toThrow(
       " `undefined` is not assignable to type: `identifier` (Value is not a valid identifier, expected a string)"
     )
   })
@@ -104,10 +105,10 @@ if (process.env.NODE_ENV !== "production") {
     })
     const todo = Todo.create({ id: "x" })
     unprotect(todo)
-    expect(() => (todo.id = "stuff")).toThrowError(
+    expect(() => (todo.id = "stuff")).toThrow(
       "[mobx-state-tree] Tried to change identifier from 'x' to 'stuff'. Changing identifiers is not allowed."
     )
-    expect(() => applySnapshot(todo, { id: "stuff" })).toThrowError(
+    expect(() => applySnapshot(todo, { id: "stuff" })).toThrow(
       "[mobx-state-tree] Tried to change identifier from 'x' to 'stuff'. Changing identifiers is not allowed."
     )
   })
@@ -230,7 +231,7 @@ test("identifiers should support subtypes of types.string and types.number", () 
   })
   const s = S.create({ mies: { "7": { id: 7 } }, ref: "7" })
   expect(s.mies.get("7")).toBeTruthy()
-  expect(s.ref).toBe(s.mies.get("7"))
+  expect(s.ref).toBe(s.mies.get("7")!)
 })
 
 test("string identifiers should not accept numbers", () => {
@@ -337,7 +338,7 @@ test("it should fail when reference snapshot is ambiguous", () => {
   expect(() => {
     // tslint:disable-next-line:no-unused-expression
     store.selected // store.boxes[1] // throws because it can't know if you mean a box or an arrow!
-  }).toThrowError(
+  }).toThrow(
     "[mobx-state-tree] Cannot resolve a reference to type '(Box | Arrow)' with id: '2' unambigously, there are multiple candidates: /boxes/1, /arrows/0"
   )
   unprotect(store)
@@ -488,13 +489,13 @@ test("it should support relative lookups", () => {
   const n2 = detach(root.children[0])
   unprotect(n2)
   expect(resolveIdentifier(Node, n2, 2)).toBe(n2)
-  expect(resolveIdentifier(Node, root, 2)).toBe(undefined)
-  expect(resolveIdentifier(Node, root, 4)).toBe(undefined)
-  expect(resolveIdentifier(Node, n2, 3)).toBe(undefined)
+  expect(resolveIdentifier(Node, root, 2)).toBeUndefined()
+  expect(resolveIdentifier(Node, root, 4)).toBeUndefined()
+  expect(resolveIdentifier(Node, n2, 3)).toBeUndefined()
   expect(resolveIdentifier(Node, n2, 4)).toBe(n2.children[0])
   expect(resolveIdentifier(Node, n2.children[0], 2)).toBe(n2)
   const n5 = Node.create({ id: 5 })
-  expect(resolveIdentifier(Node, n5, 4)).toBe(undefined)
+  expect(resolveIdentifier(Node, n5, 4)).toBeUndefined()
   n2.children.push(n5)
   expect(resolveIdentifier(Node, n5, 4)).toBe(n2.children[0])
   expect(resolveIdentifier(Node, n2.children[0], 5)).toBe(n5)
@@ -519,20 +520,20 @@ test("References are non-nullable by default", () => {
     todo: { id: 3 },
     ref: 3
   })
-  expect(store.ref).toBe(store.todo)
-  expect(store.maybeRef).toBe(undefined)
+  expect(store.ref).toBe(store.todo!)
+  expect(store.maybeRef).toBeUndefined()
   store = Store.create({
     todo: { id: 3 },
     ref: 4
   })
   unprotect(store)
   if (process.env.NODE_ENV !== "production") {
-    expect(store.maybeRef).toBe(undefined)
+    expect(store.maybeRef).toBeUndefined()
     expect(() => store.ref).toThrow(
       "[mobx-state-tree] Failed to resolve reference '4' to type 'AnonymousModel' (from node: /ref)"
     )
     store.maybeRef = 3 as any // valid assignment
-    expect(store.maybeRef).toBe(store.todo)
+    expect(store.maybeRef).toBe(store.todo!)
     store.maybeRef = 4 as any // valid assignment
     expect(() => store.maybeRef).toThrow(
       "[mobx-state-tree] Failed to resolve reference '4' to type 'AnonymousModel' (from node: /maybeRef)"
@@ -801,7 +802,7 @@ test("should serialize references correctly", () => {
 
   expect(Array.from(s.mies.keys())).toEqual(["7"])
   expect(s.mies.get("7")!.id).toBe(7)
-  expect(s.mies.get(7 as any)).toBe(s.mies.get("7")) // maps automatically normalizes the key
+  expect(s.mies.get(7 as any)).toBe(s.mies.get("7")!) // maps automatically normalizes the key
 
   s.mies.put({
     id: 8
@@ -867,8 +868,8 @@ test("#1052 - Reference returns destroyed model after subtree replacing", () => 
   const store = Store.create({ todos: {} })
   store.load()
 
-  expect(store.last).toBe(undefined)
-  expect(store.lastWithId).toBe(undefined)
+  expect(store.last).toBeUndefined()
+  expect(store.lastWithId).toBeUndefined()
 
   const reactionFn = jest.fn()
   const reactionDisposer = reaction(() => store.last, reactionFn)
@@ -1048,12 +1049,12 @@ test("tryReference / isValidReference", () => {
   expect(isValidReference(() => store.ref2)).toBe(false)
 
   // the reaction should have triggered and set this to undefined
-  expect(store.ref3).toBe(undefined)
+  expect(store.ref3).toBeUndefined()
 
-  expect(() => tryReference(() => 5 as any)).toThrowError(
+  expect(() => tryReference(() => 5 as any)).toThrow(
     "The reference to be checked is not one of node, null or undefined"
   )
-  expect(() => isValidReference(() => 5 as any)).toThrowError(
+  expect(() => isValidReference(() => 5 as any)).toThrow(
     "The reference to be checked is not one of node, null or undefined"
   )
 })

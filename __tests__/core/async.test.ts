@@ -13,6 +13,7 @@ import {
   toGeneratorFunction,
   types
 } from "../../src"
+import { expect, test } from "bun:test"
 
 function delay<TV>(time: number, value: TV, shouldThrow = false): Promise<TV> {
   return new Promise((resolve, reject) => {

@@ -22,6 +22,7 @@ import {
 } from "../../src"
 
 import { autorun, configure } from "mobx"
+import { expect, test } from "bun:test"
 
 // getParent
 test("it should resolve to the parent instance", () => {
@@ -35,7 +36,7 @@ test("it should resolve to the parent instance", () => {
   unprotect(doc)
   const row = Row.create()
   doc.rows.push(row)
-  expect(getParent(row)).toEqual(doc.rows)
+  expect(getParent<any>(row)).toEqual(doc.rows)
 })
 // hasParent
 test("it should check for parent instance", () => {
@@ -91,7 +92,7 @@ test("it should throw if there is not parent of type", () => {
   const row = Row.create({
     cells: [{}]
   })
-  expect(() => getParentOfType(row.cells[0], Document)).toThrowError(
+  expect(() => getParentOfType(row.cells[0], Document)).toThrow(
     "[mobx-state-tree] Failed to find the parent of AnonymousModel@/cells/0 of a given type"
   )
 })
@@ -138,7 +139,7 @@ test("it should resolve to the root of an object", () => {
   unprotect(doc)
   const row = Row.create()
   doc.rows.push(row)
-  expect(getRoot(row)).toBe(doc)
+  expect(getRoot<any>(row)).toBe(doc)
 })
 // getIdentifier
 test("it should resolve to the identifier of the object", () => {
@@ -195,7 +196,7 @@ test("it should resolve parents", () => {
   expect(hasParent(row, 3)).toBe(false)
   expect(getParent(row) === doc.rows).toBe(true) // array
   expect(getParent(row, 2) === doc).toBe(true) // row
-  expect(() => getParent(row, 3)).toThrowError(
+  expect(() => getParent(row, 3)).toThrow(
     "[mobx-state-tree] Failed to find the parent of AnonymousModel@/rows/0 at depth 3"
   )
 })

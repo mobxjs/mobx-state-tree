@@ -1,5 +1,6 @@
 import { types } from "../../src"
 import { Hook, NodeLifeCycle } from "../../src/internal"
+import { describe, expect, it, test } from "bun:test"
 
 describe("types.string", () => {
   describe("methods", () => {
@@ -202,7 +203,7 @@ describe("types.string", () => {
       // We don't have a way to set the identifierAttribute on a primitive type, so this should return undefined.
       test("returns undefined", () => {
         const identifierAttribute = types.string.identifierAttribute
-        expect(identifierAttribute).toBe(undefined)
+        expect(identifierAttribute).toBeUndefined()
       })
     })
     describe("isType", () => {
