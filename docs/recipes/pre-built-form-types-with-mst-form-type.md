@@ -250,7 +250,7 @@ In the model file, we declare a form schema and create the form model. Subsequen
 
 Now, let's examine how the model is utilized by the UI, which is still built using Ant Design.
 
-```typescript
+```tsx
 // model.ts
 import React, { useContext } from 'react'
 import { Form, Input, Select, Button, InputNumber } from 'antd'
