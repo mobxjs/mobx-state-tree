@@ -39,7 +39,7 @@ To demonstrate the difference between mst-form-type and the Form component, I've
 
 I've utilized the [Ant Design](https://ant.design/) `Form` component for the example, although other libraries should have very similar implementations. Let's take a look at the Ant Design version first.
 
-```typescript
+```tsx
 import React, { useState, useEffect } from 'react'
 import { Form, Input, Select, Button, InputNumber } from 'antd'
 
