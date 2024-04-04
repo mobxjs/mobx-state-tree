@@ -1,7 +1,7 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Bun Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`it should support custom references - adv 1`] = `
-Array [
+[
   "1",
   "2",
   "1",
@@ -11,63 +11,63 @@ Array [
 `;
 
 exports[`it should support custom references - adv 2`] = `
-Array [
-  Object {
+[
+  {
     "selection": "Michel",
-    "users": Object {
-      "1": Object {
+    "users": {
+      "1": {
         "id": "1",
         "name": "Michel",
       },
-      "2": Object {
+      "2": {
         "id": "2",
         "name": "Mattia",
       },
     },
   },
-  Object {
+  {
     "selection": "Mattia",
-    "users": Object {
-      "1": Object {
+    "users": {
+      "1": {
         "id": "1",
         "name": "Michel",
       },
-      "2": Object {
+      "2": {
         "id": "2",
         "name": "Mattia",
       },
     },
   },
-  Object {
+  {
     "selection": "Michel",
-    "users": Object {
-      "1": Object {
+    "users": {
+      "1": {
         "id": "1",
         "name": "Michel",
       },
-      "2": Object {
+      "2": {
         "id": "2",
         "name": "Mattia",
       },
     },
   },
-  Object {
+  {
     "selection": "Michel",
-    "users": Object {
-      "2": Object {
+    "users": {
+      "2": {
         "id": "2",
         "name": "Mattia",
       },
     },
   },
-  Object {
+  {
     "selection": "Michel",
-    "users": Object {
-      "2": Object {
+    "users": {
+      "2": {
         "id": "2",
         "name": "Mattia",
       },
-      "3": Object {
+      "3": {
         "id": "3",
         "name": "Michel",
       },
@@ -77,30 +77,30 @@ Array [
 `;
 
 exports[`it should support custom references - adv 3`] = `
-Array [
-  Object {
+[
+  {
     "op": "replace",
     "path": "/selection",
     "value": "Michel",
   },
-  Object {
+  {
     "op": "replace",
     "path": "/selection",
     "value": "Mattia",
   },
-  Object {
+  {
     "op": "replace",
     "path": "/selection",
     "value": "Michel",
   },
-  Object {
+  {
     "op": "remove",
     "path": "/users/1",
   },
-  Object {
+  {
     "op": "add",
     "path": "/users/3",
-    "value": Object {
+    "value": {
       "id": "3",
       "name": "Michel",
     },
@@ -109,31 +109,31 @@ Array [
 `;
 
 exports[`it should support custom references - adv 4`] = `
-Array [
-  Object {
+[
+  {
     "op": "replace",
     "path": "/selection",
     "value": "Mattia",
   },
-  Object {
+  {
     "op": "replace",
     "path": "/selection",
     "value": "Michel",
   },
-  Object {
+  {
     "op": "replace",
     "path": "/selection",
     "value": "Mattia",
   },
-  Object {
+  {
     "op": "add",
     "path": "/users/1",
-    "value": Object {
+    "value": {
       "id": "1",
       "name": "Michel",
     },
   },
-  Object {
+  {
     "op": "remove",
     "path": "/users/3",
   },

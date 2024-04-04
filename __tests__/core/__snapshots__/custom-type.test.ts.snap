@@ -1,27 +1,82 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`reassignments will work 1`] = `
+[
+  {
+    "balance": "2.5",
+    "lastTransaction": null,
+  },
+  {
+    "balance": "3.5",
+    "lastTransaction": null,
+  },
+  {
+    "balance": "4.5",
+    "lastTransaction": null,
+  },
+  {
+    "balance": "4.5",
+    "lastTransaction": "2.5",
+  },
+  {
+    "balance": "4.5",
+    "lastTransaction": null,
+  },
+]
+`;
+
+exports[`reassignments will work 2`] = `
+[
+  {
+    "op": "replace",
+    "path": "/balance",
+    "value": "2.5",
+  },
+  {
+    "op": "replace",
+    "path": "/balance",
+    "value": "3.5",
+  },
+  {
+    "op": "replace",
+    "path": "/balance",
+    "value": "4.5",
+  },
+  {
+    "op": "replace",
+    "path": "/lastTransaction",
+    "value": "2.5",
+  },
+  {
+    "op": "replace",
+    "path": "/lastTransaction",
+    "value": null,
+  },
+]
+`;
 
 exports[`complex reassignments will work 1`] = `
-Array [
-  Object {
-    "balance": Array [
+[
+  {
+    "balance": [
       2,
       5,
     ],
   },
-  Object {
-    "balance": Array [
+  {
+    "balance": [
       2,
       5,
     ],
   },
-  Object {
-    "balance": Array [
+  {
+    "balance": [
       3,
       5,
     ],
   },
-  Object {
-    "balance": Array [
+  {
+    "balance": [
       4,
       5,
     ],
@@ -30,93 +85,38 @@ Array [
 `;
 
 exports[`complex reassignments will work 2`] = `
-Array [
-  Object {
+[
+  {
     "op": "replace",
     "path": "/balance",
-    "value": Array [
+    "value": [
       2,
       5,
     ],
   },
-  Object {
+  {
     "op": "replace",
     "path": "/balance",
-    "value": Array [
+    "value": [
       2,
       5,
     ],
   },
-  Object {
+  {
     "op": "replace",
     "path": "/balance",
-    "value": Array [
+    "value": [
       3,
       5,
     ],
   },
-  Object {
+  {
     "op": "replace",
     "path": "/balance",
-    "value": Array [
+    "value": [
       4,
       5,
     ],
-  },
-]
-`;
-
-exports[`reassignments will work 1`] = `
-Array [
-  Object {
-    "balance": "2.5",
-    "lastTransaction": null,
-  },
-  Object {
-    "balance": "3.5",
-    "lastTransaction": null,
-  },
-  Object {
-    "balance": "4.5",
-    "lastTransaction": null,
-  },
-  Object {
-    "balance": "4.5",
-    "lastTransaction": "2.5",
-  },
-  Object {
-    "balance": "4.5",
-    "lastTransaction": null,
-  },
-]
-`;
-
-exports[`reassignments will work 2`] = `
-Array [
-  Object {
-    "op": "replace",
-    "path": "/balance",
-    "value": "2.5",
-  },
-  Object {
-    "op": "replace",
-    "path": "/balance",
-    "value": "3.5",
-  },
-  Object {
-    "op": "replace",
-    "path": "/balance",
-    "value": "4.5",
-  },
-  Object {
-    "op": "replace",
-    "path": "/lastTransaction",
-    "value": "2.5",
-  },
-  Object {
-    "op": "replace",
-    "path": "/lastTransaction",
-    "value": null,
   },
 ]
 `;

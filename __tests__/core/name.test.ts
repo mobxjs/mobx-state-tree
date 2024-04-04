@@ -1,5 +1,6 @@
 import { types } from "../../src"
 import { getDebugName } from "mobx"
+import { expect, test } from "bun:test"
 
 test("it should have a debug name", () => {
   const Model = types.model("Name")
