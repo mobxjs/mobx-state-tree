@@ -24,11 +24,7 @@
       "concepts/reconciliation",
       "concepts/volatiles"
     ],
-    "API Overview": [
-      "overview/types",
-      "overview/api",
-      "overview/hooks"
-    ],
+    "API Overview": ["overview/types", "overview/api", "overview/hooks"],
     "Tips": [
       "tips/resources",
       "tips/contributing",
@@ -39,17 +35,14 @@
       "tips/snapshots-as-values",
       "tips/more-tips"
     ],
-    "Compare": [
-      "compare/context-reducer-vs-mobx-state-tree"
-    ],
+    "Compare": ["compare/context-reducer-vs-mobx-state-tree"],
     "Recipes": [
-      "recipes/auto-generated-property-setter-actions"
+      "recipes/auto-generated-property-setter-actions",
+      "recipes/pre-built-form-types-with-mst-form-type"
     ]
   },
   "mobx-state-tree": {
-    "Introduction": [
-      "API/index"
-    ],
+    "Introduction": ["API/index"],
     "Interfaces": [
       "API/interfaces/customtypeoptions",
       "API/interfaces/functionwithflag",

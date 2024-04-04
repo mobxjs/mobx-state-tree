@@ -194,6 +194,9 @@
       "recipes/auto-generated-property-setter-actions": {
         "title": "Auto-Generated Property Setter Actions"
       },
+      "recipes/pre-built-form-types-with-mst-form-type": {
+        "title": "Pre-built Form Types with MST Form Type"
+      },
       "tips/circular-deps": {
         "title": "Handle circular dependencies between files and types using `late`",
         "sidebar_label": "Circular dependencies"
