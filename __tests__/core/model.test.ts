@@ -105,7 +105,9 @@ describe("Model instantiation", () => {
           id: types.identifier,
           id2: types.identifier
         })
-      }).toThrow()
+      }).toThrow(
+        "[mobx-state-tree] Cannot define property 'id2' as object identifier, property 'id' is already defined as identifier property"
+      )
     })
   })
   describe("Edge case behavior", () => {
@@ -163,7 +165,9 @@ describe("Model instantiation", () => {
             prop1: "prop1",
             prop2: 2
           })
-        }).toThrow()
+        }).toThrow(
+          "[mobx-state-tree] Model creation failed. First argument must be a string when two arguments are provided"
+        )
       })
     }
   })
@@ -237,7 +241,9 @@ describe("Model properties objects", () => {
             return "bar"
           }
         })
-      }).toThrow()
+      }).toThrow(
+        "[mobx-state-tree] Getters are not supported as properties. Please use views instead"
+      )
     })
   })
   describe("when a user attempts to define a property with null as the value", () => {
@@ -246,7 +252,9 @@ describe("Model properties objects", () => {
         types.model({
           foo: null as any
         })
-      }).toThrow()
+      }).toThrow(
+        "[mobx-state-tree] The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?"
+      )
     })
   })
   describe("when a user attempts to define a property with undefined as the value", () => {
@@ -255,7 +263,9 @@ describe("Model properties objects", () => {
         types.model({
           foo: undefined as any
         })
-      }).toThrow()
+      }).toThrow(
+        "[mobx-state-tree] The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?"
+      )
     })
   })
   describe("when a user defines a property using a primitive value (not null or undefined)", () => {
@@ -393,7 +403,9 @@ describe("Model properties objects", () => {
           types.model({
             foo: () => "bar"
           })
-        }).toThrow()
+        }).toThrow(
+          "[mobx-state-tree] Invalid type definition for property 'foo', it looks like you passed a function. Did you forget to invoke it, or did you intend to declare a view / action?"
+        )
       })
     }
   })
