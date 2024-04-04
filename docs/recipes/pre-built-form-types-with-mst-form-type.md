@@ -3,8 +3,6 @@ id: pre-built-form-types-with-mst-form-type
 title: Pre-built Form Types with MST Form Type
 ---
 
-# MST Form Type
-
 Find the `mst-form-type` library on npm: https://www.npmjs.com/package/mst-form-type.
 
 ## Introduction
@@ -31,7 +29,7 @@ npm install mst-form-type
 npm install mobx-state-tree@^5.0.0
 ```
 
-Now that the general installation is complete, let's explore how to use it through a simple example. Although mobx-state-tree is designed to handle complex web application states, you might find the example a bit over-designed. However, the aim is to illustrate the idea of why using mst-form-type, so I've kept the logic as simple as possible.
+Now that the general installation is complete, let's explore how to use it through a simple example. Although mobx-state-tree is designed to handle complex web application states, you might find the example a bit over-designed. However, the aim is to illustrate the idea of why using mst-form-type is helpful, so I've kept the logic as simple as possible.
 
 ## Example
 
