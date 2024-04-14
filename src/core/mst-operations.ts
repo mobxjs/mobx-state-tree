@@ -891,8 +891,8 @@ export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
       else reflected.volatile.push(key)
       return
     }
-    if (descriptor.value._isMSTAction === true) reflected.actions.push(key)
     if (descriptor.value._isFlowAction === true) reflected.flowActions.push(key)
+    if (descriptor.value._isMSTAction === true) reflected.actions.push(key)
     else if (isObservableProp(target, key)) reflected.volatile.push(key)
     else reflected.views.push(key)
   })
