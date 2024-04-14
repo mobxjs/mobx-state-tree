@@ -63,6 +63,7 @@ test("reflection - model", () => {
   expect(reflection.actions.includes("actionName")).toBe(true)
   expect(reflection.flowActions.includes("generatorAction")).toBe(true)
   expect(reflection.views.includes("viewName")).toBe(true)
+  expect(reflection.views.includes("actionName")).toBe(false)
   expect(reflection.volatile.includes("volatileProperty")).toBe(true)
   expect(!!reflection.properties.users).toBe(true)
   expect(!!reflection.properties.isPerson).toBe(true)
@@ -184,6 +185,8 @@ test("reflection - members chained", () => {
   expect(reflection.actions.includes("anotherAction")).toBe(true)
   expect(reflection.views.includes("viewName")).toBe(true)
   expect(reflection.views.includes("anotherView")).toBe(true)
+  expect(reflection.views.includes("actionName")).toBe(false)
+  expect(reflection.views.includes("anotherAction")).toBe(false)
 })
 test("reflection - conditionals respected", () => {
   let swap = true
