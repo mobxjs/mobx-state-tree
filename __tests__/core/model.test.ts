@@ -85,6 +85,18 @@ describe("Model instantiation", () => {
 
       expect(Model.properties).toEqual({})
     })
+    test("Model should not mutate properties object", () => {
+      const properties = {
+        prop1: "prop1",
+        prop2: 2
+      }
+      const Model = types.model("name", properties)
+
+      expect(properties).toEqual({
+        prop1: "prop1",
+        prop2: 2
+      })
+    })
   })
   describe("Model identifier", () => {
     test("If no identifier attribute is provided, the identifierAttribute should be undefined.", () => {
