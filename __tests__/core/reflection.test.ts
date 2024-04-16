@@ -61,6 +61,7 @@ test("reflection - model", () => {
   const reflection = getMembers(node)
   expect(reflection.name).toBe("AnonymousModel")
   expect(reflection.actions.includes("actionName")).toBe(true)
+  expect(reflection.actions.includes("generatorAction")).toBe(true)
   expect(reflection.flowActions.includes("generatorAction")).toBe(true)
   expect(reflection.views.includes("viewName")).toBe(true)
   expect(reflection.views.includes("actionName")).toBe(false)
