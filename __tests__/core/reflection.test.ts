@@ -60,8 +60,11 @@ test("reflection - model", () => {
   const reflection = getMembers(node)
   expect(reflection.name).toBe("AnonymousModel")
   expect(reflection.actions.includes("actionName")).toBe(true)
+  expect(reflection.actions.includes("generatorAction")).toBe(true)
   expect(reflection.flowActions.includes("generatorAction")).toBe(true)
+  expect(reflection.flowActions.includes("actionName")).toBe(false)
   expect(reflection.views.includes("viewName")).toBe(true)
+  expect(reflection.views.includes("actionName")).toBe(false)
   expect(reflection.volatile.includes("volatileProperty")).toBe(true)
   expect(!!reflection.properties.users).toBe(true)
   expect(!!reflection.properties.isPerson).toBe(true)
@@ -165,6 +168,20 @@ test("reflection - members chained", () => {
         }
       }
     })
+    .actions((self) => {
+      function flowActionName() {
+        return 1
+      }
+      return {
+        flowActionName,
+        generatorAction: flow(function* generatorAction() {
+          const promise = new Promise((resolve) => {
+            resolve(true)
+          })
+          yield promise
+        })
+      }
+    })
     .views((self) => ({
       get viewName() {
         return 1
@@ -181,8 +198,15 @@ test("reflection - members chained", () => {
   expect(keys.includes("isPerson")).toBe(true)
   expect(reflection.actions.includes("actionName")).toBe(true)
   expect(reflection.actions.includes("anotherAction")).toBe(true)
+  expect(reflection.actions.includes("flowActionName")).toBe(true)
+  expect(reflection.actions.includes("generatorAction")).toBe(true)
+  expect(reflection.flowActions.includes("generatorAction")).toBe(true)
+  expect(reflection.flowActions.includes("flowActionName")).toBe(false)
   expect(reflection.views.includes("viewName")).toBe(true)
   expect(reflection.views.includes("anotherView")).toBe(true)
+  expect(reflection.views.includes("actionName")).toBe(false)
+  expect(reflection.views.includes("anotherAction")).toBe(false)
+  expect(reflection.views.includes("flowActionName")).toBe(false)
 })
 test("reflection - conditionals respected", () => {
   let swap = true
