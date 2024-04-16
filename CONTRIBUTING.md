@@ -45,7 +45,7 @@ Good documentation is crucial for our users. If your contribution involves chang
 1. Fork the MobX-State-Tree repository on GitHub to your own GitHub account.
 2. Clone your fork to your local machine.
 3. Create a new branch for your changes: `git checkout -b my-feature`.
-4. Before starting, it's not a bad idea to `bun install && bun run build && bun run test` to check that your machine can run the full test suite to start.
+4. Before starting, it's not a bad idea to `bun install && bun run build && bun run test:all` to check that your machine can run the full test suite to start.
 5. Make your changes and ensure that all tests pass (including any new tests you have added).
 6. Update the documentation if necessary.
 7. Commit your changes: `git commit -m "Add my feature"`. Please consider [following conventional commit formatting](https://www.conventionalcommits.org/en/v1.0.0/).
