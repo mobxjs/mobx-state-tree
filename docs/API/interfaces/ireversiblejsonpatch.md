@@ -4,7 +4,7 @@ title: "IReversibleJsonPatch"
 sidebar_label: "IReversibleJsonPatch"
 ---
 
-[mobx-state-tree - v5.4.1](../index.md) › [IReversibleJsonPatch](ireversiblejsonpatch.md)
+[mobx-state-tree - v5.4.2](../index.md) › [IReversibleJsonPatch](ireversiblejsonpatch.md)
 
 ## Hierarchy
 
@@ -27,7 +27,7 @@ sidebar_label: "IReversibleJsonPatch"
 
 • **oldValue**: *any*
 
-*Defined in [src/core/json-patch.ts:14](https://github.com/mobxjs/mobx-state-tree/blob/922ac098/src/core/json-patch.ts#L14)*
+*Defined in [src/core/json-patch.ts:14](https://github.com/mobxjs/mobx-state-tree/blob/700ab6f8/src/core/json-patch.ts#L14)*
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 *Inherited from [IJsonPatch](ijsonpatch.md).[op](ijsonpatch.md#op)*
 
-*Defined in [src/core/json-patch.ts:8](https://github.com/mobxjs/mobx-state-tree/blob/922ac098/src/core/json-patch.ts#L8)*
+*Defined in [src/core/json-patch.ts:8](https://github.com/mobxjs/mobx-state-tree/blob/700ab6f8/src/core/json-patch.ts#L8)*
 
 ___
 
@@ -47,7 +47,7 @@ ___
 
 *Inherited from [IJsonPatch](ijsonpatch.md).[path](ijsonpatch.md#path)*
 
-*Defined in [src/core/json-patch.ts:9](https://github.com/mobxjs/mobx-state-tree/blob/922ac098/src/core/json-patch.ts#L9)*
+*Defined in [src/core/json-patch.ts:9](https://github.com/mobxjs/mobx-state-tree/blob/700ab6f8/src/core/json-patch.ts#L9)*
 
 ___
 
@@ -57,4 +57,4 @@ ___
 
 *Inherited from [IJsonPatch](ijsonpatch.md).[value](ijsonpatch.md#optional-value)*
 
-*Defined in [src/core/json-patch.ts:10](https://github.com/mobxjs/mobx-state-tree/blob/922ac098/src/core/json-patch.ts#L10)*
+*Defined in [src/core/json-patch.ts:10](https://github.com/mobxjs/mobx-state-tree/blob/700ab6f8/src/core/json-patch.ts#L10)*
