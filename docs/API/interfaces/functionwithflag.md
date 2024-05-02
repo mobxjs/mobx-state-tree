@@ -4,7 +4,7 @@ title: "FunctionWithFlag"
 sidebar_label: "FunctionWithFlag"
 ---
 
-[mobx-state-tree - v5.4.2-pre.1](../index.md) › [FunctionWithFlag](functionwithflag.md)
+[mobx-state-tree - v6.0.0](../index.md) › [FunctionWithFlag](functionwithflag.md)
 
 ## Hierarchy
 
@@ -17,6 +17,7 @@ sidebar_label: "FunctionWithFlag"
 ### Properties
 
 * [Function](functionwithflag.md#function)
+* [[Symbol.metadata]](functionwithflag.md#[symbol.metadata])
 * [_isFlowAction](functionwithflag.md#optional-_isflowaction)
 * [_isMSTAction](functionwithflag.md#optional-_ismstaction)
 * [arguments](functionwithflag.md#arguments)
@@ -43,11 +44,21 @@ Defined in node_modules/typescript/lib/lib.es5.d.ts:319
 
 ___
 
+###  [Symbol.metadata]
+
+• **[Symbol.metadata]**: *DecoratorMetadata | null*
+
+*Inherited from void*
+
+Defined in node_modules/typescript/lib/lib.esnext.decorators.d.ts:27
+
+___
+
 ### `Optional` _isFlowAction
 
 • **_isFlowAction**? : *undefined | false | true*
 
-*Defined in [src/core/action.ts:42](https://github.com/mobxjs/mobx-state-tree/blob/0993cb9f/src/core/action.ts#L42)*
+*Defined in [src/core/action.ts:42](https://github.com/mobxjs/mobx-state-tree/blob/fbf21e55/src/core/action.ts#L42)*
 
 ___
 
@@ -55,7 +66,7 @@ ___
 
 • **_isMSTAction**? : *undefined | false | true*
 
-*Defined in [src/core/action.ts:41](https://github.com/mobxjs/mobx-state-tree/blob/0993cb9f/src/core/action.ts#L41)*
+*Defined in [src/core/action.ts:41](https://github.com/mobxjs/mobx-state-tree/blob/fbf21e55/src/core/action.ts#L41)*
 
 ___
 
