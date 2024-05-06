@@ -25,7 +25,7 @@ Validation context entry, this is, where the validation should run against which
 
 • **path**: *string*
 
-*Defined in [src/core/type/type-checker.ts:17](https://github.com/mobxjs/mobx-state-tree/blob/fbf21e55/src/core/type/type-checker.ts#L17)*
+*Defined in [src/core/type/type-checker.ts:17](https://github.com/mobxjs/mobx-state-tree/blob/72f4f644/src/core/type/type-checker.ts#L17)*
 
 Subpath where the validation should be run, or an empty string to validate it all
 
@@ -35,6 +35,6 @@ ___
 
 • **type**: *[IAnyType](ianytype.md)*
 
-*Defined in [src/core/type/type-checker.ts:19](https://github.com/mobxjs/mobx-state-tree/blob/fbf21e55/src/core/type/type-checker.ts#L19)*
+*Defined in [src/core/type/type-checker.ts:19](https://github.com/mobxjs/mobx-state-tree/blob/72f4f644/src/core/type/type-checker.ts#L19)*
 
 Type to validate the subpath against
