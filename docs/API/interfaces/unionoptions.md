@@ -4,7 +4,7 @@ title: "UnionOptions"
 sidebar_label: "UnionOptions"
 ---
 
-[mobx-state-tree - v5.4.2-pre.1](../index.md) › [UnionOptions](unionoptions.md)
+[mobx-state-tree - v6.0.0](../index.md) › [UnionOptions](unionoptions.md)
 
 ## Hierarchy
 
@@ -23,7 +23,7 @@ sidebar_label: "UnionOptions"
 
 • **dispatcher**? : *[ITypeDispatcher](../index.md#itypedispatcher)*
 
-*Defined in [src/types/utility-types/union.ts:26](https://github.com/mobxjs/mobx-state-tree/blob/0993cb9f/src/types/utility-types/union.ts#L26)*
+*Defined in [src/types/utility-types/union.ts:26](https://github.com/mobxjs/mobx-state-tree/blob/72f4f644/src/types/utility-types/union.ts#L26)*
 
 ___
 
@@ -31,4 +31,4 @@ ___
 
 • **eager**? : *undefined | false | true*
 
-*Defined in [src/types/utility-types/union.ts:25](https://github.com/mobxjs/mobx-state-tree/blob/0993cb9f/src/types/utility-types/union.ts#L25)*
+*Defined in [src/types/utility-types/union.ts:25](https://github.com/mobxjs/mobx-state-tree/blob/72f4f644/src/types/utility-types/union.ts#L25)*
