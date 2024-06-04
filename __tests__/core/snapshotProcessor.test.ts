@@ -642,6 +642,28 @@ describe("snapshotProcessor", () => {
     expect(ProcessedModel.is(Model)).toBe(false)
   })
 
+  test(".is checks instances against the underlying type", () => {
+    const ModelA = types.model({ x: types.number })
+    const ModelB = types.model({ x: types.number })
+    const modelA = ModelA.create({ x: 1 })
+    const modelB = ModelB.create({ x: 2 })
+
+    // despite having the same snapshot type, .is is false for the instance of one against the other because they are not the same type
+    expect(ModelA.is(modelA)).toBe(true)
+    expect(ModelB.is(modelA)).toBe(false)
+    expect(ModelA.is(modelB)).toBe(false)
+    expect(ModelB.is(modelB)).toBe(true)
+
+    const ProcessedModel = types.snapshotProcessor(ModelA, {})
+
+    const processedModel = ProcessedModel.create({ x: 3 })
+    expect(ProcessedModel.is(processedModel)).toBe(true)
+    expect(ModelA.is(processedModel)).toBe(true)
+    expect(ModelB.is(processedModel)).toBe(false)
+    expect(ProcessedModel.is(modelA)).toBe(true)
+    expect(ProcessedModel.is(modelB)).toBe(false)
+  })
+
   describe("1776 - reconciliation in an array", () => {
     test("model with transformed property is reconciled", () => {
       const SP = types.snapshotProcessor(

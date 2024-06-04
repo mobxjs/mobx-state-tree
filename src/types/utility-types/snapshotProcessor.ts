@@ -153,7 +153,7 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
     const value = isType(thing)
       ? this._subtype
       : isStateTreeNode(thing)
-      ? getSnapshot(thing, false)
+      ? thing
       : this.preProcessSnapshotSafe(thing)
     if (value === $preProcessorFailed) {
       return false
