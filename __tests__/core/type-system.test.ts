@@ -1263,3 +1263,12 @@ test("union type inference verification for a large number of types", () => {
   assertTypesEqual(_ as ITC, _ as "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j")
   assertTypesEqual(_ as ITS, _ as "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j")
 })
+
+test("2186 - model type preserved when adding props", () => {
+  const BaseModel = types.model()
+  type BaseModelType = typeof BaseModel
+
+  const DerivedModel = BaseModel.props({ a: "" })
+
+  const test: BaseModelType = DerivedModel
+})
