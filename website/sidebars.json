@@ -44,7 +44,8 @@
     ],
     "Recipes": [
       "recipes/auto-generated-property-setter-actions",
-      "recipes/pre-built-form-types-with-mst-form-type"
+      "recipes/pre-built-form-types-with-mst-form-type",
+      "recipes/mst-query"
     ]
   },
   "mobx-state-tree": {
