@@ -1,6 +1,6 @@
 ---
 id: mst-query
-title: mst-query
+title: Manage Asynchronous Data with mst-query 
 ---
 
 Find the `mst-query` library on GitHub: https://github.com/ConrabOpto/mst-query.
