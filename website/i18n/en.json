@@ -194,6 +194,9 @@
       "recipes/auto-generated-property-setter-actions": {
         "title": "Auto-Generated Property Setter Actions"
       },
+      "recipes/mst-query": {
+        "title": "Manage Asynchronous Data with mst-query"
+      },
       "recipes/pre-built-form-types-with-mst-form-type": {
         "title": "Pre-built Form Types with MST Form Type"
       },

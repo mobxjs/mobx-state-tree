@@ -28,7 +28,7 @@ sidebar_label: "IActionTrackingMiddleware2Hooks"
 
 • **filter**? : *undefined | function*
 
-*Defined in [src/middlewares/createActionTrackingMiddleware2.ts:9](https://github.com/mobxjs/mobx-state-tree/blob/72f4f644/src/middlewares/createActionTrackingMiddleware2.ts#L9)*
+*Defined in [src/middlewares/createActionTrackingMiddleware2.ts:9](https://github.com/mobxjs/mobx-state-tree/blob/030cb3bb/src/middlewares/createActionTrackingMiddleware2.ts#L9)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **onFinish**: *function*
 
-*Defined in [src/middlewares/createActionTrackingMiddleware2.ts:11](https://github.com/mobxjs/mobx-state-tree/blob/72f4f644/src/middlewares/createActionTrackingMiddleware2.ts#L11)*
+*Defined in [src/middlewares/createActionTrackingMiddleware2.ts:11](https://github.com/mobxjs/mobx-state-tree/blob/030cb3bb/src/middlewares/createActionTrackingMiddleware2.ts#L11)*
 
 #### Type declaration:
 
@@ -55,7 +55,7 @@ ___
 
 • **onStart**: *function*
 
-*Defined in [src/middlewares/createActionTrackingMiddleware2.ts:10](https://github.com/mobxjs/mobx-state-tree/blob/72f4f644/src/middlewares/createActionTrackingMiddleware2.ts#L10)*
+*Defined in [src/middlewares/createActionTrackingMiddleware2.ts:10](https://github.com/mobxjs/mobx-state-tree/blob/030cb3bb/src/middlewares/createActionTrackingMiddleware2.ts#L10)*
 
 #### Type declaration:
 
