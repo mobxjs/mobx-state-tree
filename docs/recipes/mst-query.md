@@ -235,12 +235,11 @@ const TodoStore = createModelStore("TodoStore", Todo)
         return;
       }
 
-      let updateResult;
-      try {
-        updateResult = yield self.todoUpdateMutation.mutate({ request });
-      } catch (err) {
-        logApi.sendLog(err.message);
+      const { error, result: updateResult } = yield self.todoUpdateMutation.mutate({ request });
+      if (error) {
+        logApi.sendLog(error.message);
       }
+
       self.updateResult = updateResult;
     });
   }));
