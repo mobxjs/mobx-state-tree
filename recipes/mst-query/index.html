@@ -1,0 +1,331 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Manage Asynchronous Data with mst-query · MobX-state-tree</title><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="generator" content="Docusaurus"/><meta name="description" content="Find the `mst-query` library on GitHub: https://github.com/ConrabOpto/mst-query."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Manage Asynchronous Data with mst-query · MobX-state-tree"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobx-state-tree.js.org//"/><meta property="og:description" content="Find the `mst-query` library on GitHub: https://github.com/ConrabOpto/mst-query."/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/dracula.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-65632006-4', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script type="text/javascript" src="https://codefund.io/properties/635/funder.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="MobX-state-tree"/><h2 class="headerTitleWithLogo">MobX-state-tree</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/intro/welcome" target="_self">Documentation</a></li><li class=""><a href="/API/" target="_self">TypeDocs</a></li><li class=""><a href="https://opencollective.com/mobx" target="_self">Sponsor</a></li><li class=""><a href="https://github.com/mobxjs/mobx-state-tree" target="_self">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Recipes</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Introduction<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/intro/welcome">Welcome to MobX-State-Tree!</a></li><li class="navListItem"><a class="navItem" href="/intro/installation">Installation</a></li><li class="navListItem"><a class="navItem" href="/intro/getting-started">Getting Started Tutorial</a></li><li class="navListItem"><a class="navItem" href="/intro/examples">Examples</a></li><li class="navListItem"><a class="navItem" href="/intro/philosophy">Overview &amp; Philosophy</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Basic Concepts<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/concepts/trees">Types, models, trees &amp; state</a></li><li class="navListItem"><a class="navItem" href="/concepts/actions">Actions</a></li><li class="navListItem"><a class="navItem" href="/concepts/views">Derived values</a></li><li class="navListItem"><a class="navItem" href="/concepts/using-react">React and MST</a></li><li class="navListItem"><a class="navItem" href="/concepts/snapshots">Snapshots</a></li><li class="navListItem"><a class="navItem" href="/concepts/references">Identifiers and references</a></li><li class="navListItem"><a class="navItem" href="/concepts/async-actions">Asynchronous actions</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Advanced Concepts<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/concepts/patches">Patches</a></li><li class="navListItem"><a class="navItem" href="/concepts/listeners">Listening to changes</a></li><li class="navListItem"><a class="navItem" href="/concepts/dependency-injection">Dependency Injection</a></li><li class="navListItem"><a class="navItem" href="/concepts/middleware">Middleware</a></li><li class="navListItem"><a class="navItem" href="/concepts/reconciliation">Reconciliation</a></li><li class="navListItem"><a class="navItem" href="/concepts/volatiles">Volatile state</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">API Overview<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/overview/types">Types overview</a></li><li class="navListItem"><a class="navItem" href="/overview/api">API overview</a></li><li class="navListItem"><a class="navItem" href="/overview/hooks">Lifecycle hooks overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Tips<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/tips/resources">Talks &amp; Blogs</a></li><li class="navListItem"><a class="navItem" href="/tips/faq">Frequently Asked Questions</a></li><li class="navListItem"><a class="navItem" href="/tips/typescript">TypeScript and MST</a></li><li class="navListItem"><a class="navItem" href="/tips/circular-deps">Circular dependencies</a></li><li class="navListItem"><a class="navItem" href="/tips/inheritance">Simulating inheritance</a></li><li class="navListItem"><a class="navItem" href="/tips/snapshots-as-values">Using snapshots as values</a></li><li class="navListItem"><a class="navItem" href="/tips/more-tips">Miscellaneous Tips</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Compare<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/compare/context-reducer-vs-mobx-state-tree">React Context vs. MobX-State-Tree</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Recipes<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/recipes/auto-generated-property-setter-actions">Auto-Generated Property Setter Actions</a></li><li class="navListItem"><a class="navItem" href="/recipes/pre-built-form-types-with-mst-form-type">Pre-built Form Types with MST Form Type</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/recipes/mst-query">Manage Asynchronous Data with mst-query</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx-state-tree/edit/master/docs/recipes/mst-query.md" target="_blank" rel="noreferrer noopener">Edit</a><h1 id="__docusaurus" class="postHeaderTitle">Manage Asynchronous Data with mst-query</h1></header><article><div><span><p>Find the <code>mst-query</code> library on GitHub: <a href="https://github.com/ConrabOpto/mst-query">https://github.com/ConrabOpto/mst-query</a>.</p>
+<h1><a class="anchor" aria-hidden="true" id="mst-query"></a><a href="#mst-query" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>mst-query</h1>
+<p>mst-query is a query library designed specifically for MobX-State-Tree. It functions similarly to <a href="https://tanstack.com/query/latest">react-query</a> but operates as a thin layer on top of a MobX-State-Tree store.</p>
+<p>Key features include:</p>
+<ul>
+<li>Asynchronous data management with React hooks</li>
+<li>Automatic normalization</li>
+<li>Query invalidation upon stale data</li>
+<li>Imperative api</li>
+<li>Optimistic update</li>
+<li>Garbage collection</li>
+</ul>
+<p>In this recipes section, we'll briefly discuss each of these features and how they solve common problems when using MST.</p>
+<h2><a class="anchor" aria-hidden="true" id="async-data-managment-with-react-hooks"></a><a href="#async-data-managment-with-react-hooks" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Async data managment with React hooks</h2>
+<p>Creating your own React hook for data fetching in components can be challenging. Managing all potential edge cases that may arise is both complex and error-prone.</p>
+<p>Opting for a third-party hook provides a more reliable solution. However, this approach can sometimes lead to redundant data storage, as data may be cached within the hook as well as within your models.</p>
+<p>mst-query offers a convenient method for fetching data directly within your components, seamlessly integrating with MST:</p>
+<pre><code class="hljs css language-tsx"><span class="hljs-comment">// Regular MST:</span>
+<span class="hljs-keyword">const</span> Todo = observer(<span class="hljs-function">(<span class="hljs-params">{ id }</span>) =&gt;</span> {
+  useEffect(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    store.loadTodo(id);
+  }, [id]);  
+  
+  <span class="hljs-keyword">if</span> (store.todoError) <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>Got an error...<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>;
+  
+  <span class="hljs-keyword">if</span> (store.todoIsLoading) <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>Is loading...<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>;
+  
+  <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">Todo</span> <span class="hljs-attr">todo</span>=<span class="hljs-string">{store.todo}</span> /&gt;</span></span>;
+});
+
+<span class="hljs-comment">// With mst-query:</span>
+<span class="hljs-keyword">const</span> Todo = observer(<span class="hljs-function">(<span class="hljs-params">{ id }</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> { data, error, isLoading } = useQuery(store.todoQuery, { <span class="hljs-attr">request</span>: { id } })  
+  
+  <span class="hljs-keyword">if</span> (error) <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>Got an error...<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>;
+  
+  <span class="hljs-keyword">if</span> (isLoading) <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>Is loading...<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>;
+
+  <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">Todo</span> <span class="hljs-attr">todo</span>=<span class="hljs-string">{data}</span> /&gt;</span></span>;
+});
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="creating-queries"></a><a href="#creating-queries" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating queries</h2>
+<p>In mst-query, queries are treated as models. This means you can observe and update them just like regular models. You define a query model using <code>createQuery</code>:</p>
+<pre><code class="hljs css language-ts"><span class="hljs-keyword">const</span> LoadTodoQuery = createQuery(<span class="hljs-string">"LoadTodoQuery"</span>, {
+  data: t.reference(Todo),
+  request: t.model({ id: t.string }),
+  <span class="hljs-keyword">async</span> endpoint({ request }) {
+    <span class="hljs-keyword">return</span> todoApi.get(request.id)
+  }
+});
+</code></pre>
+<p>The first option, <code>data</code>, represents the shape of the data returned from the endpoint. The second option, <code>request</code>, represents the arguments passed to the endpoint function. Both data and request undergo runtime type checking.</p>
+<h2><a class="anchor" aria-hidden="true" id="automatic-normalization"></a><a href="#automatic-normalization" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Automatic normalization</h2>
+<p>A unique feature of mst-query is that data received from the server is automatically normalized. Because queries already understand the shape of the data returned from the API they consume, we can automate the process of creating and updating models with identifiers:</p>
+<pre><code class="hljs css language-ts"><span class="hljs-keyword">import</span> { t, flow } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-state-tree"</span>
+
+<span class="hljs-keyword">const</span> User = t.model(<span class="hljs-string">"User"</span>, {
+  id: t.identifier,
+  name: t.string
+})
+
+<span class="hljs-keyword">const</span> Todo = t.model(<span class="hljs-string">"Todo"</span>, {
+  id: t.identifier,
+  title: t.string,
+  message: t.string,
+  done: t.boolean,
+  createdBy: t.reference(User)
+})
+
+<span class="hljs-comment">// Regular MST:</span>
+<span class="hljs-keyword">const</span> TodoStore = t
+  .model(<span class="hljs-string">"RootStore"</span>, {
+    todos: t.map(Todo)
+  })
+  .actions(<span class="hljs-function">(<span class="hljs-params">self</span>) =&gt;</span> ({
+    loadTodo: flow(<span class="hljs-function"><span class="hljs-keyword">function</span>* <span class="hljs-title">loadTodo</span>(<span class="hljs-params">todoId: <span class="hljs-built_in">string</span></span>) </span>{
+        <span class="hljs-keyword">const</span> todo = <span class="hljs-keyword">yield</span> todoApi.getTodo(todoId);
+
+        <span class="hljs-keyword">const</span> root = getRoot(self);
+        <span class="hljs-keyword">const</span> user = root.userStore.createOrUpdateUser(todo.createdBy);
+        todo.createdBy = user;
+
+        <span class="hljs-keyword">const</span> oldTodo = self.todos.get(todoId);
+        <span class="hljs-keyword">if</span> (!oldTodo) {
+          self.todos.put({ todo });
+        } <span class="hljs-keyword">else</span> {
+          self.todos.put({ ...getSnapshot(oldTodo), ...todo });
+        }
+    })
+  }))
+
+<span class="hljs-comment">// With mst-query:</span>
+<span class="hljs-keyword">const</span> UserStore = createModelStore(<span class="hljs-string">'UserStore'</span>, User);
+
+<span class="hljs-keyword">const</span> TodoStore = createModelStore(<span class="hljs-string">"TodoStore"</span>, Todo).props({
+  todoQuery: createQuery(<span class="hljs-string">"TodoQuery"</span>, {
+    data: t.reference(Todo),
+    request: t.model({ id: t.string }),
+    <span class="hljs-keyword">async</span> endpoint({ request }) {
+      <span class="hljs-keyword">return</span> todoApi.getTodo(request.id)
+    }
+  })
+})
+
+<span class="hljs-keyword">const</span> RootStore = createRootStore({
+    userStore: t.optional(UserStore, {}),
+    todoStore: t.optional(TodoStore, {})
+});
+</code></pre>
+<p>The functions <code>createRootStore</code> and <code>createModelStore</code> let mst-query know about your models that should be normalized. Note that you don't have to manually update the createdBy property on the todo, as this is done automatically for you.</p>
+<p>In this example, we only had one nested data model in our response. However, in a real-world scenario, such as querying a GraphQL endpoint, you may need to handle dozens of similar properties. Mst-query will normalize all of these for you without additional code.</p>
+<h2><a class="anchor" aria-hidden="true" id="query-invalidation-upon-stale-data"></a><a href="#query-invalidation-upon-stale-data" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Query invalidation upon stale data</h2>
+<p>Just like in react-query, you can pass a <code>staleTime</code> option to <code>useQuery</code>. This ensures your data gets periodically updated as the user navigates through your app. The default value of <code>staleTime</code> is 0, which means your users always see fresh data.</p>
+<p>In mst-query, models are also automatically updated when you use <code>createMutation</code> and <code>mutate</code>. The only requirements are that your API returns the new data and that the data property is a reference type:</p>
+<pre><code class="hljs css language-ts"><span class="hljs-keyword">const</span> TodoRequestModel = t.model({ id: t.string, done: t.boolean, title: t.string });
+
+<span class="hljs-keyword">const</span> TodoUpdateMutation = createMutation(<span class="hljs-string">"TodoUpdateMutation"</span>, {
+    data: t.reference(Todo),
+    request: TodoRequestModel,
+    <span class="hljs-keyword">async</span> endpoint({ request }) {
+      <span class="hljs-keyword">return</span> todoApi.update(request)
+    }
+});
+
+<span class="hljs-keyword">const</span> TodoStore = createModelStore(<span class="hljs-string">"TodoStore"</span>, Todo)
+  .props({
+    todoQuery: TodoQuery,
+    todoUpdateMutation: TodoUpdateMutation
+  })
+  .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
+    update(data) {
+      <span class="hljs-comment">// When mutate successfully resolves, the Todo will be automatically updated.</span>
+      self.todoUpdateMutation.mutate({ request: data });
+    }
+  }))
+</code></pre>
+<p>You can also manually refetch a query by calling <code>invalidate</code>. This pairs nicely with <code>createMutation</code> and a new listener called <code>onMutate</code>.</p>
+<p>A common use case for this is refetching a list of items:</p>
+<pre><code class="hljs css language-tsx"><span class="hljs-keyword">const</span> TodoListQuery = createQuery(<span class="hljs-string">"TodoListQuery"</span>, {
+    <span class="hljs-attr">data</span>: t.array(t.reference(Todo)),
+    <span class="hljs-keyword">async</span> endpoint() {
+      <span class="hljs-keyword">return</span> todoApi.getList();
+    }
+});
+
+<span class="hljs-keyword">const</span> TodoAddMutation = createMutation(<span class="hljs-string">"TodoAddMutation"</span>, {
+    <span class="hljs-attr">data</span>: t.reference(Todo),
+    <span class="hljs-attr">request</span>: TodoRequestModel,
+    <span class="hljs-keyword">async</span> endpoint({ request }) {
+      <span class="hljs-keyword">return</span> todoApi.update(request)
+    }
+});
+
+<span class="hljs-keyword">const</span> TodoStore = createModelStore(<span class="hljs-string">"TodoStore"</span>, Todo)
+  .props({
+    <span class="hljs-attr">todoListQuery</span>: TodoListQuery,
+    <span class="hljs-attr">todoAddMutation</span>: todoAddMutation
+  })
+  .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
+    afterCreate() {
+      onMutate(self.todoAdd, (result) =&gt; {
+        <span class="hljs-comment">// Call invalidate to refetch the list...</span>
+        self.todoListQuery.invalidate();
+
+        <span class="hljs-comment">// ...or add the new item directly if you don't need to refetch</span>
+        self.todoListQuery.data.push(result);
+      });
+    }  
+  }));
+
+<span class="hljs-keyword">const</span> TodoListContainer = observer(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+  <span class="hljs-keyword">const</span> { data } = useQuery(store.todoListQuery);
+  
+  <span class="hljs-keyword">const</span> [addTodo, { isLoading }] = useMutation(store.todoAddMutation);
+  
+  <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">TodoList</span> <span class="hljs-attr">todos</span>=<span class="hljs-string">{data}</span> <span class="hljs-attr">onAdd</span>=<span class="hljs-string">{addTodo}</span> <span class="hljs-attr">isAdding</span>=<span class="hljs-string">{isLoading}</span> /&gt;</span></span>;
+});
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="imperative-api"></a><a href="#imperative-api" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Imperative api</h2>
+<p>Using hooks is convenient, but sometimes your data fetching logic can become more complex, resulting in a lot of business logic in your components.</p>
+<p>Thankfully, most things you can do with hooks can also be accomplished with an imperative API:</p>
+<pre><code class="hljs css language-tsx"><span class="hljs-keyword">const</span> TodoStore = createModelStore(<span class="hljs-string">"TodoStore"</span>, Todo)
+  .props({
+    <span class="hljs-attr">todoQuery</span>: TodoQuery,
+    <span class="hljs-attr">todoUpdateMutation</span>: TodoUpdateMutation
+  })
+  .volatile(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
+    <span class="hljs-attr">permssionError</span>: <span class="hljs-string">''</span>,
+    <span class="hljs-attr">updateResult</span>: <span class="hljs-literal">null</span>
+  }))
+  .actions(<span class="hljs-function"><span class="hljs-params">self</span> =&gt;</span> ({
+    <span class="hljs-attr">updateTodo</span>: flow(<span class="hljs-function"><span class="hljs-keyword">function</span>* (<span class="hljs-params">request</span>) </span>{
+      <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">yield</span> todoApi.checkPermissions(request.id);
+      <span class="hljs-keyword">if</span> (!result.ok) {
+        self.permissionError = <span class="hljs-string">'You are not allowed to edit this resource'</span>;
+        <span class="hljs-keyword">return</span>;
+      }
+
+      <span class="hljs-keyword">const</span> { error, <span class="hljs-attr">result</span>: updateResult } = <span class="hljs-keyword">yield</span> self.todoUpdateMutation.mutate({ request });
+      <span class="hljs-keyword">if</span> (error) {
+        logApi.sendLog(error.message);
+      }
+
+      self.updateResult = updateResult;
+    });
+  }));
+
+<span class="hljs-keyword">const</span> TodoLoader = <span class="hljs-keyword">async</span> (id) =&gt; {
+  <span class="hljs-comment">// Manual fetch in a route loader. This is also how you prefetch data.</span>
+  <span class="hljs-keyword">const</span> todo = <span class="hljs-keyword">await</span> store.todoQuery.query({ <span class="hljs-attr">request</span>: { id } });
+  <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">TodoContainer</span> <span class="hljs-attr">todo</span>=<span class="hljs-string">{todo}</span> <span class="hljs-attr">store</span>=<span class="hljs-string">{store}</span>  /&gt;</span></span>;
+};
+
+<span class="hljs-keyword">const</span> TodoContainer = observer(<span class="hljs-function">(<span class="hljs-params">props</span>) =&gt;</span> {    
+  <span class="hljs-keyword">const</span> { todo, store } = props;
+  <span class="hljs-keyword">return</span> (
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">Todo</span> 
+      <span class="hljs-attr">todo</span>=<span class="hljs-string">{todo}</span> 
+      <span class="hljs-attr">onUpdate</span>=<span class="hljs-string">{store.updateTodo}</span> 
+      <span class="hljs-attr">permissionError</span>=<span class="hljs-string">{store.permissionError}</span> 
+    /&gt;</span></span>
+  );
+});
+</code></pre>
+<p>The imperative API supports most of the features in mst-query. However, automatically refetching a query when it's stale—either by passing <code>staleTime</code> or calling <code>invalidate</code>—is currently not supported.</p>
+<h2><a class="anchor" aria-hidden="true" id="optimistic-update"></a><a href="#optimistic-update" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Optimistic update</h2>
+<p>Optimistic updates are important for a UI to feel responsive. You achieve this in mst-query by passing your update to the <code>optimisticUpdate</code> option in <code>mutate</code>. When the mutate call resolves, whether successfully or not, the optimistic update is automatically rolled back.</p>
+<pre><code class="hljs css language-ts"><span class="hljs-keyword">const</span> serverTodo = <span class="hljs-keyword">yield</span> self.todoAddMutation.mutate({
+  request: data,
+  optimisticUpdate() {
+    <span class="hljs-comment">// createModelStore provides a merge action that you can use to manually create models</span>
+    <span class="hljs-keyword">const</span> clientTodo = todoStore.merge({
+      id: <span class="hljs-string">`<span class="hljs-subst">${<span class="hljs-built_in">Math</span>.random()}</span>`</span>,
+      title: data.title,
+      done: data.done,
+      createdBy: loggedInUserId
+    });
+
+    todoStore.todoListQuery.push(clientTodo);
+  }
+});
+
+todoStore.todoListQuery.push(serverTodo);
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="garbage-collection"></a><a href="#garbage-collection" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Garbage collection</h2>
+<p>Consider a scenario where an MST application fetches a list of items from an API. Over time, items may be added, updated, or removed. In regular MST, every item fetched remains in memory unless you manually remove them. If the list is paginated, the problem is even larger.</p>
+<p>Since mst-query tracks all models via queries, it can safely remove unused models. You do this by calling runGc on the rootStore:</p>
+<p><code>rootStore.runGc()</code></p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/recipes/pre-built-form-types-with-mst-form-type"><span class="arrow-prev">← </span><span>Pre-built Form Types with MST Form Type</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#async-data-managment-with-react-hooks">Async data managment with React hooks</a></li><li><a href="#creating-queries">Creating queries</a></li><li><a href="#automatic-normalization">Automatic normalization</a></li><li><a href="#query-invalidation-upon-stale-data">Query invalidation upon stale data</a></li><li><a href="#imperative-api">Imperative api</a></li><li><a href="#optimistic-update">Optimistic update</a></li><li><a href="#garbage-collection">Garbage collection</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="MobX-state-tree" width="66" height="58"/></a><div><h5>Docs</h5><a href="/intro/getting-started">Getting Started</a><a href="/concepts/trees">Basic concepts</a><a href="/concepts/patches">Advanced concepts</a><a href="/overview/types">API Reference</a></div><div><h5>Community</h5><a href="https://github.com/mobxjs/mobx-state-tree/discussions" target="_blank" rel="noreferrer noopener">GitHub Discussions</a><a href="https://stackoverflow.com/questions/tagged/mobx-state-tree" target="_blank" rel="noreferrer noopener">Stack Overflow</a></div><div><h5>More</h5><a href="/blog">Blog</a><a href="https://github.com/mobxjs/mobx-state-tree">GitHub</a><a class="github-button" href="https://github.com/mobxjs/mobx-state-tree" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2024 Michel Weststrate</section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: 'b7b0cfe7d1c8fa6db6089df94a3128f1',
+                indexName: 'mobx-state-tree',
+                inputSelector: '#search_input_react'
+              });
+            </script></body></html>
