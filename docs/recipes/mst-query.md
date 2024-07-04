@@ -1,6 +1,13 @@
+---
+id: mst-query
+title: mst-query
+---
+
+Find the `mst-query` library on GitHub: https://github.com/ConrabOpto/mst-query.
+
 # mst-query
 
-mst-query is a query library designed specifically for MobX-State-Tree. It functions similarly to react-query but operates as a thin layer on top of a MobX-State-Tree store.
+mst-query is a query library designed specifically for MobX-State-Tree. It functions similarly to [react-query](https://tanstack.com/query/latest) but operates as a thin layer on top of a MobX-State-Tree store.
 
 Key features include:
 
@@ -90,7 +97,7 @@ const TodoStore = t
   })
   .actions((self) => ({
     loadTodo: flow(function* loadTodo(todoId: string) {
-        const todo = yield api.fetchTodo(todoId);
+        const todo = yield todoApi.getTodo(todoId);
 
         const root = getRoot(self);
         const user = root.userStore.createOrUpdateUser(todo.createdBy);
@@ -113,7 +120,7 @@ const TodoStore = createModelStore("TodoStore", Todo).props({
     data: t.reference(Todo),
     request: t.model({ id: t.string }),
     async endpoint({ request }) {
-      return api.fetchTodo(request.id)
+      return todoApi.getTodo(request.id)
     }
   })
 })
