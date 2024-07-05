@@ -18,7 +18,8 @@ import {
   IAnyType,
   ModelPrimitive,
   ModelPropertiesDeclaration,
-  SnapshotOut
+  SnapshotOut,
+  type ISimpleType
 } from "../../src"
 import { expect, test } from "bun:test"
 
@@ -49,6 +50,7 @@ const assertTypesEqual = <ActualT, ExpectedT>(
     ? NotExactErrorMessage<ActualT, ExpectedT>
     : ExpectedT
 ): [ActualT, ExpectedT] => [t, u] as [ActualT, ExpectedT]
+
 const _: unknown = undefined
 
 const createTestFactories = () => {
@@ -1262,4 +1264,20 @@ test("union type inference verification for a large number of types", () => {
 
   assertTypesEqual(_ as ITC, _ as "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j")
   assertTypesEqual(_ as ITS, _ as "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j")
+})
+
+test("#2186 substitutability type verification for model types extending a common base", () => {
+  const BaseType = types.model()
+  const SubTypeOptional = BaseType.props({ a: "" })
+  const SubTypeRequired = BaseType.props({ a: types.string })
+  const SubTypeRequiredWithAnotherOptional = SubTypeRequired.props({ a: types.string, b: 5 })
+
+  true || ((t: typeof BaseType) => t.create())(SubTypeOptional)
+  true ||
+    ((t: typeof SubTypeRequired) => t.create({ a: "123" }))(SubTypeRequiredWithAnotherOptional)
+  true ||
+    ((t: typeof BaseType) => t.create())(
+      // @ts-expect-error -- a is required
+      SubTypeRequired
+    )
 })
