@@ -78,6 +78,6 @@ export function literal<S extends Primitives>(value: S): ISimpleType<S> {
  * @param type
  * @returns
  */
-export function isLiteralType<IT extends ISimpleType<any>>(type: IT): type is IT {
+export function isLiteralType(type: unknown): type is ISimpleType<any> {
   return isType(type) && (type.flags & TypeFlags.Literal) > 0
 }

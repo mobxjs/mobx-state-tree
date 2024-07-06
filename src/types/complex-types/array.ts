@@ -505,8 +505,6 @@ function areSame(oldNode: AnyNode, newValue: any) {
  * @param type
  * @returns `true` if the type is an array type.
  */
-export function isArrayType<Items extends IAnyType = IAnyType>(
-  type: IAnyType
-): type is IArrayType<Items> {
+export function isArrayType(type: unknown): type is IArrayType<IAnyType> {
   return isType(type) && (type.flags & TypeFlags.Array) > 0
 }

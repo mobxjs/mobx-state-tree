@@ -238,9 +238,9 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
  * @param type
  * @returns
  */
-export function isPrimitiveType<
-  IT extends ISimpleType<string> | ISimpleType<number> | ISimpleType<boolean> | typeof DatePrimitive
->(type: IT): type is IT {
+export function isPrimitiveType(
+  type: unknown
+): type is ISimpleType<string> | ISimpleType<number> | ISimpleType<boolean> | typeof DatePrimitive {
   return (
     isType(type) &&
     (type.flags &

@@ -226,6 +226,6 @@ const undefinedAsOptionalValues: [undefined] = [undefined]
  * @param type
  * @returns
  */
-export function isOptionalType<IT extends IAnyType>(type: IT): type is IT {
+export function isOptionalType(type: unknown): type is IOptionalIType<IAnyType, [any, ...any[]]> {
   return isType(type) && (type.flags & TypeFlags.Optional) > 0
 }

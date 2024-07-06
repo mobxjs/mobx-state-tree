@@ -132,9 +132,9 @@ export const identifierNumber: ISimpleType<number> = new IdentifierNumberType()
  * @param type
  * @returns
  */
-export function isIdentifierType<IT extends typeof identifier | typeof identifierNumber>(
-  type: IT
-): type is IT {
+export function isIdentifierType(
+  type: unknown
+): type is typeof identifier | typeof identifierNumber {
   return isType(type) && (type.flags & TypeFlags.Identifier) > 0
 }
 

@@ -12,7 +12,8 @@ import {
   IType,
   IAnyType,
   AnyObjectNode,
-  SimpleType
+  SimpleType,
+  type ISimpleType
 } from "../../internal"
 
 /**
@@ -106,6 +107,6 @@ export function frozen(arg?: any): any {
  * @param type
  * @returns
  */
-export function isFrozenType<IT extends IType<T | any, T, T>, T = any>(type: IT): type is IT {
+export function isFrozenType(type: unknown): type is ISimpleType<any> {
   return isType(type) && (type.flags & TypeFlags.Frozen) > 0
 }
