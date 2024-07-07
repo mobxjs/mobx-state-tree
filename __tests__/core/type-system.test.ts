@@ -19,9 +19,31 @@ import {
   ModelPrimitive,
   ModelPropertiesDeclaration,
   SnapshotOut,
-  type ISimpleType
+  type ISimpleType,
+  isOptionalType,
+  isUnionType,
+  type IOptionalIType,
+  type ITypeUnion,
+  isMapType,
+  isArrayType,
+  isModelType,
+  isLiteralType,
+  isPrimitiveType,
+  isReferenceType,
+  isIdentifierType,
+  isRefinementType,
+  isLateType
 } from "../../src"
 import { expect, test } from "bun:test"
+import type {
+  DatePrimitive,
+  IAnyComplexType,
+  IAnyModelType,
+  IArrayType,
+  IMapType,
+  IReferenceType,
+  IUnionType
+} from "../../src/internal"
 
 type DifferingKeys<ActualT, ExpectedT> = {
   [K in keyof ActualT | keyof ExpectedT]: K extends keyof ActualT
@@ -34,22 +56,18 @@ type DifferingKeys<ActualT, ExpectedT> = {
 }[keyof ActualT | keyof ExpectedT] &
   string
 
-type NotExactErrorMessage<ActualT, ExpectedT> = ActualT extends Record<string, unknown>
-  ? ExpectedT extends Record<string, unknown>
+type NotExactErrorMessage<ActualT, ExpectedT> = ActualT extends Record<string, any>
+  ? ExpectedT extends Record<string, any>
     ? `Mismatched property: ${DifferingKeys<ActualT, ExpectedT>}`
     : "Expected a non-object type, but received an object"
-  : ExpectedT extends Record<string, unknown>
+  : ExpectedT extends Record<string, any>
   ? "Expected an object type, but received a non-object type"
   : "Types are not exactly equal"
 
-type IsExact<T1, T2> = [T1] extends [T2] ? ([T2] extends [T1] ? Exact<T1, T2> : never) : never
-
 const assertTypesEqual = <ActualT, ExpectedT>(
   t: ActualT,
-  u: IsExact<ActualT, ExpectedT> extends never
-    ? NotExactErrorMessage<ActualT, ExpectedT>
-    : ExpectedT
-): [ActualT, ExpectedT] => [t, u] as [ActualT, ExpectedT]
+  u: Exact<ActualT, ExpectedT> extends never ? NotExactErrorMessage<ActualT, ExpectedT> : ExpectedT
+): [ActualT, ExpectedT] => [t, u] as any
 
 const _: unknown = undefined
 
@@ -1280,4 +1298,37 @@ test("#2186 substitutability type verification for model types extending a commo
       // @ts-expect-error -- a is required
       SubTypeRequired
     )
+})
+
+test("#2184 - type narrowing functions should narrow to the expected type", () => {
+  const type: unknown = null
+
+  if (isOptionalType(type)) {
+    assertTypesEqual(type, _ as IOptionalIType<IAnyType, [any, ...any[]]>)
+  } else if (isUnionType(type)) {
+    assertTypesEqual(type, _ as IUnionType<IAnyType[]>)
+  } else if (isFrozenType(type)) {
+    assertTypesEqual(type, _ as ISimpleType<any>)
+  } else if (isMapType(type)) {
+    assertTypesEqual(type, _ as IMapType<IAnyType>)
+  } else if (isArrayType(type)) {
+    assertTypesEqual(type, _ as IArrayType<IAnyType>)
+  } else if (isModelType(type)) {
+    assertTypesEqual(type, _ as IAnyModelType)
+  } else if (isLiteralType(type)) {
+    assertTypesEqual(type, _ as ISimpleType<any>)
+  } else if (isPrimitiveType(type)) {
+    assertTypesEqual(
+      type,
+      _ as ISimpleType<string> | ISimpleType<number> | ISimpleType<boolean> | typeof DatePrimitive
+    )
+  } else if (isReferenceType(type)) {
+    assertTypesEqual(type, _ as IReferenceType<IAnyComplexType>)
+  } else if (isIdentifierType(type)) {
+    assertTypesEqual(type, _ as ISimpleType<string> | ISimpleType<number>)
+  } else if (isRefinementType(type)) {
+    assertTypesEqual(type, _ as IAnyType)
+  } else if (isLateType(type)) {
+    assertTypesEqual(type, _ as IAnyType)
+  }
 })

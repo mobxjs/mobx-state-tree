@@ -509,8 +509,6 @@ export function map<IT extends IAnyType>(subtype: IT): IMapType<IT> {
  * @param type
  * @returns `true` if it is a map type.
  */
-export function isMapType<Items extends IAnyType = IAnyType>(
-  type: IAnyType
-): type is IMapType<Items> {
+export function isMapType(type: unknown): type is IMapType<IAnyType> {
   return isType(type) && (type.flags & TypeFlags.Map) > 0
 }

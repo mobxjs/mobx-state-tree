@@ -151,7 +151,7 @@ export type _CustomCSProcessor<T> = Exclude<T, _NotCustomized> extends never
 export interface ITypeUnion<C, S, T>
   extends IType<_CustomCSProcessor<C>, _CustomCSProcessor<S>, T> {}
 
-type IUnionType<Types extends IAnyType[]> = ITypeUnion<
+export type IUnionType<Types extends IAnyType[]> = ITypeUnion<
   Types[number]["CreationType"],
   Types[number]["SnapshotType"],
   Types[number]["TypeWithoutSTN"]
@@ -200,6 +200,6 @@ export function union<Types extends IAnyType[]>(
  * @param type
  * @returns
  */
-export function isUnionType<IT extends IAnyType>(type: IT): type is IT {
-  return (type.flags & TypeFlags.Union) > 0
+export function isUnionType(type: unknown): type is IUnionType<IAnyType[]> {
+  return isType(type) && (type.flags & TypeFlags.Union) > 0
 }
