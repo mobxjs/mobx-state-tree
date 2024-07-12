@@ -149,11 +149,28 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
     return this._subtype
   }
 
+  /**
+   * MST considers a given value to "be" of a subtype is the value is either:
+   *
+   * 1. And instance of the subtype
+   * 2. A valid snapshot *in* of the subtype
+   *
+   * Before v7, we used to also consider processed models (as in, SnapshotOut values of this).
+   * This is no longer the case, and is more in line with our overall "is" philosophy, which you can
+   * see in `src/core/type/type.ts:104` (assuming lines don't change too much).
+   *
+   * For additonal commentary, see discussion in https://github.com/mobxjs/mobx-state-tree/pull/2182
+   *
+   * The `is` function specifically checks for `SnapshotIn` or `Instance` of a given type.
+   *
+   * @param thing
+   * @returns
+   */
   is(thing: any): thing is any {
     const value = isType(thing)
       ? this._subtype
       : isStateTreeNode(thing)
-      ? getSnapshot(thing, false)
+      ? thing
       : this.preProcessSnapshotSafe(thing)
     if (value === $preProcessorFailed) {
       return false
