@@ -159,6 +159,8 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
    * This is no longer the case, and is more in line with our overall "is" philosophy, which you can
    * see in `src/core/type/type.ts:104` (assuming lines don't change too much).
    *
+   * For additonal commentary, see discussion in https://github.com/mobxjs/mobx-state-tree/pull/2182
+   *
    * The `is` function specifically checks for `SnapshotIn` or `Instance` of a given type.
    *
    * @param thing
