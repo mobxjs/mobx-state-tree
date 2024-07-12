@@ -81,20 +81,20 @@ export interface ModelPropertiesDeclaration {
  */
 export type ModelPropertiesDeclarationToProperties<T extends ModelPropertiesDeclaration> =
   T extends { [k: string]: IAnyType } // optimization to reduce nesting
-  ? T
-  : {
-    [K in keyof T]: T[K] extends IAnyType // keep IAnyType check on the top to reduce nesting
-    ? T[K]
-    : T[K] extends string
-    ? IType<string | undefined, string, string>
-    : T[K] extends number
-    ? IType<number | undefined, number, number>
-    : T[K] extends boolean
-    ? IType<boolean | undefined, boolean, boolean>
-    : T[K] extends Date
-    ? IType<number | Date | undefined, number, Date>
-    : never
-  }
+    ? T
+    : {
+        [K in keyof T]: T[K] extends IAnyType // keep IAnyType check on the top to reduce nesting
+          ? T[K]
+          : T[K] extends string
+          ? IType<string | undefined, string, string>
+          : T[K] extends number
+          ? IType<number | undefined, number, number>
+          : T[K] extends boolean
+          ? IType<boolean | undefined, boolean, boolean>
+          : T[K] extends Date
+          ? IType<number | Date | undefined, number, Date>
+          : never
+      }
 
 /**
  * Checks if a value is optional (undefined, any or unknown).
@@ -124,28 +124,32 @@ type IsOptionalValue<C, TV, FV> = undefined extends C ? TV : FV
 type DefinablePropsNames<T> = { [K in keyof T]: IsOptionalValue<T[K], never, K> }[keyof T]
 
 /** @hidden */
-export type ExtractCFromProps<P extends ModelProperties> = { [k in keyof P]: P[k]["CreationType"] }
+export type ExtractCFromProps<P extends ModelProperties> = MaybeEmpty<{
+  [k in keyof P]: P[k]["CreationType"]
+}>
 
 /** @hidden */
-export type ModelCreationType<PC> = { [P in DefinablePropsNames<PC>]: PC[P] } & Partial<PC>
+export type MaybeEmpty<T> = keyof T extends never ? EmptyObject : T
+
+/** @hidden */
+export type ModelCreationType<PC> = MaybeEmpty<{ [P in DefinablePropsNames<PC>]: PC[P] }> &
+  Partial<PC>
 
 // Ensure an object can be given additional properties.
 //
 // For the empty object type, `Record<string, never>`, we need to convert into a record type that will allow us to
 // assign new values. Any other type should allow additional properties by default.
-type WithAdditionalProperties<T> = T extends Record<string, never> ? Record<string, unknown> : T // & Record<string, unknown>
+type WithAdditionalProperties<T> = T extends Record<string, never> ? EmptyObject : T
+
+declare const $nonEmptyObject: unique symbol
+type EmptyObject = { [$nonEmptyObject]?: never }
 
 /** @hidden */
-export type ModelCreationType2<P extends ModelProperties, CustomC> = keyof P extends never
-  ? // When there are no props, we want to prevent passing in any object. We have two objects we want to allow:
-  //  1. The empty object
-  //  2. An instance of this model
-  //
-  // The `IStateTreeNode` interface allows both. For (1), these props are optional so an empty object is allowed.
-  // For (2), an instance will contain these two props, including the "secret" `$stateTreeNodeType` prop. TypeScript's
-  // excess property checking will then ensure no other props are passed in.
-  IStateTreeNode
-  : _CustomOrOther<CustomC, ModelCreationType<ExtractCFromProps<P>>>
+export type ModelCreationType2<P extends ModelProperties, CustomC> = MaybeEmpty<
+  keyof P extends never
+    ? _CustomOrOther<CustomC, ModelCreationType<EmptyObject>>
+    : _CustomOrOther<CustomC, ModelCreationType<ExtractCFromProps<P>>>
+>
 
 /** @hidden */
 export type ModelSnapshotType<P extends ModelProperties> = {
@@ -183,10 +187,10 @@ export interface IModelType<
   CustomC = _NotCustomized,
   CustomS = _NotCustomized
 > extends IType<
-  ModelCreationType2<PROPS, CustomC>,
-  ModelSnapshotType2<PROPS, CustomS>,
-  ModelInstanceType<PROPS, OTHERS>
-> {
+    ModelCreationType2<PROPS, CustomC>,
+    ModelSnapshotType2<PROPS, CustomS>,
+    ModelInstanceType<PROPS, OTHERS>
+  > {
   readonly properties: PROPS
 
   named(newName: string): IModelType<PROPS, OTHERS, CustomC, CustomS>
@@ -225,7 +229,7 @@ export interface IModelType<
 /**
  * Any model type.
  */
-export interface IAnyModelType extends IModelType<any, any, any, any> { }
+export interface IAnyModelType extends IModelType<any, any, any, any> {}
 
 /** @hidden */
 export type ExtractProps<T extends IAnyModelType> = T extends IModelType<infer P, any, any, any>
@@ -272,59 +276,62 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
   })
 
   // loop through properties and ensures that all items are types
-  return keysList.reduce((props, key) => {
-    // warn if user intended a HOOK
-    if (key in Hook) {
-      throw new MstError(
-        `Hook '${key}' was defined as property. Hooks should be defined as part of the actions`
-      )
-    }
+  return keysList.reduce(
+    (props, key) => {
+      // warn if user intended a HOOK
+      if (key in Hook) {
+        throw new MstError(
+          `Hook '${key}' was defined as property. Hooks should be defined as part of the actions`
+        )
+      }
 
-    // the user intended to use a view
-    const descriptor = Object.getOwnPropertyDescriptor(declaredProps, key)!
-    if ("get" in descriptor) {
-      throw new MstError("Getters are not supported as properties. Please use views instead")
-    }
-    // undefined and null are not valid
-    const value = descriptor.value
-    if (value === null || value === undefined) {
-      throw new MstError(
-        "The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?"
-      )
-    }
-    // its a primitive, convert to its type
-    else if (isPrimitive(value)) {
-      props[key] = optional(getPrimitiveFactoryFromValue(value), value)
-    }
-    // map defaults to empty object automatically for models
-    else if (value instanceof MapType) {
-      props[key] = optional(value, {})
-    } else if (value instanceof ArrayType) {
-      props[key] = optional(value, [])
-    }
-    // its already a type
-    else if (isType(value)) {
-      // do nothing, it's already a type
-    }
-    // its a function, maybe the user wanted a view?
-    else if (devMode() && typeof value === "function") {
-      throw new MstError(
-        `Invalid type definition for property '${key}', it looks like you passed a function. Did you forget to invoke it, or did you intend to declare a view / action?`
-      )
-    }
-    // no other complex values
-    else if (devMode() && typeof value === "object") {
-      throw new MstError(
-        `Invalid type definition for property '${key}', it looks like you passed an object. Try passing another model type or a types.frozen.`
-      )
-    } else {
-      throw new MstError(
-        `Invalid type definition for property '${key}', cannot infer a type from a value like '${value}' (${typeof value})`
-      )
-    }
+      // the user intended to use a view
+      const descriptor = Object.getOwnPropertyDescriptor(declaredProps, key)!
+      if ("get" in descriptor) {
+        throw new MstError("Getters are not supported as properties. Please use views instead")
+      }
+      // undefined and null are not valid
+      const value = descriptor.value
+      if (value === null || value === undefined) {
+        throw new MstError(
+          "The default value of an attribute cannot be null or undefined as the type cannot be inferred. Did you mean `types.maybe(someType)`?"
+        )
+      }
+      // its a primitive, convert to its type
+      else if (isPrimitive(value)) {
+        props[key] = optional(getPrimitiveFactoryFromValue(value), value)
+      }
+      // map defaults to empty object automatically for models
+      else if (value instanceof MapType) {
+        props[key] = optional(value, {})
+      } else if (value instanceof ArrayType) {
+        props[key] = optional(value, [])
+      }
+      // its already a type
+      else if (isType(value)) {
+        // do nothing, it's already a type
+      }
+      // its a function, maybe the user wanted a view?
+      else if (devMode() && typeof value === "function") {
+        throw new MstError(
+          `Invalid type definition for property '${key}', it looks like you passed a function. Did you forget to invoke it, or did you intend to declare a view / action?`
+        )
+      }
+      // no other complex values
+      else if (devMode() && typeof value === "object") {
+        throw new MstError(
+          `Invalid type definition for property '${key}', it looks like you passed an object. Try passing another model type or a types.frozen.`
+        )
+      } else {
+        throw new MstError(
+          `Invalid type definition for property '${key}', cannot infer a type from a value like '${value}' (${typeof value})`
+        )
+      }
 
-    return props
-  }, { ...declaredProps } as any)
+      return props
+    },
+    { ...declaredProps } as any
+  )
 }
 
 /**
@@ -332,18 +339,19 @@ function toPropertiesObject(declaredProps: ModelPropertiesDeclaration): ModelPro
  * @hidden
  */
 export class ModelType<
-  PROPS extends ModelProperties,
-  OTHERS,
-  CustomC,
-  CustomS,
-  MT extends IModelType<PROPS, OTHERS, CustomC, CustomS>
->
+    PROPS extends ModelProperties,
+    OTHERS,
+    CustomC,
+    CustomS,
+    MT extends IModelType<PROPS, OTHERS, CustomC, CustomS>
+  >
   extends ComplexType<
     ModelCreationType2<PROPS, CustomC>,
     ModelSnapshotType2<PROPS, CustomS>,
     ModelInstanceType<PROPS, OTHERS>
   >
-  implements IModelType<PROPS, OTHERS, CustomC, CustomS> {
+  implements IModelType<PROPS, OTHERS, CustomC, CustomS>
+{
   readonly flags = TypeFlags.Object
 
   /*
@@ -437,8 +445,8 @@ export class ModelType<
       const actionInvoker = createActionInvoker(self as any, name, boundAction)
       actions[name] = actionInvoker
 
-        // See #646, allow models to be mocked
-        ; (!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(self, name, actionInvoker)
+      // See #646, allow models to be mocked
+      ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(self, name, actionInvoker)
     })
   }
 
@@ -513,7 +521,7 @@ export class ModelType<
       } else if (typeof descriptor.value === "function") {
         // this is a view function, merge as is!
         // See #646, allow models to be mocked
-        ; (!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(self, key, descriptor.value)
+        ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(self, key, descriptor.value)
       } else {
         throw new MstError(`A view member should either be a function or getter based property`)
       }
@@ -643,7 +651,7 @@ export class ModelType<
       try {
         // TODO: FIXME, make sure the observable ref is used!
         const atom = getAtom(node.storedValue, name)
-          ; (atom as any).reportObserved()
+        ;(atom as any).reportObserved()
       } catch (e) {
         throw new MstError(`${name} property is declared twice`)
       }
@@ -667,14 +675,14 @@ export class ModelType<
     if (!(patch.op === "replace" || patch.op === "add")) {
       throw new MstError(`object does not support operation ${patch.op}`)
     }
-    ; (node.storedValue as any)[subpath] = patch.value
+    ;(node.storedValue as any)[subpath] = patch.value
   }
 
   applySnapshot(node: this["N"], snapshot: this["C"]): void {
     typecheckInternal(this, snapshot)
     const preProcessedSnapshot = this.applySnapshotPreProcessor(snapshot)
     this.forAllProps((name) => {
-      ; (node.storedValue as any)[name] = preProcessedSnapshot[name]
+      ;(node.storedValue as any)[name] = preProcessedSnapshot[name]
     })
   }
 
@@ -730,7 +738,7 @@ export class ModelType<
   }
 
   removeChild(node: this["N"], subpath: string) {
-    ; (node.storedValue as any)[subpath] = undefined
+    ;(node.storedValue as any)[subpath] = undefined
   }
 }
 ModelType.prototype.applySnapshot = action(ModelType.prototype.applySnapshot)
@@ -851,6 +859,6 @@ export function compose(...args: any[]): any {
  * @param type
  * @returns
  */
-export function isModelType<IT extends IAnyModelType = IAnyModelType>(type: IAnyType): type is IT {
+export function isModelType(type: unknown): type is IAnyModelType {
   return isType(type) && (type.flags & TypeFlags.Object) > 0
 }

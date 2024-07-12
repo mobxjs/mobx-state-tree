@@ -28,7 +28,9 @@ import {
   assertIsType,
   isValidIdentifier,
   IStateTreeNode,
-  devMode
+  devMode,
+  isType,
+  type IAnyModelType
 } from "../../internal"
 
 export type OnReferenceInvalidatedEvent<STN extends IAnyStateTreeNode> = {
@@ -508,8 +510,8 @@ export function reference<IT extends IAnyComplexType>(
  * @param type
  * @returns
  */
-export function isReferenceType<IT extends IReferenceType<any>>(type: IT): type is IT {
-  return (type.flags & TypeFlags.Reference) > 0
+export function isReferenceType(type: unknown): type is IReferenceType<IAnyComplexType> {
+  return isType(type) && (type.flags & TypeFlags.Reference) > 0
 }
 
 export function safeReference<IT extends IAnyComplexType>(

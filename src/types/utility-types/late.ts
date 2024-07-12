@@ -138,6 +138,6 @@ export function late(nameOrType: any, maybeType?: () => IAnyType): IAnyType {
  * @param type
  * @returns
  */
-export function isLateType<IT extends IAnyType>(type: IT): type is IT {
+export function isLateType(type: unknown): type is IAnyType {
   return isType(type) && (type.flags & TypeFlags.Late) > 0
 }
