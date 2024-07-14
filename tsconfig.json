@@ -4,7 +4,7 @@
     "target": "es6",
     "sourceMap": false,
     "declaration": true,
-    "module": "es2015",
+    "module": "es6",
     "removeComments": false,
     "moduleResolution": "node",
     "experimentalDecorators": true,
