@@ -2,23 +2,6 @@ import { applySnapshot, getSnapshot, types } from "../../src"
 import { Hook } from "../../src/internal"
 import { describe, expect, it, jest, test } from "bun:test"
 
-test("it should call preProcessSnapshot with the correct argument", () => {
-  const onSnapshot = jest.fn((snapshot: any) => {
-    return {
-      val: snapshot.val + 1
-    }
-  })
-
-  const Model = types
-    .model({
-      val: types.number
-    })
-    .preProcessSnapshot(onSnapshot)
-
-  const model = Model.create({ val: 0 })
-  applySnapshot(model, { val: 1 })
-  expect(onSnapshot).toHaveBeenLastCalledWith({ val: 1 })
-})
 describe("Model instantiation", () => {
   describe("Model name", () => {
     test("Providing a string as the first argument should set it as the model's name.", () => {
@@ -208,7 +191,23 @@ describe("Model instantiation", () => {
       })
     })
   })
+  test("it should call preProcessSnapshot with the correct argument", () => {
+    const onSnapshot = jest.fn((snapshot: any) => {
+      return {
+        val: snapshot.val + 1
+      }
+    })
 
+    const Model = types
+      .model({
+        val: types.number
+      })
+      .preProcessSnapshot(onSnapshot)
+
+    const model = Model.create({ val: 0 })
+    applySnapshot(model, { val: 1 })
+    expect(onSnapshot).toHaveBeenLastCalledWith({ val: 1 })
+  })
   describe("When a model has duplicate key in actions or views", () => {
     test("it should show friendly message", () => {
       const UserModel = types
@@ -228,6 +227,196 @@ describe("Model instantiation", () => {
           name: "Subramanya Chakravarthy"
         })
       ).toThrow("[mobx-state-tree] name property is declared twice")
+    })
+  })
+  describe("with all of the property types", () => {
+    const IdentifiedWithString = types.model({ id: types.identifier })
+    const IdentifiedWithNumber = types.model({ id: types.identifierNumber })
+
+    const Custom = types.custom<string, string>({
+      name: "angle bracketed",
+      fromSnapshot(snapshot, _env) {
+        return `<${snapshot}>`
+      },
+      toSnapshot(value) {
+        return value.slice(1, -1)
+      },
+      isTargetType(value): boolean {
+        return value.startsWith("<") && value.endsWith(">")
+      },
+      getValidationMessage(snapshot): string {
+        if (typeof snapshot == "string") return ""
+        throw new Error(`${snapshot} missing surrounding angle brackets`)
+      }
+    })
+
+    const Everything = types.model({
+      boolean: types.boolean,
+      custom: Custom,
+      Date: types.Date,
+      enumeration: types.enumeration(["A", "B"]),
+      float: types.float,
+      finite: types.finite,
+      frozen: types.frozen<{ s: string }>(),
+      integer: types.integer,
+      late: types.late(() => types.string),
+      lazy: types.lazy("lazy", {
+        loadType: () => Promise.resolve(types.string),
+        shouldLoadPredicate: () => true
+      }),
+      literal: types.literal("literal"),
+      maybe: types.maybe(types.string),
+      maybeNull: types.maybeNull(types.number),
+      null: types.null,
+      number: types.number,
+      optional: types.optional(types.string, "default"),
+      reference: types.reference(IdentifiedWithString),
+      refinement: types.refinement(types.string, (s) => s.length > 2),
+      string: types.string,
+      safeReference: types.safeReference(IdentifiedWithNumber),
+      undefined: types.undefined,
+      union: types.union(types.string, types.number)
+    } satisfies Record<Exclude<keyof typeof types, "compose" | "model" | "identifier" | "identifierNumber" | "map" | "array" | "snapshotProcessor">, any>)
+
+    const Root = types.model({
+      everything: types.snapshotProcessor(Everything, {
+        preProcessor(snapshot) {
+          if (snapshot.refinement.length < 2) {
+            return { ...snapshot, refinement: "<broken>" }
+          }
+          return snapshot
+        }
+      }),
+      mapOfStrings: types.map(IdentifiedWithString),
+      arrayOfNumbers: types.array(IdentifiedWithNumber)
+    })
+
+    it("does not throw with input snapshots", () => {
+      const value = Root.create({
+        everything: {
+          boolean: true,
+          custom: "custom",
+          Date: 0,
+          enumeration: "A",
+          float: 1.23,
+          finite: 1,
+          frozen: { s: "test" },
+          integer: 1,
+          late: "test",
+          lazy: "test",
+          literal: "literal",
+          maybe: "test",
+          maybeNull: 1,
+          null: null,
+          number: 1,
+          optional: "test",
+          reference: "id-a",
+          refinement: "test",
+          string: "test",
+          safeReference: 1,
+          undefined: undefined,
+          union: "test"
+        },
+        mapOfStrings: {
+          "id-a": { id: "id-a" }
+        },
+        arrayOfNumbers: [{ id: 1 }]
+      })
+
+      expect(getSnapshot(value)).toEqual({
+        everything: {
+          boolean: true,
+          custom: "custom",
+          Date: 0,
+          enumeration: "A",
+          float: 1.23,
+          finite: 1,
+          frozen: { s: "test" },
+          integer: 1,
+          late: "test",
+          lazy: "test",
+          literal: "literal",
+          maybe: "test",
+          maybeNull: 1,
+          null: null,
+          number: 1,
+          optional: "test",
+          reference: "id-a",
+          refinement: "test",
+          string: "test",
+          safeReference: 1,
+          undefined: undefined,
+          union: "test"
+        },
+        mapOfStrings: {
+          "id-a": { id: "id-a" }
+        },
+        arrayOfNumbers: [{ id: 1 }]
+      })
+    })
+
+    it("does not throw with input instances", () => {
+      const instanceA = IdentifiedWithString.create({ id: "id-a" })
+      const instance1 = IdentifiedWithNumber.create({ id: 1 })
+      const value = Root.create({
+        everything: {
+          boolean: types.boolean.create(true),
+          custom: Custom.create("custom"),
+          Date: types.Date.create(0),
+          enumeration: types.enumeration(["A", "B"]).create("A"),
+          float: types.float.create(1.23),
+          finite: types.finite.create(1),
+          frozen: types.frozen<{ s: string }>().create({ s: "test" }),
+          integer: types.integer.create(1),
+          late: types.string.create("test"),
+          lazy: types.string.create("test"),
+          literal: types.literal("literal").create("literal"),
+          maybe: types.maybe(types.string).create("test"),
+          maybeNull: types.maybeNull(types.number).create(1),
+          null: types.null.create(null),
+          number: types.number.create(1),
+          optional: types.optional(types.string, "default").create("test"),
+          reference: instanceA,
+          refinement: types.refinement(types.string, (s) => s.length > 2).create("test"),
+          string: types.string.create("test"),
+          safeReference: instance1,
+          undefined: types.undefined.create(undefined),
+          union: types.union(types.string, types.number).create("test")
+        },
+        mapOfStrings: { "id-a": instanceA },
+        arrayOfNumbers: [instance1]
+      })
+
+      expect(getSnapshot(value)).toEqual({
+        everything: {
+          boolean: true,
+          custom: "custom",
+          Date: 0,
+          enumeration: "A",
+          float: 1.23,
+          finite: 1,
+          frozen: { s: "test" },
+          integer: 1,
+          late: "test",
+          lazy: "test",
+          literal: "literal",
+          maybe: "test",
+          maybeNull: 1,
+          null: null,
+          number: 1,
+          optional: "test",
+          reference: "id-a",
+          refinement: "test",
+          string: "test",
+          safeReference: 1,
+          undefined: undefined,
+          union: "test"
+        },
+        mapOfStrings: {
+          "id-a": { id: "id-a" }
+        },
+        arrayOfNumbers: [{ id: 1 }]
+      })
     })
   })
 })
