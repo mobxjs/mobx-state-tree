@@ -18,7 +18,7 @@
     "importHelpers": true,
     "stripInternal": true,
     "downlevelIteration": true,
-    "lib": ["ES2016"],
+    "lib": ["es6"],
     "useDefineForClassFields": true,
     "isolatedModules": true,
     "skipLibCheck": true
