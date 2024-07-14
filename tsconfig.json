@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "lib/",
-    "target": "es5",
+    "target": "es6",
     "sourceMap": false,
     "declaration": true,
     "module": "es2015",
@@ -18,7 +18,7 @@
     "importHelpers": true,
     "stripInternal": true,
     "downlevelIteration": true,
-    "lib": ["es6"],
+    "lib": ["ES2016"],
     "useDefineForClassFields": true,
     "isolatedModules": true,
     "skipLibCheck": true
