@@ -1332,3 +1332,45 @@ test("#2184 - type narrowing functions should narrow to the expected type", () =
     assertTypesEqual(type, _ as IAnyType)
   }
 })
+
+describe("for snapshotProcessor", () => {
+  const Model = types.model({ name: types.optional(types.string, "string") })
+
+  test("produces the right types when not customized", () => {
+    const Processor = types.snapshotProcessor(Model, {
+      preProcessor(snapshot) {
+        assertTypesEqual(snapshot, _ as { name?: string | undefined })
+        return snapshot
+      },
+      postProcessor(snapshot) {
+        assertTypesEqual(snapshot, _ as { name: string })
+        return snapshot
+      }
+    })
+
+    type ITC = SnapshotIn<typeof Processor>
+    type ITS = SnapshotOut<typeof Processor>
+
+    assertTypesEqual(_ as ITC, _ as SnapshotIn<typeof Model>)
+    assertTypesEqual(_ as ITS, _ as SnapshotOut<typeof Model>)
+  })
+
+  test("produces the right types when customized", () => {
+    const Processor = types.snapshotProcessor<typeof Model, string, number>(Model, {
+      preProcessor(snapshot) {
+        assertTypesEqual(snapshot, _ as string)
+        return Model.create({ name: snapshot })
+      },
+      postProcessor(snapshot) {
+        assertTypesEqual(snapshot, _ as SnapshotOut<typeof Model>)
+        return snapshot.name.length
+      }
+    })
+
+    type ITC = SnapshotIn<typeof Processor>
+    type ITS = SnapshotOut<typeof Processor>
+
+    assertTypesEqual(_ as ITC, _ as string)
+    assertTypesEqual(_ as ITS, _ as number)
+  })
+})
