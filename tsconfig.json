@@ -23,6 +23,5 @@
     "isolatedModules": true,
     "skipLibCheck": true
   },
-  "files": ["src/index.ts"],
-  "include": ["**/*.{js,ts}"]
+  "include": ["**/*.js", "**/*.ts"]
 }
