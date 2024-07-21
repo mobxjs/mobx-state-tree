@@ -1,4 +1,5 @@
 import { MstError } from "../src/utils"
+import { describe, expect, test } from "bun:test"
 
 describe("MstError custom error class", () => {
   test("with default message", () => {

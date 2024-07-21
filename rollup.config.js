@@ -21,7 +21,7 @@ const prodPlugins = () => [
 ]
 
 const config = (outFile, format, mode) => ({
-  input: "./lib/index.js",
+  input: "./lib/src/index.js",
   output: {
     file: path.join("./dist", outFile),
     format: format,

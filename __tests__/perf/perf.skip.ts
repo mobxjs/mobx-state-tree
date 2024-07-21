@@ -1,5 +1,6 @@
 import { smallScenario, mediumScenario, largeScenario } from "./scenarios"
 import { start } from "./timer"
+import { expect, test } from "bun:test"
 
 // TODO: Not sure how this should work. This feels super fragile.
 const TOO_SLOW_MS = 10000

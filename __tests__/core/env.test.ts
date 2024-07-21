@@ -313,6 +313,6 @@ test("#1231", () => {
 
   const fails = logs.filter((l) => l.startsWith("fail:"))
   if (fails.length > 0) {
-    fail(`\n${fails.join("\n")}`)
+    expect().fail(`\n${fails.join("\n")}`)
   }
 })
