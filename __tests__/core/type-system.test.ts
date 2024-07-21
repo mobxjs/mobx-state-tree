@@ -34,7 +34,7 @@ import {
   isRefinementType,
   isLateType
 } from "../../src"
-import { expect, test } from "bun:test"
+import { describe, expect, test } from "bun:test"
 import type {
   DatePrimitive,
   IAnyComplexType,
