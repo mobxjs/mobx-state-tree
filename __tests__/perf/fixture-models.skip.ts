@@ -1,4 +1,5 @@
 import { Hero, Monster, Treasure } from "./fixtures/fixture-models"
+import { expect, test } from "bun:test"
 const mst = require("../../dist/mobx-state-tree.umd")
 const { unprotect } = mst
 

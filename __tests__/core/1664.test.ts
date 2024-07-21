@@ -1,4 +1,5 @@
 import { types as t } from "../../src/index"
+import { describe, test } from "bun:test"
 
 describe("1664. Array and model types are not inferred correctly when broken down into their components", () => {
   test("should not throw a typescript error", () => {

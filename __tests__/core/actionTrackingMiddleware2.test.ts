@@ -43,7 +43,7 @@ async function doTest(m: any, mode: "success" | "fail") {
   try {
     await m.setZ(8) // -> setY(9) -> setX(10)
     if (mode === "fail") {
-      fail("should have failed")
+      expect().fail("should have failed")
     }
   } catch (e) {
     if (mode === "fail") {

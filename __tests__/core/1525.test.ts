@@ -1,4 +1,5 @@
 import { types, Instance } from "../../src/index"
+import { describe, it } from "bun:test"
 
 describe("1525. Model instance maybe fields becoming TypeScript optional fields when included in a types.union", () => {
   it("does not throw a typescript error", () => {
