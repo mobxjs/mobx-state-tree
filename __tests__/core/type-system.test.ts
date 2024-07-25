@@ -34,7 +34,7 @@ import {
   isRefinementType,
   isLateType
 } from "../../src"
-import { describe, expect, test } from "bun:test"
+import { expect, test } from "bun:test"
 import type {
   DatePrimitive,
   IAnyComplexType,
@@ -1339,7 +1339,7 @@ describe("for snapshotProcessor", () => {
   test("produces the right types when not customized", () => {
     const Processor = types.snapshotProcessor(Model, {
       preProcessor(snapshot) {
-        assertTypesEqual(snapshot, _ as { name?: string | undefined })
+        assertTypesEqual(snapshot, _ as SnapshotIn<typeof Model>)
         return snapshot
       },
       postProcessor(snapshot) {
