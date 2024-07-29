@@ -32,6 +32,7 @@ export interface _NotCustomized {
   // only for typings
   readonly [$mstNotCustomized]: undefined
 }
+
 /** @hidden */
 export type _CustomOrOther<Custom, Other> = Custom extends _NotCustomized ? Other : Custom
 
@@ -220,12 +221,16 @@ export interface ISnapshotProcessors<IT extends IAnyType, CustomC, CustomS> {
   /**
    * Function that transforms an input snapshot.
    */
-  preProcessor?(snapshot: CustomC): IT["CreationType"]
+  preProcessor?(snapshot: _CustomOrOther<CustomC, IT["CreationType"]>): IT["CreationType"]
+
   /**
    * Function that transforms an output snapshot.
    * @param snapshot
    */
-  postProcessor?(snapshot: IT["SnapshotType"], node: Instance<IT>): CustomS
+  postProcessor?(
+    snapshot: IT["SnapshotType"],
+    node: Instance<IT>
+  ): _CustomOrOther<CustomS, IT["SnapshotType"]>
 }
 
 /**
