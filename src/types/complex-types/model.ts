@@ -125,7 +125,7 @@ type DefinablePropsNames<T> = { [K in keyof T]: IsOptionalValue<T[K], never, K> 
 
 /** @hidden */
 export type ExtractCFromProps<P extends ModelProperties> = MaybeEmpty<{
-  [k in keyof P]: P[k]["CreationType"]
+  [k in keyof P]: P[k]["CreationType"] | P[k]["TypeWithoutSTN"]
 }>
 
 /** @hidden */

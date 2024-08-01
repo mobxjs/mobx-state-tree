@@ -24,6 +24,7 @@ import {
   getStateTreeNodeSafe,
   assertArg
 } from "../../internal"
+import type { Writable, WritableKeys } from "ts-essentials"
 
 /**
  * @internal
@@ -70,6 +71,8 @@ export type STNValue<T, IT extends IAnyType> = T extends object ? T & IStateTree
 /** @hidden */
 const $type: unique symbol = Symbol("$type")
 
+type ExcludeReadonly<T> = T extends {} ? T[WritableKeys<T>] : T
+
 /**
  * A type, either complex or simple.
  */
@@ -93,7 +96,7 @@ export interface IType<C, S, T> {
    *
    * @returns An instance of that type.
    */
-  create(snapshot?: C, env?: any): this["Type"]
+  create(snapshot?: C | ExcludeReadonly<T>, env?: any): this["Type"]
 
   /**
    * Checks if a given snapshot / instance is of the given type.
@@ -110,7 +113,7 @@ export interface IType<C, S, T> {
    * @param context Validation context, an array of { subpaths, subtypes } that should be validated
    * @returns The validation result, an array with the list of validation errors.
    */
-  validate(thing: C, context: IValidationContext): IValidationResult
+  validate(thing: C | T, context: IValidationContext): IValidationResult
 
   /**
    * Gets the textual representation of the type as a string.
