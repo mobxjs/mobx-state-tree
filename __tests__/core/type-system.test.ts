@@ -1210,6 +1210,9 @@ test("object creation with no props", () => {
   // Instances can be created with their own instance type
   MyType.create(MyType.create())
 
+  // Instances can be created with a snapshot of themselves
+  true || MyType.create(getSnapshot(MyType.create()))
+
   // TODO @ts-expect-error -- symbols aren't props (but may be one day)
   // This currently is allowed, because excess property checking doesn't happen against symbols.
   // See https://github.com/microsoft/TypeScript/issues/44794
