@@ -13,12 +13,7 @@ import {
   ISerializedActionCall,
   Instance
 } from "../../src"
-import { beforeEach, expect, test } from "bun:test"
-import { resetNextActionId } from "../../src/internal"
-
-beforeEach(() => {
-  resetNextActionId()
-})
+import { expect, test } from "bun:test"
 
 /// Simple action replay and invocation
 const Task = types

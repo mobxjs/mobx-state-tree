@@ -33,11 +33,13 @@ const Todo = types
 const Store = types.model({
   todos: types.array(Todo)
 })
+
 function createEnvironment() {
   return {
     useUppercase: true
   }
 }
+
 test("it should be possible to use environments", () => {
   const env = createEnvironment()
   const todo = Todo.create({}, env)

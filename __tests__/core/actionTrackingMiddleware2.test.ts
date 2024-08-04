@@ -6,12 +6,7 @@ import {
   IActionTrackingMiddleware2Call
 } from "../../src"
 
-import { beforeEach, expect, it, test } from "bun:test"
-import { resetNextActionId } from "../../src/internal"
-
-beforeEach(() => {
-  resetNextActionId()
-})
+import { expect, it, test } from "bun:test"
 
 function createTestMiddleware(m: any, actionName: string, value: number, calls: string[]) {
   function checkCall(call: IActionTrackingMiddleware2Call<any>) {

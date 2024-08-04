@@ -11,7 +11,7 @@ import {
   Instance,
   IAnyType
 } from "../../src"
-import { describe, expect, it, test } from "bun:test"
+import { describe, expect, it, test, beforeEach } from "bun:test"
 
 const createTestFactories = () => {
   const Box = types.model("Box", {
@@ -280,20 +280,18 @@ describe("1045 - secondary union types with applySnapshot and ids", () => {
             describe(useCreate ? "using create" : "not using create", () => {
               for (const type of [2, 1]) {
                 describe(`snapshot is of type Submodel${type}`, () => {
-                  it(`apply snapshot works when the node is not touched`, () => {
+                  beforeEach(() => {
                     configure({
                       useProxies: "never"
                     })
+                  })
 
+                  it(`apply snapshot works when the node is not touched`, () => {
                     const t = initTest(useSnapshot, useCreate, submodel1First, type)
                     t.applySn()
                   })
 
                   it(`apply snapshot works when the node is touched`, () => {
-                    configure({
-                      useProxies: "never"
-                    })
-
                     const t = initTest(useSnapshot, useCreate, submodel1First, type)
                     // tslint:disable-next-line:no-unused-expression
                     t.store[0]

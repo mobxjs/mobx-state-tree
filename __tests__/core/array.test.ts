@@ -352,10 +352,6 @@ test("it should support observable arrays", () => {
 })
 
 test("it should support observable arrays, array should be real when useProxies eq 'always'", () => {
-  configure({
-    useProxies: "always"
-  })
-
   const TestArray = types.array(types.number)
   const testArray = TestArray.create(observable([1, 2]))
   expect(testArray[0] === 1).toBe(true)
