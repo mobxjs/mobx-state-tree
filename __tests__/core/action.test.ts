@@ -13,7 +13,12 @@ import {
   ISerializedActionCall,
   Instance
 } from "../../src"
-import { expect, test } from "bun:test"
+import { beforeEach, expect, test } from "bun:test"
+import { resetNextActionId } from "../../src/internal"
+
+beforeEach(() => {
+  resetNextActionId()
+})
 
 /// Simple action replay and invocation
 const Task = types
@@ -337,10 +342,10 @@ test("middleware events are correct", () => {
   const event1 = {
     args: [7],
     context: {},
-    id: process.env.NODE_ENV !== "production" ? 29 : 28,
+    id: 1,
     name: "a",
     parentId: 0,
-    rootId: process.env.NODE_ENV !== "production" ? 29 : 28,
+    rootId: 1,
     allParentIds: [],
     tree: {},
     type: "action",
@@ -350,11 +355,11 @@ test("middleware events are correct", () => {
   const event2 = {
     args: [14],
     context: {},
-    id: process.env.NODE_ENV !== "production" ? 30 : 29,
+    id: 2,
     name: "b",
-    parentId: process.env.NODE_ENV !== "production" ? 29 : 28,
-    rootId: process.env.NODE_ENV !== "production" ? 29 : 28,
-    allParentIds: [process.env.NODE_ENV !== "production" ? 29 : 28],
+    parentId: 1,
+    rootId: 1,
+    allParentIds: [1],
     tree: {},
     type: "action",
     parentEvent: event1,

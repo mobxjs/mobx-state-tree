@@ -13,8 +13,13 @@ import {
   toGeneratorFunction,
   types
 } from "../../src"
-import { expect, test } from "bun:test"
+import { beforeEach, expect, test } from "bun:test"
 import type { Writable } from "ts-essentials"
+import { resetNextActionId } from "../../src/internal"
+
+beforeEach(() => {
+  resetNextActionId()
+})
 
 function delay<TV>(time: number, value: TV, shouldThrow = false): Promise<TV> {
   return new Promise((resolve, reject) => {
