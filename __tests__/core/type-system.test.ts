@@ -1,5 +1,3 @@
-import { Exact } from "ts-essentials"
-
 import {
   types,
   getSnapshot,
@@ -63,6 +61,8 @@ type NotExactErrorMessage<ActualT, ExpectedT> = ActualT extends Record<string, a
   : ExpectedT extends Record<string, any>
   ? "Expected an object type, but received a non-object type"
   : "Types are not exactly equal"
+
+type Exact<A, B> = [A] extends [B] ? ([B] extends [A] ? A : never) : never
 
 const assertTypesEqual = <ActualT, ExpectedT>(
   t: ActualT,
@@ -1376,4 +1376,30 @@ describe("for snapshotProcessor", () => {
     assertTypesEqual(_ as ITC, _ as string)
     assertTypesEqual(_ as ITS, _ as number)
   })
+})
+
+test("#1627 - union dispatch function is typed", () => {
+  const model = types.model({ a: types.string })
+  const _union = types.union(
+    {
+      dispatcher(snapshot) {
+        assertTypesEqual(snapshot, _ as SnapshotIn<typeof model> | SnapshotIn<typeof types.null>)
+        return snapshot?.a ? model : types.null
+      }
+    },
+    model,
+    types.null
+  )
+
+  const _brokenUnion = types.union(
+    {
+      // @ts-expect-error -- types.string isn't a valid type for the union
+      dispatcher(snapshot) {
+        assertTypesEqual(snapshot, _ as SnapshotIn<typeof model> | SnapshotIn<typeof types.null>)
+        return snapshot?.a ? model : types.string
+      }
+    },
+    model,
+    types.null
+  )
 })
