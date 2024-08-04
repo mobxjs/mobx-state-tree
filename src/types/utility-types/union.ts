@@ -19,11 +19,23 @@ import {
   assertArg
 } from "../../internal"
 
-export type ITypeDispatcher = (snapshot: any) => IAnyType
+export type ITypeDispatcher<Types extends IAnyType[]> = (
+  snapshot: Types[number]["SnapshotType"]
+) => Types[number]
 
-export interface UnionOptions {
+export interface UnionOptions<Types extends IAnyType[]> {
+  /**
+   * Whether or not to use eager validation.
+   *
+   * When `true`, the first matching type will be used. Otherwise, all types will be checked and the
+   * validation will pass if and only if a single type matches.
+   */
   eager?: boolean
-  dispatcher?: ITypeDispatcher
+
+  /**
+   * A function that returns the type to be used given an input snapshot.
+   */
+  dispatcher?: ITypeDispatcher<Types>
 }
 
 /**
@@ -35,7 +47,7 @@ export class Union<Types extends IAnyType[]> extends BaseType<
   _CustomCSProcessor<Types[number]["SnapshotType"]>,
   Types[number]["TypeWithoutSTN"]
 > {
-  private readonly _dispatcher?: ITypeDispatcher
+  private readonly _dispatcher?: ITypeDispatcher<Types>
   private readonly _eager: boolean = true
 
   get flags() {
@@ -48,7 +60,7 @@ export class Union<Types extends IAnyType[]> extends BaseType<
     return result
   }
 
-  constructor(name: string, private readonly _types: Types, options?: UnionOptions) {
+  constructor(name: string, private readonly _types: Types, options?: UnionOptions<Types>) {
     super(name)
     options = {
       eager: true,
@@ -159,7 +171,7 @@ export type IUnionType<Types extends IAnyType[]> = ITypeUnion<
 
 export function union<Types extends IAnyType[]>(...types: Types): IUnionType<Types>
 export function union<Types extends IAnyType[]>(
-  options: UnionOptions,
+  options: UnionOptions<Types>,
   ...types: Types
 ): IUnionType<Types>
 /**
@@ -170,11 +182,11 @@ export function union<Types extends IAnyType[]>(
  * @returns
  */
 export function union<Types extends IAnyType[]>(
-  optionsOrType: UnionOptions | Types[number],
+  optionsOrType: UnionOptions<Types> | Types[number],
   ...otherTypes: Types
 ): IUnionType<Types> {
   const options = isType(optionsOrType) ? undefined : optionsOrType
-  const types = isType(optionsOrType) ? [optionsOrType, ...otherTypes] : otherTypes
+  const types = (isType(optionsOrType) ? [optionsOrType, ...otherTypes] : otherTypes) as Types
   const name = "(" + types.map((type) => type.name).join(" | ") + ")"
 
   // check all options
