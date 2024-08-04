@@ -14,6 +14,7 @@ import {
   types
 } from "../../src"
 import { expect, test } from "bun:test"
+import type { Writable } from "ts-essentials"
 
 function delay<TV>(time: number, value: TV, shouldThrow = false): Promise<TV> {
   return new Promise((resolve, reject) => {
@@ -301,8 +302,8 @@ test("flow gain back control when node become not alive during yield", async () 
   }
 })
 
-function filterRelevantStuff(stuff: IMiddlewareEvent[]) {
-  return stuff.map((x: any) => {
+function filterRelevantStuff(stuff: Partial<Writable<IMiddlewareEvent>>[]) {
+  return stuff.map((x) => {
     delete x.context
     delete x.tree
     return x
