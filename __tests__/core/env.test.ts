@@ -116,7 +116,7 @@ test("it is possible to set a value inside a map of a map when using the same en
   expect(getEnv(mapOfMap) === env).toBe(true)
   expect(getEnv(mapOfMap.map.get("whatever")!.map.get("1234")!) === env).toBe(true)
 })
-test("clone preserves environnment", () => {
+test("clone preserves environment", () => {
   const env = createEnvironment()
   const store = Store.create({ todos: [{}] }, env)
   {

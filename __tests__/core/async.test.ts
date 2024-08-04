@@ -24,7 +24,7 @@ function delay<TV>(time: number, value: TV, shouldThrow = false): Promise<TV> {
   })
 }
 
-function testCoffeeTodo(
+async function testCoffeeTodo(
   generator: (
     self: any
   ) => (str: string) => Generator<Promise<any>, string | void | undefined, undefined>,
@@ -32,7 +32,6 @@ function testCoffeeTodo(
   resultValue: string | undefined,
   producedCoffees: any[]
 ) {
-  configure({ enforceActions: "observed" })
   const Todo = types
     .model({
       title: "get coffee"
@@ -40,34 +39,34 @@ function testCoffeeTodo(
     .actions((self) => ({
       startFetch: flow(generator(self))
     }))
+
   const events: IMiddlewareEvent[] = []
-  const coffees: any[] = []
   const t1 = Todo.create({})
   addMiddleware(t1, (c, next) => {
     events.push(c)
     return next(c)
   })
+
+  const coffees: any[] = []
   reaction(
     () => t1.title,
     (coffee) => coffees.push(coffee)
   )
-  function handleResult(res: string | undefined | void) {
-    expect(res).toBe(resultValue)
-    expect(coffees).toEqual(producedCoffees)
-    const filtered = filterRelevantStuff(events)
-    expect(filtered).toMatchSnapshot()
+
+  try {
+    configure({ enforceActions: "observed" })
+    const result = await t1.startFetch("black")
+    expect(shouldError).toBe(false)
+    expect(result).toBe(resultValue)
+  } catch (error) {
+    expect(shouldError).toBe(true)
+  } finally {
     configure({ enforceActions: "never" })
   }
-  t1.startFetch("black").then(
-    (r) => {
-      expect(shouldError).toBe(false)
-      handleResult(r)
-    },
-    (r) => {
-      expect(shouldError).toBe(true)
-      handleResult(r)
-    }
-  )
+
+  expect(coffees).toEqual(producedCoffees)
+  const filtered = filterRelevantStuff(events)
+  expect(filtered).toMatchSnapshot()
 }
 test("flow happens in single ticks", async () => {
   const X = types
