@@ -43,16 +43,9 @@ test("it should load the correct type", async () => {
   expect(store.lazyModel.height).toBe(2)
   expect(store.lazyModel.area).toBeUndefined()
   store.load()
-  const promise = new Promise<number>((resolve, reject) => {
-    when(
-      () => store.lazyModel && store.lazyModel.area !== undefined,
-      () => resolve(store.lazyModel.area)
-    )
 
-    setTimeout(reject, 2000)
-  })
-
-  await expect(promise).resolves.toBe(6)
+  await when(() => store.lazyModel && store.lazyModel.area !== undefined, { timeout: 2000 })
+  await expect(store.lazyModel.area).toBe(6)
 })
 
 test("maintains the tree structure when loaded", async () => {

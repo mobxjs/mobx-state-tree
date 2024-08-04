@@ -513,6 +513,10 @@ export class ModelType<
     if (!isPlainObject(views))
       throw new MstError(`views initializer should return a plain object containing views`)
     Object.getOwnPropertyNames(views).forEach((key) => {
+      if (key in this.properties) {
+        throw new MstError(`${key} property is declared twice`)
+      }
+
       // is this a computed property?
       const descriptor = Object.getOwnPropertyDescriptor(views, key)!
       if ("get" in descriptor) {
@@ -648,13 +652,10 @@ export class ModelType<
   getSnapshot(node: this["N"], applyPostProcess = true): this["S"] {
     const res = {} as any
     this.forAllProps((name, type) => {
-      try {
-        // TODO: FIXME, make sure the observable ref is used!
-        const atom = getAtom(node.storedValue, name)
-        ;(atom as any).reportObserved()
-      } catch (e) {
-        throw new MstError(`${name} property is declared twice`)
-      }
+      // TODO: FIXME, make sure the observable ref is used!
+      const atom = getAtom(node.storedValue, name)
+      ;(atom as any).reportObserved()
+
       res[name] = this.getChildNode(node, name).snapshot
     })
     if (applyPostProcess) {

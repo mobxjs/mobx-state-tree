@@ -12,12 +12,6 @@ const plainObjectString = Object.toString()
  * @internal
  * @hidden
  */
-declare const global: any
-
-/**
- * @internal
- * @hidden
- */
 export const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([])
 
 /**
