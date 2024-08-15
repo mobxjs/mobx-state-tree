@@ -146,17 +146,17 @@ async function flowTest(mode: "success" | "fail") {
 
   if (mode === "success") {
     expect(calls).toEqual([
-      "setY (9) - onStart",
-      "setX (11) - onStart",
-      "setX (11) - onFinish (error: false)",
-      "setY (9) - onFinish (error: false)"
+      "setY (3) - onStart",
+      "setX (5) - onStart",
+      "setX (5) - onFinish (error: false)",
+      "setY (3) - onFinish (error: false)"
     ])
   } else {
     expect(calls).toEqual([
-      "setY (16) - onStart",
-      "setX (18) - onStart",
-      "setX (18) - onFinish (error: true)",
-      "setY (16) - onFinish (error: true)"
+      "setY (10) - onStart",
+      "setX (12) - onStart",
+      "setX (12) - onFinish (error: true)",
+      "setY (10) - onFinish (error: true)"
     ])
   }
 }
@@ -213,7 +213,7 @@ test("#1250", async () => {
   const p = model.setX()
   expect(model.x).toBe(10)
   expect(model.y).toBe(0)
-  expect(calls).toEqual(["setX (21) <- (undefined) - filter", "setX (21) <- (undefined) - onStart"])
+  expect(calls).toEqual(["setX (1) <- (undefined) - filter", "setX (1) <- (undefined) - onStart"])
   calls.length = 0
 
   await new Promise<void>((r) =>
@@ -225,16 +225,16 @@ test("#1250", async () => {
   expect(model.x).toBe(10)
   expect(model.y).toBe(10)
   expect(calls).toEqual([
-    "setY (23) <- (undefined) - filter",
-    "setY (23) <- (undefined) - onStart",
-    "setY (23) <- (undefined) - onFinish (error: false)"
+    "setY (3) <- (undefined) - filter",
+    "setY (3) <- (undefined) - onStart",
+    "setY (3) <- (undefined) - onFinish (error: false)"
   ])
   calls.length = 0
 
   await p
   expect(model.x).toBe(10)
   expect(model.y).toBe(10)
-  expect(calls).toEqual(["setX (21) <- (undefined) - onFinish (error: false)"])
+  expect(calls).toEqual(["setX (1) <- (undefined) - onFinish (error: false)"])
   calls.length = 0
 })
 

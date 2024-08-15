@@ -1,6 +1,6 @@
 import { t } from "../../src/index"
 import { Hook, ObjectNode, onPatch, unprotect } from "../../src/internal"
-import { beforeEach, describe, expect, jest, it, spyOn } from "bun:test"
+import { describe, expect, jest, it, spyOn } from "bun:test"
 
 const TestModel = t.model("TestModel", {
   title: t.string
@@ -27,9 +27,6 @@ const TestModelWithIdentifier = t.model("TestModelWithIdentifier", {
  * Feel free to make changes you need to, or even skip tests if they're a nuisance.
  */
 describe("ObjectNode", () => {
-  beforeEach(() => {
-    jest.restoreAllMocks()
-  })
   describe("constructor", () => {
     // Since ObjectNode is not exported as part of the MST API, we don't have tests for invalid parameters, but we expect an error in this scenario.
     it("throws if type is not a complex type", () => {

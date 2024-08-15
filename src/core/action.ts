@@ -76,6 +76,17 @@ export function getNextActionId() {
   return nextActionId++
 }
 
+/**
+ * @internal
+ * @hidden should only ever be used for testing within MST itself
+ */
+export function resetNextActionId() {
+  if (!devMode() && !process.env.MST_TESTING) {
+    throw new Error("resetNextActionId should only be used when testing MST")
+  }
+  nextActionId = 1
+}
+
 // TODO: optimize away entire action context if there is no middleware in tree?
 /**
  * @internal

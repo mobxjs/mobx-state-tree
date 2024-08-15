@@ -120,7 +120,7 @@ test("it should support custom references - adv", () => {
   expect(p.inversePatches).toMatchSnapshot()
 })
 
-test("it should support dynamic loading", (done) => {
+test("it should support dynamic loading", async () => {
   const events: string[] = []
   const User = types.model({
     name: types.string,
@@ -175,14 +175,11 @@ test("it should support dynamic loading", (done) => {
   expect(s.users.length).toBe(0)
   // @ts-expect-error - typescript doesn't know that the user will be loaded
   expect(s.selection).toBe(null)
-  when(
-    () => s.users.length === 1 && s.users[0].age === 18 && s.users[0].name === "Mattia",
-    () => {
-      expect(s.selection).toBe(s.users[0])
-      expect(events).toEqual(["loading Mattia", "loaded Mattia"])
-      done()
-    }
-  )
+
+  await when(() => s.users.length === 1 && s.users[0].age === 18 && s.users[0].name === "Mattia")
+
+  expect(s.selection).toBe(s.users[0])
+  expect(events).toEqual(["loading Mattia", "loaded Mattia"])
 })
 
 test("custom reference / safe custom reference to another store works", () => {
