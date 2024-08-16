@@ -16,22 +16,15 @@ const Model = types.model({
 let m: Instance<typeof Model>
 let disposer: IDisposer | undefined
 
-const options: Parameters<Bench["add"]>[2] = {
-  beforeEach() {
-    m = Model.create({
-      string: "string",
-      number: 1,
-      integer: 1,
-      float: 1.1,
-      boolean: true,
-      date: new Date()
-    })
-  },
-
-  afterEach() {
-    disposer?.()
-    disposer = undefined
-  }
+const modelCreate = () => {
+  m = Model.create({
+    string: "string",
+    number: 1,
+    integer: 1,
+    float: 1.1,
+    boolean: true,
+    date: new Date()
+  })
 }
 
 await withBenchmark(path.parse(__filename).name, (suite) => {
@@ -45,14 +38,21 @@ await withBenchmark(path.parse(__filename).name, (suite) => {
           value: "new string"
         })
       },
-      options
+      {
+        beforeEach: modelCreate
+      }
     )
-    // TODO not sure why, but this one runs infinitely
-    .todo(
+    .add(
       "onPatch",
       () => {
         disposer = onPatch(m, (patch) => patch)
       },
-      options
+      {
+        beforeAll: modelCreate,
+        afterEach() {
+          disposer?.()
+          disposer = undefined
+        }
+      }
     )
 })

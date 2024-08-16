@@ -17,7 +17,7 @@ export const withBenchmark = async (name: string, fn: (suite: Bench) => void) =>
     })
   )
 
-  await fn(suite)
+  fn(suite)
 
   console.log(`Warming up "${name}"...`)
   await suite.warmup()
