@@ -1,6 +1,8 @@
 import { withCodSpeed } from "@codspeed/tinybench-plugin"
 import { Bench } from "tinybench"
 import { applyPatch, onPatch, types, type Instance, type IDisposer } from "../src"
+import { withBenchmark } from "./lib"
+import * as path from "path"
 
 const Model = types.model({
   string: types.string,
@@ -10,12 +12,6 @@ const Model = types.model({
   boolean: types.boolean,
   date: types.Date
 })
-
-const suite = withCodSpeed(
-  new Bench({
-    warmupTime: 100
-  })
-)
 
 let m: Instance<typeof Model>
 let disposer: IDisposer | undefined
@@ -38,27 +34,25 @@ const options: Parameters<Bench["add"]>[2] = {
   }
 }
 
-suite
-  .add(
-    "applyPatch",
-    () => {
-      applyPatch(m, {
-        op: "replace",
-        path: "/string",
-        value: "new string"
-      })
-    },
-    options
-  )
-  // TODO this one seems to run forever (likely it runs too fast and tinybench wants to run it way too much)
-  .todo(
-    "onPatch",
-    () => {
-      disposer = onPatch(m, (patch) => patch)
-    },
-    options
-  )
-
-// await suite.warmup()
-await suite.run()
-console.table(suite.table())
+await withBenchmark(path.parse(__filename).name, (suite) => {
+  suite
+    .add(
+      "applyPatch",
+      () => {
+        applyPatch(m, {
+          op: "replace",
+          path: "/string",
+          value: "new string"
+        })
+      },
+      options
+    )
+    // TODO not sure why, but this one runs infinitely
+    .todo(
+      "onPatch",
+      () => {
+        disposer = onPatch(m, (patch) => patch)
+      },
+      options
+    )
+})
