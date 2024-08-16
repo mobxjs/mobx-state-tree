@@ -1,4 +1,3 @@
-import { start } from "./timer"
 import { Treasure, Hero, Monster } from "./fixtures/fixture-models"
 import { createTreasure, createHeros, createMonsters } from "./fixtures/fixture-data"
 
