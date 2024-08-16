@@ -21,7 +21,6 @@
     "test:prod": "MST_TESTING=1 NODE_ENV=production bun test",
     "test:all": "bun run test:dev && bun run test:prod && bun run size",
     "test:perf": "bun test ./__benchmarks__/*.bench.ts",
-    "test:perf:compiled": "bun run build && /usr/bin/time bun run ts-node --project=tsconfig.umd.json __benchmarks__/report.ts",
     "typecheck": "tsc --noEmit",
     "size": "size-limit",
     "tag-new-version": "yarn version && git push --tags",
