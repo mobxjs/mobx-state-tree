@@ -1,7 +1,6 @@
+import { unprotect } from "mobx-state-tree"
 import { Hero, Monster, Treasure } from "./fixtures/fixture-models"
 import { expect, test } from "bun:test"
-const mst = require("../../dist/mobx-state-tree.umd")
-const { unprotect } = mst
 
 const SAMPLE_HERO = {
   id: 1,
@@ -10,15 +9,18 @@ const SAMPLE_HERO = {
   role: "cleric",
   description: "hi"
 }
+
 test("Hero computed fields", () => {
   const hero = Hero.create(SAMPLE_HERO)
   expect(hero.descriptionLength).toBe(2)
 })
+
 test("Tresure", () => {
   const treasure = Treasure.create({ gold: 1, trapped: true })
   expect(treasure.trapped).toBe(true)
   expect(treasure.gold).toBe(1)
 })
+
 test("Monster computed fields", () => {
   const monster = Monster.create({
     id: "foo",
