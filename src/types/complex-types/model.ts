@@ -408,11 +408,16 @@ export class ModelType<
 
   private instantiateActions(self: this["T"], actions: ModelActions): void {
     // check if return is correct
-    if (!isPlainObject(actions))
+    if (!isPlainObject(actions)) {
       throw new MstError(`actions initializer should return a plain object containing actions`)
+    }
 
     // bind actions to the object created
-    Object.keys(actions).forEach((name) => {
+    Object.getOwnPropertyNames(actions).forEach((name) => {
+      if (name in this.properties) {
+        throw new MstError(`'${name}' is a property and cannot be declared as an action`)
+      }
+
       // warn if preprocessor was given
       if (name === PRE_PROCESS_SNAPSHOT)
         throw new MstError(
@@ -478,9 +483,17 @@ export class ModelType<
     }
   ): void {
     // check views return
-    if (!isPlainObject(state))
+    if (!isPlainObject(state)) {
       throw new MstError(`volatile state initializer should return a plain object containing state`)
-    set(self, state)
+    }
+
+    Object.getOwnPropertyNames(state).forEach((name) => {
+      if (name in this.properties) {
+        throw new MstError(`'${name}' is a property and cannot be declared as volatile state`)
+      }
+
+      set(self, name, state[name])
+    })
   }
 
   extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
@@ -510,22 +523,24 @@ export class ModelType<
 
   private instantiateViews(self: this["T"], views: Object): void {
     // check views return
-    if (!isPlainObject(views))
+    if (!isPlainObject(views)) {
       throw new MstError(`views initializer should return a plain object containing views`)
-    Object.getOwnPropertyNames(views).forEach((key) => {
-      if (key in this.properties) {
-        throw new MstError(`${key} property is declared twice`)
+    }
+
+    Object.getOwnPropertyNames(views).forEach((name) => {
+      if (name in this.properties) {
+        throw new MstError(`'${name}' is a property and cannot be declared as a view`)
       }
 
       // is this a computed property?
-      const descriptor = Object.getOwnPropertyDescriptor(views, key)!
+      const descriptor = Object.getOwnPropertyDescriptor(views, name)!
       if ("get" in descriptor) {
-        defineProperty(self, key, descriptor)
-        makeObservable(self, { [key]: computed } as any)
+        defineProperty(self, name, descriptor)
+        makeObservable(self, { [name]: computed } as any)
       } else if (typeof descriptor.value === "function") {
         // this is a view function, merge as is!
         // See #646, allow models to be mocked
-        ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(self, key, descriptor.value)
+        ;(!devMode() ? addHiddenFinalProp : addHiddenWritableProp)(self, name, descriptor.value)
       } else {
         throw new MstError(`A view member should either be a function or getter based property`)
       }

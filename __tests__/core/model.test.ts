@@ -208,8 +208,9 @@ describe("Model instantiation", () => {
     applySnapshot(model, { val: 1 })
     expect(onSnapshot).toHaveBeenLastCalledWith({ val: 1 })
   })
-  describe("When a model has duplicate key in actions or views", () => {
-    test("it should show friendly message", () => {
+
+  describe("Should show a friendly message when a model has a property overridden by", () => {
+    test("a view", () => {
       const UserModel = types
         .model("UserModel", {
           id: types.identifier,
@@ -226,9 +227,48 @@ describe("Model instantiation", () => {
           id: "chakri",
           name: "Subramanya Chakravarthy"
         })
-      ).toThrow("[mobx-state-tree] name property is declared twice")
+      ).toThrow("[mobx-state-tree] 'name' is a property and cannot be declared as a view")
+    })
+
+    test("an action", () => {
+      const StringSet = types
+        .model("StringSet", {
+          setName: types.string,
+          items: types.array(types.string)
+        })
+        .actions((self) => ({
+          setName(name: string) {
+            self.setName = name
+          }
+        }))
+
+      expect(() =>
+        StringSet.create({
+          setName: "Fruits",
+          items: ["banana", "apple"]
+        })
+      ).toThrow("[mobx-state-tree] 'setName' is a property and cannot be declared as an action")
+    })
+
+    test("a volatile", () => {
+      const UserModel = types
+        .model("UserModel", {
+          id: types.identifier,
+          name: types.string
+        })
+        .volatile((_self) => ({
+          name: "Subramanya Chakravarthy"
+        }))
+
+      expect(() =>
+        UserModel.create({
+          id: "chakri",
+          name: "Subramanya Chakravarthy"
+        })
+      ).toThrow("[mobx-state-tree] 'name' is a property and cannot be declared as volatile state")
     })
   })
+
   describe("with all of the property types", () => {
     const IdentifiedWithString = types.model({ id: types.identifier })
     const IdentifiedWithNumber = types.model({ id: types.identifierNumber })
