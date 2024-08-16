@@ -15,7 +15,7 @@
   "typings": "dist/index.d.ts",
   "sideEffects": false,
   "scripts": {
-    "benchmark": "bun run ./__benchmarks__/*.bench.ts",
+    "benchmark": "find ./__benchmarks__ -name '*.bench.mts' | xargs -n1 bun run",
     "clean": "shx rm -rf dist lib",
     "build": "bun run clean && tsc && cpr lib/src dist --filter=\\.js$ && rollup -c",
     "test:dev": "NODE_ENV=development bun test",
