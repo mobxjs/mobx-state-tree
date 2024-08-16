@@ -1,13 +1,12 @@
 import { withCodSpeed } from "@codspeed/tinybench-plugin"
-import { createHeros, createMonsters, createTreasure } from "./fixtures/fixture-data"
 import { Bench } from "tinybench"
+import { createHeros, createMonsters, createTreasure } from "./fixtures/fixture-data"
 
 const suite = withCodSpeed(
   new Bench({
     // Increase warmup time and iterations from the default 100ms to (hopefully) engage the JIT
     // and get measurements closer to steady state.
-    warmupTime: 2000,
-    warmupIterations: 100
+    warmupTime: 1000
   })
 )
 
@@ -28,5 +27,6 @@ suite
     createMonsters(10, 1000, 100)
   })
 
+await suite.warmup()
 await suite.run()
 console.table(suite.table())
