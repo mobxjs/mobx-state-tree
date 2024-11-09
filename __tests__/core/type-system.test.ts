@@ -1,38 +1,37 @@
+import { describe, expect, test } from "bun:test"
 import {
-  types,
-  getSnapshot,
-  unprotect,
-  getRoot,
-  getParent,
-  SnapshotOrInstance,
-  cast,
-  SnapshotIn,
-  Instance,
-  castToSnapshot,
-  IType,
-  isStateTreeNode,
-  isFrozenType,
-  TypeOfValue,
   IAnyType,
+  IType,
+  Instance,
   ModelPrimitive,
   ModelPropertiesDeclaration,
+  SnapshotIn,
+  SnapshotOrInstance,
   SnapshotOut,
-  type ISimpleType,
-  isOptionalType,
-  isUnionType,
-  type IOptionalIType,
-  type ITypeUnion,
-  isMapType,
+  TypeOfValue,
+  cast,
+  castToSnapshot,
+  getParent,
+  getRoot,
+  getSnapshot,
   isArrayType,
-  isModelType,
+  isFrozenType,
+  isIdentifierType,
+  isLateType,
   isLiteralType,
+  isMapType,
+  isModelType,
+  isOptionalType,
   isPrimitiveType,
   isReferenceType,
-  isIdentifierType,
   isRefinementType,
-  isLateType
+  isStateTreeNode,
+  isUnionType,
+  types,
+  unprotect,
+  type IOptionalIType,
+  type ISimpleType
 } from "../../src"
-import { describe, expect, test } from "bun:test"
 import type {
   DatePrimitive,
   IAnyComplexType,
@@ -1401,5 +1400,86 @@ test("#1627 - union dispatch function is typed", () => {
     },
     model,
     types.null
+  )
+})
+
+test("#2216 - should respect optionality when extending another type", () => {
+  const Base = types.model("ErrorStore", { value: types.string }).extend((self) => ({
+    actions: {
+      setValue(value?: string): boolean {
+        self.value = value || "test"
+        return true
+      },
+
+      setAnotherValue(value?: string): boolean {
+        self.value = value || "test"
+        return true
+      }
+    },
+    views: {
+      get spam(): string {
+        return self.value
+      },
+
+      get eggs(): string {
+        return self.value
+      }
+    },
+    state: {
+      anotherValue: "test" as string,
+      soManyValues: "test" as string
+    }
+  }))
+
+  const Extended = Base.named("Extended")
+    .props({
+      value: "test"
+    })
+    .extend((self) => ({
+      actions: {
+        setValue(value: string): number {
+          self.value = value
+          return value.length
+        }
+      },
+      views: {
+        get spam(): boolean {
+          return !!self.value
+        }
+      },
+      state: {
+        anotherValue: "test" as string | undefined
+      }
+    }))
+    .actions((self) => ({
+      setAnotherValue(value: string): number {
+        self.value = value
+        return value.length
+      }
+    }))
+    .views((self) => ({
+      get eggs(): boolean {
+        return !!self.value
+      }
+    }))
+    .volatile((self) => ({
+      soManyValues: "test" as string | undefined
+    }))
+
+  type InputSnapshot = SnapshotIn<typeof Extended>
+  type InstanceType = Instance<typeof Extended>
+
+  assertTypesEqual(_ as InputSnapshot, _ as { value?: string })
+  assertTypesEqual(
+    _ as InstanceType,
+    _ as {
+      value: string
+      setValue(value: string): number
+      setAnotherValue(value: string): number
+      spam: boolean
+      eggs: boolean
+      anotherValue: string | undefined
+      soManyValues: string | undefined
+    }
   )
 })
