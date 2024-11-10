@@ -1,61 +1,60 @@
 import {
+  IObjectDidChange,
+  IObjectWillChange,
   _getAdministration,
   _interceptReads,
   action,
   computed,
   defineProperty,
-  intercept,
   getAtom,
-  IObjectWillChange,
+  intercept,
+  makeObservable,
   observable,
   observe,
-  set,
-  IObjectDidChange,
-  makeObservable
+  set
 } from "mobx"
 import {
-  addHiddenFinalProp,
-  addHiddenWritableProp,
+  AnyNode,
+  AnyObjectNode,
   ArrayType,
   ComplexType,
-  createActionInvoker,
-  createObjectNode,
   EMPTY_ARRAY,
   EMPTY_OBJECT,
-  escapeJsonPath,
+  FunctionWithFlag,
+  Hook,
+  IAnyType,
+  IChildNodesMap,
+  IJsonPatch,
+  IType,
+  IValidationContext,
+  IValidationResult,
+  Instance,
+  MapType,
   MstError,
+  TypeFlags,
+  _CustomOrOther,
+  _NotCustomized,
+  addHiddenFinalProp,
+  addHiddenWritableProp,
+  assertArg,
+  assertIsString,
+  createActionInvoker,
+  createObjectNode,
+  devMode,
+  escapeJsonPath,
   flattenTypeErrors,
   freeze,
   getContextForPath,
   getPrimitiveFactoryFromValue,
   getStateTreeNode,
-  IAnyType,
-  IChildNodesMap,
-  IValidationContext,
-  IJsonPatch,
   isPlainObject,
   isPrimitive,
   isStateTreeNode,
   isType,
-  IType,
-  IValidationResult,
   mobxShallow,
   optional,
-  MapType,
-  typecheckInternal,
   typeCheckFailure,
-  TypeFlags,
-  Hook,
-  AnyObjectNode,
-  AnyNode,
-  _CustomOrOther,
-  _NotCustomized,
-  Instance,
-  devMode,
-  assertIsString,
-  assertArg,
-  FunctionWithFlag,
-  type IStateTreeNode
+  typecheckInternal
 } from "../../internal"
 
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
@@ -73,6 +72,9 @@ export type ModelPrimitive = string | number | boolean | Date
 export interface ModelPropertiesDeclaration {
   [key: string]: ModelPrimitive | IAnyType
 }
+
+/** intersect two object types, but omit keys of B from A before doing so */
+type OmitMerge<A, B> = Omit<A, keyof B> & B
 
 /**
  * Unmaps syntax property declarations to a map of { propName: IType }
@@ -116,6 +118,8 @@ type IsOptionalValue<C, TV, FV> = undefined extends C ? TV : FV
 // type _D = IsOptionalValue<string & undefined, true, false> // false, but we don't care
 // type _E = IsOptionalValue<any, true, false> // true
 // type _F = IsOptionalValue<unknown, true, false> // true
+
+type AnyObject = Record<string, any>
 
 /**
  * Name of the properties of an object that can't be set to undefined, any or unknown
@@ -199,23 +203,28 @@ export interface IModelType<
   // so it is recommended to use pre/post process snapshot after all props have been defined
   props<PROPS2 extends ModelPropertiesDeclaration>(
     props: PROPS2
-  ): IModelType<PROPS & ModelPropertiesDeclarationToProperties<PROPS2>, OTHERS, CustomC, CustomS>
+  ): IModelType<
+    OmitMerge<PROPS, ModelPropertiesDeclarationToProperties<PROPS2>>,
+    OTHERS,
+    CustomC,
+    CustomS
+  >
 
-  views<V extends Object>(
+  views<V extends AnyObject>(
     fn: (self: Instance<this>) => V
-  ): IModelType<PROPS, OTHERS & V, CustomC, CustomS>
+  ): IModelType<PROPS, OmitMerge<OTHERS, V>, CustomC, CustomS>
 
   actions<A extends ModelActions>(
     fn: (self: Instance<this>) => A
-  ): IModelType<PROPS, OTHERS & A, CustomC, CustomS>
+  ): IModelType<PROPS, OmitMerge<OTHERS, A>, CustomC, CustomS>
 
-  volatile<TP extends object>(
-    fn: (self: Instance<this>) => TP
-  ): IModelType<PROPS, OTHERS & TP, CustomC, CustomS>
+  volatile<VS extends AnyObject>(
+    fn: (self: Instance<this>) => VS
+  ): IModelType<PROPS, OmitMerge<OTHERS, VS>, CustomC, CustomS>
 
-  extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
+  extend<A extends ModelActions = {}, V extends AnyObject = {}, VS extends AnyObject = {}>(
     fn: (self: Instance<this>) => { actions?: A; views?: V; state?: VS }
-  ): IModelType<PROPS, OTHERS & A & V & VS, CustomC, CustomS>
+  ): IModelType<PROPS, OmitMerge<OTHERS, A & V & VS>, CustomC, CustomS>
 
   preProcessSnapshot<NewC = ModelCreationType2<PROPS, CustomC>>(
     fn: (snapshot: NewC) => WithAdditionalProperties<ModelCreationType2<PROPS, CustomC>>
@@ -235,6 +244,7 @@ export interface IAnyModelType extends IModelType<any, any, any, any> {}
 export type ExtractProps<T extends IAnyModelType> = T extends IModelType<infer P, any, any, any>
   ? P
   : never
+
 /** @hidden */
 export type ExtractOthers<T extends IAnyModelType> = T extends IModelType<any, infer O, any, any>
   ? O
@@ -463,7 +473,7 @@ export class ModelType<
     return this.cloneAndEnhance({ properties })
   }
 
-  volatile<TP extends object>(fn: (self: Instance<this>) => TP) {
+  volatile<TP extends AnyObject>(fn: (self: Instance<this>) => TP) {
     if (typeof fn !== "function") {
       throw new MstError(
         `You passed an ${typeof fn} to volatile state as an argument, when function is expected`
@@ -496,7 +506,7 @@ export class ModelType<
     })
   }
 
-  extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
+  extend<A extends ModelActions = {}, V extends AnyObject = {}, VS extends AnyObject = {}>(
     fn: (self: Instance<this>) => { actions?: A; views?: V; state?: VS }
   ) {
     const initializer = (self: Instance<this>) => {
@@ -513,7 +523,7 @@ export class ModelType<
     return this.cloneAndEnhance({ initializers: [initializer] })
   }
 
-  views<V extends Object>(fn: (self: Instance<this>) => V) {
+  views<V extends AnyObject>(fn: (self: Instance<this>) => V) {
     const viewInitializer = (self: Instance<this>) => {
       this.instantiateViews(self, fn(self))
       return self
@@ -521,7 +531,7 @@ export class ModelType<
     return this.cloneAndEnhance({ initializers: [viewInitializer] })
   }
 
-  private instantiateViews(self: this["T"], views: Object): void {
+  private instantiateViews(self: this["T"], views: AnyObject): void {
     // check views return
     if (!isPlainObject(views)) {
       throw new MstError(`views initializer should return a plain object containing views`)
