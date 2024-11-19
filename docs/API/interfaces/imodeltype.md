@@ -4,7 +4,7 @@ title: "IModelType"
 sidebar_label: "IModelType"
 ---
 
-[mobx-state-tree - v6.0.1](../index.md) › [IModelType](imodeltype.md)
+[mobx-state-tree - v7.0.0](../index.md) › [IModelType](imodeltype.md)
 
 ## Type parameters
 
@@ -55,7 +55,7 @@ sidebar_label: "IModelType"
 
 *Inherited from [IType](itype.md).[identifierAttribute](itype.md#optional-identifierattribute)*
 
-*Defined in [src/core/type/type.ts:89](https://github.com/mobxjs/mobx-state-tree/blob/7097c4d6/src/core/type/type.ts#L89)*
+*Defined in [src/core/type/type.ts:92](https://github.com/mobxjs/mobx-state-tree/blob/96f2e469/src/core/type/type.ts#L92)*
 
 Name of the identifier attribute or null if none.
 
@@ -67,7 +67,7 @@ ___
 
 *Inherited from [IType](itype.md).[name](itype.md#name)*
 
-*Defined in [src/core/type/type.ts:84](https://github.com/mobxjs/mobx-state-tree/blob/7097c4d6/src/core/type/type.ts#L84)*
+*Defined in [src/core/type/type.ts:87](https://github.com/mobxjs/mobx-state-tree/blob/96f2e469/src/core/type/type.ts#L87)*
 
 Friendly type name.
 
@@ -77,15 +77,15 @@ ___
 
 • **properties**: *PROPS*
 
-*Defined in [src/types/complex-types/model.ts:194](https://github.com/mobxjs/mobx-state-tree/blob/7097c4d6/src/types/complex-types/model.ts#L194)*
+*Defined in [src/types/complex-types/model.ts:198](https://github.com/mobxjs/mobx-state-tree/blob/96f2e469/src/types/complex-types/model.ts#L198)*
 
 ## Methods
 
 ###  actions
 
-▸ **actions**<**A**>(`fn`: function): *[IModelType](imodeltype.md)‹PROPS, OTHERS & A, CustomC, CustomS›*
+▸ **actions**<**A**>(`fn`: function): *[IModelType](imodeltype.md)‹PROPS, OmitMerge‹OTHERS, A›, CustomC, CustomS›*
 
-*Defined in [src/types/complex-types/model.ts:208](https://github.com/mobxjs/mobx-state-tree/blob/7097c4d6/src/types/complex-types/model.ts#L208)*
+*Defined in [src/types/complex-types/model.ts:217](https://github.com/mobxjs/mobx-state-tree/blob/96f2e469/src/types/complex-types/model.ts#L217)*
 
 **Type parameters:**
 
@@ -103,17 +103,17 @@ Name | Type |
 ------ | ------ |
 `self` | [Instance](../index.md#instance)‹this› |
 
-**Returns:** *[IModelType](imodeltype.md)‹PROPS, OTHERS & A, CustomC, CustomS›*
+**Returns:** *[IModelType](imodeltype.md)‹PROPS, OmitMerge‹OTHERS, A›, CustomC, CustomS›*
 
 ___
 
 ###  create
 
-▸ **create**(`snapshot?`: [C](undefined), `env?`: any): *this["Type"]*
+▸ **create**(`snapshot?`: ModelCreationType2‹PROPS, CustomC› | ExcludeReadonly‹ModelInstanceType‹PROPS, OTHERS››, `env?`: any): *this["Type"]*
 
 *Inherited from [IType](itype.md).[create](itype.md#create)*
 
-*Defined in [src/core/type/type.ts:96](https://github.com/mobxjs/mobx-state-tree/blob/7097c4d6/src/core/type/type.ts#L96)*
+*Defined in [src/core/type/type.ts:99](https://github.com/mobxjs/mobx-state-tree/blob/96f2e469/src/core/type/type.ts#L99)*
 
 Creates an instance for the type given an snapshot input.
 
@@ -121,7 +121,7 @@ Creates an instance for the type given an snapshot input.
 
 Name | Type |
 ------ | ------ |
-`snapshot?` | [C](undefined) |
+`snapshot?` | ModelCreationType2‹PROPS, CustomC› &#124; ExcludeReadonly‹ModelInstanceType‹PROPS, OTHERS›› |
 `env?` | any |
 
 **Returns:** *this["Type"]*
@@ -136,7 +136,7 @@ ___
 
 *Inherited from [IType](itype.md).[describe](itype.md#describe)*
 
-*Defined in [src/core/type/type.ts:118](https://github.com/mobxjs/mobx-state-tree/blob/7097c4d6/src/core/type/type.ts#L118)*
+*Defined in [src/core/type/type.ts:121](https://github.com/mobxjs/mobx-state-tree/blob/96f2e469/src/core/type/type.ts#L121)*
 
 Gets the textual representation of the type as a string.
 
@@ -146,17 +146,17 @@ ___
 
 ###  extend
 
-▸ **extend**<**A**, **V**, **VS**>(`fn`: function): *[IModelType](imodeltype.md)‹PROPS, OTHERS & A & V & VS, CustomC, CustomS›*
+▸ **extend**<**A**, **V**, **VS**>(`fn`: function): *[IModelType](imodeltype.md)‹PROPS, OmitMerge‹OTHERS, A & V & VS›, CustomC, CustomS›*
 
-*Defined in [src/types/complex-types/model.ts:216](https://github.com/mobxjs/mobx-state-tree/blob/7097c4d6/src/types/complex-types/model.ts#L216)*
+*Defined in [src/types/complex-types/model.ts:225](https://github.com/mobxjs/mobx-state-tree/blob/96f2e469/src/types/complex-types/model.ts#L225)*
 
 **Type parameters:**
 
 ▪ **A**: *ModelActions*
 
-▪ **V**: *Object*
+▪ **V**: *AnyObject*
 
-▪ **VS**: *Object*
+▪ **VS**: *AnyObject*
 
 **Parameters:**
 
@@ -170,7 +170,7 @@ Name | Type |
 ------ | ------ |
 `self` | [Instance](../index.md#instance)‹this› |
 
-**Returns:** *[IModelType](imodeltype.md)‹PROPS, OTHERS & A & V & VS, CustomC, CustomS›*
+**Returns:** *[IModelType](imodeltype.md)‹PROPS, OmitMerge‹OTHERS, A & V & VS›, CustomC, CustomS›*
 
 ___
 
@@ -180,7 +180,7 @@ ___
 
 *Inherited from [IType](itype.md).[is](itype.md#is)*
 
-*Defined in [src/core/type/type.ts:104](https://github.com/mobxjs/mobx-state-tree/blob/7097c4d6/src/core/type/type.ts#L104)*
+*Defined in [src/core/type/type.ts:107](https://github.com/mobxjs/mobx-state-tree/blob/96f2e469/src/core/type/type.ts#L107)*
 
 Checks if a given snapshot / instance is of the given type.
 
@@ -200,7 +200,7 @@ ___
 
 ▸ **named**(`newName`: string): *[IModelType](imodeltype.md)‹PROPS, OTHERS, CustomC, CustomS›*
 
-*Defined in [src/types/complex-types/model.ts:196](https://github.com/mobxjs/mobx-state-tree/blob/7097c4d6/src/types/complex-types/model.ts#L196)*
+*Defined in [src/types/complex-types/model.ts:200](https://github.com/mobxjs/mobx-state-tree/blob/96f2e469/src/types/complex-types/model.ts#L200)*
 
 **Parameters:**
 
@@ -216,7 +216,7 @@ ___
 
 ▸ **postProcessSnapshot**<**NewS**>(`fn`: function): *[IModelType](imodeltype.md)‹PROPS, OTHERS, CustomC, NewS›*
 
-*Defined in [src/types/complex-types/model.ts:224](https://github.com/mobxjs/mobx-state-tree/blob/7097c4d6/src/types/complex-types/model.ts#L224)*
+*Defined in [src/types/complex-types/model.ts:233](https://github.com/mobxjs/mobx-state-tree/blob/96f2e469/src/types/complex-types/model.ts#L233)*
 
 **Type parameters:**
 
@@ -242,7 +242,7 @@ ___
 
 ▸ **preProcessSnapshot**<**NewC**>(`fn`: function): *[IModelType](imodeltype.md)‹PROPS, OTHERS, NewC, CustomS›*
 
-*Defined in [src/types/complex-types/model.ts:220](https://github.com/mobxjs/mobx-state-tree/blob/7097c4d6/src/types/complex-types/model.ts#L220)*
+*Defined in [src/types/complex-types/model.ts:229](https://github.com/mobxjs/mobx-state-tree/blob/96f2e469/src/types/complex-types/model.ts#L229)*
 
 **Type parameters:**
 
@@ -266,9 +266,9 @@ ___
 
 ###  props
 
-▸ **props**<**PROPS2**>(`props`: PROPS2): *[IModelType](imodeltype.md)‹PROPS & ModelPropertiesDeclarationToProperties‹PROPS2›, OTHERS, CustomC, CustomS›*
+▸ **props**<**PROPS2**>(`props`: PROPS2): *[IModelType](imodeltype.md)‹OmitMerge‹PROPS, ModelPropertiesDeclarationToProperties‹PROPS2››, OTHERS, CustomC, CustomS›*
 
-*Defined in [src/types/complex-types/model.ts:200](https://github.com/mobxjs/mobx-state-tree/blob/7097c4d6/src/types/complex-types/model.ts#L200)*
+*Defined in [src/types/complex-types/model.ts:204](https://github.com/mobxjs/mobx-state-tree/blob/96f2e469/src/types/complex-types/model.ts#L204)*
 
 **Type parameters:**
 
@@ -280,17 +280,17 @@ Name | Type |
 ------ | ------ |
 `props` | PROPS2 |
 
-**Returns:** *[IModelType](imodeltype.md)‹PROPS & ModelPropertiesDeclarationToProperties‹PROPS2›, OTHERS, CustomC, CustomS›*
+**Returns:** *[IModelType](imodeltype.md)‹OmitMerge‹PROPS, ModelPropertiesDeclarationToProperties‹PROPS2››, OTHERS, CustomC, CustomS›*
 
 ___
 
 ###  validate
 
-▸ **validate**(`thing`: ModelCreationType2‹PROPS, CustomC›, `context`: [IValidationContext](../index.md#ivalidationcontext)): *[IValidationResult](../index.md#ivalidationresult)*
+▸ **validate**(`thing`: ModelCreationType2‹PROPS, CustomC› | ModelInstanceType‹PROPS, OTHERS›, `context`: [IValidationContext](../index.md#ivalidationcontext)): *[IValidationResult](../index.md#ivalidationresult)*
 
 *Inherited from [IType](itype.md).[validate](itype.md#validate)*
 
-*Defined in [src/core/type/type.ts:113](https://github.com/mobxjs/mobx-state-tree/blob/7097c4d6/src/core/type/type.ts#L113)*
+*Defined in [src/core/type/type.ts:116](https://github.com/mobxjs/mobx-state-tree/blob/96f2e469/src/core/type/type.ts#L116)*
 
 Run's the type's typechecker on the given value with the given validation context.
 
@@ -298,7 +298,7 @@ Run's the type's typechecker on the given value with the given validation contex
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`thing` | ModelCreationType2‹PROPS, CustomC› | Value to be checked, either a snapshot or an instance. |
+`thing` | ModelCreationType2‹PROPS, CustomC› &#124; ModelInstanceType‹PROPS, OTHERS› | Value to be checked, either a snapshot or an instance. |
 `context` | [IValidationContext](../index.md#ivalidationcontext) | Validation context, an array of { subpaths, subtypes } that should be validated |
 
 **Returns:** *[IValidationResult](../index.md#ivalidationresult)*
@@ -309,13 +309,13 @@ ___
 
 ###  views
 
-▸ **views**<**V**>(`fn`: function): *[IModelType](imodeltype.md)‹PROPS, OTHERS & V, CustomC, CustomS›*
+▸ **views**<**V**>(`fn`: function): *[IModelType](imodeltype.md)‹PROPS, OmitMerge‹OTHERS, V›, CustomC, CustomS›*
 
-*Defined in [src/types/complex-types/model.ts:204](https://github.com/mobxjs/mobx-state-tree/blob/7097c4d6/src/types/complex-types/model.ts#L204)*
+*Defined in [src/types/complex-types/model.ts:213](https://github.com/mobxjs/mobx-state-tree/blob/96f2e469/src/types/complex-types/model.ts#L213)*
 
 **Type parameters:**
 
-▪ **V**: *Object*
+▪ **V**: *AnyObject*
 
 **Parameters:**
 
@@ -329,25 +329,25 @@ Name | Type |
 ------ | ------ |
 `self` | [Instance](../index.md#instance)‹this› |
 
-**Returns:** *[IModelType](imodeltype.md)‹PROPS, OTHERS & V, CustomC, CustomS›*
+**Returns:** *[IModelType](imodeltype.md)‹PROPS, OmitMerge‹OTHERS, V›, CustomC, CustomS›*
 
 ___
 
 ###  volatile
 
-▸ **volatile**<**TP**>(`fn`: function): *[IModelType](imodeltype.md)‹PROPS, OTHERS & TP, CustomC, CustomS›*
+▸ **volatile**<**VS**>(`fn`: function): *[IModelType](imodeltype.md)‹PROPS, OmitMerge‹OTHERS, VS›, CustomC, CustomS›*
 
-*Defined in [src/types/complex-types/model.ts:212](https://github.com/mobxjs/mobx-state-tree/blob/7097c4d6/src/types/complex-types/model.ts#L212)*
+*Defined in [src/types/complex-types/model.ts:221](https://github.com/mobxjs/mobx-state-tree/blob/96f2e469/src/types/complex-types/model.ts#L221)*
 
 **Type parameters:**
 
-▪ **TP**: *object*
+▪ **VS**: *AnyObject*
 
 **Parameters:**
 
 ▪ **fn**: *function*
 
-▸ (`self`: [Instance](../index.md#instance)‹this›): *TP*
+▸ (`self`: [Instance](../index.md#instance)‹this›): *VS*
 
 **Parameters:**
 
@@ -355,4 +355,4 @@ Name | Type |
 ------ | ------ |
 `self` | [Instance](../index.md#instance)‹this› |
 
-**Returns:** *[IModelType](imodeltype.md)‹PROPS, OTHERS & TP, CustomC, CustomS›*
+**Returns:** *[IModelType](imodeltype.md)‹PROPS, OmitMerge‹OTHERS, VS›, CustomC, CustomS›*

@@ -4,7 +4,7 @@ title: "ISnapshotProcessors"
 sidebar_label: "ISnapshotProcessors"
 ---
 
-[mobx-state-tree - v6.0.1](../index.md) › [ISnapshotProcessors](isnapshotprocessors.md)
+[mobx-state-tree - v7.0.0](../index.md) › [ISnapshotProcessors](isnapshotprocessors.md)
 
 Snapshot processors.
 
@@ -31,9 +31,9 @@ Snapshot processors.
 
 ### `Optional` postProcessor
 
-▸ **postProcessor**(`snapshot`: IT["SnapshotType"], `node`: [Instance](../index.md#instance)‹IT›): *CustomS*
+▸ **postProcessor**(`snapshot`: IT["SnapshotType"], `node`: [Instance](../index.md#instance)‹IT›): *_CustomOrOther‹CustomS, IT["SnapshotType"]›*
 
-*Defined in [src/types/utility-types/snapshotProcessor.ts:211](https://github.com/mobxjs/mobx-state-tree/blob/7097c4d6/src/types/utility-types/snapshotProcessor.ts#L211)*
+*Defined in [src/types/utility-types/snapshotProcessor.ts:230](https://github.com/mobxjs/mobx-state-tree/blob/96f2e469/src/types/utility-types/snapshotProcessor.ts#L230)*
 
 Function that transforms an output snapshot.
 
@@ -44,15 +44,15 @@ Name | Type | Description |
 `snapshot` | IT["SnapshotType"] |   |
 `node` | [Instance](../index.md#instance)‹IT› | - |
 
-**Returns:** *CustomS*
+**Returns:** *_CustomOrOther‹CustomS, IT["SnapshotType"]›*
 
 ___
 
 ### `Optional` preProcessor
 
-▸ **preProcessor**(`snapshot`: CustomC): *IT["CreationType"]*
+▸ **preProcessor**(`snapshot`: _CustomOrOther‹CustomC, IT["CreationType"]›): *IT["CreationType"]*
 
-*Defined in [src/types/utility-types/snapshotProcessor.ts:206](https://github.com/mobxjs/mobx-state-tree/blob/7097c4d6/src/types/utility-types/snapshotProcessor.ts#L206)*
+*Defined in [src/types/utility-types/snapshotProcessor.ts:224](https://github.com/mobxjs/mobx-state-tree/blob/96f2e469/src/types/utility-types/snapshotProcessor.ts#L224)*
 
 Function that transforms an input snapshot.
 
@@ -60,6 +60,6 @@ Function that transforms an input snapshot.
 
 Name | Type |
 ------ | ------ |
-`snapshot` | CustomC |
+`snapshot` | _CustomOrOther‹CustomC, IT["CreationType"]› |
 
 **Returns:** *IT["CreationType"]*
