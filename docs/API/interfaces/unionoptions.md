@@ -4,7 +4,11 @@ title: "UnionOptions"
 sidebar_label: "UnionOptions"
 ---
 
-[mobx-state-tree - v6.0.1](../index.md) › [UnionOptions](unionoptions.md)
+[mobx-state-tree - v7.0.0](../index.md) › [UnionOptions](unionoptions.md)
+
+## Type parameters
+
+▪ **Types**: *[IAnyType](ianytype.md)[]*
 
 ## Hierarchy
 
@@ -21,9 +25,11 @@ sidebar_label: "UnionOptions"
 
 ### `Optional` dispatcher
 
-• **dispatcher**? : *[ITypeDispatcher](../index.md#itypedispatcher)*
+• **dispatcher**? : *[ITypeDispatcher](../index.md#itypedispatcher)‹Types›*
 
-*Defined in [src/types/utility-types/union.ts:26](https://github.com/mobxjs/mobx-state-tree/blob/7097c4d6/src/types/utility-types/union.ts#L26)*
+*Defined in [src/types/utility-types/union.ts:38](https://github.com/mobxjs/mobx-state-tree/blob/d5d9f75f/src/types/utility-types/union.ts#L38)*
+
+A function that returns the type to be used given an input snapshot.
 
 ___
 
@@ -31,4 +37,9 @@ ___
 
 • **eager**? : *undefined | false | true*
 
-*Defined in [src/types/utility-types/union.ts:25](https://github.com/mobxjs/mobx-state-tree/blob/7097c4d6/src/types/utility-types/union.ts#L25)*
+*Defined in [src/types/utility-types/union.ts:33](https://github.com/mobxjs/mobx-state-tree/blob/d5d9f75f/src/types/utility-types/union.ts#L33)*
+
+Whether or not to use eager validation.
+
+When `true`, the first matching type will be used. Otherwise, all types will be checked and the
+validation will pass if and only if a single type matches.
