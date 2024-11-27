@@ -16,7 +16,7 @@ let livelinessChecking: LivelinessMode = "warn"
  * @param mode `"warn"`, `"error"` or `"ignore"`
  */
 export function setLivelinessChecking(mode: LivelinessMode) {
-  livelinessChecking = mode
+    livelinessChecking = mode
 }
 
 /**
@@ -25,7 +25,7 @@ export function setLivelinessChecking(mode: LivelinessMode) {
  * @returns `"warn"`, `"error"` or `"ignore"`
  */
 export function getLivelinessChecking(): LivelinessMode {
-  return livelinessChecking
+    return livelinessChecking
 }
 
 /**
@@ -45,5 +45,5 @@ export type LivelynessMode = LivelinessMode
  * @param mode `"warn"`, `"error"` or `"ignore"`
  */
 export function setLivelynessChecking(mode: LivelinessMode) {
-  setLivelinessChecking(mode)
+    setLivelinessChecking(mode)
 }

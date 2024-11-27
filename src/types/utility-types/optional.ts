@@ -1,19 +1,19 @@
 import {
-  isStateTreeNode,
-  IType,
-  TypeFlags,
-  isType,
-  IValidationContext,
-  IValidationResult,
-  typecheckInternal,
-  typeCheckSuccess,
-  MstError,
-  IAnyType,
-  AnyObjectNode,
-  BaseType,
-  assertIsType,
-  ExtractCSTWithSTN,
-  devMode
+    isStateTreeNode,
+    IType,
+    TypeFlags,
+    isType,
+    IValidationContext,
+    IValidationResult,
+    typecheckInternal,
+    typeCheckSuccess,
+    MstError,
+    IAnyType,
+    AnyObjectNode,
+    BaseType,
+    assertIsType,
+    ExtractCSTWithSTN,
+    devMode
 } from "../../internal"
 
 type IFunctionReturn<T> = () => T
@@ -31,135 +31,140 @@ export type ValidOptionalValues = [ValidOptionalValue, ...ValidOptionalValue[]]
  * @internal
  */
 export class OptionalValue<
-  IT extends IAnyType,
-  OptionalVals extends ValidOptionalValues
+    IT extends IAnyType,
+    OptionalVals extends ValidOptionalValues
 > extends BaseType<
-  IT["CreationType"] | OptionalVals[number],
-  IT["SnapshotType"],
-  IT["TypeWithoutSTN"]
+    IT["CreationType"] | OptionalVals[number],
+    IT["SnapshotType"],
+    IT["TypeWithoutSTN"]
 > {
-  get flags() {
-    return this._subtype.flags | TypeFlags.Optional
-  }
-
-  constructor(
-    private readonly _subtype: IT,
-    private readonly _defaultValue: IOptionalValue<IT["CreationType"], IT["Type"]>,
-    readonly optionalValues: OptionalVals
-  ) {
-    super(_subtype.name)
-  }
-
-  describe() {
-    return this._subtype.describe() + "?"
-  }
-
-  instantiate(
-    parent: AnyObjectNode | null,
-    subpath: string,
-    environment: any,
-    initialValue: this["C"] | this["T"]
-  ): this["N"] {
-    if (this.optionalValues.indexOf(initialValue) >= 0) {
-      const defaultInstanceOrSnapshot = this.getDefaultInstanceOrSnapshot()
-      return this._subtype.instantiate(parent, subpath, environment, defaultInstanceOrSnapshot)
-    }
-    return this._subtype.instantiate(parent, subpath, environment, initialValue)
-  }
-
-  reconcile(
-    current: this["N"],
-    newValue: this["C"] | this["T"],
-    parent: AnyObjectNode,
-    subpath: string
-  ): this["N"] {
-    return this._subtype.reconcile(
-      current,
-      this.optionalValues.indexOf(newValue) < 0 && this._subtype.is(newValue)
-        ? newValue
-        : this.getDefaultInstanceOrSnapshot(),
-      parent,
-      subpath
-    )
-  }
-
-  getDefaultInstanceOrSnapshot(): this["C"] | this["T"] {
-    const defaultInstanceOrSnapshot =
-      typeof this._defaultValue === "function"
-        ? (this._defaultValue as IFunctionReturn<this["C"] | this["T"]>)()
-        : this._defaultValue
-
-    // while static values are already snapshots and checked on types.optional
-    // generator functions must always be rechecked just in case
-    if (typeof this._defaultValue === "function") {
-      typecheckInternal(this, defaultInstanceOrSnapshot)
+    get flags() {
+        return this._subtype.flags | TypeFlags.Optional
     }
 
-    return defaultInstanceOrSnapshot
-  }
-
-  isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
-    // defaulted values can be skipped
-    if (this.optionalValues.indexOf(value) >= 0) {
-      return typeCheckSuccess()
+    constructor(
+        private readonly _subtype: IT,
+        private readonly _defaultValue: IOptionalValue<IT["CreationType"], IT["Type"]>,
+        readonly optionalValues: OptionalVals
+    ) {
+        super(_subtype.name)
     }
-    // bounce validation to the sub-type
-    return this._subtype.validate(value, context)
-  }
 
-  isAssignableFrom(type: IAnyType) {
-    return this._subtype.isAssignableFrom(type)
-  }
+    describe() {
+        return this._subtype.describe() + "?"
+    }
 
-  getSubTypes() {
-    return this._subtype
-  }
+    instantiate(
+        parent: AnyObjectNode | null,
+        subpath: string,
+        environment: any,
+        initialValue: this["C"] | this["T"]
+    ): this["N"] {
+        if (this.optionalValues.indexOf(initialValue) >= 0) {
+            const defaultInstanceOrSnapshot = this.getDefaultInstanceOrSnapshot()
+            return this._subtype.instantiate(
+                parent,
+                subpath,
+                environment,
+                defaultInstanceOrSnapshot
+            )
+        }
+        return this._subtype.instantiate(parent, subpath, environment, initialValue)
+    }
+
+    reconcile(
+        current: this["N"],
+        newValue: this["C"] | this["T"],
+        parent: AnyObjectNode,
+        subpath: string
+    ): this["N"] {
+        return this._subtype.reconcile(
+            current,
+            this.optionalValues.indexOf(newValue) < 0 && this._subtype.is(newValue)
+                ? newValue
+                : this.getDefaultInstanceOrSnapshot(),
+            parent,
+            subpath
+        )
+    }
+
+    getDefaultInstanceOrSnapshot(): this["C"] | this["T"] {
+        const defaultInstanceOrSnapshot =
+            typeof this._defaultValue === "function"
+                ? (this._defaultValue as IFunctionReturn<this["C"] | this["T"]>)()
+                : this._defaultValue
+
+        // while static values are already snapshots and checked on types.optional
+        // generator functions must always be rechecked just in case
+        if (typeof this._defaultValue === "function") {
+            typecheckInternal(this, defaultInstanceOrSnapshot)
+        }
+
+        return defaultInstanceOrSnapshot
+    }
+
+    isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
+        // defaulted values can be skipped
+        if (this.optionalValues.indexOf(value) >= 0) {
+            return typeCheckSuccess()
+        }
+        // bounce validation to the sub-type
+        return this._subtype.validate(value, context)
+    }
+
+    isAssignableFrom(type: IAnyType) {
+        return this._subtype.isAssignableFrom(type)
+    }
+
+    getSubTypes() {
+        return this._subtype
+    }
 }
 
 /** @hidden */
 export type OptionalDefaultValueOrFunction<IT extends IAnyType> =
-  | IT["CreationType"]
-  | IT["SnapshotType"]
-  | (() => ExtractCSTWithSTN<IT>)
+    | IT["CreationType"]
+    | IT["SnapshotType"]
+    | (() => ExtractCSTWithSTN<IT>)
 
 /** @hidden */
 export interface IOptionalIType<IT extends IAnyType, OptionalVals extends ValidOptionalValues>
-  extends IType<
-    IT["CreationType"] | OptionalVals[number],
-    IT["SnapshotType"],
-    IT["TypeWithoutSTN"]
-  > {}
+    extends IType<
+        IT["CreationType"] | OptionalVals[number],
+        IT["SnapshotType"],
+        IT["TypeWithoutSTN"]
+    > {}
 
 function checkOptionalPreconditions<IT extends IAnyType>(
-  type: IAnyType,
-  defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
+    type: IAnyType,
+    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
 ) {
-  // make sure we never pass direct instances
-  if (typeof defaultValueOrFunction !== "function" && isStateTreeNode(defaultValueOrFunction)) {
-    throw new MstError(
-      "default value cannot be an instance, pass a snapshot or a function that creates an instance/snapshot instead"
-    )
-  }
-  assertIsType(type, 1)
-  if (devMode()) {
-    // we only check default values if they are passed directly
-    // if they are generator functions they will be checked once they are generated
-    // we don't check generator function results here to avoid generating a node just for type-checking purposes
-    // which might generate side-effects
-    if (typeof defaultValueOrFunction !== "function") {
-      typecheckInternal(type, defaultValueOrFunction)
+    // make sure we never pass direct instances
+    if (typeof defaultValueOrFunction !== "function" && isStateTreeNode(defaultValueOrFunction)) {
+        throw new MstError(
+            "default value cannot be an instance, pass a snapshot or a function that creates an instance/snapshot instead"
+        )
     }
-  }
+    assertIsType(type, 1)
+    if (devMode()) {
+        // we only check default values if they are passed directly
+        // if they are generator functions they will be checked once they are generated
+        // we don't check generator function results here to avoid generating a node just for type-checking purposes
+        // which might generate side-effects
+        if (typeof defaultValueOrFunction !== "function") {
+            typecheckInternal(type, defaultValueOrFunction)
+        }
+    }
 }
 
 export function optional<IT extends IAnyType>(
-  type: IT,
-  defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
+    type: IT,
+    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>
 ): IOptionalIType<IT, [undefined]>
 export function optional<IT extends IAnyType, OptionalVals extends ValidOptionalValues>(
-  type: IT,
-  defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>,
-  optionalValues: OptionalVals
+    type: IT,
+    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>,
+    optionalValues: OptionalVals
 ): IOptionalIType<IT, OptionalVals>
 /**
  * `types.optional` - Can be used to create a property with a default value.
@@ -204,17 +209,17 @@ export function optional<IT extends IAnyType, OptionalVals extends ValidOptional
  * @returns
  */
 export function optional<IT extends IAnyType, OptionalVals extends ValidOptionalValues>(
-  type: IT,
-  defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>,
-  optionalValues?: OptionalVals
+    type: IT,
+    defaultValueOrFunction: OptionalDefaultValueOrFunction<IT>,
+    optionalValues?: OptionalVals
 ): IOptionalIType<IT, OptionalVals> {
-  checkOptionalPreconditions(type, defaultValueOrFunction)
+    checkOptionalPreconditions(type, defaultValueOrFunction)
 
-  return new OptionalValue(
-    type,
-    defaultValueOrFunction,
-    optionalValues ? optionalValues : undefinedAsOptionalValues
-  )
+    return new OptionalValue(
+        type,
+        defaultValueOrFunction,
+        optionalValues ? optionalValues : undefinedAsOptionalValues
+    )
 }
 
 const undefinedAsOptionalValues: [undefined] = [undefined]
@@ -227,5 +232,5 @@ const undefinedAsOptionalValues: [undefined] = [undefined]
  * @returns
  */
 export function isOptionalType(type: unknown): type is IOptionalIType<IAnyType, [any, ...any[]]> {
-  return isType(type) && (type.flags & TypeFlags.Optional) > 0
+    return isType(type) && (type.flags & TypeFlags.Optional) > 0
 }

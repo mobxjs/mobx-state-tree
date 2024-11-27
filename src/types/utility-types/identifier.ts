@@ -1,61 +1,64 @@
 import {
-  MstError,
-  createScalarNode,
-  SimpleType,
-  TypeFlags,
-  isType,
-  IValidationContext,
-  IValidationResult,
-  typeCheckFailure,
-  ModelType,
-  typeCheckSuccess,
-  ISimpleType,
-  AnyObjectNode,
-  ScalarNode,
-  assertArg
+    MstError,
+    createScalarNode,
+    SimpleType,
+    TypeFlags,
+    isType,
+    IValidationContext,
+    IValidationResult,
+    typeCheckFailure,
+    ModelType,
+    typeCheckSuccess,
+    ISimpleType,
+    AnyObjectNode,
+    ScalarNode,
+    assertArg
 } from "../../internal"
 
 abstract class BaseIdentifierType<T> extends SimpleType<T, T, T> {
-  readonly flags = TypeFlags.Identifier
+    readonly flags = TypeFlags.Identifier
 
-  constructor(name: string, private readonly validType: "string" | "number") {
-    super(name)
-  }
-
-  instantiate(
-    parent: AnyObjectNode | null,
-    subpath: string,
-    environment: any,
-    initialValue: this["C"]
-  ): this["N"] {
-    if (!parent || !(parent.type instanceof ModelType))
-      throw new MstError(
-        `Identifier types can only be instantiated as direct child of a model type`
-      )
-
-    return createScalarNode(this, parent, subpath, environment, initialValue)
-  }
-
-  reconcile(current: this["N"], newValue: this["C"], parent: AnyObjectNode, subpath: string) {
-    // we don't consider detaching here since identifier are scalar nodes, and scalar nodes cannot be detached
-    if (current.storedValue !== newValue)
-      throw new MstError(
-        `Tried to change identifier from '${current.storedValue}' to '${newValue}'. Changing identifiers is not allowed.`
-      )
-    current.setParent(parent, subpath)
-    return current
-  }
-
-  isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
-    if (typeof value !== this.validType) {
-      return typeCheckFailure(
-        context,
-        value,
-        `Value is not a valid ${this.describe()}, expected a ${this.validType}`
-      )
+    constructor(
+        name: string,
+        private readonly validType: "string" | "number"
+    ) {
+        super(name)
     }
-    return typeCheckSuccess()
-  }
+
+    instantiate(
+        parent: AnyObjectNode | null,
+        subpath: string,
+        environment: any,
+        initialValue: this["C"]
+    ): this["N"] {
+        if (!parent || !(parent.type instanceof ModelType))
+            throw new MstError(
+                `Identifier types can only be instantiated as direct child of a model type`
+            )
+
+        return createScalarNode(this, parent, subpath, environment, initialValue)
+    }
+
+    reconcile(current: this["N"], newValue: this["C"], parent: AnyObjectNode, subpath: string) {
+        // we don't consider detaching here since identifier are scalar nodes, and scalar nodes cannot be detached
+        if (current.storedValue !== newValue)
+            throw new MstError(
+                `Tried to change identifier from '${current.storedValue}' to '${newValue}'. Changing identifiers is not allowed.`
+            )
+        current.setParent(parent, subpath)
+        return current
+    }
+
+    isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
+        if (typeof value !== this.validType) {
+            return typeCheckFailure(
+                context,
+                value,
+                `Value is not a valid ${this.describe()}, expected a ${this.validType}`
+            )
+        }
+        return typeCheckSuccess()
+    }
 }
 
 /**
@@ -63,15 +66,15 @@ abstract class BaseIdentifierType<T> extends SimpleType<T, T, T> {
  * @hidden
  */
 export class IdentifierType extends BaseIdentifierType<string> {
-  readonly flags = TypeFlags.Identifier
+    readonly flags = TypeFlags.Identifier
 
-  constructor() {
-    super(`identifier`, "string")
-  }
+    constructor() {
+        super(`identifier`, "string")
+    }
 
-  describe() {
-    return `identifier`
-  }
+    describe() {
+        return `identifier`
+    }
 }
 
 /**
@@ -79,17 +82,17 @@ export class IdentifierType extends BaseIdentifierType<string> {
  * @hidden
  */
 export class IdentifierNumberType extends BaseIdentifierType<number> {
-  constructor() {
-    super("identifierNumber", "number")
-  }
+    constructor() {
+        super("identifierNumber", "number")
+    }
 
-  getSnapshot(node: ScalarNode<number, number, number>): number {
-    return node.storedValue
-  }
+    getSnapshot(node: ScalarNode<number, number, number>): number {
+        return node.storedValue
+    }
 
-  describe() {
-    return `identifierNumber`
-  }
+    describe() {
+        return `identifierNumber`
+    }
 }
 
 /**
@@ -133,9 +136,9 @@ export const identifierNumber: ISimpleType<number> = new IdentifierNumberType()
  * @returns
  */
 export function isIdentifierType(
-  type: unknown
+    type: unknown
 ): type is typeof identifier | typeof identifierNumber {
-  return isType(type) && (type.flags & TypeFlags.Identifier) > 0
+    return isType(type) && (type.flags & TypeFlags.Identifier) > 0
 }
 
 /**
@@ -148,7 +151,7 @@ export type ReferenceIdentifier = string | number
  * @hidden
  */
 export function normalizeIdentifier(id: ReferenceIdentifier): string {
-  return "" + id
+    return "" + id
 }
 
 /**
@@ -156,7 +159,7 @@ export function normalizeIdentifier(id: ReferenceIdentifier): string {
  * @hidden
  */
 export function isValidIdentifier(id: any): id is ReferenceIdentifier {
-  return typeof id === "string" || typeof id === "number"
+    return typeof id === "string" || typeof id === "number"
 }
 
 /**
@@ -164,5 +167,5 @@ export function isValidIdentifier(id: any): id is ReferenceIdentifier {
  * @hidden
  */
 export function assertIsValidIdentifier(id: ReferenceIdentifier, argNumber: number | number[]) {
-  assertArg(id, isValidIdentifier, "string or number (identifier)", argNumber)
+    assertArg(id, isValidIdentifier, "string or number (identifier)", argNumber)
 }

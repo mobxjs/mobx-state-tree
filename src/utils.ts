@@ -1,8 +1,8 @@
 import {
-  isObservableArray,
-  isObservableObject,
-  _getGlobalState,
-  defineProperty as mobxDefineProperty
+    isObservableArray,
+    isObservableObject,
+    _getGlobalState,
+    defineProperty as mobxDefineProperty
 } from "mobx"
 import { Primitives } from "./core/type/type"
 
@@ -25,8 +25,8 @@ export const EMPTY_OBJECT: {} = Object.freeze({})
  * @hidden
  */
 export const mobxShallow = _getGlobalState().useProxies
-  ? { deep: false }
-  : { deep: false, proxy: false }
+    ? { deep: false }
+    : { deep: false, proxy: false }
 Object.freeze(mobxShallow)
 
 /**
@@ -39,9 +39,9 @@ export type IDisposer = () => void
  * @hidden
  */
 export class MstError extends Error {
-  constructor(message = "Illegal state") {
-    super(`[mobx-state-tree] ${message}`)
-  }
+    constructor(message = "Illegal state") {
+        super(`[mobx-state-tree] ${message}`)
+    }
 }
 
 /**
@@ -49,7 +49,7 @@ export class MstError extends Error {
  * @hidden
  */
 export function identity(_: any): any {
-  return _
+    return _
 }
 
 /**
@@ -69,7 +69,7 @@ export const isInteger = Number.isInteger
  * @hidden
  */
 export function isFloat(val: any) {
-  return Number(val) === val && val % 1 !== 0
+    return Number(val) === val && val % 1 !== 0
 }
 
 /**
@@ -77,7 +77,7 @@ export function isFloat(val: any) {
  * @hidden
  */
 export function isFinite(val: any) {
-  return Number.isFinite(val)
+    return Number.isFinite(val)
 }
 
 /**
@@ -85,7 +85,7 @@ export function isFinite(val: any) {
  * @hidden
  */
 export function isArray(val: any): val is any[] {
-  return Array.isArray(val) || isObservableArray(val)
+    return Array.isArray(val) || isObservableArray(val)
 }
 
 /**
@@ -93,9 +93,9 @@ export function isArray(val: any): val is any[] {
  * @hidden
  */
 export function asArray<T>(val: undefined | null | T | T[] | ReadonlyArray<T>): T[] {
-  if (!val) return EMPTY_ARRAY as any as T[]
-  if (isArray(val)) return val as T[]
-  return [val] as T[]
+    if (!val) return EMPTY_ARRAY as any as T[]
+    if (isArray(val)) return val as T[]
+    return [val] as T[]
 }
 
 /**
@@ -123,11 +123,11 @@ export function extend(a: any, ...b: any[]): any
  * @hidden
  */
 export function extend(a: any, ...b: any[]) {
-  for (let i = 0; i < b.length; i++) {
-    const current = b[i]
-    for (let key in current) a[key] = current[key]
-  }
-  return a
+    for (let i = 0; i < b.length; i++) {
+        const current = b[i]
+        for (let key in current) a[key] = current[key]
+    }
+    return a
 }
 
 /**
@@ -135,10 +135,10 @@ export function extend(a: any, ...b: any[]) {
  * @hidden
  */
 export function isPlainObject(value: any): value is { [k: string]: any } {
-  if (value === null || typeof value !== "object") return false
-  const proto = Object.getPrototypeOf(value)
-  if (proto == null) return true
-  return proto.constructor?.toString() === plainObjectString
+    if (value === null || typeof value !== "object") return false
+    const proto = Object.getPrototypeOf(value)
+    if (proto == null) return true
+    return proto.constructor?.toString() === plainObjectString
 }
 
 /**
@@ -146,12 +146,12 @@ export function isPlainObject(value: any): value is { [k: string]: any } {
  * @hidden
  */
 export function isMutable(value: any) {
-  return (
-    value !== null &&
-    typeof value === "object" &&
-    !(value instanceof Date) &&
-    !(value instanceof RegExp)
-  )
+    return (
+        value !== null &&
+        typeof value === "object" &&
+        !(value instanceof Date) &&
+        !(value instanceof RegExp)
+    )
 }
 
 /**
@@ -159,14 +159,14 @@ export function isMutable(value: any) {
  * @hidden
  */
 export function isPrimitive(value: any, includeDate = true): value is Primitives {
-  return (
-    value === null ||
-    value === undefined ||
-    typeof value === "string" ||
-    typeof value === "number" ||
-    typeof value === "boolean" ||
-    (includeDate && value instanceof Date)
-  )
+    return (
+        value === null ||
+        value === undefined ||
+        typeof value === "string" ||
+        typeof value === "number" ||
+        typeof value === "boolean" ||
+        (includeDate && value instanceof Date)
+    )
 }
 
 /**
@@ -175,8 +175,8 @@ export function isPrimitive(value: any, includeDate = true): value is Primitives
  * Freeze a value and return it (if not in production)
  */
 export function freeze<T>(value: T): T {
-  if (!devMode()) return value
-  return isPrimitive(value) || isObservableArray(value) ? value : Object.freeze(value)
+    if (!devMode()) return value
+    return isPrimitive(value) || isObservableArray(value) ? value : Object.freeze(value)
 }
 
 /**
@@ -185,18 +185,21 @@ export function freeze<T>(value: T): T {
  * Recursively freeze a value (if not in production)
  */
 export function deepFreeze<T>(value: T): T {
-  if (!devMode()) return value
-  freeze(value)
+    if (!devMode()) return value
+    freeze(value)
 
-  if (isPlainObject(value)) {
-    Object.keys(value).forEach((propKey) => {
-      if (!isPrimitive((value as any)[propKey]) && !Object.isFrozen((value as any)[propKey])) {
-        deepFreeze((value as any)[propKey])
-      }
-    })
-  }
+    if (isPlainObject(value)) {
+        Object.keys(value).forEach(propKey => {
+            if (
+                !isPrimitive((value as any)[propKey]) &&
+                !Object.isFrozen((value as any)[propKey])
+            ) {
+                deepFreeze((value as any)[propKey])
+            }
+        })
+    }
 
-  return value
+    return value
 }
 
 /**
@@ -204,7 +207,7 @@ export function deepFreeze<T>(value: T): T {
  * @hidden
  */
 export function isSerializable(value: any) {
-  return typeof value !== "function"
+    return typeof value !== "function"
 }
 
 /**
@@ -212,9 +215,9 @@ export function isSerializable(value: any) {
  * @hidden
  */
 export function defineProperty(object: any, key: PropertyKey, descriptor: PropertyDescriptor) {
-  isObservableObject(object)
-    ? mobxDefineProperty(object, key, descriptor)
-    : Object.defineProperty(object, key, descriptor)
+    isObservableObject(object)
+        ? mobxDefineProperty(object, key, descriptor)
+        : Object.defineProperty(object, key, descriptor)
 }
 
 /**
@@ -222,12 +225,12 @@ export function defineProperty(object: any, key: PropertyKey, descriptor: Proper
  * @hidden
  */
 export function addHiddenFinalProp(object: any, propName: string, value: any) {
-  defineProperty(object, propName, {
-    enumerable: false,
-    writable: false,
-    configurable: true,
-    value
-  })
+    defineProperty(object, propName, {
+        enumerable: false,
+        writable: false,
+        configurable: true,
+        value
+    })
 }
 
 /**
@@ -235,12 +238,12 @@ export function addHiddenFinalProp(object: any, propName: string, value: any) {
  * @hidden
  */
 export function addHiddenWritableProp(object: any, propName: string, value: any) {
-  defineProperty(object, propName, {
-    enumerable: false,
-    writable: true,
-    configurable: true,
-    value
-  })
+    defineProperty(object, propName, {
+        enumerable: false,
+        writable: true,
+        configurable: true,
+        value
+    })
 }
 
 /**
@@ -254,43 +257,43 @@ export type ArgumentTypes<F extends Function> = F extends (...args: infer A) => 
  * @hidden
  */
 class EventHandler<F extends Function> {
-  private handlers: F[] = []
+    private handlers: F[] = []
 
-  get hasSubscribers(): boolean {
-    return this.handlers.length > 0
-  }
-
-  register(fn: F, atTheBeginning = false): IDisposer {
-    if (atTheBeginning) {
-      this.handlers.unshift(fn)
-    } else {
-      this.handlers.push(fn)
+    get hasSubscribers(): boolean {
+        return this.handlers.length > 0
     }
-    return () => {
-      this.unregister(fn)
+
+    register(fn: F, atTheBeginning = false): IDisposer {
+        if (atTheBeginning) {
+            this.handlers.unshift(fn)
+        } else {
+            this.handlers.push(fn)
+        }
+        return () => {
+            this.unregister(fn)
+        }
     }
-  }
 
-  has(fn: F): boolean {
-    return this.handlers.indexOf(fn) >= 0
-  }
-
-  unregister(fn: F) {
-    const index = this.handlers.indexOf(fn)
-    if (index >= 0) {
-      this.handlers.splice(index, 1)
+    has(fn: F): boolean {
+        return this.handlers.indexOf(fn) >= 0
     }
-  }
 
-  clear() {
-    this.handlers.length = 0
-  }
+    unregister(fn: F) {
+        const index = this.handlers.indexOf(fn)
+        if (index >= 0) {
+            this.handlers.splice(index, 1)
+        }
+    }
 
-  emit(...args: ArgumentTypes<F>) {
-    // make a copy just in case it changes
-    const handlers = this.handlers.slice()
-    handlers.forEach((f) => f(...args))
-  }
+    clear() {
+        this.handlers.length = 0
+    }
+
+    emit(...args: ArgumentTypes<F>) {
+        // make a copy just in case it changes
+        const handlers = this.handlers.slice()
+        handlers.forEach(f => f(...args))
+    }
 }
 
 /**
@@ -298,52 +301,52 @@ class EventHandler<F extends Function> {
  * @hidden
  */
 export class EventHandlers<E extends { [k: string]: Function }> {
-  private eventHandlers?: { [k in keyof E]?: EventHandler<Function> }
+    private eventHandlers?: { [k in keyof E]?: EventHandler<Function> }
 
-  hasSubscribers(event: keyof E): boolean {
-    const handler = this.eventHandlers && this.eventHandlers[event]
-    return !!handler && handler!.hasSubscribers
-  }
-
-  register<N extends keyof E>(event: N, fn: E[N], atTheBeginning = false): IDisposer {
-    if (!this.eventHandlers) {
-      this.eventHandlers = {}
+    hasSubscribers(event: keyof E): boolean {
+        const handler = this.eventHandlers && this.eventHandlers[event]
+        return !!handler && handler!.hasSubscribers
     }
-    let handler = this.eventHandlers[event]
-    if (!handler) {
-      handler = this.eventHandlers[event] = new EventHandler()
+
+    register<N extends keyof E>(event: N, fn: E[N], atTheBeginning = false): IDisposer {
+        if (!this.eventHandlers) {
+            this.eventHandlers = {}
+        }
+        let handler = this.eventHandlers[event]
+        if (!handler) {
+            handler = this.eventHandlers[event] = new EventHandler()
+        }
+        return handler.register(fn, atTheBeginning)
     }
-    return handler.register(fn, atTheBeginning)
-  }
 
-  has<N extends keyof E>(event: N, fn: E[N]): boolean {
-    const handler = this.eventHandlers && this.eventHandlers[event]
-    return !!handler && handler!.has(fn)
-  }
-
-  unregister<N extends keyof E>(event: N, fn: E[N]) {
-    const handler = this.eventHandlers && this.eventHandlers[event]
-    if (handler) {
-      handler!.unregister(fn)
+    has<N extends keyof E>(event: N, fn: E[N]): boolean {
+        const handler = this.eventHandlers && this.eventHandlers[event]
+        return !!handler && handler!.has(fn)
     }
-  }
 
-  clear<N extends keyof E>(event: N) {
-    if (this.eventHandlers) {
-      delete this.eventHandlers[event]
+    unregister<N extends keyof E>(event: N, fn: E[N]) {
+        const handler = this.eventHandlers && this.eventHandlers[event]
+        if (handler) {
+            handler!.unregister(fn)
+        }
     }
-  }
 
-  clearAll() {
-    this.eventHandlers = undefined
-  }
-
-  emit<N extends keyof E>(event: N, ...args: ArgumentTypes<E[N]>) {
-    const handler = this.eventHandlers && this.eventHandlers[event]
-    if (handler) {
-      ;(handler!.emit as any)(...args)
+    clear<N extends keyof E>(event: N) {
+        if (this.eventHandlers) {
+            delete this.eventHandlers[event]
+        }
     }
-  }
+
+    clearAll() {
+        this.eventHandlers = undefined
+    }
+
+    emit<N extends keyof E>(event: N, ...args: ArgumentTypes<E[N]>) {
+        const handler = this.eventHandlers && this.eventHandlers[event]
+        if (handler) {
+            ;(handler!.emit as any)(...args)
+        }
+    }
 }
 
 const prototypeHasOwnProperty = Object.prototype.hasOwnProperty
@@ -353,7 +356,7 @@ const prototypeHasOwnProperty = Object.prototype.hasOwnProperty
  * @hidden
  */
 export function hasOwnProperty(object: Object, propName: string) {
-  return prototypeHasOwnProperty.call(object, propName)
+    return prototypeHasOwnProperty.call(object, propName)
 }
 
 /**
@@ -361,9 +364,9 @@ export function hasOwnProperty(object: Object, propName: string) {
  * @hidden
  */
 export function argsToArray(args: IArguments): any[] {
-  const res = new Array(args.length)
-  for (let i = 0; i < args.length; i++) res[i] = args[i]
-  return res
+    const res = new Array(args.length)
+    for (let i = 0; i < args.length; i++) res[i] = args[i]
+    return res
 }
 
 /**
@@ -371,7 +374,7 @@ export function argsToArray(args: IArguments): any[] {
  * @hidden
  */
 export function stringStartsWith(str: string, beginning: string) {
-  return str.indexOf(beginning) === 0
+    return str.indexOf(beginning) === 0
 }
 
 /**
@@ -385,14 +388,14 @@ export type DeprecatedFunction = Function & { ids?: { [id: string]: true } }
  * @hidden
  */
 export const deprecated: DeprecatedFunction = function (id: string, message: string): void {
-  // skip if running production
-  if (!devMode()) return
-  // warn if hasn't been warned before
-  if (deprecated.ids && !deprecated.ids.hasOwnProperty(id)) {
-    warnError("Deprecation warning: " + message)
-  }
-  // mark as warned to avoid duplicate warn message
-  if (deprecated.ids) deprecated.ids[id] = true
+    // skip if running production
+    if (!devMode()) return
+    // warn if hasn't been warned before
+    if (deprecated.ids && !deprecated.ids.hasOwnProperty(id)) {
+        warnError("Deprecation warning: " + message)
+    }
+    // mark as warned to avoid duplicate warn message
+    if (deprecated.ids) deprecated.ids[id] = true
 }
 deprecated.ids = {}
 
@@ -401,17 +404,17 @@ deprecated.ids = {}
  * @hidden
  */
 export function warnError(msg: string) {
-  console.warn(new Error(`[mobx-state-tree] ${msg}`))
+    console.warn(new Error(`[mobx-state-tree] ${msg}`))
 }
 /**
  * @internal
  * @hidden
  */
 export function isTypeCheckingEnabled() {
-  return (
-    devMode() ||
-    (typeof process !== "undefined" && process.env && process.env.ENABLE_TYPE_CHECK === "true")
-  )
+    return (
+        devMode() ||
+        (typeof process !== "undefined" && process.env && process.env.ENABLE_TYPE_CHECK === "true")
+    )
 }
 
 /**
@@ -419,7 +422,7 @@ export function isTypeCheckingEnabled() {
  * @hidden
  */
 export function devMode() {
-  return process.env.NODE_ENV !== "production"
+    return process.env.NODE_ENV !== "production"
 }
 
 /**
@@ -427,19 +430,19 @@ export function devMode() {
  * @hidden
  */
 export function assertArg<T>(
-  value: T,
-  fn: (value: T) => boolean,
-  typeName: string,
-  argNumber: number | number[]
+    value: T,
+    fn: (value: T) => boolean,
+    typeName: string,
+    argNumber: number | number[]
 ) {
-  if (devMode()) {
-    if (!fn(value)) {
-      // istanbul ignore next
-      throw new MstError(
-        `expected ${typeName} as argument ${asArray(argNumber).join(" or ")}, got ${value} instead`
-      )
+    if (devMode()) {
+        if (!fn(value)) {
+            // istanbul ignore next
+            throw new MstError(
+                `expected ${typeName} as argument ${asArray(argNumber).join(" or ")}, got ${value} instead`
+            )
+        }
     }
-  }
 }
 
 /**
@@ -447,7 +450,7 @@ export function assertArg<T>(
  * @hidden
  */
 export function assertIsFunction(value: Function, argNumber: number | number[]) {
-  assertArg(value, (fn) => typeof fn === "function", "function", argNumber)
+    assertArg(value, fn => typeof fn === "function", "function", argNumber)
 }
 
 /**
@@ -455,18 +458,18 @@ export function assertIsFunction(value: Function, argNumber: number | number[]) 
  * @hidden
  */
 export function assertIsNumber(
-  value: number,
-  argNumber: number | number[],
-  min?: number,
-  max?: number
+    value: number,
+    argNumber: number | number[],
+    min?: number,
+    max?: number
 ) {
-  assertArg(value, (n) => typeof n === "number", "number", argNumber)
-  if (min !== undefined) {
-    assertArg(value, (n) => n >= min, `number greater than ${min}`, argNumber)
-  }
-  if (max !== undefined) {
-    assertArg(value, (n) => n <= max, `number lesser than ${max}`, argNumber)
-  }
+    assertArg(value, n => typeof n === "number", "number", argNumber)
+    if (min !== undefined) {
+        assertArg(value, n => n >= min, `number greater than ${min}`, argNumber)
+    }
+    if (max !== undefined) {
+        assertArg(value, n => n <= max, `number lesser than ${max}`, argNumber)
+    }
 }
 
 /**
@@ -474,10 +477,10 @@ export function assertIsNumber(
  * @hidden
  */
 export function assertIsString(value: string, argNumber: number | number[], canBeEmpty = true) {
-  assertArg(value, (s) => typeof s === "string", "string", argNumber)
-  if (!canBeEmpty) {
-    assertArg(value, (s) => s !== "", "not empty string", argNumber)
-  }
+    assertArg(value, s => typeof s === "string", "string", argNumber)
+    if (!canBeEmpty) {
+        assertArg(value, s => s !== "", "not empty string", argNumber)
+    }
 }
 
 /**
@@ -485,11 +488,11 @@ export function assertIsString(value: string, argNumber: number | number[], canB
  * @hidden
  */
 export function setImmediateWithFallback(fn: (...args: any[]) => void) {
-  if (typeof queueMicrotask === "function") {
-    queueMicrotask(fn)
-  } else if (typeof setImmediate === "function") {
-    setImmediate(fn)
-  } else {
-    setTimeout(fn, 1)
-  }
+    if (typeof queueMicrotask === "function") {
+        queueMicrotask(fn)
+    } else if (typeof setImmediate === "function") {
+        setImmediate(fn)
+    } else {
+        setTimeout(fn, 1)
+    }
 }

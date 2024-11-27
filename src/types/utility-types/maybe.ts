@@ -1,11 +1,11 @@
 import {
-  union,
-  optional,
-  IType,
-  undefinedType,
-  nullType,
-  IAnyType,
-  assertIsType
+    union,
+    optional,
+    IType,
+    undefinedType,
+    nullType,
+    IAnyType,
+    assertIsType
 } from "../../internal"
 
 const optionalUndefinedType = optional(undefinedType, undefined)
@@ -13,7 +13,7 @@ const optionalNullType = optional(nullType, null)
 
 /** @hidden */
 export interface IMaybeIType<IT extends IAnyType, C, O>
-  extends IType<IT["CreationType"] | C, IT["SnapshotType"] | O, IT["TypeWithoutSTN"] | O> {}
+    extends IType<IT["CreationType"] | C, IT["SnapshotType"] | O, IT["TypeWithoutSTN"] | O> {}
 
 /** @hidden */
 export interface IMaybe<IT extends IAnyType> extends IMaybeIType<IT, undefined, undefined> {}
@@ -29,9 +29,9 @@ export interface IMaybeNull<IT extends IAnyType> extends IMaybeIType<IT, null | 
  * @returns
  */
 export function maybe<IT extends IAnyType>(type: IT): IMaybe<IT> {
-  assertIsType(type, 1)
+    assertIsType(type, 1)
 
-  return union(type, optionalUndefinedType)
+    return union(type, optionalUndefinedType)
 }
 
 /**
@@ -42,7 +42,7 @@ export function maybe<IT extends IAnyType>(type: IT): IMaybe<IT> {
  * @returns
  */
 export function maybeNull<IT extends IAnyType>(type: IT): IMaybeNull<IT> {
-  assertIsType(type, 1)
+    assertIsType(type, 1)
 
-  return union(type, optionalNullType)
+    return union(type, optionalNullType)
 }

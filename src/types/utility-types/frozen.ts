@@ -1,19 +1,19 @@
 import {
-  isSerializable,
-  deepFreeze,
-  createScalarNode,
-  IValidationContext,
-  IValidationResult,
-  typeCheckSuccess,
-  typeCheckFailure,
-  TypeFlags,
-  isType,
-  optional,
-  IType,
-  IAnyType,
-  AnyObjectNode,
-  SimpleType,
-  type ISimpleType
+    isSerializable,
+    deepFreeze,
+    createScalarNode,
+    IValidationContext,
+    IValidationResult,
+    typeCheckSuccess,
+    typeCheckFailure,
+    TypeFlags,
+    isType,
+    optional,
+    IType,
+    IAnyType,
+    AnyObjectNode,
+    SimpleType,
+    type ISimpleType
 } from "../../internal"
 
 /**
@@ -21,33 +21,37 @@ import {
  * @hidden
  */
 export class Frozen<T> extends SimpleType<T, T, T> {
-  flags = TypeFlags.Frozen
+    flags = TypeFlags.Frozen
 
-  constructor(private subType?: IAnyType) {
-    super(subType ? `frozen(${subType.name})` : "frozen")
-  }
-
-  describe() {
-    return "<any immutable value>"
-  }
-
-  instantiate(
-    parent: AnyObjectNode | null,
-    subpath: string,
-    environment: any,
-    value: this["C"]
-  ): this["N"] {
-    // create the node
-    return createScalarNode(this, parent, subpath, environment, deepFreeze(value))
-  }
-
-  isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
-    if (!isSerializable(value)) {
-      return typeCheckFailure(context, value, "Value is not serializable and cannot be frozen")
+    constructor(private subType?: IAnyType) {
+        super(subType ? `frozen(${subType.name})` : "frozen")
     }
-    if (this.subType) return this.subType.validate(value, context)
-    return typeCheckSuccess()
-  }
+
+    describe() {
+        return "<any immutable value>"
+    }
+
+    instantiate(
+        parent: AnyObjectNode | null,
+        subpath: string,
+        environment: any,
+        value: this["C"]
+    ): this["N"] {
+        // create the node
+        return createScalarNode(this, parent, subpath, environment, deepFreeze(value))
+    }
+
+    isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
+        if (!isSerializable(value)) {
+            return typeCheckFailure(
+                context,
+                value,
+                "Value is not serializable and cannot be frozen"
+            )
+        }
+        if (this.subType) return this.subType.validate(value, context)
+        return typeCheckSuccess()
+    }
 }
 
 const untypedFrozenInstance = new Frozen()
@@ -96,9 +100,9 @@ export function frozen<T = any>(): IType<T, T, T> // do not assume undefined by 
  * @returns
  */
 export function frozen(arg?: any): any {
-  if (arguments.length === 0) return untypedFrozenInstance
-  else if (isType(arg)) return new Frozen(arg)
-  else return optional(untypedFrozenInstance, arg)
+    if (arguments.length === 0) return untypedFrozenInstance
+    else if (isType(arg)) return new Frozen(arg)
+    else return optional(untypedFrozenInstance, arg)
 }
 
 /**
@@ -108,5 +112,5 @@ export function frozen(arg?: any): any {
  * @returns
  */
 export function isFrozenType(type: unknown): type is ISimpleType<any> {
-  return isType(type) && (type.flags & TypeFlags.Frozen) > 0
+    return isType(type) && (type.flags & TypeFlags.Frozen) > 0
 }

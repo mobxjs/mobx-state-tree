@@ -1,41 +1,41 @@
 import { isComputedProp, isObservableProp } from "mobx"
 import {
-  IAnyStateTreeNode,
-  IType,
-  IAnyModelType,
-  getStateTreeNode,
-  IStateTreeNode,
-  isStateTreeNode,
-  IJsonPatch,
-  splitJsonPath,
-  asArray,
-  MstError,
-  IDisposer,
-  resolveNodeByPath,
-  getRelativePathBetweenNodes,
-  freeze,
-  IAnyType,
-  isModelType,
-  InvalidReferenceError,
-  normalizeIdentifier,
-  ReferenceIdentifier,
-  AnyObjectNode,
-  assertIsType,
-  assertIsStateTreeNode,
-  TypeOfValue,
-  assertIsFunction,
-  assertIsNumber,
-  assertIsString,
-  assertArg,
-  assertIsValidIdentifier,
-  IActionContext,
-  getRunningActionContext,
-  IAnyComplexType
+    IAnyStateTreeNode,
+    IType,
+    IAnyModelType,
+    getStateTreeNode,
+    IStateTreeNode,
+    isStateTreeNode,
+    IJsonPatch,
+    splitJsonPath,
+    asArray,
+    MstError,
+    IDisposer,
+    resolveNodeByPath,
+    getRelativePathBetweenNodes,
+    freeze,
+    IAnyType,
+    isModelType,
+    InvalidReferenceError,
+    normalizeIdentifier,
+    ReferenceIdentifier,
+    AnyObjectNode,
+    assertIsType,
+    assertIsStateTreeNode,
+    TypeOfValue,
+    assertIsFunction,
+    assertIsNumber,
+    assertIsString,
+    assertArg,
+    assertIsValidIdentifier,
+    IActionContext,
+    getRunningActionContext,
+    IAnyComplexType
 } from "../internal"
 
 /** @hidden */
 export type TypeOrStateTreeNodeToStateTreeNode<T extends IAnyType | IAnyStateTreeNode> =
-  T extends IType<any, any, infer TT> ? TT & IStateTreeNode<T> : T
+    T extends IType<any, any, infer TT> ? TT & IStateTreeNode<T> : T
 
 /**
  * Returns the _actual_ type of the given tree node. (Or throws)
@@ -44,9 +44,9 @@ export type TypeOrStateTreeNodeToStateTreeNode<T extends IAnyType | IAnyStateTre
  * @returns
  */
 export function getType(object: IAnyStateTreeNode): IAnyComplexType {
-  assertIsStateTreeNode(object, 1)
+    assertIsStateTreeNode(object, 1)
 
-  return getStateTreeNode(object).type
+    return getStateTreeNode(object).type
 }
 
 /**
@@ -66,9 +66,9 @@ export function getType(object: IAnyStateTreeNode): IAnyComplexType {
  * @returns
  */
 export function getChildType(object: IAnyStateTreeNode, propertyName?: string): IAnyType {
-  assertIsStateTreeNode(object, 1)
+    assertIsStateTreeNode(object, 1)
 
-  return getStateTreeNode(object).getChildType(propertyName)
+    return getStateTreeNode(object).getChildType(propertyName)
 }
 
 /**
@@ -81,14 +81,14 @@ export function getChildType(object: IAnyStateTreeNode, propertyName?: string): 
  * @returns function to remove the listener
  */
 export function onPatch(
-  target: IAnyStateTreeNode,
-  callback: (patch: IJsonPatch, reversePatch: IJsonPatch) => void
+    target: IAnyStateTreeNode,
+    callback: (patch: IJsonPatch, reversePatch: IJsonPatch) => void
 ): IDisposer {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
-  assertIsFunction(callback, 2)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
+    assertIsFunction(callback, 2)
 
-  return getStateTreeNode(target).onPatch(callback)
+    return getStateTreeNode(target).onPatch(callback)
 }
 
 /**
@@ -101,14 +101,14 @@ export function onPatch(
  * @returns
  */
 export function onSnapshot<S>(
-  target: IStateTreeNode<IType<any, S, any>>,
-  callback: (snapshot: S) => void
+    target: IStateTreeNode<IType<any, S, any>>,
+    callback: (snapshot: S) => void
 ): IDisposer {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
-  assertIsFunction(callback, 2)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
+    assertIsFunction(callback, 2)
 
-  return getStateTreeNode(target).onSnapshot(callback)
+    return getStateTreeNode(target).onSnapshot(callback)
 }
 
 /**
@@ -122,25 +122,25 @@ export function onSnapshot<S>(
  * @returns
  */
 export function applyPatch(
-  target: IAnyStateTreeNode,
-  patch: IJsonPatch | ReadonlyArray<IJsonPatch>
+    target: IAnyStateTreeNode,
+    patch: IJsonPatch | ReadonlyArray<IJsonPatch>
 ): void {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
-  assertArg(patch, (p) => typeof p === "object", "object or array", 2)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
+    assertArg(patch, p => typeof p === "object", "object or array", 2)
 
-  getStateTreeNode(target).applyPatches(asArray(patch))
+    getStateTreeNode(target).applyPatches(asArray(patch))
 }
 
 export interface IPatchRecorder {
-  patches: ReadonlyArray<IJsonPatch>
-  inversePatches: ReadonlyArray<IJsonPatch>
-  reversedInversePatches: ReadonlyArray<IJsonPatch>
-  readonly recording: boolean
-  stop(): void
-  resume(): void
-  replay(target?: IAnyStateTreeNode): void
-  undo(target?: IAnyStateTreeNode): void
+    patches: ReadonlyArray<IJsonPatch>
+    inversePatches: ReadonlyArray<IJsonPatch>
+    reversedInversePatches: ReadonlyArray<IJsonPatch>
+    readonly recording: boolean
+    stop(): void
+    resume(): void
+    replay(target?: IAnyStateTreeNode): void
+    undo(target?: IAnyStateTreeNode): void
 }
 
 /**
@@ -175,86 +175,86 @@ export interface IPatchRecorder {
  * @returns
  */
 export function recordPatches(
-  subject: IAnyStateTreeNode,
-  filter?: (
-    patch: IJsonPatch,
-    inversePatch: IJsonPatch,
-    actionContext: IActionContext | undefined
-  ) => boolean
+    subject: IAnyStateTreeNode,
+    filter?: (
+        patch: IJsonPatch,
+        inversePatch: IJsonPatch,
+        actionContext: IActionContext | undefined
+    ) => boolean
 ): IPatchRecorder {
-  // check all arguments
-  assertIsStateTreeNode(subject, 1)
+    // check all arguments
+    assertIsStateTreeNode(subject, 1)
 
-  interface IPatches {
-    patches: IJsonPatch[]
-    reversedInversePatches: IJsonPatch[]
-    inversePatches: IJsonPatch[]
-  }
-
-  const data: Pick<IPatches, "patches" | "inversePatches"> = {
-    patches: [],
-    inversePatches: []
-  }
-
-  // we will generate the immutable copy of patches on demand for public consumption
-  const publicData: Partial<IPatches> = {}
-
-  let disposer: IDisposer | undefined
-
-  const recorder: IPatchRecorder = {
-    get recording() {
-      return !!disposer
-    },
-    get patches() {
-      if (!publicData.patches) {
-        publicData.patches = data.patches.slice()
-      }
-      return publicData.patches
-    },
-    get reversedInversePatches() {
-      if (!publicData.reversedInversePatches) {
-        publicData.reversedInversePatches = data.inversePatches.slice().reverse()
-      }
-      return publicData.reversedInversePatches
-    },
-    get inversePatches() {
-      if (!publicData.inversePatches) {
-        publicData.inversePatches = data.inversePatches.slice()
-      }
-      return publicData.inversePatches
-    },
-    stop() {
-      if (disposer) {
-        disposer()
-        disposer = undefined
-      }
-    },
-    resume() {
-      if (disposer) return
-      disposer = onPatch(subject, (patch, inversePatch) => {
-        // skip patches that are asked to be filtered if there's a filter in place
-        if (filter && !filter(patch, inversePatch, getRunningActionContext())) {
-          return
-        }
-        data.patches.push(patch)
-        data.inversePatches.push(inversePatch)
-
-        // mark immutable public patches as dirty
-        publicData.patches = undefined
-        publicData.inversePatches = undefined
-        publicData.reversedInversePatches = undefined
-      })
-    },
-    replay(target?: IAnyStateTreeNode) {
-      applyPatch(target || subject, data.patches)
-    },
-    undo(target?: IAnyStateTreeNode) {
-      applyPatch(target || subject, data.inversePatches.slice().reverse())
+    interface IPatches {
+        patches: IJsonPatch[]
+        reversedInversePatches: IJsonPatch[]
+        inversePatches: IJsonPatch[]
     }
-  }
 
-  recorder.resume()
-  return recorder
+    const data: Pick<IPatches, "patches" | "inversePatches"> = {
+        patches: [],
+        inversePatches: []
+    }
+
+    // we will generate the immutable copy of patches on demand for public consumption
+    const publicData: Partial<IPatches> = {}
+
+    let disposer: IDisposer | undefined
+
+    const recorder: IPatchRecorder = {
+        get recording() {
+            return !!disposer
+        },
+        get patches() {
+            if (!publicData.patches) {
+                publicData.patches = data.patches.slice()
+            }
+            return publicData.patches
+        },
+        get reversedInversePatches() {
+            if (!publicData.reversedInversePatches) {
+                publicData.reversedInversePatches = data.inversePatches.slice().reverse()
+            }
+            return publicData.reversedInversePatches
+        },
+        get inversePatches() {
+            if (!publicData.inversePatches) {
+                publicData.inversePatches = data.inversePatches.slice()
+            }
+            return publicData.inversePatches
+        },
+        stop() {
+            if (disposer) {
+                disposer()
+                disposer = undefined
+            }
+        },
+        resume() {
+            if (disposer) return
+            disposer = onPatch(subject, (patch, inversePatch) => {
+                // skip patches that are asked to be filtered if there's a filter in place
+                if (filter && !filter(patch, inversePatch, getRunningActionContext())) {
+                    return
+                }
+                data.patches.push(patch)
+                data.inversePatches.push(inversePatch)
+
+                // mark immutable public patches as dirty
+                publicData.patches = undefined
+                publicData.inversePatches = undefined
+                publicData.reversedInversePatches = undefined
+            })
+        },
+        replay(target?: IAnyStateTreeNode) {
+            applyPatch(target || subject, data.patches)
+        },
+        undo(target?: IAnyStateTreeNode) {
+            applyPatch(target || subject, data.inversePatches.slice().reverse())
+        }
+    }
+
+    recorder.resume()
+    return recorder
 }
 
 /**
@@ -263,12 +263,12 @@ export function recordPatches(
  * @param target
  */
 export function protect(target: IAnyStateTreeNode): void {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
 
-  const node = getStateTreeNode(target)
-  if (!node.isRoot) throw new MstError("`protect` can only be invoked on root nodes")
-  node.isProtectionEnabled = true
+    const node = getStateTreeNode(target)
+    if (!node.isRoot) throw new MstError("`protect` can only be invoked on root nodes")
+    node.isProtectionEnabled = true
 }
 
 /**
@@ -296,19 +296,19 @@ export function protect(target: IAnyStateTreeNode): void {
  * ```
  */
 export function unprotect(target: IAnyStateTreeNode): void {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
 
-  const node = getStateTreeNode(target)
-  if (!node.isRoot) throw new MstError("`unprotect` can only be invoked on root nodes")
-  node.isProtectionEnabled = false
+    const node = getStateTreeNode(target)
+    if (!node.isRoot) throw new MstError("`unprotect` can only be invoked on root nodes")
+    node.isProtectionEnabled = false
 }
 
 /**
  * Returns true if the object is in protected mode, @see protect
  */
 export function isProtected(target: IAnyStateTreeNode): boolean {
-  return getStateTreeNode(target).isProtected
+    return getStateTreeNode(target).isProtected
 }
 
 /**
@@ -319,10 +319,10 @@ export function isProtected(target: IAnyStateTreeNode): boolean {
  * @returns
  */
 export function applySnapshot<C>(target: IStateTreeNode<IType<C, any, any>>, snapshot: C) {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
 
-  return getStateTreeNode(target).applySnapshot(snapshot)
+    return getStateTreeNode(target).applySnapshot(snapshot)
 }
 
 /**
@@ -334,16 +334,16 @@ export function applySnapshot<C>(target: IStateTreeNode<IType<C, any, any>>, sna
  * @returns
  */
 export function getSnapshot<S>(
-  target: IStateTreeNode<IType<any, S, any>>,
-  applyPostProcess = true
+    target: IStateTreeNode<IType<any, S, any>>,
+    applyPostProcess = true
 ): S {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
 
-  const node = getStateTreeNode(target)
-  if (applyPostProcess) return node.snapshot
+    const node = getStateTreeNode(target)
+    if (applyPostProcess) return node.snapshot
 
-  return freeze(node.type.getSnapshot(node, false))
+    return freeze(node.type.getSnapshot(node, false))
 }
 
 /**
@@ -354,16 +354,16 @@ export function getSnapshot<S>(
  * @returns
  */
 export function hasParent(target: IAnyStateTreeNode, depth: number = 1): boolean {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
-  assertIsNumber(depth, 2, 0)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
+    assertIsNumber(depth, 2, 0)
 
-  let parent: AnyObjectNode | null = getStateTreeNode(target).parent
-  while (parent) {
-    if (--depth === 0) return true
-    parent = parent.parent
-  }
-  return false
+    let parent: AnyObjectNode | null = getStateTreeNode(target).parent
+    while (parent) {
+        if (--depth === 0) return true
+        parent = parent.parent
+    }
+    return false
 }
 
 /**
@@ -380,20 +380,20 @@ export function hasParent(target: IAnyStateTreeNode, depth: number = 1): boolean
  * @returns
  */
 export function getParent<IT extends IAnyStateTreeNode | IAnyComplexType>(
-  target: IAnyStateTreeNode,
-  depth = 1
+    target: IAnyStateTreeNode,
+    depth = 1
 ): TypeOrStateTreeNodeToStateTreeNode<IT> {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
-  assertIsNumber(depth, 2, 0)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
+    assertIsNumber(depth, 2, 0)
 
-  let d = depth
-  let parent: AnyObjectNode | null = getStateTreeNode(target).parent
-  while (parent) {
-    if (--d === 0) return parent.storedValue as any
-    parent = parent.parent
-  }
-  throw new MstError(`Failed to find the parent of ${getStateTreeNode(target)} at depth ${depth}`)
+    let d = depth
+    let parent: AnyObjectNode | null = getStateTreeNode(target).parent
+    while (parent) {
+        if (--d === 0) return parent.storedValue as any
+        parent = parent.parent
+    }
+    throw new MstError(`Failed to find the parent of ${getStateTreeNode(target)} at depth ${depth}`)
 }
 
 /**
@@ -404,16 +404,16 @@ export function getParent<IT extends IAnyStateTreeNode | IAnyComplexType>(
  * @returns
  */
 export function hasParentOfType(target: IAnyStateTreeNode, type: IAnyComplexType): boolean {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
-  assertIsType(type, 2)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
+    assertIsType(type, 2)
 
-  let parent: AnyObjectNode | null = getStateTreeNode(target).parent
-  while (parent) {
-    if (type.is(parent.storedValue)) return true
-    parent = parent.parent
-  }
-  return false
+    let parent: AnyObjectNode | null = getStateTreeNode(target).parent
+    while (parent) {
+        if (type.is(parent.storedValue)) return true
+        parent = parent.parent
+    }
+    return false
 }
 
 /**
@@ -424,19 +424,19 @@ export function hasParentOfType(target: IAnyStateTreeNode, type: IAnyComplexType
  * @returns
  */
 export function getParentOfType<IT extends IAnyComplexType>(
-  target: IAnyStateTreeNode,
-  type: IT
+    target: IAnyStateTreeNode,
+    type: IT
 ): IT["Type"] {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
-  assertIsType(type, 2)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
+    assertIsType(type, 2)
 
-  let parent: AnyObjectNode | null = getStateTreeNode(target).parent
-  while (parent) {
-    if (type.is(parent.storedValue)) return parent.storedValue
-    parent = parent.parent
-  }
-  throw new MstError(`Failed to find the parent of ${getStateTreeNode(target)} of a given type`)
+    let parent: AnyObjectNode | null = getStateTreeNode(target).parent
+    while (parent) {
+        if (type.is(parent.storedValue)) return parent.storedValue
+        parent = parent.parent
+    }
+    throw new MstError(`Failed to find the parent of ${getStateTreeNode(target)} of a given type`)
 }
 
 /**
@@ -449,12 +449,12 @@ export function getParentOfType<IT extends IAnyComplexType>(
  * @returns
  */
 export function getRoot<IT extends IAnyComplexType | IAnyStateTreeNode>(
-  target: IAnyStateTreeNode
+    target: IAnyStateTreeNode
 ): TypeOrStateTreeNodeToStateTreeNode<IT> {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
 
-  return getStateTreeNode(target).root.storedValue
+    return getStateTreeNode(target).root.storedValue
 }
 
 /**
@@ -464,10 +464,10 @@ export function getRoot<IT extends IAnyComplexType | IAnyStateTreeNode>(
  * @returns
  */
 export function getPath(target: IAnyStateTreeNode): string {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
 
-  return getStateTreeNode(target).path
+    return getStateTreeNode(target).path
 }
 
 /**
@@ -477,10 +477,10 @@ export function getPath(target: IAnyStateTreeNode): string {
  * @returns
  */
 export function getPathParts(target: IAnyStateTreeNode): string[] {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
 
-  return splitJsonPath(getStateTreeNode(target).path)
+    return splitJsonPath(getStateTreeNode(target).path)
 }
 
 /**
@@ -490,10 +490,10 @@ export function getPathParts(target: IAnyStateTreeNode): string[] {
  * @returns
  */
 export function isRoot(target: IAnyStateTreeNode): boolean {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
 
-  return getStateTreeNode(target).isRoot
+    return getStateTreeNode(target).isRoot
 }
 
 /**
@@ -505,12 +505,12 @@ export function isRoot(target: IAnyStateTreeNode): boolean {
  * @returns
  */
 export function resolvePath(target: IAnyStateTreeNode, path: string): any {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
-  assertIsString(path, 2)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
+    assertIsString(path, 2)
 
-  const node = resolveNodeByPath(getStateTreeNode(target), path)
-  return node ? node.value : undefined
+    const node = resolveNodeByPath(getStateTreeNode(target), path)
+    return node ? node.value : undefined
 }
 
 /**
@@ -523,20 +523,20 @@ export function resolvePath(target: IAnyStateTreeNode, path: string): any {
  * @returns
  */
 export function resolveIdentifier<IT extends IAnyModelType>(
-  type: IT,
-  target: IAnyStateTreeNode,
-  identifier: ReferenceIdentifier
+    type: IT,
+    target: IAnyStateTreeNode,
+    identifier: ReferenceIdentifier
 ): IT["Type"] | undefined {
-  // check all arguments
-  assertIsType(type, 1)
-  assertIsStateTreeNode(target, 2)
-  assertIsValidIdentifier(identifier, 3)
+    // check all arguments
+    assertIsType(type, 1)
+    assertIsStateTreeNode(target, 2)
+    assertIsValidIdentifier(identifier, 3)
 
-  const node = getStateTreeNode(target).root.identifierCache!.resolve(
-    type,
-    normalizeIdentifier(identifier)
-  )
-  return node?.value
+    const node = getStateTreeNode(target).root.identifierCache!.resolve(
+        type,
+        normalizeIdentifier(identifier)
+    )
+    return node?.value
 }
 
 /**
@@ -547,10 +547,10 @@ export function resolveIdentifier<IT extends IAnyModelType>(
  * @returns
  */
 export function getIdentifier(target: IAnyStateTreeNode): string | null {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
 
-  return getStateTreeNode(target).identifier
+    return getStateTreeNode(target).identifier
 }
 
 /**
@@ -562,28 +562,28 @@ export function getIdentifier(target: IAnyStateTreeNode): string | null {
  * @returns
  */
 export function tryReference<N extends IAnyStateTreeNode>(
-  getter: () => N | null | undefined,
-  checkIfAlive = true
+    getter: () => N | null | undefined,
+    checkIfAlive = true
 ): N | undefined {
-  try {
-    const node = getter()
-    if (node === undefined || node === null) {
-      return undefined
-    } else if (isStateTreeNode(node)) {
-      if (!checkIfAlive) {
-        return node
-      } else {
-        return isAlive(node) ? node : undefined
-      }
-    } else {
-      throw new MstError("The reference to be checked is not one of node, null or undefined")
+    try {
+        const node = getter()
+        if (node === undefined || node === null) {
+            return undefined
+        } else if (isStateTreeNode(node)) {
+            if (!checkIfAlive) {
+                return node
+            } else {
+                return isAlive(node) ? node : undefined
+            }
+        } else {
+            throw new MstError("The reference to be checked is not one of node, null or undefined")
+        }
+    } catch (e) {
+        if (e instanceof InvalidReferenceError) {
+            return undefined
+        }
+        throw e
     }
-  } catch (e) {
-    if (e instanceof InvalidReferenceError) {
-      return undefined
-    }
-    throw e
-  }
 }
 
 /**
@@ -594,24 +594,24 @@ export function tryReference<N extends IAnyStateTreeNode>(
  * @returns
  */
 export function isValidReference<N extends IAnyStateTreeNode>(
-  getter: () => N | null | undefined,
-  checkIfAlive = true
+    getter: () => N | null | undefined,
+    checkIfAlive = true
 ): boolean {
-  try {
-    const node = getter()
-    if (node === undefined || node === null) {
-      return false
-    } else if (isStateTreeNode(node)) {
-      return checkIfAlive ? isAlive(node) : true
-    } else {
-      throw new MstError("The reference to be checked is not one of node, null or undefined")
+    try {
+        const node = getter()
+        if (node === undefined || node === null) {
+            return false
+        } else if (isStateTreeNode(node)) {
+            return checkIfAlive ? isAlive(node) : true
+        } else {
+            throw new MstError("The reference to be checked is not one of node, null or undefined")
+        }
+    } catch (e) {
+        if (e instanceof InvalidReferenceError) {
+            return false
+        }
+        throw e
     }
-  } catch (e) {
-    if (e instanceof InvalidReferenceError) {
-      return false
-    }
-    throw e
-  }
 }
 
 /**
@@ -622,19 +622,19 @@ export function isValidReference<N extends IAnyStateTreeNode>(
  * @returns
  */
 export function tryResolve(target: IAnyStateTreeNode, path: string): any {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
-  assertIsString(path, 2)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
+    assertIsString(path, 2)
 
-  const node = resolveNodeByPath(getStateTreeNode(target), path, false)
-  if (node === undefined) return undefined
-  try {
-    return node.value
-  } catch (e) {
-    // For what ever reason not resolvable (e.g. totally not existing path, or value that cannot be fetched)
-    // see test / issue: 'try resolve doesn't work #686'
-    return undefined
-  }
+    const node = resolveNodeByPath(getStateTreeNode(target), path, false)
+    if (node === undefined) return undefined
+    try {
+        return node.value
+    } catch (e) {
+        // For what ever reason not resolvable (e.g. totally not existing path, or value that cannot be fetched)
+        // see test / issue: 'try resolve doesn't work #686'
+        return undefined
+    }
 }
 
 /**
@@ -646,11 +646,11 @@ export function tryResolve(target: IAnyStateTreeNode, path: string): any {
  * @returns
  */
 export function getRelativePath(base: IAnyStateTreeNode, target: IAnyStateTreeNode): string {
-  // check all arguments
-  assertIsStateTreeNode(base, 1)
-  assertIsStateTreeNode(target, 2)
+    // check all arguments
+    assertIsStateTreeNode(base, 1)
+    assertIsStateTreeNode(target, 2)
 
-  return getRelativePathBetweenNodes(getStateTreeNode(base), getStateTreeNode(target))
+    return getRelativePathBetweenNodes(getStateTreeNode(base), getStateTreeNode(target))
 }
 
 /**
@@ -664,44 +664,44 @@ export function getRelativePath(base: IAnyStateTreeNode, target: IAnyStateTreeNo
  * @returns
  */
 export function clone<T extends IAnyStateTreeNode>(
-  source: T,
-  keepEnvironment: boolean | any = true
+    source: T,
+    keepEnvironment: boolean | any = true
 ): T {
-  // check all arguments
-  assertIsStateTreeNode(source, 1)
+    // check all arguments
+    assertIsStateTreeNode(source, 1)
 
-  const node = getStateTreeNode(source)
-  return node.type.create(
-    node.snapshot,
-    keepEnvironment === true
-      ? node.root.environment
-      : keepEnvironment === false
-      ? undefined
-      : keepEnvironment
-  ) // it's an object or something else
+    const node = getStateTreeNode(source)
+    return node.type.create(
+        node.snapshot,
+        keepEnvironment === true
+            ? node.root.environment
+            : keepEnvironment === false
+              ? undefined
+              : keepEnvironment
+    ) // it's an object or something else
 }
 
 /**
  * Removes a model element from the state tree, and let it live on as a new state tree
  */
 export function detach<T extends IAnyStateTreeNode>(target: T): T {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
 
-  getStateTreeNode(target).detach()
-  return target
+    getStateTreeNode(target).detach()
+    return target
 }
 
 /**
  * Removes a model element from the state tree, and mark it as end-of-life; the element should not be used anymore
  */
 export function destroy(target: IAnyStateTreeNode): void {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
 
-  const node = getStateTreeNode(target)
-  if (node.isRoot) node.die()
-  else node.parent!.removeChild(node.subpath)
+    const node = getStateTreeNode(target)
+    if (node.isRoot) node.die()
+    else node.parent!.removeChild(node.subpath)
 }
 
 /**
@@ -714,10 +714,10 @@ export function destroy(target: IAnyStateTreeNode): void {
  * @returns
  */
 export function isAlive(target: IAnyStateTreeNode): boolean {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
 
-  return getStateTreeNode(target).observableIsAlive
+    return getStateTreeNode(target).observableIsAlive
 }
 
 /**
@@ -749,13 +749,13 @@ export function isAlive(target: IAnyStateTreeNode): boolean {
  * @returns The same disposer that was passed as argument
  */
 export function addDisposer(target: IAnyStateTreeNode, disposer: IDisposer): IDisposer {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
-  assertIsFunction(disposer, 2)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
+    assertIsFunction(disposer, 2)
 
-  const node = getStateTreeNode(target)
-  node.addDisposer(disposer)
-  return disposer
+    const node = getStateTreeNode(target)
+    node.addDisposer(disposer)
+    return disposer
 }
 
 /**
@@ -771,13 +771,13 @@ export function addDisposer(target: IAnyStateTreeNode, disposer: IDisposer): IDi
  * @returns
  */
 export function getEnv<T = any>(target: IAnyStateTreeNode): T {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
 
-  const node = getStateTreeNode(target)
-  const env = node.root.environment
-  if (!env) throw new MstError(`Failed to find the environment of ${node} ${node.path}`)
-  return env
+    const node = getStateTreeNode(target)
+    const env = node.root.environment
+    if (!env) throw new MstError(`Failed to find the environment of ${node} ${node.path}`)
+    return env
 }
 
 /**
@@ -788,42 +788,42 @@ export function getEnv<T = any>(target: IAnyStateTreeNode): T {
  * @return {boolean}
  */
 export function hasEnv(target: IAnyStateTreeNode): boolean {
-  // check all arguments
-  if (process.env.NODE_ENV !== "production") {
-    if (!isStateTreeNode(target))
-      throw new MstError(
-        "expected first argument to be a mobx-state-tree node, got " + target + " instead"
-      )
-  }
+    // check all arguments
+    if (process.env.NODE_ENV !== "production") {
+        if (!isStateTreeNode(target))
+            throw new MstError(
+                "expected first argument to be a mobx-state-tree node, got " + target + " instead"
+            )
+    }
 
-  const node = getStateTreeNode(target)
-  const env = node.root.environment
+    const node = getStateTreeNode(target)
+    const env = node.root.environment
 
-  return !!env
+    return !!env
 }
 
 /**
  * Performs a depth first walk through a tree.
  */
 export function walk(
-  target: IAnyStateTreeNode,
-  processor: (item: IAnyStateTreeNode) => void
+    target: IAnyStateTreeNode,
+    processor: (item: IAnyStateTreeNode) => void
 ): void {
-  // check all arguments
-  assertIsStateTreeNode(target, 1)
-  assertIsFunction(processor, 2)
+    // check all arguments
+    assertIsStateTreeNode(target, 1)
+    assertIsFunction(processor, 2)
 
-  const node = getStateTreeNode(target)
-  // tslint:disable-next-line:no_unused-variable
-  node.getChildren().forEach((child) => {
-    if (isStateTreeNode(child.storedValue)) walk(child.storedValue, processor)
-  })
-  processor(node.storedValue)
+    const node = getStateTreeNode(target)
+    // tslint:disable-next-line:no_unused-variable
+    node.getChildren().forEach(child => {
+        if (isStateTreeNode(child.storedValue)) walk(child.storedValue, processor)
+    })
+    processor(node.storedValue)
 }
 
 export interface IModelReflectionPropertiesData {
-  name: string
-  properties: { [K: string]: IAnyType }
+    name: string
+    properties: { [K: string]: IAnyType }
 }
 
 /**
@@ -833,29 +833,29 @@ export interface IModelReflectionPropertiesData {
  * @returns
  */
 export function getPropertyMembers(
-  typeOrNode: IAnyModelType | IAnyStateTreeNode
+    typeOrNode: IAnyModelType | IAnyStateTreeNode
 ): IModelReflectionPropertiesData {
-  let type: IAnyModelType
+    let type: IAnyModelType
 
-  if (isStateTreeNode(typeOrNode)) {
-    type = getType(typeOrNode) as IAnyModelType
-  } else {
-    type = typeOrNode as IAnyModelType
-  }
+    if (isStateTreeNode(typeOrNode)) {
+        type = getType(typeOrNode) as IAnyModelType
+    } else {
+        type = typeOrNode as IAnyModelType
+    }
 
-  assertArg(type, (t) => isModelType(t), "model type or model instance", 1)
+    assertArg(type, t => isModelType(t), "model type or model instance", 1)
 
-  return {
-    name: type.name,
-    properties: { ...type.properties }
-  }
+    return {
+        name: type.name,
+        properties: { ...type.properties }
+    }
 }
 
 export interface IModelReflectionData extends IModelReflectionPropertiesData {
-  actions: string[]
-  views: string[]
-  volatile: string[]
-  flowActions: string[]
+    actions: string[]
+    views: string[]
+    volatile: string[]
+    flowActions: string[]
 }
 
 /**
@@ -872,47 +872,47 @@ export interface IModelReflectionData extends IModelReflectionPropertiesData {
  * @returns
  */
 export function getMembers(target: IAnyStateTreeNode): IModelReflectionData {
-  const type = getStateTreeNode(target).type as unknown as IAnyModelType
+    const type = getStateTreeNode(target).type as unknown as IAnyModelType
 
-  const reflected: IModelReflectionData = {
-    ...getPropertyMembers(type),
-    actions: [],
-    volatile: [],
-    views: [],
-    flowActions: []
-  }
+    const reflected: IModelReflectionData = {
+        ...getPropertyMembers(type),
+        actions: [],
+        volatile: [],
+        views: [],
+        flowActions: []
+    }
 
-  const props = Object.getOwnPropertyNames(target)
-  props.forEach((key) => {
-    if (key in reflected.properties) return
-    const descriptor = Object.getOwnPropertyDescriptor(target, key)!
-    if (descriptor.get) {
-      if (isComputedProp(target, key)) reflected.views.push(key)
-      else reflected.volatile.push(key)
-      return
-    }
-    if (descriptor.value._isFlowAction === true) {
-      reflected.flowActions.push(key)
-    }
-    if (descriptor.value._isMSTAction === true) {
-      reflected.actions.push(key)
-    } else if (isObservableProp(target, key)) {
-      reflected.volatile.push(key)
-    } else {
-      reflected.views.push(key)
-    }
-  })
-  return reflected
+    const props = Object.getOwnPropertyNames(target)
+    props.forEach(key => {
+        if (key in reflected.properties) return
+        const descriptor = Object.getOwnPropertyDescriptor(target, key)!
+        if (descriptor.get) {
+            if (isComputedProp(target, key)) reflected.views.push(key)
+            else reflected.volatile.push(key)
+            return
+        }
+        if (descriptor.value._isFlowAction === true) {
+            reflected.flowActions.push(key)
+        }
+        if (descriptor.value._isMSTAction === true) {
+            reflected.actions.push(key)
+        } else if (isObservableProp(target, key)) {
+            reflected.volatile.push(key)
+        } else {
+            reflected.views.push(key)
+        }
+    })
+    return reflected
 }
 
 export function cast<O extends string | number | boolean | null | undefined = never>(
-  snapshotOrInstance: O
+    snapshotOrInstance: O
 ): O
 export function cast<O = never>(
-  snapshotOrInstance:
-    | TypeOfValue<O>["CreationType"]
-    | TypeOfValue<O>["SnapshotType"]
-    | TypeOfValue<O>["Type"]
+    snapshotOrInstance:
+        | TypeOfValue<O>["CreationType"]
+        | TypeOfValue<O>["SnapshotType"]
+        | TypeOfValue<O>["Type"]
 ): O
 /**
  * Casts a node snapshot or instance type to an instance type so it can be assigned to a type instance.
@@ -944,7 +944,7 @@ export function cast<O = never>(
  * @returns The same object cast as an instance
  */
 export function cast(snapshotOrInstance: any): any {
-  return snapshotOrInstance as any
+    return snapshotOrInstance as any
 }
 
 /**
@@ -975,9 +975,9 @@ export function cast(snapshotOrInstance: any): any {
  * @returns The same object cast as an input (creation) snapshot
  */
 export function castToSnapshot<I>(
-  snapshotOrInstance: I
+    snapshotOrInstance: I
 ): Extract<I, IAnyStateTreeNode> extends never ? I : TypeOfValue<I>["CreationType"] {
-  return snapshotOrInstance as any
+    return snapshotOrInstance as any
 }
 
 /**
@@ -1009,9 +1009,9 @@ export function castToSnapshot<I>(
  * @returns The same object cast as a reference snapshot (string or number)
  */
 export function castToReferenceSnapshot<I>(
-  instance: I
+    instance: I
 ): Extract<I, IAnyStateTreeNode> extends never ? I : ReferenceIdentifier {
-  return instance as any
+    return instance as any
 }
 
 /**
@@ -1024,7 +1024,7 @@ export function castToReferenceSnapshot<I>(
  * @returns
  */
 export function getNodeId(target: IAnyStateTreeNode): number {
-  assertIsStateTreeNode(target, 1)
+    assertIsStateTreeNode(target, 1)
 
-  return getStateTreeNode(target).nodeId
+    return getStateTreeNode(target).nodeId
 }

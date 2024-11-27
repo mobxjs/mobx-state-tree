@@ -1,103 +1,106 @@
 import {
-  MstError,
-  BaseType,
-  IValidationContext,
-  IValidationResult,
-  TypeFlags,
-  isType,
-  IAnyType,
-  typeCheckSuccess,
-  AnyObjectNode,
-  ExtractNodeType,
-  cannotDetermineSubtype,
-  devMode
+    MstError,
+    BaseType,
+    IValidationContext,
+    IValidationResult,
+    TypeFlags,
+    isType,
+    IAnyType,
+    typeCheckSuccess,
+    AnyObjectNode,
+    ExtractNodeType,
+    cannotDetermineSubtype,
+    devMode
 } from "../../internal"
 
 class Late<IT extends IAnyType> extends BaseType<
-  IT["CreationType"],
-  IT["SnapshotType"],
-  IT["TypeWithoutSTN"],
-  ExtractNodeType<IT>
+    IT["CreationType"],
+    IT["SnapshotType"],
+    IT["TypeWithoutSTN"],
+    ExtractNodeType<IT>
 > {
-  private _subType?: IT
+    private _subType?: IT
 
-  get flags() {
-    return (this._subType ? this._subType.flags : 0) | TypeFlags.Late
-  }
-
-  getSubType(mustSucceed: true): IT
-  getSubType(mustSucceed: false): IT | undefined
-  getSubType(mustSucceed: boolean): IT | undefined {
-    if (!this._subType) {
-      let t = undefined
-      try {
-        t = this._definition()
-      } catch (e) {
-        if (e instanceof ReferenceError)
-          // can happen in strict ES5 code when a definition is self refering
-          t = undefined
-        else throw e
-      }
-      if (mustSucceed && t === undefined)
-        throw new MstError(
-          "Late type seems to be used too early, the definition (still) returns undefined"
-        )
-      if (t) {
-        if (devMode() && !isType(t))
-          throw new MstError(
-            "Failed to determine subtype, make sure types.late returns a type definition."
-          )
-        this._subType = t
-      }
+    get flags() {
+        return (this._subType ? this._subType.flags : 0) | TypeFlags.Late
     }
-    return this._subType
-  }
 
-  constructor(name: string, private readonly _definition: () => IT) {
-    super(name)
-  }
-
-  instantiate(
-    parent: AnyObjectNode | null,
-    subpath: string,
-    environment: any,
-    initialValue: this["C"] | this["T"]
-  ): this["N"] {
-    return this.getSubType(true).instantiate(parent, subpath, environment, initialValue) as any
-  }
-
-  reconcile(
-    current: this["N"],
-    newValue: this["C"] | this["T"],
-    parent: AnyObjectNode,
-    subpath: string
-  ): this["N"] {
-    return this.getSubType(true).reconcile(current, newValue, parent, subpath) as any
-  }
-
-  describe() {
-    const t = this.getSubType(false)
-    return t ? t.name : "<uknown late type>"
-  }
-
-  isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
-    const t = this.getSubType(false)
-    if (!t) {
-      // See #916; the variable the definition closure is pointing to wasn't defined yet, so can't be evaluted yet here
-      return typeCheckSuccess()
+    getSubType(mustSucceed: true): IT
+    getSubType(mustSucceed: false): IT | undefined
+    getSubType(mustSucceed: boolean): IT | undefined {
+        if (!this._subType) {
+            let t = undefined
+            try {
+                t = this._definition()
+            } catch (e) {
+                if (e instanceof ReferenceError)
+                    // can happen in strict ES5 code when a definition is self refering
+                    t = undefined
+                else throw e
+            }
+            if (mustSucceed && t === undefined)
+                throw new MstError(
+                    "Late type seems to be used too early, the definition (still) returns undefined"
+                )
+            if (t) {
+                if (devMode() && !isType(t))
+                    throw new MstError(
+                        "Failed to determine subtype, make sure types.late returns a type definition."
+                    )
+                this._subType = t
+            }
+        }
+        return this._subType
     }
-    return t.validate(value, context)
-  }
 
-  isAssignableFrom(type: IAnyType) {
-    const t = this.getSubType(false)
-    return t ? t.isAssignableFrom(type) : false
-  }
+    constructor(
+        name: string,
+        private readonly _definition: () => IT
+    ) {
+        super(name)
+    }
 
-  getSubTypes() {
-    const subtype = this.getSubType(false)
-    return subtype ? subtype : cannotDetermineSubtype
-  }
+    instantiate(
+        parent: AnyObjectNode | null,
+        subpath: string,
+        environment: any,
+        initialValue: this["C"] | this["T"]
+    ): this["N"] {
+        return this.getSubType(true).instantiate(parent, subpath, environment, initialValue) as any
+    }
+
+    reconcile(
+        current: this["N"],
+        newValue: this["C"] | this["T"],
+        parent: AnyObjectNode,
+        subpath: string
+    ): this["N"] {
+        return this.getSubType(true).reconcile(current, newValue, parent, subpath) as any
+    }
+
+    describe() {
+        const t = this.getSubType(false)
+        return t ? t.name : "<uknown late type>"
+    }
+
+    isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
+        const t = this.getSubType(false)
+        if (!t) {
+            // See #916; the variable the definition closure is pointing to wasn't defined yet, so can't be evaluted yet here
+            return typeCheckSuccess()
+        }
+        return t.validate(value, context)
+    }
+
+    isAssignableFrom(type: IAnyType) {
+        const t = this.getSubType(false)
+        return t ? t.isAssignableFrom(type) : false
+    }
+
+    getSubTypes() {
+        const subtype = this.getSubType(false)
+        return subtype ? subtype : cannotDetermineSubtype
+    }
 }
 
 export function late<T extends IAnyType>(type: () => T): T
@@ -119,17 +122,17 @@ export function late<T extends IAnyType>(name: string, type: () => T): T
  * @returns
  */
 export function late(nameOrType: any, maybeType?: () => IAnyType): IAnyType {
-  const name = typeof nameOrType === "string" ? nameOrType : `late(${nameOrType.toString()})`
-  const type = typeof nameOrType === "string" ? maybeType : nameOrType
-  // checks that the type is actually a late type
-  if (devMode()) {
-    if (!(typeof type === "function" && type.length === 0))
-      throw new MstError(
-        "Invalid late type, expected a function with zero arguments that returns a type, got: " +
-          type
-      )
-  }
-  return new Late(name, type)
+    const name = typeof nameOrType === "string" ? nameOrType : `late(${nameOrType.toString()})`
+    const type = typeof nameOrType === "string" ? maybeType : nameOrType
+    // checks that the type is actually a late type
+    if (devMode()) {
+        if (!(typeof type === "function" && type.length === 0))
+            throw new MstError(
+                "Invalid late type, expected a function with zero arguments that returns a type, got: " +
+                    type
+            )
+    }
+    return new Late(name, type)
 }
 
 /**
@@ -139,5 +142,5 @@ export function late(nameOrType: any, maybeType?: () => IAnyType): IAnyType {
  * @returns
  */
 export function isLateType(type: unknown): type is IAnyType {
-  return isType(type) && (type.flags & TypeFlags.Late) > 0
+    return isType(type) && (type.flags & TypeFlags.Late) > 0
 }

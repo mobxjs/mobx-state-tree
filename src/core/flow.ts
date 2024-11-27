@@ -1,11 +1,11 @@
 import { argsToArray, MstError, setImmediateWithFallback } from "../utils"
 import {
-  FunctionWithFlag,
-  getCurrentActionContext,
-  getNextActionId,
-  getParentActionContext,
-  IMiddlewareEventType,
-  runWithActionContext
+    FunctionWithFlag,
+    getCurrentActionContext,
+    getNextActionId,
+    getParentActionContext,
+    IMiddlewareEventType,
+    runWithActionContext
 } from "./action"
 
 /**
@@ -19,9 +19,9 @@ export type FlowReturn<R> = R extends Promise<infer T> ? T : R
  * @returns The flow as a promise.
  */
 export function flow<R, Args extends any[]>(
-  generator: (...args: Args) => Generator<PromiseLike<any>, R, any>
+    generator: (...args: Args) => Generator<PromiseLike<any>, R, any>
 ): (...args: Args) => Promise<FlowReturn<R>> {
-  return createFlowSpawner(generator.name, generator) as any
+    return createFlowSpawner(generator.name, generator) as any
 }
 
 /**
@@ -32,7 +32,7 @@ export function flow<R, Args extends any[]>(
  * @returns
  */
 export function castFlowReturn<T>(val: T): T {
-  return val as any
+    return val as any
 }
 
 /**
@@ -58,9 +58,9 @@ export function castFlowReturn<T>(val: T): T {
  * ```
  */
 export function toGeneratorFunction<R, Args extends any[]>(p: (...args: Args) => Promise<R>) {
-  return function* (...args: Args) {
-    return (yield p(...args)) as R
-  }
+    return function* (...args: Args) {
+        return (yield p(...args)) as R
+    }
 }
 
 /**
@@ -85,7 +85,7 @@ export function toGeneratorFunction<R, Args extends any[]>(p: (...args: Args) =>
  * ```
  */
 export function* toGenerator<R>(p: Promise<R>) {
-  return (yield p) as R
+    return (yield p) as R
 }
 
 /**
@@ -93,112 +93,112 @@ export function* toGenerator<R>(p: Promise<R>) {
  * @hidden
  */
 export function createFlowSpawner(name: string, generator: FunctionWithFlag) {
-  const spawner = function flowSpawner(this: any) {
-    // Implementation based on https://github.com/tj/co/blob/master/index.js
-    const runId = getNextActionId()
-    const parentContext = getCurrentActionContext()!
-    if (!parentContext) {
-      throw new MstError("a mst flow must always have a parent context")
-    }
-    const parentActionContext = getParentActionContext(parentContext)
-    if (!parentActionContext) {
-      throw new MstError("a mst flow must always have a parent action context")
-    }
+    const spawner = function flowSpawner(this: any) {
+        // Implementation based on https://github.com/tj/co/blob/master/index.js
+        const runId = getNextActionId()
+        const parentContext = getCurrentActionContext()!
+        if (!parentContext) {
+            throw new MstError("a mst flow must always have a parent context")
+        }
+        const parentActionContext = getParentActionContext(parentContext)
+        if (!parentActionContext) {
+            throw new MstError("a mst flow must always have a parent action context")
+        }
 
-    const contextBase = {
-      name,
-      id: runId,
-      tree: parentContext.tree,
-      context: parentContext.context,
-      parentId: parentContext.id,
-      allParentIds: [...parentContext.allParentIds, parentContext.id],
-      rootId: parentContext.rootId,
-      parentEvent: parentContext,
-      parentActionEvent: parentActionContext
-    }
+        const contextBase = {
+            name,
+            id: runId,
+            tree: parentContext.tree,
+            context: parentContext.context,
+            parentId: parentContext.id,
+            allParentIds: [...parentContext.allParentIds, parentContext.id],
+            rootId: parentContext.rootId,
+            parentEvent: parentContext,
+            parentActionEvent: parentActionContext
+        }
 
-    const args = arguments
+        const args = arguments
 
-    function wrap(fn: any, type: IMiddlewareEventType, arg: any) {
-      fn.$mst_middleware = (spawner as any).$mst_middleware // pick up any middleware attached to the flow
-      return runWithActionContext(
-        {
-          ...contextBase,
-          type,
-          args: [arg]
-        },
-        fn
-      )
-    }
+        function wrap(fn: any, type: IMiddlewareEventType, arg: any) {
+            fn.$mst_middleware = (spawner as any).$mst_middleware // pick up any middleware attached to the flow
+            return runWithActionContext(
+                {
+                    ...contextBase,
+                    type,
+                    args: [arg]
+                },
+                fn
+            )
+        }
 
-    return new Promise(function (resolve, reject) {
-      let gen: any
-      const init = function asyncActionInit() {
-        gen = generator.apply(null, arguments)
-        onFulfilled(undefined) // kick off the flow
-      }
-      ;(init as any).$mst_middleware = (spawner as any).$mst_middleware
+        return new Promise(function (resolve, reject) {
+            let gen: any
+            const init = function asyncActionInit() {
+                gen = generator.apply(null, arguments)
+                onFulfilled(undefined) // kick off the flow
+            }
+            ;(init as any).$mst_middleware = (spawner as any).$mst_middleware
 
-      runWithActionContext(
-        {
-          ...contextBase,
-          type: "flow_spawn",
-          args: argsToArray(args)
-        },
-        init
-      )
+            runWithActionContext(
+                {
+                    ...contextBase,
+                    type: "flow_spawn",
+                    args: argsToArray(args)
+                },
+                init
+            )
 
-      function onFulfilled(res: any) {
-        let ret
-        try {
-          // prettier-ignore
-          const cancelError: any = wrap((r: any) => { ret = gen.next(r) }, "flow_resume", res)
-          if (cancelError instanceof Error) {
-            ret = gen.throw(cancelError)
-          }
-        } catch (e) {
-          // prettier-ignore
-          setImmediateWithFallback(() => {
+            function onFulfilled(res: any) {
+                let ret
+                try {
+                    // prettier-ignore
+                    const cancelError: any = wrap((r: any) => { ret = gen.next(r) }, "flow_resume", res)
+                    if (cancelError instanceof Error) {
+                        ret = gen.throw(cancelError)
+                    }
+                } catch (e) {
+                    // prettier-ignore
+                    setImmediateWithFallback(() => {
                         wrap((r: any) => { reject(e) }, "flow_throw", e)
                     })
-          return
-        }
-        next(ret)
-        return
-      }
+                    return
+                }
+                next(ret)
+                return
+            }
 
-      function onRejected(err: any) {
-        let ret
-        try {
-          // prettier-ignore
-          wrap((r: any) => { ret = gen.throw(r) }, "flow_resume_error", err) // or yieldError?
-        } catch (e) {
-          // prettier-ignore
-          setImmediateWithFallback(() => {
+            function onRejected(err: any) {
+                let ret
+                try {
+                    // prettier-ignore
+                    wrap((r: any) => { ret = gen.throw(r) }, "flow_resume_error", err) // or yieldError?
+                } catch (e) {
+                    // prettier-ignore
+                    setImmediateWithFallback(() => {
                         wrap((r: any) => { reject(e) }, "flow_throw", e)
                     })
-          return
-        }
-        next(ret)
-      }
+                    return
+                }
+                next(ret)
+            }
 
-      function next(ret: any) {
-        if (ret.done) {
-          // prettier-ignore
-          setImmediateWithFallback(() => {
+            function next(ret: any) {
+                if (ret.done) {
+                    // prettier-ignore
+                    setImmediateWithFallback(() => {
                         wrap((r: any) => { resolve(r) }, "flow_return", ret.value)
                     })
-          return
-        }
-        // TODO: support more type of values? See https://github.com/tj/co/blob/249bbdc72da24ae44076afd716349d2089b31c4c/index.js#L100
-        if (!ret.value || typeof ret.value.then !== "function") {
-          // istanbul ignore next
-          throw new MstError("Only promises can be yielded to `async`, got: " + ret)
-        }
-        return ret.value.then(onFulfilled, onRejected)
-      }
-    })
-  }
-  ;(spawner as FunctionWithFlag)._isFlowAction = true
-  return spawner
+                    return
+                }
+                // TODO: support more type of values? See https://github.com/tj/co/blob/249bbdc72da24ae44076afd716349d2089b31c4c/index.js#L100
+                if (!ret.value || typeof ret.value.then !== "function") {
+                    // istanbul ignore next
+                    throw new MstError("Only promises can be yielded to `async`, got: " + ret)
+                }
+                return ret.value.then(onFulfilled, onRejected)
+            }
+        })
+    }
+    ;(spawner as FunctionWithFlag)._isFlowAction = true
+    return spawner
 }

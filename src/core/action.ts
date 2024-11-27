@@ -1,45 +1,45 @@
 import { action as mobxAction } from "mobx"
 import {
-  getStateTreeNode,
-  MstError,
-  argsToArray,
-  IDisposer,
-  getRoot,
-  Hook,
-  IAnyStateTreeNode,
-  warnError,
-  AnyObjectNode,
-  devMode,
-  IActionContext
+    getStateTreeNode,
+    MstError,
+    argsToArray,
+    IDisposer,
+    getRoot,
+    Hook,
+    IAnyStateTreeNode,
+    warnError,
+    AnyObjectNode,
+    devMode,
+    IActionContext
 } from "../internal"
 
 export type IMiddlewareEventType =
-  | "action"
-  | "flow_spawn"
-  | "flow_resume"
-  | "flow_resume_error"
-  | "flow_return"
-  | "flow_throw"
+    | "action"
+    | "flow_spawn"
+    | "flow_resume"
+    | "flow_resume_error"
+    | "flow_return"
+    | "flow_throw"
 // | "task_spawn TODO, see #273"
 
 export interface IMiddlewareEvent extends IActionContext {
-  /** Event type */
-  readonly type: IMiddlewareEventType
+    /** Event type */
+    readonly type: IMiddlewareEventType
 
-  /** Parent event unique id */
-  readonly parentId: number
-  /** Parent event object */
-  readonly parentEvent: IMiddlewareEvent | undefined
+    /** Parent event unique id */
+    readonly parentId: number
+    /** Parent event object */
+    readonly parentEvent: IMiddlewareEvent | undefined
 
-  /** Root event unique id */
-  readonly rootId: number
-  /** Id of all events, from root until current (excluding current) */
-  readonly allParentIds: number[]
+    /** Root event unique id */
+    readonly rootId: number
+    /** Id of all events, from root until current (excluding current) */
+    readonly allParentIds: number[]
 }
 
 export interface FunctionWithFlag extends Function {
-  _isMSTAction?: boolean
-  _isFlowAction?: boolean
+    _isMSTAction?: boolean
+    _isFlowAction?: boolean
 }
 
 /**
@@ -47,14 +47,14 @@ export interface FunctionWithFlag extends Function {
  * @hidden
  */
 export type IMiddleware = {
-  handler: IMiddlewareHandler
-  includeHooks: boolean
+    handler: IMiddlewareHandler
+    includeHooks: boolean
 }
 
 export type IMiddlewareHandler = (
-  actionCall: IMiddlewareEvent,
-  next: (actionCall: IMiddlewareEvent, callback?: (value: any) => any) => void,
-  abort: (value: any) => void
+    actionCall: IMiddlewareEvent,
+    next: (actionCall: IMiddlewareEvent, callback?: (value: any) => any) => void,
+    abort: (value: any) => void
 ) => any
 
 let nextActionId = 1
@@ -65,7 +65,7 @@ let currentActionContext: IMiddlewareEvent | undefined
  * @hidden
  */
 export function getCurrentActionContext() {
-  return currentActionContext
+    return currentActionContext
 }
 
 /**
@@ -73,7 +73,7 @@ export function getCurrentActionContext() {
  * @hidden
  */
 export function getNextActionId() {
-  return nextActionId++
+    return nextActionId++
 }
 
 /**
@@ -81,10 +81,10 @@ export function getNextActionId() {
  * @hidden should only ever be used for testing within MST itself
  */
 export function resetNextActionId() {
-  if (!devMode() && !process.env.MST_TESTING) {
-    throw new Error("resetNextActionId should only be used when testing MST")
-  }
-  nextActionId = 1
+    if (!devMode() && !process.env.MST_TESTING) {
+        throw new Error("resetNextActionId should only be used when testing MST")
+    }
+    nextActionId = 1
 }
 
 // TODO: optimize away entire action context if there is no middleware in tree?
@@ -93,24 +93,24 @@ export function resetNextActionId() {
  * @hidden
  */
 export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
-  const node = getStateTreeNode(context.context)
+    const node = getStateTreeNode(context.context)
 
-  if (context.type === "action") {
-    node.assertAlive({
-      actionContext: context
-    })
-  }
+    if (context.type === "action") {
+        node.assertAlive({
+            actionContext: context
+        })
+    }
 
-  const baseIsRunningAction = node._isRunningAction
-  node._isRunningAction = true
-  const previousContext = currentActionContext
-  currentActionContext = context
-  try {
-    return runMiddleWares(node, context, fn)
-  } finally {
-    currentActionContext = previousContext
-    node._isRunningAction = baseIsRunningAction
-  }
+    const baseIsRunningAction = node._isRunningAction
+    node._isRunningAction = true
+    const previousContext = currentActionContext
+    currentActionContext = context
+    try {
+        return runMiddleWares(node, context, fn)
+    } finally {
+        currentActionContext = previousContext
+        node._isRunningAction = baseIsRunningAction
+    }
 }
 
 /**
@@ -118,9 +118,9 @@ export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
  * @hidden
  */
 export function getParentActionContext(parentContext: IMiddlewareEvent | undefined) {
-  if (!parentContext) return undefined
-  if (parentContext.type === "action") return parentContext
-  return parentContext.parentActionEvent
+    if (!parentContext) return undefined
+    if (parentContext.type === "action") return parentContext
+    return parentContext.parentActionEvent
 }
 
 /**
@@ -128,35 +128,37 @@ export function getParentActionContext(parentContext: IMiddlewareEvent | undefin
  * @hidden
  */
 export function createActionInvoker<T extends FunctionWithFlag>(
-  target: IAnyStateTreeNode,
-  name: string,
-  fn: T
+    target: IAnyStateTreeNode,
+    name: string,
+    fn: T
 ) {
-  const res = function () {
-    const id = getNextActionId()
-    const parentContext = currentActionContext
-    const parentActionContext = getParentActionContext(parentContext)
+    const res = function () {
+        const id = getNextActionId()
+        const parentContext = currentActionContext
+        const parentActionContext = getParentActionContext(parentContext)
 
-    return runWithActionContext(
-      {
-        type: "action",
-        name,
-        id,
-        args: argsToArray(arguments),
-        context: target,
-        tree: getRoot(target),
-        rootId: parentContext ? parentContext.rootId : id,
-        parentId: parentContext ? parentContext.id : 0,
-        allParentIds: parentContext ? [...parentContext.allParentIds, parentContext.id] : [],
-        parentEvent: parentContext,
-        parentActionEvent: parentActionContext
-      },
-      fn
-    )
-  }
-  ;(res as FunctionWithFlag)._isMSTAction = true
-  ;(res as FunctionWithFlag)._isFlowAction = fn._isFlowAction
-  return res
+        return runWithActionContext(
+            {
+                type: "action",
+                name,
+                id,
+                args: argsToArray(arguments),
+                context: target,
+                tree: getRoot(target),
+                rootId: parentContext ? parentContext.rootId : id,
+                parentId: parentContext ? parentContext.id : 0,
+                allParentIds: parentContext
+                    ? [...parentContext.allParentIds, parentContext.id]
+                    : [],
+                parentEvent: parentContext,
+                parentActionEvent: parentActionContext
+            },
+            fn
+        )
+    }
+    ;(res as FunctionWithFlag)._isMSTAction = true
+    ;(res as FunctionWithFlag)._isFlowAction = fn._isFlowAction
+    return res
 }
 
 /**
@@ -170,19 +172,19 @@ export function createActionInvoker<T extends FunctionWithFlag>(
  * @returns A callable function to dispose the middleware.
  */
 export function addMiddleware(
-  target: IAnyStateTreeNode,
-  handler: IMiddlewareHandler,
-  includeHooks: boolean = true
+    target: IAnyStateTreeNode,
+    handler: IMiddlewareHandler,
+    includeHooks: boolean = true
 ): IDisposer {
-  const node = getStateTreeNode(target)
-  if (devMode()) {
-    if (!node.isProtectionEnabled) {
-      warnError(
-        "It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`"
-      )
+    const node = getStateTreeNode(target)
+    if (devMode()) {
+        if (!node.isProtectionEnabled) {
+            warnError(
+                "It is recommended to protect the state tree before attaching action middleware, as otherwise it cannot be guaranteed that all changes are passed through middleware. See `protect`"
+            )
+        }
     }
-  }
-  return node.addMiddleWare(handler, includeHooks)
+    return node.addMiddleWare(handler, includeHooks)
 }
 
 /**
@@ -209,111 +211,111 @@ export function addMiddleware(
  * @returns The original function
  */
 export function decorate<T extends Function>(
-  handler: IMiddlewareHandler,
-  fn: T,
-  includeHooks = true
+    handler: IMiddlewareHandler,
+    fn: T,
+    includeHooks = true
 ): T {
-  const middleware: IMiddleware = { handler, includeHooks }
-  ;(fn as any).$mst_middleware = (fn as any).$mst_middleware || []
-  ;(fn as any).$mst_middleware.push(middleware)
-  return fn
+    const middleware: IMiddleware = { handler, includeHooks }
+    ;(fn as any).$mst_middleware = (fn as any).$mst_middleware || []
+    ;(fn as any).$mst_middleware.push(middleware)
+    return fn
 }
 
 class CollectedMiddlewares {
-  private arrayIndex = 0
-  private inArrayIndex = 0
-  private middlewares: IMiddleware[][] = []
+    private arrayIndex = 0
+    private inArrayIndex = 0
+    private middlewares: IMiddleware[][] = []
 
-  constructor(node: AnyObjectNode, fn: Function) {
-    // we just push middleware arrays into an array of arrays to avoid making copies
-    if ((fn as any).$mst_middleware) {
-      this.middlewares.push((fn as any).$mst_middleware)
+    constructor(node: AnyObjectNode, fn: Function) {
+        // we just push middleware arrays into an array of arrays to avoid making copies
+        if ((fn as any).$mst_middleware) {
+            this.middlewares.push((fn as any).$mst_middleware)
+        }
+        let n: AnyObjectNode | null = node
+        // Find all middlewares. Optimization: cache this?
+        while (n) {
+            if (n.middlewares) this.middlewares.push(n.middlewares)
+            n = n.parent
+        }
     }
-    let n: AnyObjectNode | null = node
-    // Find all middlewares. Optimization: cache this?
-    while (n) {
-      if (n.middlewares) this.middlewares.push(n.middlewares)
-      n = n.parent
-    }
-  }
 
-  get isEmpty() {
-    return this.middlewares.length <= 0
-  }
-
-  getNextMiddleware(): IMiddleware | undefined {
-    const array = this.middlewares[this.arrayIndex]
-    if (!array) return undefined
-    const item = array[this.inArrayIndex++]
-    if (!item) {
-      this.arrayIndex++
-      this.inArrayIndex = 0
-      return this.getNextMiddleware()
+    get isEmpty() {
+        return this.middlewares.length <= 0
     }
-    return item
-  }
+
+    getNextMiddleware(): IMiddleware | undefined {
+        const array = this.middlewares[this.arrayIndex]
+        if (!array) return undefined
+        const item = array[this.inArrayIndex++]
+        if (!item) {
+            this.arrayIndex++
+            this.inArrayIndex = 0
+            return this.getNextMiddleware()
+        }
+        return item
+    }
 }
 
 function runMiddleWares(
-  node: AnyObjectNode,
-  baseCall: IMiddlewareEvent,
-  originalFn: Function
+    node: AnyObjectNode,
+    baseCall: IMiddlewareEvent,
+    originalFn: Function
 ): any {
-  const middlewares = new CollectedMiddlewares(node, originalFn)
-  // Short circuit
-  if (middlewares.isEmpty) return mobxAction(originalFn).apply(null, baseCall.args)
+    const middlewares = new CollectedMiddlewares(node, originalFn)
+    // Short circuit
+    if (middlewares.isEmpty) return mobxAction(originalFn).apply(null, baseCall.args)
 
-  let result: any = null
+    let result: any = null
 
-  function runNextMiddleware(call: IMiddlewareEvent): any {
-    const middleware = middlewares.getNextMiddleware()
-    const handler = middleware && middleware.handler
+    function runNextMiddleware(call: IMiddlewareEvent): any {
+        const middleware = middlewares.getNextMiddleware()
+        const handler = middleware && middleware.handler
 
-    if (!handler) {
-      return mobxAction(originalFn).apply(null, call.args)
+        if (!handler) {
+            return mobxAction(originalFn).apply(null, call.args)
+        }
+
+        // skip hooks if asked to
+        if (!middleware!.includeHooks && (Hook as any)[call.name]) {
+            return runNextMiddleware(call)
+        }
+
+        let nextInvoked = false
+        function next(call2: IMiddlewareEvent, callback?: (value: any) => any): void {
+            nextInvoked = true
+            // the result can contain
+            // - the non manipulated return value from an action
+            // - the non manipulated abort value
+            // - one of the above but manipulated through the callback function
+            result = runNextMiddleware(call2)
+            if (callback) {
+                result = callback(result)
+            }
+        }
+
+        let abortInvoked = false
+        function abort(value: any) {
+            abortInvoked = true
+            // overwrite the result
+            // can be manipulated through middlewares earlier in the queue using the callback fn
+            result = value
+        }
+
+        handler(call, next, abort)
+        if (devMode()) {
+            if (!nextInvoked && !abortInvoked) {
+                const node2 = getStateTreeNode(call.tree)
+                throw new MstError(
+                    `Neither the next() nor the abort() callback within the middleware ${handler.name} for the action: "${call.name}" on the node: ${node2.type.name} was invoked.`
+                )
+            } else if (nextInvoked && abortInvoked) {
+                const node2 = getStateTreeNode(call.tree)
+                throw new MstError(
+                    `The next() and abort() callback within the middleware ${handler.name} for the action: "${call.name}" on the node: ${node2.type.name} were invoked.`
+                )
+            }
+        }
+        return result
     }
-
-    // skip hooks if asked to
-    if (!middleware!.includeHooks && (Hook as any)[call.name]) {
-      return runNextMiddleware(call)
-    }
-
-    let nextInvoked = false
-    function next(call2: IMiddlewareEvent, callback?: (value: any) => any): void {
-      nextInvoked = true
-      // the result can contain
-      // - the non manipulated return value from an action
-      // - the non manipulated abort value
-      // - one of the above but manipulated through the callback function
-      result = runNextMiddleware(call2)
-      if (callback) {
-        result = callback(result)
-      }
-    }
-
-    let abortInvoked = false
-    function abort(value: any) {
-      abortInvoked = true
-      // overwrite the result
-      // can be manipulated through middlewares earlier in the queue using the callback fn
-      result = value
-    }
-
-    handler(call, next, abort)
-    if (devMode()) {
-      if (!nextInvoked && !abortInvoked) {
-        const node2 = getStateTreeNode(call.tree)
-        throw new MstError(
-          `Neither the next() nor the abort() callback within the middleware ${handler.name} for the action: "${call.name}" on the node: ${node2.type.name} was invoked.`
-        )
-      } else if (nextInvoked && abortInvoked) {
-        const node2 = getStateTreeNode(call.tree)
-        throw new MstError(
-          `The next() and abort() callback within the middleware ${handler.name} for the action: "${call.name}" on the node: ${node2.type.name} were invoked.`
-        )
-      }
-    }
-    return result
-  }
-  return runNextMiddleware(baseCall)
+    return runNextMiddleware(baseCall)
 }

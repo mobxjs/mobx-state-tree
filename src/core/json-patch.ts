@@ -5,13 +5,13 @@ import { MstError, stringStartsWith } from "../internal"
  * http://jsonpatch.com/
  */
 export interface IJsonPatch {
-  readonly op: "replace" | "add" | "remove"
-  readonly path: string
-  readonly value?: any
+    readonly op: "replace" | "add" | "remove"
+    readonly path: string
+    readonly value?: any
 }
 
 export interface IReversibleJsonPatch extends IJsonPatch {
-  readonly oldValue: any // This goes beyond JSON-patch, but makes sure each patch can be inverse applied
+    readonly oldValue: any // This goes beyond JSON-patch, but makes sure each patch can be inverse applied
 }
 
 /**
@@ -19,9 +19,9 @@ export interface IReversibleJsonPatch extends IJsonPatch {
  * @hidden
  */
 export function splitPatch(patch: IReversibleJsonPatch): [IJsonPatch, IJsonPatch] {
-  if (!("oldValue" in patch))
-    throw new MstError(`Patches without \`oldValue\` field cannot be inversed`)
-  return [stripPatch(patch), invertPatch(patch)]
+    if (!("oldValue" in patch))
+        throw new MstError(`Patches without \`oldValue\` field cannot be inversed`)
+    return [stripPatch(patch), invertPatch(patch)]
 }
 
 /**
@@ -29,45 +29,45 @@ export function splitPatch(patch: IReversibleJsonPatch): [IJsonPatch, IJsonPatch
  * @hidden
  */
 export function stripPatch(patch: IReversibleJsonPatch): IJsonPatch {
-  // strips `oldvalue` information from the patch, so that it becomes a patch conform the json-patch spec
-  // this removes the ability to undo the patch
-  switch (patch.op) {
-    case "add":
-      return { op: "add", path: patch.path, value: patch.value }
-    case "remove":
-      return { op: "remove", path: patch.path }
-    case "replace":
-      return { op: "replace", path: patch.path, value: patch.value }
-  }
+    // strips `oldvalue` information from the patch, so that it becomes a patch conform the json-patch spec
+    // this removes the ability to undo the patch
+    switch (patch.op) {
+        case "add":
+            return { op: "add", path: patch.path, value: patch.value }
+        case "remove":
+            return { op: "remove", path: patch.path }
+        case "replace":
+            return { op: "replace", path: patch.path, value: patch.value }
+    }
 }
 
 function invertPatch(patch: IReversibleJsonPatch): IJsonPatch {
-  switch (patch.op) {
-    case "add":
-      return {
-        op: "remove",
-        path: patch.path
-      }
-    case "remove":
-      return {
-        op: "add",
-        path: patch.path,
-        value: patch.oldValue
-      }
-    case "replace":
-      return {
-        op: "replace",
-        path: patch.path,
-        value: patch.oldValue
-      }
-  }
+    switch (patch.op) {
+        case "add":
+            return {
+                op: "remove",
+                path: patch.path
+            }
+        case "remove":
+            return {
+                op: "add",
+                path: patch.path,
+                value: patch.oldValue
+            }
+        case "replace":
+            return {
+                op: "replace",
+                path: patch.path,
+                value: patch.oldValue
+            }
+    }
 }
 
 /**
  * Simple simple check to check it is a number.
  */
 function isNumber(x: string): boolean {
-  return typeof x === "number"
+    return typeof x === "number"
 }
 
 /**
@@ -76,18 +76,18 @@ function isNumber(x: string): boolean {
  * http://tools.ietf.org/html/rfc6901
  */
 export function escapeJsonPath(path: string): string {
-  if (isNumber(path) === true) {
-    return "" + path
-  }
-  if (path.indexOf("/") === -1 && path.indexOf("~") === -1) return path
-  return path.replace(/~/g, "~0").replace(/\//g, "~1")
+    if (isNumber(path) === true) {
+        return "" + path
+    }
+    if (path.indexOf("/") === -1 && path.indexOf("~") === -1) return path
+    return path.replace(/~/g, "~0").replace(/\//g, "~1")
 }
 
 /**
  * Unescape slashes and backslashes.
  */
 export function unescapeJsonPath(path: string): string {
-  return path.replace(/~1/g, "/").replace(/~0/g, "~")
+    return path.replace(/~1/g, "/").replace(/~0/g, "~")
 }
 
 /**
@@ -97,17 +97,17 @@ export function unescapeJsonPath(path: string): string {
  * @returns
  */
 export function joinJsonPath(path: string[]): string {
-  // `/` refers to property with an empty name, while `` refers to root itself!
-  if (path.length === 0) return ""
+    // `/` refers to property with an empty name, while `` refers to root itself!
+    if (path.length === 0) return ""
 
-  const getPathStr = (p: string[]) => p.map(escapeJsonPath).join("/")
-  if (path[0] === "." || path[0] === "..") {
-    // relative
-    return getPathStr(path)
-  } else {
-    // absolute
-    return "/" + getPathStr(path)
-  }
+    const getPathStr = (p: string[]) => p.map(escapeJsonPath).join("/")
+    if (path[0] === "." || path[0] === "..") {
+        // relative
+        return getPathStr(path)
+    } else {
+        // absolute
+        return "/" + getPathStr(path)
+    }
 }
 
 /**
@@ -117,29 +117,31 @@ export function joinJsonPath(path: string[]): string {
  * @returns
  */
 export function splitJsonPath(path: string): string[] {
-  // `/` refers to property with an empty name, while `` refers to root itself!
-  const parts = path.split("/").map(unescapeJsonPath)
+    // `/` refers to property with an empty name, while `` refers to root itself!
+    const parts = path.split("/").map(unescapeJsonPath)
 
-  const valid =
-    path === "" ||
-    path === "." ||
-    path === ".." ||
-    stringStartsWith(path, "/") ||
-    stringStartsWith(path, "./") ||
-    stringStartsWith(path, "../")
-  if (!valid) {
-    throw new MstError(`a json path must be either rooted, empty or relative, but got '${path}'`)
-  }
+    const valid =
+        path === "" ||
+        path === "." ||
+        path === ".." ||
+        stringStartsWith(path, "/") ||
+        stringStartsWith(path, "./") ||
+        stringStartsWith(path, "../")
+    if (!valid) {
+        throw new MstError(
+            `a json path must be either rooted, empty or relative, but got '${path}'`
+        )
+    }
 
-  // '/a/b/c' -> ["a", "b", "c"]
-  // '../../b/c' -> ["..", "..", "b", "c"]
-  // '' -> []
-  // '/' -> ['']
-  // './a' -> [".", "a"]
-  // /./a' -> [".", "a"] equivalent to './a'
+    // '/a/b/c' -> ["a", "b", "c"]
+    // '../../b/c' -> ["..", "..", "b", "c"]
+    // '' -> []
+    // '/' -> ['']
+    // './a' -> [".", "a"]
+    // /./a' -> [".", "a"] equivalent to './a'
 
-  if (parts[0] === "") {
-    parts.shift()
-  }
-  return parts
+    if (parts[0] === "") {
+        parts.shift()
+    }
+    return parts
 }

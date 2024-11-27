@@ -8,12 +8,12 @@ import { createTreasure, createHeros, createMonsters } from "./fixtures/fixture-
  * @param count The number of records to create.
  */
 export function smallScenario(count: number) {
-  const data = createTreasure(count) // ready?
-  const time = start()
-  const converted = data.map((d) => Treasure.create(d)) // go
-  const elapsed = time()
-  const sanity = converted.length === count
-  return { count, elapsed, sanity }
+    const data = createTreasure(count) // ready?
+    const time = start()
+    const converted = data.map(d => Treasure.create(d)) // go
+    const elapsed = time()
+    const sanity = converted.length === count
+    return { count, elapsed, sanity }
 }
 /**
  * Covers models with a moderate number of fields + 1 computed field.
@@ -21,12 +21,12 @@ export function smallScenario(count: number) {
  * @param count The number of records to create.
  */
 export function mediumScenario(count: number) {
-  const data = createHeros(count) // ready?
-  const time = start()
-  const converted = data.map((d) => Hero.create(d)) // go
-  const elapsed = time()
-  const sanity = converted.length === count
-  return { count, elapsed, sanity }
+    const data = createHeros(count) // ready?
+    const time = start()
+    const converted = data.map(d => Hero.create(d)) // go
+    const elapsed = time()
+    const sanity = converted.length === count
+    return { count, elapsed, sanity }
 }
 /**
  * Covers models with a large number of fields.
@@ -36,10 +36,10 @@ export function mediumScenario(count: number) {
  * @param mediumChildren The number of medium children contained within.
  */
 export function largeScenario(count: number, smallChildren: number, mediumChildren: number) {
-  const data = createMonsters(count, smallChildren, mediumChildren) // ready?
-  const time = start()
-  const converted = data.map((d) => Monster.create(d)) // go
-  const elapsed = time()
-  const sanity = converted.length === count
-  return { count, elapsed, sanity }
+    const data = createMonsters(count, smallChildren, mediumChildren) // ready?
+    const time = start()
+    const converted = data.map(d => Monster.create(d)) // go
+    const elapsed = time()
+    const sanity = converted.length === count
+    return { count, elapsed, sanity }
 }

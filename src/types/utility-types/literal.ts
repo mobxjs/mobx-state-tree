@@ -1,17 +1,17 @@
 import {
-  isPrimitive,
-  createScalarNode,
-  ISimpleType,
-  TypeFlags,
-  IValidationContext,
-  IValidationResult,
-  typeCheckSuccess,
-  typeCheckFailure,
-  isType,
-  Primitives,
-  AnyObjectNode,
-  SimpleType,
-  devMode
+    isPrimitive,
+    createScalarNode,
+    ISimpleType,
+    TypeFlags,
+    IValidationContext,
+    IValidationResult,
+    typeCheckSuccess,
+    typeCheckFailure,
+    isType,
+    Primitives,
+    AnyObjectNode,
+    SimpleType,
+    devMode
 } from "../../internal"
 import { assertArg } from "../../utils"
 
@@ -20,33 +20,37 @@ import { assertArg } from "../../utils"
  * @hidden
  */
 export class Literal<T> extends SimpleType<T, T, T> {
-  readonly value: T
-  readonly flags = TypeFlags.Literal
+    readonly value: T
+    readonly flags = TypeFlags.Literal
 
-  constructor(value: T) {
-    super(JSON.stringify(value))
-    this.value = value
-  }
-
-  instantiate(
-    parent: AnyObjectNode | null,
-    subpath: string,
-    environment: any,
-    initialValue: this["C"]
-  ): this["N"] {
-    return createScalarNode(this, parent, subpath, environment, initialValue)
-  }
-
-  describe() {
-    return JSON.stringify(this.value)
-  }
-
-  isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
-    if (isPrimitive(value) && value === this.value) {
-      return typeCheckSuccess()
+    constructor(value: T) {
+        super(JSON.stringify(value))
+        this.value = value
     }
-    return typeCheckFailure(context, value, `Value is not a literal ${JSON.stringify(this.value)}`)
-  }
+
+    instantiate(
+        parent: AnyObjectNode | null,
+        subpath: string,
+        environment: any,
+        initialValue: this["C"]
+    ): this["N"] {
+        return createScalarNode(this, parent, subpath, environment, initialValue)
+    }
+
+    describe() {
+        return JSON.stringify(this.value)
+    }
+
+    isValidSnapshot(value: this["C"], context: IValidationContext): IValidationResult {
+        if (isPrimitive(value) && value === this.value) {
+            return typeCheckSuccess()
+        }
+        return typeCheckFailure(
+            context,
+            value,
+            `Value is not a literal ${JSON.stringify(this.value)}`
+        )
+    }
 }
 
 /**
@@ -66,10 +70,10 @@ export class Literal<T> extends SimpleType<T, T, T> {
  * @returns
  */
 export function literal<S extends Primitives>(value: S): ISimpleType<S> {
-  // check that the given value is a primitive
-  assertArg(value, isPrimitive, "primitive", 1)
+    // check that the given value is a primitive
+    assertArg(value, isPrimitive, "primitive", 1)
 
-  return new Literal<S>(value)
+    return new Literal<S>(value)
 }
 
 /**
@@ -79,5 +83,5 @@ export function literal<S extends Primitives>(value: S): ISimpleType<S> {
  * @returns
  */
 export function isLiteralType(type: unknown): type is ISimpleType<any> {
-  return isType(type) && (type.flags & TypeFlags.Literal) > 0
+    return isType(type) && (type.flags & TypeFlags.Literal) > 0
 }
