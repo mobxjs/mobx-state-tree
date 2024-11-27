@@ -35,6 +35,22 @@ jobs:
           paths:
             - ./*
 
+  # Add new prettier check job
+  check-prettier:
+    executor: my-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install the latest version of bun
+          command: curl -fsSL https://bun.sh/install | bash
+      - run:
+          name: Link bun
+          command: sudo ln -s ~/.bun/bin/bun /usr/local/bin/
+      - run:
+          name: Check code formatting
+          command: bun run prettier:check
+
   # mobx-state-tree tests
   test-mst-dev:
     executor: my-executor
@@ -81,6 +97,11 @@ workflows:
   build-and-test:
     jobs:
       - build
+      
+      # Add prettier check to workflow
+      - check-prettier:
+          requires:
+            - build
 
       - test-mst-dev:
           requires:
