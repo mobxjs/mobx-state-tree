@@ -304,6 +304,30 @@ describe("snapshotProcessor", () => {
       // cloning
       expect(getSnapshot(clone(model.m))[0]).toBe(6)
     })
+
+    test("post processors on children are passed the node when the children are a model type", () => {
+      const child = types.model({ name: types.string })
+      const Model = types.model({
+        children: types.array(
+          types.snapshotProcessor(child, {
+            postProcessor(sn, node) {
+              expect(node).toBeDefined()
+              return { name: sn.name.toUpperCase() }
+            }
+          })
+        )
+      })
+
+      const model = Model.create({
+        children: [{ name: "foo" }, { name: "bar" }]
+      })
+
+      unprotect(model)
+      expect(model.children[0].name).toBe("foo")
+      expect(model.children[1].name).toBe("bar")
+      expect(getSnapshot(model).children[0].name).toBe("FOO")
+      expect(getSnapshot(model).children[1].name).toBe("BAR")
+    })
   })
 
   describe("over a map type", () => {
