@@ -3,15 +3,15 @@ import { resetNextActionId, setLivelinessChecking } from "../src/internal"
 import { configure } from "mobx"
 
 beforeEach(() => {
-  setLivelinessChecking("warn")
-  resetNextActionId()
+    setLivelinessChecking("warn")
+    resetNextActionId()
 })
 
 afterEach(() => {
-  mock.restore()
+    mock.restore()
 
-  // Some tests turn off proxy support, so ensure it's always turned back on
-  configure({
-    useProxies: "always"
-  })
+    // Some tests turn off proxy support, so ensure it's always turned back on
+    configure({
+        useProxies: "always"
+    })
 })

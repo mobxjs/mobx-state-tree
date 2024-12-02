@@ -1,22 +1,22 @@
 import {
-  SimpleType,
-  isPrimitive,
-  MstError,
-  identity,
-  createScalarNode,
-  ISimpleType,
-  IType,
-  TypeFlags,
-  IValidationContext,
-  IValidationResult,
-  typeCheckSuccess,
-  typeCheckFailure,
-  isType,
-  isInteger,
-  AnyObjectNode,
-  AnyNode,
-  isFloat,
-  isFinite
+    SimpleType,
+    isPrimitive,
+    MstError,
+    identity,
+    createScalarNode,
+    ISimpleType,
+    IType,
+    TypeFlags,
+    IValidationContext,
+    IValidationResult,
+    typeCheckSuccess,
+    typeCheckFailure,
+    isType,
+    isInteger,
+    AnyObjectNode,
+    AnyNode,
+    isFloat,
+    isFinite
 } from "../internal"
 
 // TODO: implement CoreType using types.custom ?
@@ -25,40 +25,40 @@ import {
  * @hidden
  */
 export class CoreType<C, S, T> extends SimpleType<C, S, T> {
-  constructor(
-    name: string,
-    readonly flags: TypeFlags,
-    private readonly checker: (value: C) => boolean,
-    private readonly initializer: (v: C) => T = identity
-  ) {
-    super(name)
-    this.flags = flags
-  }
-
-  describe() {
-    return this.name
-  }
-
-  instantiate(
-    parent: AnyObjectNode | null,
-    subpath: string,
-    environment: any,
-    initialValue: C
-  ): this["N"] {
-    return createScalarNode(this, parent, subpath, environment, initialValue)
-  }
-
-  createNewInstance(snapshot: C) {
-    return this.initializer(snapshot)
-  }
-
-  isValidSnapshot(value: C, context: IValidationContext): IValidationResult {
-    if (isPrimitive(value) && this.checker(value as any)) {
-      return typeCheckSuccess()
+    constructor(
+        name: string,
+        readonly flags: TypeFlags,
+        private readonly checker: (value: C) => boolean,
+        private readonly initializer: (v: C) => T = identity
+    ) {
+        super(name)
+        this.flags = flags
     }
-    const typeName = this.name === "Date" ? "Date or a unix milliseconds timestamp" : this.name
-    return typeCheckFailure(context, value, `Value is not a ${typeName}`)
-  }
+
+    describe() {
+        return this.name
+    }
+
+    instantiate(
+        parent: AnyObjectNode | null,
+        subpath: string,
+        environment: any,
+        initialValue: C
+    ): this["N"] {
+        return createScalarNode(this, parent, subpath, environment, initialValue)
+    }
+
+    createNewInstance(snapshot: C) {
+        return this.initializer(snapshot)
+    }
+
+    isValidSnapshot(value: C, context: IValidationContext): IValidationResult {
+        if (isPrimitive(value) && this.checker(value as any)) {
+            return typeCheckSuccess()
+        }
+        const typeName = this.name === "Date" ? "Date or a unix milliseconds timestamp" : this.name
+        return typeCheckFailure(context, value, `Value is not a ${typeName}`)
+    }
 }
 
 /**
@@ -75,9 +75,9 @@ export class CoreType<C, S, T> extends SimpleType<C, S, T> {
  */
 // tslint:disable-next-line:variable-name
 export const string: ISimpleType<string> = new CoreType<string, string, string>(
-  "string",
-  TypeFlags.String,
-  (v) => typeof v === "string"
+    "string",
+    TypeFlags.String,
+    v => typeof v === "string"
 )
 
 /**
@@ -94,9 +94,9 @@ export const string: ISimpleType<string> = new CoreType<string, string, string>(
  */
 // tslint:disable-next-line:variable-name
 export const number: ISimpleType<number> = new CoreType<number, number, number>(
-  "number",
-  TypeFlags.Number,
-  (v) => typeof v === "number"
+    "number",
+    TypeFlags.Number,
+    v => typeof v === "number"
 )
 
 /**
@@ -112,9 +112,9 @@ export const number: ISimpleType<number> = new CoreType<number, number, number>(
  */
 // tslint:disable-next-line:variable-name
 export const integer: ISimpleType<number> = new CoreType<number, number, number>(
-  "integer",
-  TypeFlags.Integer,
-  (v) => isInteger(v)
+    "integer",
+    TypeFlags.Integer,
+    v => isInteger(v)
 )
 
 /**
@@ -130,9 +130,9 @@ export const integer: ISimpleType<number> = new CoreType<number, number, number>
  */
 // tslint:disable-next-line:variable-name
 export const float: ISimpleType<number> = new CoreType<number, number, number>(
-  "float",
-  TypeFlags.Float,
-  (v) => isFloat(v)
+    "float",
+    TypeFlags.Float,
+    v => isFloat(v)
 )
 
 /**
@@ -148,9 +148,9 @@ export const float: ISimpleType<number> = new CoreType<number, number, number>(
  */
 // tslint:disable-next-line:variable-name
 export const finite: ISimpleType<number> = new CoreType<number, number, number>(
-  "finite",
-  TypeFlags.Finite,
-  (v) => isFinite(v)
+    "finite",
+    TypeFlags.Finite,
+    v => isFinite(v)
 )
 
 /**
@@ -167,37 +167,37 @@ export const finite: ISimpleType<number> = new CoreType<number, number, number>(
  */
 // tslint:disable-next-line:variable-name
 export const boolean: ISimpleType<boolean> = new CoreType<boolean, boolean, boolean>(
-  "boolean",
-  TypeFlags.Boolean,
-  (v) => typeof v === "boolean"
+    "boolean",
+    TypeFlags.Boolean,
+    v => typeof v === "boolean"
 )
 
 /**
  * `types.null` - The type of the value `null`
  */
 export const nullType: ISimpleType<null> = new CoreType<null, null, null>(
-  "null",
-  TypeFlags.Null,
-  (v) => v === null
+    "null",
+    TypeFlags.Null,
+    v => v === null
 )
 
 /**
  * `types.undefined` - The type of the value `undefined`
  */
 export const undefinedType: ISimpleType<undefined> = new CoreType<undefined, undefined, undefined>(
-  "undefined",
-  TypeFlags.Undefined,
-  (v) => v === undefined
+    "undefined",
+    TypeFlags.Undefined,
+    v => v === undefined
 )
 
 const _DatePrimitive = new CoreType<number | Date, number, Date>(
-  "Date",
-  TypeFlags.Date,
-  (v) => typeof v === "number" || v instanceof Date,
-  (v) => (v instanceof Date ? v : new Date(v))
+    "Date",
+    TypeFlags.Date,
+    v => typeof v === "number" || v instanceof Date,
+    v => (v instanceof Date ? v : new Date(v))
 )
 _DatePrimitive.getSnapshot = function (node: AnyNode) {
-  return node.storedValue.getTime()
+    return node.storedValue.getTime()
 }
 
 /**
@@ -219,17 +219,17 @@ export const DatePrimitive: IType<number | Date, number, Date> = _DatePrimitive
  * @hidden
  */
 export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
-  switch (typeof value) {
-    case "string":
-      return string
-    case "number":
-      return number // In the future, isInteger(value) ? integer : number would be interesting, but would be too breaking for now
-    case "boolean":
-      return boolean
-    case "object":
-      if (value instanceof Date) return DatePrimitive
-  }
-  throw new MstError("Cannot determine primitive type from value " + value)
+    switch (typeof value) {
+        case "string":
+            return string
+        case "number":
+            return number // In the future, isInteger(value) ? integer : number would be interesting, but would be too breaking for now
+        case "boolean":
+            return boolean
+        case "object":
+            if (value instanceof Date) return DatePrimitive
+    }
+    throw new MstError("Cannot determine primitive type from value " + value)
 }
 
 /**
@@ -239,16 +239,16 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
  * @returns
  */
 export function isPrimitiveType(
-  type: unknown
+    type: unknown
 ): type is ISimpleType<string> | ISimpleType<number> | ISimpleType<boolean> | typeof DatePrimitive {
-  return (
-    isType(type) &&
-    (type.flags &
-      (TypeFlags.String |
-        TypeFlags.Number |
-        TypeFlags.Integer |
-        TypeFlags.Boolean |
-        TypeFlags.Date)) >
-      0
-  )
+    return (
+        isType(type) &&
+        (type.flags &
+            (TypeFlags.String |
+                TypeFlags.Number |
+                TypeFlags.Integer |
+                TypeFlags.Boolean |
+                TypeFlags.Date)) >
+            0
+    )
 }

@@ -9,11 +9,11 @@ export type UnionStringArray<T extends readonly string[]> = T[number]
 // the only case where this doesn't work is when passing to the function an array variable with a mutable type constraint;
 // for these cases, it will just fallback and assume the type is a generic string.
 export function enumeration<T extends string>(
-  options: readonly T[]
+    options: readonly T[]
 ): ISimpleType<UnionStringArray<T[]>>
 export function enumeration<T extends string>(
-  name: string,
-  options: readonly T[]
+    name: string,
+    options: readonly T[]
 ): ISimpleType<UnionStringArray<T[]>>
 /**
  * `types.enumeration` - Can be used to create an string based enumeration.
@@ -31,17 +31,17 @@ export function enumeration<T extends string>(
  * @returns
  */
 export function enumeration<T extends string>(
-  name: string | readonly T[],
-  options?: readonly T[]
+    name: string | readonly T[],
+    options?: readonly T[]
 ): ISimpleType<T[number]> {
-  const realOptions: readonly T[] = typeof name === "string" ? options! : name
-  // check all options
-  if (devMode()) {
-    realOptions.forEach((option, i) => {
-      assertIsString(option, i + 1)
-    })
-  }
-  const type = union(...realOptions.map((option) => literal("" + option)))
-  if (typeof name === "string") type.name = name
-  return type as ISimpleType<T[number]>
+    const realOptions: readonly T[] = typeof name === "string" ? options! : name
+    // check all options
+    if (devMode()) {
+        realOptions.forEach((option, i) => {
+            assertIsString(option, i + 1)
+        })
+    }
+    const type = union(...realOptions.map(option => literal("" + option)))
+    if (typeof name === "string") type.name = name
+    return type as ISimpleType<T[number]>
 }

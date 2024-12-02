@@ -1,49 +1,49 @@
 import { IMiddlewareEvent, IMiddlewareHandler, IActionContext } from "../internal"
 
 export interface IActionTrackingMiddleware2Call<TEnv> extends Readonly<IActionContext> {
-  env: TEnv | undefined
-  readonly parentCall?: IActionTrackingMiddleware2Call<TEnv>
+    env: TEnv | undefined
+    readonly parentCall?: IActionTrackingMiddleware2Call<TEnv>
 }
 
 export interface IActionTrackingMiddleware2Hooks<TEnv> {
-  filter?: (call: IActionTrackingMiddleware2Call<TEnv>) => boolean
-  onStart: (call: IActionTrackingMiddleware2Call<TEnv>) => void
-  onFinish: (call: IActionTrackingMiddleware2Call<TEnv>, error?: any) => void
+    filter?: (call: IActionTrackingMiddleware2Call<TEnv>) => boolean
+    onStart: (call: IActionTrackingMiddleware2Call<TEnv>) => void
+    onFinish: (call: IActionTrackingMiddleware2Call<TEnv>, error?: any) => void
 }
 
 class RunningAction {
-  private flowsPending = 0
-  private running = true
+    private flowsPending = 0
+    private running = true
 
-  constructor(
-    public readonly hooks: IActionTrackingMiddleware2Hooks<any> | undefined,
-    readonly call: IActionTrackingMiddleware2Call<any>
-  ) {
-    if (hooks) {
-      hooks.onStart(call)
+    constructor(
+        public readonly hooks: IActionTrackingMiddleware2Hooks<any> | undefined,
+        readonly call: IActionTrackingMiddleware2Call<any>
+    ) {
+        if (hooks) {
+            hooks.onStart(call)
+        }
     }
-  }
 
-  finish(error?: any) {
-    if (this.running) {
-      this.running = false
-      if (this.hooks) {
-        this.hooks.onFinish(this.call, error)
-      }
+    finish(error?: any) {
+        if (this.running) {
+            this.running = false
+            if (this.hooks) {
+                this.hooks.onFinish(this.call, error)
+            }
+        }
     }
-  }
 
-  incFlowsPending() {
-    this.flowsPending++
-  }
+    incFlowsPending() {
+        this.flowsPending++
+    }
 
-  decFlowsPending() {
-    this.flowsPending--
-  }
+    decFlowsPending() {
+        this.flowsPending--
+    }
 
-  get hasFlowsPending() {
-    return this.flowsPending > 0
-  }
+    get hasFlowsPending() {
+        return this.flowsPending > 0
+    }
 }
 
 /**
@@ -70,85 +70,85 @@ class RunningAction {
  * @returns
  */
 export function createActionTrackingMiddleware2<TEnv = any>(
-  middlewareHooks: IActionTrackingMiddleware2Hooks<TEnv>
+    middlewareHooks: IActionTrackingMiddleware2Hooks<TEnv>
 ): IMiddlewareHandler {
-  const runningActions = new Map<number, RunningAction>()
+    const runningActions = new Map<number, RunningAction>()
 
-  return function actionTrackingMiddleware(
-    call: IMiddlewareEvent,
-    next: (actionCall: IMiddlewareEvent) => any
-  ) {
-    // find parentRunningAction
-    const parentRunningAction = call.parentActionEvent
-      ? runningActions.get(call.parentActionEvent.id)
-      : undefined
+    return function actionTrackingMiddleware(
+        call: IMiddlewareEvent,
+        next: (actionCall: IMiddlewareEvent) => any
+    ) {
+        // find parentRunningAction
+        const parentRunningAction = call.parentActionEvent
+            ? runningActions.get(call.parentActionEvent.id)
+            : undefined
 
-    if (call.type === "action") {
-      const newCall: IActionTrackingMiddleware2Call<TEnv> = {
-        ...call,
-        // make a shallow copy of the parent action env
-        env: parentRunningAction && parentRunningAction.call.env,
-        parentCall: parentRunningAction && parentRunningAction.call
-      }
-
-      const passesFilter = !middlewareHooks.filter || middlewareHooks.filter(newCall)
-      const hooks = passesFilter ? middlewareHooks : undefined
-
-      const runningAction = new RunningAction(hooks, newCall)
-      runningActions.set(call.id, runningAction)
-
-      let res
-      try {
-        res = next(call)
-      } catch (e) {
-        runningActions.delete(call.id)
-        runningAction.finish(e)
-        throw e
-      }
-      // sync action finished
-      if (!runningAction.hasFlowsPending) {
-        runningActions.delete(call.id)
-        runningAction.finish()
-      }
-      return res
-    } else {
-      if (!parentRunningAction) {
-        return next(call)
-      }
-
-      switch (call.type) {
-        case "flow_spawn": {
-          parentRunningAction.incFlowsPending()
-          return next(call)
-        }
-        case "flow_resume":
-        case "flow_resume_error": {
-          return next(call)
-        }
-        case "flow_throw": {
-          const error = call.args[0]
-          try {
-            return next(call)
-          } finally {
-            parentRunningAction.decFlowsPending()
-            if (!parentRunningAction.hasFlowsPending) {
-              runningActions.delete(call.parentActionEvent!.id)
-              parentRunningAction.finish(error)
+        if (call.type === "action") {
+            const newCall: IActionTrackingMiddleware2Call<TEnv> = {
+                ...call,
+                // make a shallow copy of the parent action env
+                env: parentRunningAction && parentRunningAction.call.env,
+                parentCall: parentRunningAction && parentRunningAction.call
             }
-          }
-        }
-        case "flow_return": {
-          try {
-            return next(call)
-          } finally {
-            parentRunningAction.decFlowsPending()
-            if (!parentRunningAction.hasFlowsPending) {
-              runningActions.delete(call.parentActionEvent!.id)
-              parentRunningAction.finish()
+
+            const passesFilter = !middlewareHooks.filter || middlewareHooks.filter(newCall)
+            const hooks = passesFilter ? middlewareHooks : undefined
+
+            const runningAction = new RunningAction(hooks, newCall)
+            runningActions.set(call.id, runningAction)
+
+            let res
+            try {
+                res = next(call)
+            } catch (e) {
+                runningActions.delete(call.id)
+                runningAction.finish(e)
+                throw e
             }
-          }
+            // sync action finished
+            if (!runningAction.hasFlowsPending) {
+                runningActions.delete(call.id)
+                runningAction.finish()
+            }
+            return res
+        } else {
+            if (!parentRunningAction) {
+                return next(call)
+            }
+
+            switch (call.type) {
+                case "flow_spawn": {
+                    parentRunningAction.incFlowsPending()
+                    return next(call)
+                }
+                case "flow_resume":
+                case "flow_resume_error": {
+                    return next(call)
+                }
+                case "flow_throw": {
+                    const error = call.args[0]
+                    try {
+                        return next(call)
+                    } finally {
+                        parentRunningAction.decFlowsPending()
+                        if (!parentRunningAction.hasFlowsPending) {
+                            runningActions.delete(call.parentActionEvent!.id)
+                            parentRunningAction.finish(error)
+                        }
+                    }
+                }
+                case "flow_return": {
+                    try {
+                        return next(call)
+                    } finally {
+                        parentRunningAction.decFlowsPending()
+                        if (!parentRunningAction.hasFlowsPending) {
+                            runningActions.delete(call.parentActionEvent!.id)
+                            parentRunningAction.finish()
+                        }
+                    }
+                }
+            }
         }
-      }
     }
-  }
 }
