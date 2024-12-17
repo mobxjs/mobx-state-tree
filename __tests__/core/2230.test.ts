@@ -1,5 +1,4 @@
 //github.com/mobxjs/mobx-state-tree/issues/2230
-
 import { describe, test } from "bun:test"
 import { types, Instance } from "../../src/index"
 
@@ -150,6 +149,31 @@ describe("2230 - type instantiation is excessively deep and possibly infinite", 
                 return self.prop41
             }
         }))
+            .actions((self: IAction4) => ({
+                getProp51(): string {
+                    return self.prop51
+                }
+            }))
+            .actions((self: IAction4) => ({
+                getProp61(): string {
+                    return self.prop61
+                }
+            }))
+            .actions((self: IAction4) => ({
+                getProp71(): string {
+                    return self.prop71
+                }
+            }))
+            .actions((self: IAction4) => ({
+                getProp81(): string {
+                    return self.prop81
+                }
+            }))
+            .actions((self: IAction4) => ({
+                getProp91(): string {
+                    return self.prop91
+                }
+            }))
         interface IAction5 extends Instance<typeof Action5> {}
     })
 })
