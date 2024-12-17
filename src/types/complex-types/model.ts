@@ -73,11 +73,6 @@ export interface ModelPropertiesDeclaration {
     [key: string]: ModelPrimitive | IAnyType
 }
 
-/** intersect two object types, but omit keys of B from A before doing so */
-type OmitMerge<A, B> = {
-    [K in keyof A as K extends keyof B ? never : K]: A[K]
-} & B
-
 /**
  * Unmaps syntax property declarations to a map of { propName: IType }
  *
@@ -205,28 +200,23 @@ export interface IModelType<
     // so it is recommended to use pre/post process snapshot after all props have been defined
     props<PROPS2 extends ModelPropertiesDeclaration>(
         props: PROPS2
-    ): IModelType<
-        OmitMerge<PROPS, ModelPropertiesDeclarationToProperties<PROPS2>>,
-        OTHERS,
-        CustomC,
-        CustomS
-    >
+    ): IModelType<PROPS & ModelPropertiesDeclarationToProperties<PROPS2>, OTHERS, CustomC, CustomS>
 
-    views<V extends AnyObject>(
+    views<V extends Object>(
         fn: (self: Instance<this>) => V
-    ): IModelType<PROPS, OmitMerge<OTHERS, V>, CustomC, CustomS>
+    ): IModelType<PROPS, OTHERS & V, CustomC, CustomS>
 
     actions<A extends ModelActions>(
         fn: (self: Instance<this>) => A
-    ): IModelType<PROPS, OmitMerge<OTHERS, A>, CustomC, CustomS>
+    ): IModelType<PROPS, OTHERS & A, CustomC, CustomS>
 
-    volatile<VS extends AnyObject>(
-        fn: (self: Instance<this>) => VS
-    ): IModelType<PROPS, OmitMerge<OTHERS, VS>, CustomC, CustomS>
+    volatile<TP extends object>(
+        fn: (self: Instance<this>) => TP
+    ): IModelType<PROPS, OTHERS & TP, CustomC, CustomS>
 
-    extend<A extends ModelActions = {}, V extends AnyObject = {}, VS extends AnyObject = {}>(
+    extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
         fn: (self: Instance<this>) => { actions?: A; views?: V; state?: VS }
-    ): IModelType<PROPS, OmitMerge<OTHERS, A & V & VS>, CustomC, CustomS>
+    ): IModelType<PROPS, OTHERS & A & V & VS, CustomC, CustomS>
 
     preProcessSnapshot<NewC = ModelCreationType2<PROPS, CustomC>>(
         fn: (snapshot: NewC) => WithAdditionalProperties<ModelCreationType2<PROPS, CustomC>>
@@ -477,7 +467,7 @@ export class ModelType<
         return this.cloneAndEnhance({ properties })
     }
 
-    volatile<TP extends AnyObject>(fn: (self: Instance<this>) => TP) {
+    volatile<TP extends object>(fn: (self: Instance<this>) => TP) {
         if (typeof fn !== "function") {
             throw new MstError(
                 `You passed an ${typeof fn} to volatile state as an argument, when function is expected`
@@ -514,7 +504,7 @@ export class ModelType<
         })
     }
 
-    extend<A extends ModelActions = {}, V extends AnyObject = {}, VS extends AnyObject = {}>(
+    extend<A extends ModelActions = {}, V extends Object = {}, VS extends Object = {}>(
         fn: (self: Instance<this>) => { actions?: A; views?: V; state?: VS }
     ) {
         const initializer = (self: Instance<this>) => {
@@ -531,7 +521,7 @@ export class ModelType<
         return this.cloneAndEnhance({ initializers: [initializer] })
     }
 
-    views<V extends AnyObject>(fn: (self: Instance<this>) => V) {
+    views<V extends Object>(fn: (self: Instance<this>) => V) {
         const viewInitializer = (self: Instance<this>) => {
             this.instantiateViews(self, fn(self))
             return self
@@ -539,7 +529,7 @@ export class ModelType<
         return this.cloneAndEnhance({ initializers: [viewInitializer] })
     }
 
-    private instantiateViews(self: this["T"], views: AnyObject): void {
+    private instantiateViews(self: this["T"], views: Object): void {
         // check views return
         if (!isPlainObject(views)) {
             throw new MstError(`views initializer should return a plain object containing views`)
