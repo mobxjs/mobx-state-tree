@@ -4,7 +4,7 @@ title: "IModelReflectionData"
 sidebar_label: "IModelReflectionData"
 ---
 
-[mobx-state-tree - v7.0.0](../index.md) › [IModelReflectionData](imodelreflectiondata.md)
+[mobx-state-tree - v7.0.1](../index.md) › [IModelReflectionData](imodelreflectiondata.md)
 
 ## Hierarchy
 
@@ -29,7 +29,7 @@ sidebar_label: "IModelReflectionData"
 
 • **actions**: *string[]*
 
-*Defined in [src/core/mst-operations.ts:855](https://github.com/mobxjs/mobx-state-tree/blob/d5d9f75f/src/core/mst-operations.ts#L855)*
+*Defined in [src/core/mst-operations.ts:855](https://github.com/mobxjs/mobx-state-tree/blob/f8bb1472/src/core/mst-operations.ts#L855)*
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 • **flowActions**: *string[]*
 
-*Defined in [src/core/mst-operations.ts:858](https://github.com/mobxjs/mobx-state-tree/blob/d5d9f75f/src/core/mst-operations.ts#L858)*
+*Defined in [src/core/mst-operations.ts:858](https://github.com/mobxjs/mobx-state-tree/blob/f8bb1472/src/core/mst-operations.ts#L858)*
 
 ___
 
@@ -47,7 +47,7 @@ ___
 
 *Inherited from [IModelReflectionPropertiesData](imodelreflectionpropertiesdata.md).[name](imodelreflectionpropertiesdata.md#name)*
 
-*Defined in [src/core/mst-operations.ts:825](https://github.com/mobxjs/mobx-state-tree/blob/d5d9f75f/src/core/mst-operations.ts#L825)*
+*Defined in [src/core/mst-operations.ts:825](https://github.com/mobxjs/mobx-state-tree/blob/f8bb1472/src/core/mst-operations.ts#L825)*
 
 ___
 
@@ -57,7 +57,7 @@ ___
 
 *Inherited from [IModelReflectionPropertiesData](imodelreflectionpropertiesdata.md).[properties](imodelreflectionpropertiesdata.md#properties)*
 
-*Defined in [src/core/mst-operations.ts:826](https://github.com/mobxjs/mobx-state-tree/blob/d5d9f75f/src/core/mst-operations.ts#L826)*
+*Defined in [src/core/mst-operations.ts:826](https://github.com/mobxjs/mobx-state-tree/blob/f8bb1472/src/core/mst-operations.ts#L826)*
 
 #### Type declaration:
 
@@ -69,7 +69,7 @@ ___
 
 • **views**: *string[]*
 
-*Defined in [src/core/mst-operations.ts:856](https://github.com/mobxjs/mobx-state-tree/blob/d5d9f75f/src/core/mst-operations.ts#L856)*
+*Defined in [src/core/mst-operations.ts:856](https://github.com/mobxjs/mobx-state-tree/blob/f8bb1472/src/core/mst-operations.ts#L856)*
 
 ___
 
@@ -77,4 +77,4 @@ ___
 
 • **volatile**: *string[]*
 
-*Defined in [src/core/mst-operations.ts:857](https://github.com/mobxjs/mobx-state-tree/blob/d5d9f75f/src/core/mst-operations.ts#L857)*
+*Defined in [src/core/mst-operations.ts:857](https://github.com/mobxjs/mobx-state-tree/blob/f8bb1472/src/core/mst-operations.ts#L857)*
