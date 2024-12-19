@@ -4,7 +4,7 @@ title: "FunctionWithFlag"
 sidebar_label: "FunctionWithFlag"
 ---
 
-[mobx-state-tree - v7.0.0](../index.md) › [FunctionWithFlag](functionwithflag.md)
+[mobx-state-tree - v7.0.1](../index.md) › [FunctionWithFlag](functionwithflag.md)
 
 ## Hierarchy
 
@@ -58,7 +58,7 @@ ___
 
 • **_isFlowAction**? : *undefined | false | true*
 
-*Defined in [src/core/action.ts:42](https://github.com/mobxjs/mobx-state-tree/blob/d5d9f75f/src/core/action.ts#L42)*
+*Defined in [src/core/action.ts:42](https://github.com/mobxjs/mobx-state-tree/blob/f8bb1472/src/core/action.ts#L42)*
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 • **_isMSTAction**? : *undefined | false | true*
 
-*Defined in [src/core/action.ts:41](https://github.com/mobxjs/mobx-state-tree/blob/d5d9f75f/src/core/action.ts#L41)*
+*Defined in [src/core/action.ts:41](https://github.com/mobxjs/mobx-state-tree/blob/f8bb1472/src/core/action.ts#L41)*
 
 ___
 
@@ -106,7 +106,7 @@ ___
 
 *Inherited from void*
 
-Defined in node_modules/typescript/lib/lib.es2015.core.d.ts:95
+Defined in node_modules/typescript/lib/lib.es2015.core.d.ts:97
 
 Returns the name of the function. Function names are read-only and can not be changed.
 

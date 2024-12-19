@@ -4,7 +4,7 @@ title: "IHooks"
 sidebar_label: "IHooks"
 ---
 
-[mobx-state-tree - v7.0.0](../index.md) › [IHooks](ihooks.md)
+[mobx-state-tree - v7.0.1](../index.md) › [IHooks](ihooks.md)
 
 ## Hierarchy
 
@@ -25,7 +25,7 @@ sidebar_label: "IHooks"
 
 • **[Hook.afterAttach]**? : *undefined | function*
 
-*Defined in [src/core/node/Hook.ts:14](https://github.com/mobxjs/mobx-state-tree/blob/d5d9f75f/src/core/node/Hook.ts#L14)*
+*Defined in [src/core/node/Hook.ts:14](https://github.com/mobxjs/mobx-state-tree/blob/f8bb1472/src/core/node/Hook.ts#L14)*
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 • **[Hook.afterCreate]**? : *undefined | function*
 
-*Defined in [src/core/node/Hook.ts:13](https://github.com/mobxjs/mobx-state-tree/blob/d5d9f75f/src/core/node/Hook.ts#L13)*
+*Defined in [src/core/node/Hook.ts:13](https://github.com/mobxjs/mobx-state-tree/blob/f8bb1472/src/core/node/Hook.ts#L13)*
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 • **[Hook.beforeDestroy]**? : *undefined | function*
 
-*Defined in [src/core/node/Hook.ts:16](https://github.com/mobxjs/mobx-state-tree/blob/d5d9f75f/src/core/node/Hook.ts#L16)*
+*Defined in [src/core/node/Hook.ts:16](https://github.com/mobxjs/mobx-state-tree/blob/f8bb1472/src/core/node/Hook.ts#L16)*
 
 ___
 
@@ -49,4 +49,4 @@ ___
 
 • **[Hook.beforeDetach]**? : *undefined | function*
 
-*Defined in [src/core/node/Hook.ts:15](https://github.com/mobxjs/mobx-state-tree/blob/d5d9f75f/src/core/node/Hook.ts#L15)*
+*Defined in [src/core/node/Hook.ts:15](https://github.com/mobxjs/mobx-state-tree/blob/f8bb1472/src/core/node/Hook.ts#L15)*
