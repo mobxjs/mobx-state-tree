@@ -52,6 +52,9 @@
     "files": [
         "dist/"
     ],
+    "dependencies": {
+        "ts-essentials": "^9.4.1"
+    },
     "devDependencies": {
         "@size-limit/preset-big-lib": "^5.0.3",
         "@types/bun": "^1.0.6",
@@ -71,7 +74,6 @@
         "rollup-plugin-terser": "^6.1.0",
         "shx": "^0.3.2",
         "size-limit": "^5.0.3",
-        "ts-essentials": "^9.4.1",
         "ts-node": "^8.10.2",
         "tslib": "^2.0.0",
         "tslint": "^6.1.3",

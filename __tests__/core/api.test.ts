@@ -1,6 +1,6 @@
-import * as mst from "../../src"
-import { readFileSync } from "fs"
 import { expect, test } from "bun:test"
+import { readFileSync } from "fs"
+import * as mst from "../../src"
 
 function stringToArray(s: string): string[] {
     return s.split(",").map(str => str.trim())
@@ -156,7 +156,7 @@ test("all methods mentioned in API docs", () => {
 })
 
 test("only accepted dependencies", () => {
-    const validDeps: string[] = []
+    const validDeps: string[] = ["ts-essentials"]
 
     const deps =
         JSON.parse(readFileSync(__dirname + "/../../package.json", "utf8")).dependencies || {}
