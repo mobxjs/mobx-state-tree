@@ -9,7 +9,7 @@ about: I think something is not working as it should
 
 -   [ ] I've checked documentation and searched for existing issues [and discussions](https://github.com/mobxjs/mobx-state-tree/discussions)
 -   [ ] I've made sure my project is based on the latest MST version
--   [ ] Fork [this](https://codesandbox.io/s/y64pzxj01) code sandbox or another minimal reproduction.
+-   [ ] Fork [this](https://codesandbox.io/p/sandbox/mobx-state-tree-todolist-forked-pj732k) code sandbox or another minimal reproduction.
 
 **Sandbox link or minimal reproduction code**
 
