@@ -121,7 +121,7 @@
 <li><a href="/API/#compose"><code>types.compose(name?, type1...typeX)</code></a>, creates a new model type by taking a bunch of existing types and combining them into a new one.</li>
 <li><a href="/API/#reference"><code>types.reference(targetType)</code></a> creates a property that is a reference to another item of the given <code>targetType</code> somewhere in the same tree. See <a href="/concepts/references#references">references</a> for more details.</li>
 <li><a href="/API/#safereference"><code>types.safeReference(targetType)</code></a> is like a standard reference, except that it accepts the undefined value by default and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed. See <a href="/concepts/references#references">references</a> for more details.</li>
-<li><a href="/API/#snapshotprocessor"><code>types.snapshotProcessor(type, processors, name?)</code></a> runs a pre snapshot / post snapshot processor before/after serializing a given type. Example:
+<li><a href="/API/#snapshotprocessor"><code>types.snapshotProcessor(type, processors, name?)</code></a> runs a pre snapshot / post snapshot processor before/after serializing a given type. <a href="https://github.com/mobxjs/mobx-state-tree/issues/1317">See known issue with <code>applySnapshot</code> and <code>preProcessSnapshot</code></a> Example:
 <pre><code class="hljs css language-ts"><span class="hljs-keyword">const</span> Todo1 = types.model({ text: types.string })
 <span class="hljs-comment">// in the backend the text type must be null when empty</span>
 <span class="hljs-keyword">interface</span> BackendTodo {
