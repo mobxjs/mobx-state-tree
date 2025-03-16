@@ -65,7 +65,7 @@ Note that since MST v3 `types.array` and `types.map` are wrapped in `types.optio
 -   [`types.compose(name?, type1...typeX)`](/API/#compose), creates a new model type by taking a bunch of existing types and combining them into a new one.
 -   [`types.reference(targetType)`](/API/#reference) creates a property that is a reference to another item of the given `targetType` somewhere in the same tree. See [references](/concepts/references#references) for more details.
 -   [`types.safeReference(targetType)`](/API/#safereference) is like a standard reference, except that it accepts the undefined value by default and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps when the reference it is pointing to gets detached/destroyed. See [references](/concepts/references#references) for more details.
--   [`types.snapshotProcessor(type, processors, name?)`](/API/#snapshotprocessor) runs a pre snapshot / post snapshot processor before/after serializing a given type. Example:
+-   [`types.snapshotProcessor(type, processors, name?)`](/API/#snapshotprocessor) runs a pre snapshot / post snapshot processor before/after serializing a given type. [See known issue with `applySnapshot` and `preProcessSnapshot`](https://github.com/mobxjs/mobx-state-tree/issues/1317) Example:
     ```ts
     const Todo1 = types.model({ text: types.string })
     // in the backend the text type must be null when empty

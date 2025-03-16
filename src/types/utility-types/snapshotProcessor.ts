@@ -236,6 +236,8 @@ export interface ISnapshotProcessors<IT extends IAnyType, CustomC, CustomS> {
 /**
  * `types.snapshotProcessor` - Runs a pre/post snapshot processor before/after serializing a given type.
  *
+ * [See known issue with `applySnapshot` and `preProcessSnapshot`](https://github.com/mobxjs/mobx-state-tree/issues/1317)
+ *
  * Example:
  * ```ts
  * const Todo1 = types.model({ text: types.string })
