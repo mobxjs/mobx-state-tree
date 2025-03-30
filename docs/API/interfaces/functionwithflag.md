@@ -58,7 +58,7 @@ ___
 
 • **_isFlowAction**? : *undefined | false | true*
 
-*Defined in [src/core/action.ts:42](https://github.com/mobxjs/mobx-state-tree/blob/84c63895/src/core/action.ts#L42)*
+*Defined in [src/core/action.ts:42](https://github.com/mobxjs/mobx-state-tree/blob/b34bf45a/src/core/action.ts#L42)*
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 • **_isMSTAction**? : *undefined | false | true*
 
-*Defined in [src/core/action.ts:41](https://github.com/mobxjs/mobx-state-tree/blob/84c63895/src/core/action.ts#L41)*
+*Defined in [src/core/action.ts:41](https://github.com/mobxjs/mobx-state-tree/blob/b34bf45a/src/core/action.ts#L41)*
 
 ___
 
