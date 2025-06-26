@@ -785,7 +785,7 @@ ___
 
 *Defined in [src/types/complex-types/array.ts:348](https://github.com/mobxjs/mobx-state-tree/blob/b34bf45a/src/types/complex-types/array.ts#L348)*
 
-`types.array` - Creates an index based collection type who's children are all of a uniform declared type.
+`types.array` - Creates an index based collection type whose children are all of a uniform declared type.
 
 This type will always produce [observable arrays](https://mobx.js.org/api.html#observablearray)
 
@@ -3088,7 +3088,7 @@ ___
 Returns true if the given state tree node is not killed yet.
 This means that the node is still a part of a tree, and that `destroy`
 has not been called. If a node is not alive anymore, the only thing one can do with it
-is requesting it's last path and snapshot
+is requesting its last path and snapshot
 
 **Parameters:**
 
@@ -3577,7 +3577,7 @@ ___
 
 *Defined in [src/types/complex-types/map.ts:511](https://github.com/mobxjs/mobx-state-tree/blob/b34bf45a/src/types/complex-types/map.ts#L511)*
 
-`types.map` - Creates a key based collection type who's children are all of a uniform declared type.
+`types.map` - Creates a key based collection type whose children are all of a uniform declared type.
 If the type stored in a map has an identifier, it is mandatory to store the child under that identifier in the map.
 
 This type will always produce [observable maps](https://mobx.js.org/api.html#observablemap)
@@ -4473,7 +4473,7 @@ ___
 
 *Defined in [src/core/type/type-checker.ts:164](https://github.com/mobxjs/mobx-state-tree/blob/b34bf45a/src/core/type/type-checker.ts#L164)*
 
-Run's the typechecker for the given type on the given value, which can be a snapshot or an instance.
+Runs the typechecker for the given type on the given value, which can be a snapshot or an instance.
 Throws if the given value is not according the provided type specification.
 Use this if you need typechecks even in a production build (by default all automatic runtime type checks will be skipped in production builds)
 
