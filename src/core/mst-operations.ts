@@ -760,7 +760,7 @@ export function addDisposer(target: IAnyStateTreeNode, disposer: IDisposer): IDi
 
 /**
  * Returns the environment of the current state tree, or throws. For more info on environments,
- * see [Dependency injection](https://github.com/mobxjs/mobx-state-tree#dependency-injection)
+ * see [Dependency injection](/concepts/dependency-injection)
  *
  * Please note that in child nodes access to the root is only possible
  * once the `afterAttach` hook has fired
