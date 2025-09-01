@@ -87,3 +87,6 @@ const MyComponent = observer((props) => {
 - [Dan Abramov](https://twitter.com/dan_abramov)'s work on [Redux](http://redux.js.org) has strongly influenced the idea of snapshots and transactional actions in MST.
 - [Giulio Canti](https://twitter.com/GiulioCanti)'s work on [tcomb](http://github.com/gcanti/tcomb) and type systems in general has strongly influenced the type system of MST.
 - All the early adopters encouraging to pursue this whole idea and proving it is something feasible.
+
+
+<!-- Security scan triggered at 2025-09-01 20:15:05 -->
