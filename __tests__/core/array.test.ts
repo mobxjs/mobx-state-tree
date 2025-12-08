@@ -12,7 +12,8 @@ import {
     IJsonPatch,
     setLivelinessChecking,
     detach,
-    cast
+    cast,
+    SnapshotIn
 } from "../../src"
 import { observable, autorun, configure } from "mobx"
 import { expect, test } from "bun:test"
@@ -287,6 +288,38 @@ test("it should reconciliate keyed instances correctly", () => {
     expect(store.todos[0] === tea).toBe(true)
     expect(store.todos[1] === coffee).toBe(true)
     expect(store.todos[2] === biscuit).toBe(false)
+})
+test("it should reconciliate large array instances efficiently", () => {
+    const Todo = types.model("Task", {
+        id: types.identifier,
+        task: ""
+    })
+    const Store = types
+        .model("Store", {
+            todos: types.array(types.maybeNull(Todo))
+        })
+        .actions(self => ({
+            setTodos(todos: SnapshotIn<typeof self.todos>) {
+                self.todos = cast(todos)
+            }
+        }))
+    const todos = Array.from({ length: 5000 }, (_, i) => ({ id: `todo-${i}`, task: `task-${i}` }))
+    const reversedTodos = [...todos].reverse()
+    const store = Store.create({
+        todos: todos
+    })
+
+    const todosBeforeSet = store.todos.slice()
+
+    const now = Date.now()
+    store.setTodos(reversedTodos)
+    const elapsed = Date.now() - now
+    expect(elapsed).toBeLessThan(1000)
+
+    for (let i = 0; i < todos.length; i++) {
+        // Check reconciliation, the instance in store should be the same instance as before the set, just in reversed order
+        expect(store.todos[i]).toBe(todosBeforeSet[todos.length - i - 1])
+    }
 })
 test("it correctly reconciliate when swapping", () => {
     const Task = types.model("Task", {})
