@@ -154,9 +154,9 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
                 }
             }
 
-            if (typeof id !== "string" && typeof id !== "number") {
+            if (typeof id !== "string" && typeof id !== "number" && typeof id !== "bigint") {
                 throw new MstError(
-                    `Instance identifier '${this.identifierAttribute}' for type '${this.type.name}' must be a string or a number`
+                    `Instance identifier '${this.identifierAttribute}' for type '${this.type.name}' must be a string, a number or a bigint`
                 )
             }
 

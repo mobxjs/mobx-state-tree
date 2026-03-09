@@ -312,6 +312,7 @@ describe("Model instantiation", () => {
             maybe: types.maybe(types.string),
             maybeNull: types.maybeNull(types.number),
             null: types.null,
+            bigint: types.bigint,
             number: types.number,
             optional: types.optional(types.string, "default"),
             reference: types.reference(IdentifiedWithString),
@@ -327,7 +328,7 @@ describe("Model instantiation", () => {
                 | "model"
                 | "identifier"
                 | "identifierNumber"
-                | "bigint"
+                | "identifierBigint"
                 | "map"
                 | "array"
                 | "snapshotProcessor"
@@ -365,6 +366,7 @@ describe("Model instantiation", () => {
                     maybe: "test",
                     maybeNull: 1,
                     null: null,
+                    bigint: BigInt(1),
                     number: 1,
                     optional: "test",
                     reference: "id-a",
@@ -396,6 +398,7 @@ describe("Model instantiation", () => {
                     maybe: "test",
                     maybeNull: 1,
                     null: null,
+                    bigint: "1",
                     number: 1,
                     optional: "test",
                     reference: "id-a",
@@ -431,6 +434,7 @@ describe("Model instantiation", () => {
                     maybe: types.maybe(types.string).create("test"),
                     maybeNull: types.maybeNull(types.number).create(1),
                     null: types.null.create(null),
+                    bigint: types.bigint.create(BigInt(1)),
                     number: types.number.create(1),
                     optional: types.optional(types.string, "default").create("test"),
                     reference: instanceA,
@@ -460,6 +464,7 @@ describe("Model instantiation", () => {
                     maybe: "test",
                     maybeNull: 1,
                     null: null,
+                    bigint: "1",
                     number: 1,
                     optional: "test",
                     reference: "id-a",
