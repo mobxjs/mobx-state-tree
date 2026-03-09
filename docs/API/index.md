@@ -62,10 +62,12 @@ sidebar_label: "Globals"
 ### Variables
 
 * [DatePrimitive](index.md#const-dateprimitive)
+* [bigint](index.md#const-bigint)
 * [boolean](index.md#const-boolean)
 * [finite](index.md#const-finite)
 * [float](index.md#const-float)
 * [identifier](index.md#const-identifier)
+* [identifierBigint](index.md#const-identifierbigint)
 * [identifierNumber](index.md#const-identifiernumber)
 * [integer](index.md#const-integer)
 * [nullType](index.md#const-nulltype)
@@ -541,6 +543,27 @@ Example:
 ```ts
  const Todo = types.model("Todo", {
      id: types.identifier,
+     title: types.string
+ })
+```
+
+**`returns`** 
+
+___
+
+### `Const` identifierBigint
+
+• **identifierBigint**: *[IType](interfaces/itype.md)‹bigint | string | number, string, bigint›* = 
+    new IdentifierBigintType()
+
+*Defined in [src/types/utility-types/identifier.ts:231](https://github.com/mobxjs/mobx-state-tree/blob/e3b5780d/src/types/utility-types/identifier.ts#L231)*
+
+`types.identifierBigint` - Similar to `types.identifier`. Snapshots serialize to string (JSON-safe) and deserialize from string, number or bigint.
+
+Example:
+```ts
+ const Todo = types.model("Todo", {
+     id: types.identifierBigint,
      title: types.string
  })
 ```

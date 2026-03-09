@@ -646,7 +646,7 @@ test("#923", () => {
     types.optional(types.map(Bar), {}) // Should have no compile error!
 })
 
-test("snapshot type of reference must be string | number", () => {
+test("snapshot type of reference must be ReferenceIdentifier (string | number | bigint)", () => {
     const M = types.model({ id: types.identifier, a: "bar" })
     const R = types.reference(M)
 
@@ -655,7 +655,7 @@ test("snapshot type of reference must be string | number", () => {
         realM: { id: "5" },
         refM: "5"
     })
-    const sn: string | number = getSnapshot(s.refM)
+    const sn: string | number | bigint = getSnapshot(s.refM)
 })
 
 test("#951", () => {
@@ -1337,7 +1337,10 @@ test("#2184 - type narrowing functions should narrow to the expected type", () =
     } else if (isReferenceType(type)) {
         assertTypesEqual(type, _ as IReferenceType<IAnyComplexType>)
     } else if (isIdentifierType(type)) {
-        assertTypesEqual(type, _ as ISimpleType<string> | ISimpleType<number>)
+        assertTypesEqual(
+            type,
+            _ as ISimpleType<string> | ISimpleType<number> | typeof types.identifierBigint
+        )
     } else if (isRefinementType(type)) {
         assertTypesEqual(type, _ as IAnyType)
     } else if (isLateType(type)) {

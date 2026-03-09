@@ -10,6 +10,7 @@ import {
     ModelType,
     typeCheckSuccess,
     ISimpleType,
+    IType,
     AnyObjectNode,
     ScalarNode,
     assertArg
@@ -20,7 +21,7 @@ abstract class BaseIdentifierType<T> extends SimpleType<T, T, T> {
 
     constructor(
         name: string,
-        private readonly validType: "string" | "number"
+        private readonly validType: "string" | "number" | "bigint"
     ) {
         super(name)
     }
@@ -130,6 +131,107 @@ export const identifier: ISimpleType<string> = new IdentifierType()
 export const identifierNumber: ISimpleType<number> = new IdentifierNumberType()
 
 /**
+ * @internal
+ * @hidden
+ * IdentifierBigintType uses SimpleType<bigint | string | number, string, bigint> so snapshots serialize to string (JSON-safe).
+ */
+export class IdentifierBigintType extends SimpleType<bigint | string | number, string, bigint> {
+    readonly flags = TypeFlags.Identifier
+
+    constructor() {
+        super("identifierBigint")
+    }
+
+    createNewInstance(snapshot: bigint | string | number): bigint {
+        if (typeof snapshot === "bigint") return snapshot
+        return BigInt(snapshot)
+    }
+
+    instantiate(
+        parent: AnyObjectNode | null,
+        subpath: string,
+        environment: any,
+        initialValue: bigint | string | number
+    ): this["N"] {
+        if (!parent || !(parent.type instanceof ModelType))
+            throw new MstError(
+                `Identifier types can only be instantiated as direct child of a model type`
+            )
+        return createScalarNode(this, parent, subpath, environment, initialValue)
+    }
+
+    reconcile(
+        current: this["N"],
+        newValue: bigint | string | number,
+        parent: AnyObjectNode,
+        subpath: string
+    ): this["N"] {
+        const currentVal = current.storedValue
+        const newVal = typeof newValue === "bigint" ? newValue : BigInt(newValue)
+        if (currentVal !== newVal)
+            throw new MstError(
+                `Tried to change identifier from '${currentVal}' to '${newVal}'. Changing identifiers is not allowed.`
+            )
+        current.setParent(parent, subpath)
+        return current
+    }
+
+    isValidSnapshot(
+        value: bigint | string | number,
+        context: IValidationContext
+    ): IValidationResult {
+        if (typeof value === "bigint") {
+            return typeCheckSuccess()
+        }
+
+        if (typeof value === "string" || typeof value === "number") {
+            try {
+                // BigInt primitive constructor verifies whether the value is a valid integer
+                BigInt(value)
+                return typeCheckSuccess()
+            } catch (e) {
+                const errorMessage = e instanceof Error ? e.message : String(e)
+                return typeCheckFailure(
+                    context,
+                    value,
+                    `Value is not a valid ${this.describe()}: ${errorMessage}`
+                )
+            }
+        }
+
+        return typeCheckFailure(
+            context,
+            value,
+            `Value is not a valid ${this.describe()}, expected a bigint, a string or a number`
+        )
+    }
+
+    getSnapshot(node: this["N"]): string {
+        return String(node.storedValue)
+    }
+
+    describe() {
+        return `identifierBigint`
+    }
+}
+
+/**
+ * `types.identifierBigint` - Similar to `types.identifier`. Snapshots serialize to string (JSON-safe) and deserialize from string, number or bigint.
+ *
+ * Example:
+ * ```ts
+ *  const Todo = types.model("Todo", {
+ *      id: types.identifierBigint,
+ *      title: types.string
+ *  })
+ * ```
+ *
+ * @returns
+ */
+export const identifierBigint: IType<bigint | string | number, string, bigint> =
+    new IdentifierBigintType()
+
+/**
  * Returns if a given value represents an identifier type.
  *
  * @param type
@@ -137,14 +239,14 @@ export const identifierNumber: ISimpleType<number> = new IdentifierNumberType()
  */
 export function isIdentifierType(
     type: unknown
-): type is typeof identifier | typeof identifierNumber {
+): type is typeof identifier | typeof identifierNumber | typeof identifierBigint {
     return isType(type) && (type.flags & TypeFlags.Identifier) > 0
 }
 
 /**
  * Valid types for identifiers.
  */
-export type ReferenceIdentifier = string | number
+export type ReferenceIdentifier = string | number | bigint
 
 /**
  * @internal
@@ -159,7 +261,7 @@ export function normalizeIdentifier(id: ReferenceIdentifier): string {
  * @hidden
  */
 export function isValidIdentifier(id: any): id is ReferenceIdentifier {
-    return typeof id === "string" || typeof id === "number"
+    return typeof id === "string" || typeof id === "number" || typeof id === "bigint"
 }
 
 /**
@@ -167,5 +269,5 @@ export function isValidIdentifier(id: any): id is ReferenceIdentifier {
  * @hidden
  */
 export function assertIsValidIdentifier(id: ReferenceIdentifier, argNumber: number | number[]) {
-    assertArg(id, isValidIdentifier, "string or number (identifier)", argNumber)
+    assertArg(id, isValidIdentifier, "string, number or bigint (identifier)", argNumber)
 }
