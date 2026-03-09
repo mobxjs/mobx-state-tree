@@ -25,7 +25,7 @@
         "typecheck": "tsc --noEmit",
         "size": "size-limit",
         "tag-new-version": "yarn version && git push --tags",
-        "build-docs": "bun run fix-typedoc && shx rm -rf ./docs/API && typedoc --options ./typedocconfig.js",
+        "build-docs": "bun run fix-typedoc && shx rm -rf ./docs/API && typedoc --options ./typedocconfig.js && node scripts/fix-docs-source-links.js",
         "publish-docs": "bun run build-docs && cd ./website && GIT_USER=jamonholmgren USE_SSH=true bun run publish-gh-pages",
         "start": "cd website && bun run start",
         "prepare": "husky install",
