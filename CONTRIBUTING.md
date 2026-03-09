@@ -40,6 +40,8 @@ To maintain our library's stability, we are always striving to improve test cove
 
 Good documentation is crucial for our users. If your contribution involves changes to the library's behavior, please update the documentation accordingly. Not every PR is necessarily going to require documentation updates, but we encourage you to consider touching up documentation related to your code changes. If you're unsure about where to make changes, feel free to reach out to us, and we'll be happy to guide you.
 
+When changing the API, commit the code changes first, then run `npm run build-docs` and commit the documentation separately.
+
 ### Submitting a Pull Request
 
 1. Fork the MobX-State-Tree repository on GitHub to your own GitHub account.
