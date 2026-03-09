@@ -3,7 +3,7 @@
   "compilerOptions": {
     "rootDir": "../",
     "module": "commonjs",
-    "lib": ["es2017", "dom"],
+    "lib": ["es2017", "es2020.bigint", "dom"],
     "target": "es6",
     "sourceMap": false,
     "noEmit": true

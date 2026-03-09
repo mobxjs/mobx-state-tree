@@ -106,3 +106,44 @@ if (process.env.NODE_ENV !== "production") {
         }).toThrow()
     })
 }
+
+test("types.bigint accepts bigint values", () => {
+    const Model = types.model({
+        id: types.bigint,
+        value: types.bigint
+    })
+    const instance = Model.create({ id: BigInt(1), value: BigInt(2) })
+    expect(instance.id).toBe(BigInt(1))
+    expect(instance.value).toBe(BigInt(2))
+    expect(types.bigint.describe()).toBe("bigint")
+})
+
+test("types.bigint snapshot round-trip preserves bigint", () => {
+    const Model = types.model({ id: types.bigint })
+    const instance = Model.create({ id: BigInt("9007199254740993") })
+    const snapshot = getSnapshot(instance)
+    expect(snapshot.id).toBe("9007199254740993")
+    expect(typeof snapshot.id).toBe("string")
+})
+
+test("types.bigint snapshot is JSON-serializable and deserializes correctly", () => {
+    const Model = types.model({ id: types.bigint, value: types.bigint })
+    const instance = Model.create({ id: BigInt(1), value: BigInt("9007199254740993") })
+    const snapshot = getSnapshot(instance)
+    const json = JSON.stringify(snapshot)
+    expect(json).toBe('{"id":"1","value":"9007199254740993"}')
+    const parsed = JSON.parse(json)
+    const restored = Model.create(parsed)
+    expect(restored.id).toBe(BigInt(1))
+    expect(restored.value).toBe(BigInt("9007199254740993"))
+})
+
+if (process.env.NODE_ENV !== "production") {
+    test("Passing non bigint/string/number to types.bigint", () => {
+        const Model = types.model({ id: types.bigint })
+        expect(() => Model.create({ id: BigInt(1) })).not.toThrow()
+        expect(() => Model.create({ id: "1" })).not.toThrow()
+        expect(() => Model.create({ id: 1 })).not.toThrow()
+        expect(() => Model.create({ id: null as any })).toThrow()
+    })
+}

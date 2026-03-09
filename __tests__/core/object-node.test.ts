@@ -1210,8 +1210,7 @@ describe("ObjectNode", () => {
             describe("when given some falsy value", () => {
                 it("returns the value", () => {
                     const node = new ObjectNode(TestModel as any, null, "", {}, { title: "hello" })
-                    // @ts-expect-error - we're testing the behavior of unbox with non-undefined values
-                    expect(node.unbox(undefined)).toBe(undefined)
+                    expect(node.unbox(undefined)).toBeUndefined()
                     // @ts-expect-error - we're testing the behavior of unbox with non-undefined values
                     expect(node.unbox(null as any)).toBe(null)
                     // @ts-expect-error - we're testing the behavior of unbox with non-undefined values
@@ -1331,8 +1330,7 @@ describe("ObjectNode", () => {
         describe("when the type does not have an identifier", () => {
             it("returns undefined", () => {
                 const node = new ObjectNode(TestModel as any, null, "", {}, { title: "hello" })
-                // @ts-expect-error - we're testing the behavior of identifierAttribute with a type that doesn't have one
-                expect(node.identifierAttribute).toBe(undefined)
+                expect(node.identifierAttribute).toBeUndefined()
             })
         })
         describe("when the type has an identifier", () => {
