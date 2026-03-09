@@ -439,6 +439,25 @@ LogLine.create({ timestamp: new Date() })
 
 ___
 
+### `Const` bigint
+
+• **bigint**: *[IType](interfaces/itype.md)‹bigint | string | number, string, bigint›* =  _BigIntPrimitive
+
+*Defined in [src/types/primitives.ts:192](https://github.com/mobxjs/mobx-state-tree/blob/8c6f719b/src/types/primitives.ts#L192)*
+
+`types.bigint` - Creates a type that can only contain a bigint value.
+Snapshots serialize to string (JSON-safe) and deserialize from string, number or bigint.
+
+Example:
+```ts
+const BigId = types.model({
+  id: types.identifier,
+  value: types.bigint
+})
+getSnapshot(store).value // "0" (string, JSON-safe)
+```
+___
+
 ### `Const` boolean
 
 • **boolean**: *[ISimpleType](interfaces/isimpletype.md)‹boolean›* =  new CoreType<boolean, boolean, boolean>(

@@ -114,6 +114,7 @@ const TYPES = stringToArray(`
     integer,
     float,
     finite,
+    bigint,
     Date,
     map,
     array,

@@ -1,31 +1,44 @@
 import { t } from "../../src"
 import { Hook, NodeLifeCycle } from "../../src/internal"
-import { describe, expect, it, test } from "bun:test"
+import { describe, it, expect, test } from "bun:test"
 
-describe("types.boolean", () => {
+describe("types.bigint", () => {
     describe("methods", () => {
         describe("create", () => {
             describe("with no arguments", () => {
                 if (process.env.NODE_ENV !== "production") {
                     it("should throw an error in development", () => {
                         expect(() => {
-                            t.boolean.create()
+                            t.bigint.create()
                         }).toThrow()
                     })
                 }
             })
-            describe("with a boolean argument", () => {
-                it("should return a boolean", () => {
-                    const n = t.boolean.create(true)
-                    expect(typeof n).toBe("boolean")
+            describe("with a bigint argument", () => {
+                it("should return a bigint", () => {
+                    const n = t.bigint.create(BigInt(1))
+                    expect(typeof n).toBe("bigint")
+                })
+            })
+            describe("with a number argument", () => {
+                it("should return a bigint", () => {
+                    const n = t.bigint.create(1)
+                    expect(typeof n).toBe("bigint")
+                    expect(n).toBe(BigInt(1))
+                })
+            })
+            describe("with a string argument", () => {
+                it("should return a bigint", () => {
+                    const n = t.bigint.create("2")
+                    expect(typeof n).toBe("bigint")
+                    expect(n).toBe(BigInt(2))
                 })
             })
             describe("with argument of different types", () => {
                 const testCases = [
                     null,
                     undefined,
-                    "string",
-                    1,
+                    true,
                     [],
                     function () {},
                     new Date(),
@@ -33,16 +46,14 @@ describe("types.boolean", () => {
                     new Map(),
                     new Set(),
                     Symbol(),
-                    new Error(),
-                    Infinity,
-                    NaN
+                    new Error()
                 ]
 
                 if (process.env.NODE_ENV !== "production") {
                     testCases.forEach(testCase => {
                         it(`should throw an error when passed ${JSON.stringify(testCase)}`, () => {
                             expect(() => {
-                                t.boolean.create(testCase as any)
+                                t.bigint.create(testCase as any)
                             }).toThrow()
                         })
                     })
@@ -50,46 +61,46 @@ describe("types.boolean", () => {
             })
         })
         describe("describe", () => {
-            it("should return the value 'boolean'", () => {
-                const description = t.boolean.describe()
-                expect(description).toBe("boolean")
+            it("should return the value 'bigint'", () => {
+                const description = t.bigint.describe()
+                expect(description).toBe("bigint")
             })
         })
         describe("getSnapshot", () => {
-            it("should return the value passed in", () => {
-                const b = t.boolean.instantiate(null, "", {}, true)
-                const snapshot = t.boolean.getSnapshot(b)
-                expect(snapshot).toBe(true)
+            it("should return the value as string (JSON-safe)", () => {
+                const n = t.bigint.instantiate(null, "", {}, BigInt(1))
+                const snapshot = t.bigint.getSnapshot(n)
+                expect(snapshot).toBe("1")
+                expect(typeof snapshot).toBe("string")
             })
         })
         describe("getSubtype", () => {
             it("should return null", () => {
-                const subtype = t.boolean.getSubTypes()
+                const subtype = t.bigint.getSubTypes()
                 expect(subtype).toBe(null)
             })
         })
         describe("instantiate", () => {
             if (process.env.NODE_ENV !== "production") {
                 describe("with invalid arguments", () => {
-                    it("should not throw an error", () => {
+                    it("should throw when passed undefined", () => {
                         expect(() => {
-                            // @ts-ignore
-                            t.boolean.instantiate()
-                        }).not.toThrow()
+                            t.bigint.instantiate(null, "", {}, undefined as any)
+                        }).toThrow()
                     })
                 })
             }
-            describe("with a boolean argument", () => {
+            describe("with a bigint argument", () => {
                 it("should return an object", () => {
-                    const b = t.boolean.instantiate(null, "", {}, true)
-                    expect(typeof b).toBe("object")
+                    const n = t.bigint.instantiate(null, "", {}, BigInt(1))
+                    expect(typeof n).toBe("object")
                 })
             })
         })
         describe("is", () => {
-            describe("with a boolean argument", () => {
+            describe("with a bigint argument", () => {
                 it("should return true", () => {
-                    const result = t.boolean.is(true)
+                    const result = t.bigint.is(BigInt(1))
                     expect(result).toBe(true)
                 })
             })
@@ -97,8 +108,7 @@ describe("types.boolean", () => {
                 const testCases = [
                     null,
                     undefined,
-                    "string",
-                    1,
+                    true,
                     [],
                     function () {},
                     new Date(),
@@ -106,30 +116,38 @@ describe("types.boolean", () => {
                     new Map(),
                     new Set(),
                     Symbol(),
-                    new Error(),
-                    Infinity,
-                    NaN
+                    new Error()
                 ]
 
                 testCases.forEach(testCase => {
                     it(`should return false when passed ${JSON.stringify(testCase)}`, () => {
-                        const result = t.boolean.is(testCase as any)
+                        const result = t.bigint.is(testCase as any)
                         expect(result).toBe(false)
                     })
                 })
             })
+            describe("with a string argument", () => {
+                it("should return true (string is valid snapshot input)", () => {
+                    expect(t.bigint.is("1")).toBe(true)
+                })
+            })
+            describe("with a number argument", () => {
+                it("should return true (number is valid snapshot input)", () => {
+                    expect(t.bigint.is(1)).toBe(true)
+                })
+            })
         })
         describe("isAssignableFrom", () => {
-            describe("with a boolean argument", () => {
+            describe("with a bigint argument", () => {
                 it("should return true", () => {
-                    const result = t.boolean.isAssignableFrom(t.boolean)
+                    const result = t.bigint.isAssignableFrom(t.bigint)
                     expect(result).toBe(true)
                 })
             })
             describe("with argument of different types", () => {
                 const testCases = [
                     t.Date,
-                    t.number,
+                    t.boolean,
                     t.finite,
                     t.float,
                     t.identifier,
@@ -142,18 +160,24 @@ describe("types.boolean", () => {
 
                 testCases.forEach(testCase => {
                     it(`should return false when passed ${JSON.stringify(testCase)}`, () => {
-                        const result = t.boolean.isAssignableFrom(testCase as any)
+                        const result = t.bigint.isAssignableFrom(testCase as any)
                         expect(result).toBe(false)
                     })
                 })
             })
         })
-        // TODO: we need to test this, but to be honest I'm not sure what the expected behavior is on single boolean nodes.
-        describe.skip("reconcile", () => {})
         describe("validate", () => {
-            describe("with a boolean argument", () => {
-                it("should return with no validation errors", () => {
-                    const result = t.boolean.validate(true, [])
+            describe("with a bigint, string or number argument", () => {
+                it("should return with no validation errors for bigint", () => {
+                    const result = t.bigint.validate(BigInt(1), [])
+                    expect(result).toEqual([])
+                })
+                it("should return with no validation errors for string", () => {
+                    const result = t.bigint.validate("1", [])
+                    expect(result).toEqual([])
+                })
+                it("should return with no validation errors for number", () => {
+                    const result = t.bigint.validate(1, [])
                     expect(result).toEqual([])
                 })
             })
@@ -161,8 +185,7 @@ describe("types.boolean", () => {
                 const testCases = [
                     null,
                     undefined,
-                    "string",
-                    1,
+                    true,
                     [],
                     function () {},
                     new Date(),
@@ -170,20 +193,18 @@ describe("types.boolean", () => {
                     new Map(),
                     new Set(),
                     Symbol(),
-                    new Error(),
-                    Infinity,
-                    NaN
+                    new Error()
                 ]
 
                 testCases.forEach(testCase => {
                     it(`should return with a validation error when passed ${JSON.stringify(
                         testCase
                     )}`, () => {
-                        const result = t.boolean.validate(testCase as any, [])
+                        const result = t.bigint.validate(testCase as any, [])
                         expect(result).toEqual([
                             {
                                 context: [],
-                                message: "Value is not a boolean",
+                                message: "Value is not a bigint",
                                 value: testCase
                             }
                         ])
@@ -195,27 +216,26 @@ describe("types.boolean", () => {
     describe("properties", () => {
         describe("flags", () => {
             test("return the correct value", () => {
-                const flags = t.boolean.flags
-                expect(flags).toBe(4)
+                const flags = t.bigint.flags
+                expect(flags).toBe(1 << 23)
             })
         })
         describe("identifierAttribute", () => {
-            // We don't have a way to set the identifierAttribute on a primitive type, so this should return undefined.
             test("returns undefined", () => {
-                const identifierAttribute = t.boolean.identifierAttribute
+                const identifierAttribute = t.bigint.identifierAttribute
                 expect(identifierAttribute).toBeUndefined()
             })
         })
         describe("isType", () => {
             test("returns true", () => {
-                const isType = t.boolean.isType
+                const isType = t.bigint.isType
                 expect(isType).toBe(true)
             })
         })
         describe("name", () => {
-            test('returns "boolean"', () => {
-                const name = t.boolean.name
-                expect(name).toBe("boolean")
+            test('returns "bigint"', () => {
+                const name = t.bigint.name
+                expect(name).toBe("bigint")
             })
         })
     })
@@ -223,64 +243,65 @@ describe("types.boolean", () => {
         describe("methods", () => {
             describe("aboutToDie", () => {
                 it("calls the beforeDetach hook", () => {
-                    const b = t.boolean.instantiate(null, "", {}, true)
+                    const n = t.bigint.instantiate(null, "", {}, BigInt(1))
                     let called = false
-                    b.registerHook(Hook.beforeDestroy, () => {
+                    n.registerHook(Hook.beforeDestroy, () => {
                         called = true
                     })
-                    b.aboutToDie()
+                    n.aboutToDie()
                     expect(called).toBe(true)
                 })
             })
             describe("die", () => {
                 it("kills the node", () => {
-                    const b = t.boolean.instantiate(null, "", {}, true)
-                    b.die()
-                    expect(b.isAlive).toBe(false)
+                    const n = t.bigint.instantiate(null, "", {}, BigInt(1))
+                    n.die()
+                    expect(n.isAlive).toBe(false)
                 })
                 it("should mark the node as dead", () => {
-                    const b = t.boolean.instantiate(null, "", {}, true)
-                    b.die()
-                    expect(b.state).toBe(NodeLifeCycle.DEAD)
+                    const n = t.bigint.instantiate(null, "", {}, BigInt(1))
+                    n.die()
+                    expect(n.state).toBe(NodeLifeCycle.DEAD)
                 })
             })
             describe("finalizeCreation", () => {
                 it("should mark the node as finalized", () => {
-                    const b = t.boolean.instantiate(null, "", {}, true)
-                    b.finalizeCreation()
-                    expect(b.state).toBe(NodeLifeCycle.FINALIZED)
+                    const n = t.bigint.instantiate(null, "", {}, BigInt(1))
+                    n.finalizeCreation()
+                    expect(n.state).toBe(NodeLifeCycle.FINALIZED)
                 })
             })
             describe("finalizeDeath", () => {
                 it("should mark the node as dead", () => {
-                    const b = t.boolean.instantiate(null, "", {}, true)
-                    b.finalizeDeath()
-                    expect(b.state).toBe(NodeLifeCycle.DEAD)
+                    const n = t.bigint.instantiate(null, "", {}, BigInt(1))
+                    n.finalizeDeath()
+                    expect(n.state).toBe(NodeLifeCycle.DEAD)
                 })
             })
             describe("getReconciliationType", () => {
                 it("should return the correct type", () => {
-                    const b = t.boolean.instantiate(null, "", {}, true)
-                    const type = b.getReconciliationType()
-                    expect(type).toBe(t.boolean)
+                    const n = t.bigint.instantiate(null, "", {}, BigInt(1))
+                    const type = n.getReconciliationType()
+                    expect(type).toBe(t.bigint)
                 })
             })
             describe("getSnapshot", () => {
-                it("should return the value passed in", () => {
-                    const b = t.boolean.instantiate(null, "", {}, true)
-                    const snapshot = b.getSnapshot()
-                    expect(snapshot).toBe(true)
+                it("should return the value as string (JSON-safe)", () => {
+                    const n = t.bigint.instantiate(null, "", {}, BigInt(1))
+                    const snapshot = n.getSnapshot()
+                    expect(snapshot).toBe("1")
+                    expect(typeof snapshot).toBe("string")
                 })
             })
             describe("registerHook", () => {
                 it("should register a hook and call it", () => {
-                    const b = t.boolean.instantiate(null, "", {}, true)
+                    const n = t.bigint.instantiate(null, "", {}, BigInt(1))
                     let called = false
-                    b.registerHook(Hook.beforeDestroy, () => {
+                    n.registerHook(Hook.beforeDestroy, () => {
                         called = true
                     })
 
-                    b.die()
+                    n.die()
 
                     expect(called).toBe(true)
                 })
@@ -289,25 +310,25 @@ describe("types.boolean", () => {
                 if (process.env.NODE_ENV !== "production") {
                     describe("with null", () => {
                         it("should throw an error", () => {
-                            const b = t.boolean.instantiate(null, "", {}, true)
+                            const n = t.bigint.instantiate(null, "", {}, BigInt(1))
                             expect(() => {
-                                b.setParent(null, "foo")
+                                n.setParent(null, "foo")
                             }).toThrow()
                         })
                     })
                     describe("with a parent object", () => {
                         it("should throw an error", () => {
                             const Parent = t.model({
-                                child: t.boolean
+                                child: t.bigint
                             })
 
-                            const parent = Parent.create({ child: true })
+                            const parent = Parent.create({ child: BigInt(1) })
 
-                            const b = t.boolean.instantiate(null, "", {}, true)
+                            const n = t.bigint.instantiate(null, "", {}, BigInt(1))
 
                             expect(() => {
                                 // @ts-ignore
-                                b.setParent(parent, "bar")
+                                n.setParent(parent, "bar")
                             }).toThrow(
                                 "[mobx-state-tree] assertion failed: scalar nodes cannot change their parent"
                             )

@@ -20,7 +20,7 @@ test("performs well on large scenario", () => {
     expect(largeScenario(10, 10, 10).elapsed < TOO_SLOW_MS).toBe(true)
 })
 
-test("timer", () => async () => {
+test("timer", async () => {
     const go = start()
 
     await new Promise(resolve => setTimeout(resolve, 2))

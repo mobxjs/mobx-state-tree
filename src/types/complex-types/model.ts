@@ -66,7 +66,7 @@ export interface ModelProperties {
 }
 
 /** @hidden */
-export type ModelPrimitive = string | number | boolean | Date
+export type ModelPrimitive = string | number | boolean | Date | bigint
 
 /** @hidden */
 export interface ModelPropertiesDeclaration {

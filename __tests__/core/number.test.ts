@@ -200,8 +200,7 @@ describe("types.number", () => {
             // We don't have a way to set the identifierAttribute on a primitive type, so this should return undefined.
             test("returns undefined", () => {
                 const identifierAttribute = t.number.identifierAttribute
-                // @ts-expect-error this is a test to make sure the value is undefined, we expect this
-                expect(identifierAttribute).toBe(undefined)
+                expect(identifierAttribute).toBeUndefined()
             })
         })
         describe("isType", () => {

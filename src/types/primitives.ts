@@ -153,6 +153,44 @@ export const finite: ISimpleType<number> = new CoreType<number, number, number>(
     v => isFinite(v)
 )
 
+const _BigIntPrimitive = new CoreType<bigint | string | number, string, bigint>(
+    "bigint",
+    TypeFlags.BigInt,
+    v => {
+        if (typeof v === "bigint") {
+            return true
+        }
+
+        if (typeof v === "string" || typeof v === "number") {
+            try {
+                // BigInt primitive constructor verifies whether the value is a valid integer
+                BigInt(v)
+                return true
+            } catch {}
+        }
+        return false
+    },
+    v => (typeof v === "bigint" ? v : BigInt(v))
+)
+_BigIntPrimitive.getSnapshot = function (node: AnyNode) {
+    return String(node.storedValue)
+}
+
+/**
+ * `types.bigint` - Creates a type that can only contain a bigint value.
+ * Snapshots serialize to string (JSON-safe) and deserialize from string, number or bigint.
+ *
+ * Example:
+ * ```ts
+ * const BigId = types.model({
+ *   id: types.identifier,
+ *   value: types.bigint
+ * })
+ * getSnapshot(store).value // "0" (string, JSON-safe)
+ * ```
+ */
+export const bigint: IType<bigint | string | number, string, bigint> = _BigIntPrimitive
+
 /**
  * `types.boolean` - Creates a type that can only contain a boolean value.
  * This type is used for boolean values by default
@@ -226,6 +264,8 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
             return number // In the future, isInteger(value) ? integer : number would be interesting, but would be too breaking for now
         case "boolean":
             return boolean
+        case "bigint":
+            return bigint
         case "object":
             if (value instanceof Date) return DatePrimitive
     }
@@ -240,7 +280,12 @@ export function getPrimitiveFactoryFromValue(value: any): ISimpleType<any> {
  */
 export function isPrimitiveType(
     type: unknown
-): type is ISimpleType<string> | ISimpleType<number> | ISimpleType<boolean> | typeof DatePrimitive {
+): type is
+    | ISimpleType<string>
+    | ISimpleType<number>
+    | ISimpleType<boolean>
+    | typeof bigint
+    | typeof DatePrimitive {
     return (
         isType(type) &&
         (type.flags &
@@ -248,7 +293,8 @@ export function isPrimitiveType(
                 TypeFlags.Number |
                 TypeFlags.Integer |
                 TypeFlags.Boolean |
-                TypeFlags.Date)) >
+                TypeFlags.Date |
+                TypeFlags.BigInt)) >
             0
     )
 }

@@ -327,6 +327,7 @@ describe("Model instantiation", () => {
                 | "model"
                 | "identifier"
                 | "identifierNumber"
+                | "bigint"
                 | "map"
                 | "array"
                 | "snapshotProcessor"

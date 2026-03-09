@@ -165,6 +165,7 @@ export function isPrimitive(value: any, includeDate = true): value is Primitives
         typeof value === "string" ||
         typeof value === "number" ||
         typeof value === "boolean" ||
+        typeof value === "bigint" ||
         (includeDate && value instanceof Date)
     )
 }

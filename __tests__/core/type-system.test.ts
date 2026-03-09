@@ -1331,6 +1331,7 @@ test("#2184 - type narrowing functions should narrow to the expected type", () =
                 | ISimpleType<string>
                 | ISimpleType<number>
                 | ISimpleType<boolean>
+                | typeof types.bigint
                 | typeof DatePrimitive
         )
     } else if (isReferenceType(type)) {
