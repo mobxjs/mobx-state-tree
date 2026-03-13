@@ -350,6 +350,30 @@ export function array<IT extends IAnyType>(subtype: IT): IArrayType<IT> {
     return new ArrayType<IT>(`${subtype.name}[]`, subtype)
 }
 
+function buildObjectByIdMap(nodes: AnyNode[]): [Set<string>, Map<string, Array<AnyNode>> | null] {
+    // Creates a map of node by identifier value.
+    //  In theory, several nodes can have the same identifier, if the array contains different types, so every identifier is mapped to an array of nodes with the same values.
+    //  In practice this in probably a rare case, so we can live with the performance hit.
+    //
+    // If not all nodes have identifier, we can't use the map for lookups, so we return null.
+    const identifierAttributes = new Set<string>()
+    const keyToObjectMap = new Map<string, Array<AnyObjectNode>>()
+
+    for (const node of nodes) {
+        if (node instanceof ObjectNode && node.identifierAttribute && node.identifier !== null) {
+            identifierAttributes.add(node.identifierAttribute)
+            const key = node.identifier
+            if (!keyToObjectMap.has(key)) {
+                keyToObjectMap.set(key, [])
+            }
+            keyToObjectMap.get(key)!.push(node)
+        } else {
+            return [identifierAttributes, null] // Not all nodes have identifier, so we can't use the map.
+        }
+    }
+    return [identifierAttributes, keyToObjectMap]
+}
+
 function reconcileArrayChildren<TT>(
     parent: AnyObjectNode,
     childType: IType<any, any, TT>,
@@ -358,6 +382,8 @@ function reconcileArrayChildren<TT>(
     newPaths: (string | number)[]
 ): AnyNode[] | null {
     let nothingChanged = true
+
+    const [identifierAttributes, oldNodeMap] = buildObjectByIdMap(oldNodes)
 
     for (let i = 0; ; i++) {
         const hasNewNode = i <= newValues.length - 1
@@ -404,14 +430,28 @@ function reconcileArrayChildren<TT>(
             // nothing to do, try to reorder
             let oldMatch = undefined
 
-            // find a possible candidate to reuse
-            for (let j = i; j < oldNodes.length; j++) {
-                if (areSame(oldNodes[j], newValue)) {
-                    oldMatch = oldNodes.splice(j, 1)[0]
-                    break
+            // Try to find match by identifier attributes
+            if (oldNodeMap && typeof newValue === "object" && newValue !== null) {
+                for (const identifierAttribute of identifierAttributes) {
+                    if (!(identifierAttribute in newValue)) {
+                        continue
+                    }
+                    const identifierValue = (newValue as any)[identifierAttribute]
+                    const matchingNodes = oldNodeMap.get(identifierValue) || []
+
+                    oldMatch = matchingNodes.find(node => areSame(node, newValue))
+                    if (oldMatch) {
+                        break
+                    }
+                }
+            } else {
+                for (let j = i; j < oldNodes.length; j++) {
+                    if (areSame(oldNodes[j], newValue)) {
+                        oldMatch = oldNodes.splice(j, 1)[0]
+                        break
+                    }
                 }
             }
-
             nothingChanged = false
             const newNode = valueAsNode(childType, parent, newPath, newValue, oldMatch)
             oldNodes.splice(i, 0, newNode)
