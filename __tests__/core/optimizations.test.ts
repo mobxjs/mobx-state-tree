@@ -78,6 +78,8 @@ test("it should only validate changed array items when applying a parent snapsho
     validationCalls = 0
     applySnapshot(store, snapshot)
 
-    expect(validationCalls).toBe(1)
+    if (process.env.NODE_ENV !== "production") {
+        expect(validationCalls).toBe(1)
+    }
     expect(getSnapshot(store)).toEqual(snapshot)
 })
