@@ -17,6 +17,7 @@ import {
     assertIsType,
     ComplexType,
     convertChildNodesToArray,
+    cannotDetermineSubtype,
     createActionInvoker,
     createObjectNode,
     devMode,
@@ -33,6 +34,7 @@ import {
     IHooksGetter,
     IJsonPatch,
     isArray,
+    isMutable,
     isNode,
     isPlainObject,
     isStateTreeNode,
@@ -290,9 +292,70 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     }
 
     applySnapshot(node: this["N"], snapshot: this["C"]): void {
-        typecheckInternal(this, snapshot)
+        if (!isArray(snapshot)) {
+            typecheckInternal(this, snapshot)
+            return
+        }
+
         const target = node.storedValue
-        target.replace(snapshot as any)
+        const childNodes = node.getChildren()
+        const oldLength = childNodes.length
+        const newLength = snapshot.length
+        const childType = this.getChildType()
+        const minLength = Math.min(oldLength, newLength)
+
+        let start = 0
+        while (start < minLength && childNodes[start].snapshot === snapshot[start]) {
+            start++
+        }
+
+        if (start === oldLength && start === newLength) {
+            return
+        }
+
+        if (oldLength === newLength) {
+            let canApplyDirectly = true
+
+            for (let i = start; i < newLength; i++) {
+                if (childNodes[i].snapshot === snapshot[i]) continue
+                if (!canApplyDirectSnapshot(childType, childNodes[i], snapshot[i])) {
+                    canApplyDirectly = false
+                    break
+                }
+            }
+
+            if (canApplyDirectly) {
+                for (let i = start; i < newLength; i++) {
+                    const childNode = childNodes[i]
+                    if (childNode.snapshot === snapshot[i]) continue
+                    if (canApplyDirectSnapshot(childType, childNode, snapshot[i])) {
+                        childNode.applySnapshot(snapshot[i] as any)
+                    }
+                }
+                return
+            }
+        }
+
+        let oldEnd = oldLength - 1
+        let newEnd = newLength - 1
+        while (
+            oldEnd >= start &&
+            newEnd >= start &&
+            childNodes[oldEnd].snapshot === snapshot[newEnd]
+        ) {
+            oldEnd--
+            newEnd--
+        }
+
+        const oldCount = oldEnd >= start ? oldEnd - start + 1 : 0
+        const newValues = newEnd >= start ? snapshot.slice(start, newEnd + 1) : EMPTY_ARRAY
+
+        if (oldCount === 1 && newValues.length === 1) {
+            target[start] = newValues[0] as any
+            return
+        }
+
+        target.splice(start, oldCount, ...(newValues as any))
     }
 
     getChildType(): IAnyType {
@@ -348,6 +411,34 @@ ArrayType.prototype.applySnapshot = action(ArrayType.prototype.applySnapshot)
 export function array<IT extends IAnyType>(subtype: IT): IArrayType<IT> {
     assertIsType(subtype, 1)
     return new ArrayType<IT>(`${subtype.name}[]`, subtype)
+}
+
+function canApplyDirectSnapshot(
+    childType: IAnyType,
+    childNode: AnyNode,
+    newValue: any
+): childNode is ObjectNode<any, any, any> {
+    const reconciliationType = childNode.getReconciliationType()
+    const directApplyType = resolveDirectApplyType(childType)
+
+    return (
+        childNode instanceof ObjectNode &&
+        reconciliationType === directApplyType &&
+        reconciliationType instanceof ComplexType &&
+        isMutable(newValue) &&
+        !isStateTreeNode(newValue) &&
+        reconciliationType.isMatchingSnapshotId(childNode as any, newValue)
+    )
+}
+
+function resolveDirectApplyType(type: IAnyType): IAnyType {
+    const subTypes = type.getSubTypes()
+
+    if (!subTypes || Array.isArray(subTypes) || subTypes === cannotDetermineSubtype) {
+        return type
+    }
+
+    return resolveDirectApplyType(subTypes)
 }
 
 function reconcileArrayChildren<TT>(

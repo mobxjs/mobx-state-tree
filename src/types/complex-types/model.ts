@@ -49,10 +49,13 @@ import {
     getStateTreeNode,
     isPlainObject,
     isPrimitive,
+    isMutable,
     isStateTreeNode,
     isType,
     mobxShallow,
+    ObjectNode,
     optional,
+    cannotDetermineSubtype,
     typeCheckFailure,
     typecheckInternal
 } from "../../internal"
@@ -714,10 +717,24 @@ export class ModelType<
     }
 
     applySnapshot(node: this["N"], snapshot: this["C"]): void {
-        typecheckInternal(this, snapshot)
         const preProcessedSnapshot = this.applySnapshotPreProcessor(snapshot)
-        this.forAllProps(name => {
-            ;(node.storedValue as any)[name] = preProcessedSnapshot[name]
+        if (!isPlainObject(preProcessedSnapshot)) {
+            typecheckInternal(this, snapshot)
+            return
+        }
+
+        this.forAllProps((name, childType) => {
+            const childNode = node.getChildNode(name)
+            const newValue = preProcessedSnapshot[name]
+
+            if (childNode.snapshot === newValue) return
+
+            if (canApplyDirectSnapshot(childType, childNode, newValue)) {
+                childNode.applySnapshot(newValue)
+                return
+            }
+
+            ;(node.storedValue as any)[name] = newValue
         })
     }
 
@@ -775,6 +792,34 @@ export class ModelType<
     removeChild(node: this["N"], subpath: string) {
         ;(node.storedValue as any)[subpath] = undefined
     }
+}
+
+function canApplyDirectSnapshot(
+    childType: IAnyType,
+    childNode: AnyNode,
+    newValue: any
+): childNode is ObjectNode<any, any, any> {
+    const reconciliationType = childNode.getReconciliationType()
+    const directApplyType = resolveDirectApplyType(childType)
+
+    return (
+        childNode instanceof ObjectNode &&
+        reconciliationType === directApplyType &&
+        reconciliationType instanceof ComplexType &&
+        isMutable(newValue) &&
+        !isStateTreeNode(newValue) &&
+        reconciliationType.isMatchingSnapshotId(childNode as any, newValue)
+    )
+}
+
+function resolveDirectApplyType(type: IAnyType): IAnyType {
+    const subTypes = type.getSubTypes()
+
+    if (!subTypes || Array.isArray(subTypes) || subTypes === cannotDetermineSubtype) {
+        return type
+    }
+
+    return resolveDirectApplyType(subTypes)
 }
 ModelType.prototype.applySnapshot = action(ModelType.prototype.applySnapshot)
 
