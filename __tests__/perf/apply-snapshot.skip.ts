@@ -1,4 +1,4 @@
-import { types, getSnapshot, applySnapshot } from "../../src"
+import { types, getSnapshot, applySnapshot, onPatch } from "../../src"
 import { start } from "./timer"
 import { expect, test } from "bun:test"
 
@@ -30,23 +30,37 @@ const Group = types.model("Group", {
     shapes: types.array(Shape)
 })
 
-function benchmarkApplySnapshot(itemCount: number, changedCount: number) {
+function benchmarkApplySnapshot(
+    itemCount: number,
+    changedCount: number,
+    targetItemCount = itemCount,
+    withPatchListener = false
+) {
     const group = Group.create({
         shapes: new Array(itemCount).fill({})
     })
 
-    const baseline = getSnapshot(group)
+    const targetSnapshot =
+        targetItemCount === itemCount
+            ? getSnapshot(group)
+            : {
+                  shapes: new Array(targetItemCount).fill({})
+              }
 
-    const indices = Array.from({ length: changedCount }, (_, i) =>
-        Math.floor((i * itemCount) / changedCount)
-    )
-    for (const idx of indices) {
-        group.shapes[idx].set({ x: 20, y: 30 })
+    if (changedCount > 0) {
+        const indices = Array.from({ length: changedCount }, (_, i) =>
+            Math.floor((i * itemCount) / changedCount)
+        )
+        for (const idx of indices) {
+            group.shapes[idx].set({ x: 20, y: 30 })
+        }
     }
 
+    const patchDisposer = withPatchListener ? onPatch(group, () => {}) : undefined
     const time = start()
-    applySnapshot(group, baseline)
+    applySnapshot(group, targetSnapshot)
     const elapsed = time()
+    patchDisposer?.()
 
     return elapsed
 }
@@ -75,3 +89,48 @@ test("applySnapshot - 1k items, all changed (worst case baseline)", () => {
     const elapsed = benchmarkApplySnapshot(1000, 1000)
     console.log(`  1k items, all changed: ${elapsed}ms`)
 })
+
+test(
+    "applySnapshot - 10k items, all changed (worst case baseline)",
+    () => {
+        const elapsed = benchmarkApplySnapshot(10000, 10000)
+        console.log(`  10k items, all changed: ${elapsed}ms`)
+    },
+    { timeout: 30000 }
+)
+
+test(
+    "applySnapshot - 10k items, grow to 11k",
+    () => {
+        const elapsed = benchmarkApplySnapshot(10000, 0, 11000)
+        console.log(`  10k items, grow to 11k: ${elapsed}ms`)
+    },
+    { timeout: 30000 }
+)
+
+test(
+    "applySnapshot - 10k items, shrink to 9k",
+    () => {
+        const elapsed = benchmarkApplySnapshot(10000, 0, 9000)
+        console.log(`  10k items, shrink to 9k: ${elapsed}ms`)
+    },
+    { timeout: 30000 }
+)
+
+test(
+    "applySnapshot - 10k items, 1 changed, patch listener",
+    () => {
+        const elapsed = benchmarkApplySnapshot(10000, 1, 10000, true)
+        console.log(`  10k items, 1 changed, patch listener: ${elapsed}ms`)
+    },
+    { timeout: 30000 }
+)
+
+test(
+    "applySnapshot - 10k items, all changed, patch listener",
+    () => {
+        const elapsed = benchmarkApplySnapshot(10000, 10000, 10000, true)
+        console.log(`  10k items, all changed, patch listener: ${elapsed}ms`)
+    },
+    { timeout: 30000 }
+)

@@ -303,20 +303,24 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         const newLength = snapshot.length
         const childType = this.getChildType()
         const minLength = Math.min(oldLength, newLength)
+        const firstChangedIndex = findFirstChangedIndex(childNodes, snapshot, minLength)
 
-        let start = 0
-        while (start < minLength && childNodes[start].snapshot === snapshot[start]) {
-            start++
+        // If all array items are the same and the length did not change, there is nothing to do.
+        if (firstChangedIndex === oldLength && firstChangedIndex === newLength) {
+            return
         }
 
-        if (start === oldLength && start === newLength) {
+        // Preserve the existing replace behavior for length changes and when patches are being
+        // observed, since those cases are more sensitive to patch shape and benchmark variance.
+        if (oldLength !== newLength || node.hasPatchSubscribers()) {
+            target.replace(snapshot as any)
             return
         }
 
         if (oldLength === newLength) {
             let canApplyDirectly = true
 
-            for (let i = start; i < newLength; i++) {
+            for (let i = firstChangedIndex; i < newLength; i++) {
                 if (childNodes[i].snapshot === snapshot[i]) continue
                 if (!canApplyDirectSnapshot(childType, childNodes[i], snapshot[i])) {
                     canApplyDirectly = false
@@ -325,7 +329,7 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
             }
 
             if (canApplyDirectly) {
-                for (let i = start; i < newLength; i++) {
+                for (let i = firstChangedIndex; i < newLength; i++) {
                     const childNode = childNodes[i]
                     if (childNode.snapshot === snapshot[i]) continue
                     if (canApplyDirectSnapshot(childType, childNode, snapshot[i])) {
@@ -339,23 +343,26 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         let oldEnd = oldLength - 1
         let newEnd = newLength - 1
         while (
-            oldEnd >= start &&
-            newEnd >= start &&
+            oldEnd >= firstChangedIndex &&
+            newEnd >= firstChangedIndex &&
             childNodes[oldEnd].snapshot === snapshot[newEnd]
         ) {
             oldEnd--
             newEnd--
         }
 
-        const oldCount = oldEnd >= start ? oldEnd - start + 1 : 0
-        const newValues = newEnd >= start ? snapshot.slice(start, newEnd + 1) : EMPTY_ARRAY
+        const oldCount = oldEnd >= firstChangedIndex ? oldEnd - firstChangedIndex + 1 : 0
+        const newValues =
+            newEnd >= firstChangedIndex
+                ? snapshot.slice(firstChangedIndex, newEnd + 1)
+                : EMPTY_ARRAY
 
         if (oldCount === 1 && newValues.length === 1) {
-            target[start] = newValues[0] as any
+            target[firstChangedIndex] = newValues[0] as any
             return
         }
 
-        target.splice(start, oldCount, ...(newValues as any))
+        target.splice(firstChangedIndex, oldCount, ...(newValues as any))
     }
 
     getChildType(): IAnyType {
@@ -411,6 +418,14 @@ ArrayType.prototype.applySnapshot = action(ArrayType.prototype.applySnapshot)
 export function array<IT extends IAnyType>(subtype: IT): IArrayType<IT> {
     assertIsType(subtype, 1)
     return new ArrayType<IT>(`${subtype.name}[]`, subtype)
+}
+
+function findFirstChangedIndex(childNodes: readonly AnyNode[], snapshot: any[], length: number) {
+    let index = 0
+    while (index < length && childNodes[index].snapshot === snapshot[index]) {
+        index++
+    }
+    return index
 }
 
 function canApplyDirectSnapshot(

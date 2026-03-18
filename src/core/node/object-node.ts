@@ -593,6 +593,14 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         return this._internalEventsRegister(InternalEvents.Patch, handler)
     }
 
+    hasPatchSubscribers(): boolean {
+        if (this._internalEventsHasSubscribers(InternalEvents.Patch)) {
+            return true
+        }
+
+        return this.parent ? this.parent.hasPatchSubscribers() : false
+    }
+
     emitPatch(basePatch: IReversibleJsonPatch, source: AnyNode): void {
         if (this._internalEventsHasSubscribers(InternalEvents.Patch)) {
             // calculate the relative path of the patch
