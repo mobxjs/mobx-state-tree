@@ -129,6 +129,38 @@ test("it should apply patches", () => {
     ])
     expect(getSnapshot(doc)).toEqual([{ to: "universe" }])
 })
+test("it should preserve replace patches for applySnapshot when array patches are observed", () => {
+    const { Factory } = createTestFactories()
+    const doc = Factory.create([{ to: "world" }, { to: "mars" }])
+    const patches: IJsonPatch[] = []
+
+    onPatch(doc, patch => patches.push(patch))
+    applySnapshot(doc, [{ to: "universe" }, { to: "mars" }])
+
+    expect(patches).toEqual([
+        {
+            op: "replace",
+            path: "",
+            value: [{ to: "universe" }, { to: "mars" }]
+        }
+    ])
+})
+test("it should preserve replace patches for length-changing applySnapshot when array patches are observed", () => {
+    const { Factory } = createTestFactories()
+    const doc = Factory.create([{ to: "world" }])
+    const patches: IJsonPatch[] = []
+
+    onPatch(doc, patch => patches.push(patch))
+    applySnapshot(doc, [{ to: "universe" }, { to: "mars" }])
+
+    expect(patches).toEqual([
+        {
+            op: "replace",
+            path: "",
+            value: [{ to: "universe" }, { to: "mars" }]
+        }
+    ])
+})
 // === TYPE CHECKS ===
 test("it should check the type correctly", () => {
     const { Factory } = createTestFactories()
