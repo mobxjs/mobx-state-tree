@@ -533,6 +533,34 @@ export abstract class SimpleType<C, S, T> extends BaseType<C, S, T, ScalarNode<C
     }
 }
 
+export function canApplyDirectSnapshot(
+    childType: IAnyType,
+    childNode: AnyNode,
+    newValue: any
+): childNode is ObjectNode<any, any, any> {
+    const reconciliationType = childNode.getReconciliationType()
+    const directApplyType = resolveDirectApplyType(childType)
+
+    return (
+        childNode instanceof ObjectNode &&
+        reconciliationType === directApplyType &&
+        reconciliationType instanceof ComplexType &&
+        isMutable(newValue) &&
+        !isStateTreeNode(newValue) &&
+        reconciliationType.isMatchingSnapshotId(childNode as any, newValue)
+    )
+}
+
+export function resolveDirectApplyType(type: IAnyType): IAnyType {
+    const subTypes = type.getSubTypes()
+
+    if (!subTypes || Array.isArray(subTypes) || subTypes === cannotDetermineSubtype) {
+        return type
+    }
+
+    return resolveDirectApplyType(subTypes)
+}
+
 /**
  * Returns if a given value represents a type.
  *

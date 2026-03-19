@@ -14,6 +14,7 @@ import {
     IObservableMapInitialValues
 } from "mobx"
 import {
+    canApplyDirectSnapshot,
     ComplexType,
     createObjectNode,
     escapeJsonPath,
@@ -494,33 +495,6 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     }
 }
 
-function canApplyDirectSnapshot(
-    childType: IAnyType,
-    childNode: AnyNode,
-    newValue: any
-): childNode is ObjectNode<any, any, any> {
-    const reconciliationType = childNode.getReconciliationType()
-    const directApplyType = resolveDirectApplyType(childType)
-
-    return (
-        childNode instanceof ObjectNode &&
-        reconciliationType === directApplyType &&
-        reconciliationType instanceof ComplexType &&
-        isMutable(newValue) &&
-        !isStateTreeNode(newValue) &&
-        reconciliationType.isMatchingSnapshotId(childNode as any, newValue)
-    )
-}
-
-function resolveDirectApplyType(type: IAnyType): IAnyType {
-    const subTypes = type.getSubTypes()
-
-    if (!subTypes || Array.isArray(subTypes) || subTypes === cannotDetermineSubtype) {
-        return type
-    }
-
-    return resolveDirectApplyType(subTypes)
-}
 MapType.prototype.applySnapshot = action(MapType.prototype.applySnapshot)
 
 /**

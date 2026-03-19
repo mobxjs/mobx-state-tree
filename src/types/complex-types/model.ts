@@ -17,6 +17,7 @@ import {
     AnyNode,
     AnyObjectNode,
     ArrayType,
+    canApplyDirectSnapshot,
     ComplexType,
     EMPTY_ARRAY,
     EMPTY_OBJECT,
@@ -49,13 +50,10 @@ import {
     getStateTreeNode,
     isPlainObject,
     isPrimitive,
-    isMutable,
     isStateTreeNode,
     isType,
     mobxShallow,
-    ObjectNode,
     optional,
-    cannotDetermineSubtype,
     typeCheckFailure,
     typecheckInternal
 } from "../../internal"
@@ -794,33 +792,6 @@ export class ModelType<
     }
 }
 
-function canApplyDirectSnapshot(
-    childType: IAnyType,
-    childNode: AnyNode,
-    newValue: any
-): childNode is ObjectNode<any, any, any> {
-    const reconciliationType = childNode.getReconciliationType()
-    const directApplyType = resolveDirectApplyType(childType)
-
-    return (
-        childNode instanceof ObjectNode &&
-        reconciliationType === directApplyType &&
-        reconciliationType instanceof ComplexType &&
-        isMutable(newValue) &&
-        !isStateTreeNode(newValue) &&
-        reconciliationType.isMatchingSnapshotId(childNode as any, newValue)
-    )
-}
-
-function resolveDirectApplyType(type: IAnyType): IAnyType {
-    const subTypes = type.getSubTypes()
-
-    if (!subTypes || Array.isArray(subTypes) || subTypes === cannotDetermineSubtype) {
-        return type
-    }
-
-    return resolveDirectApplyType(subTypes)
-}
 ModelType.prototype.applySnapshot = action(ModelType.prototype.applySnapshot)
 
 export function model<P extends ModelPropertiesDeclaration = {}>(

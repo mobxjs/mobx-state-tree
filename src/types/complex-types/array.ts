@@ -15,9 +15,9 @@ import {
     AnyNode,
     AnyObjectNode,
     assertIsType,
+    canApplyDirectSnapshot,
     ComplexType,
     convertChildNodesToArray,
-    cannotDetermineSubtype,
     createActionInvoker,
     createObjectNode,
     devMode,
@@ -34,7 +34,6 @@ import {
     IHooksGetter,
     IJsonPatch,
     isArray,
-    isMutable,
     isNode,
     isPlainObject,
     isStateTreeNode,
@@ -424,24 +423,6 @@ function findFirstChangedIndex(childNodes: readonly AnyNode[], snapshot: any[], 
     return index
 }
 
-function canApplyDirectSnapshot(
-    childType: IAnyType,
-    childNode: AnyNode,
-    newValue: any
-): childNode is ObjectNode<any, any, any> {
-    const reconciliationType = childNode.getReconciliationType()
-    const directApplyType = resolveDirectApplyType(childType)
-
-    return (
-        childNode instanceof ObjectNode &&
-        reconciliationType === directApplyType &&
-        reconciliationType instanceof ComplexType &&
-        isMutable(newValue) &&
-        !isStateTreeNode(newValue) &&
-        reconciliationType.isMatchingSnapshotId(childNode as any, newValue)
-    )
-}
-
 function canApplyDirectSnapshotsInRange(
     childType: IAnyType,
     childNodes: readonly AnyNode[],
@@ -470,16 +451,6 @@ function applyDirectSnapshotsInRange(
         if (childNode.snapshot === snapshot[i]) continue
         ;(childNode as ObjectNode<any, any, any>).applySnapshot(snapshot[i] as any)
     }
-}
-
-function resolveDirectApplyType(type: IAnyType): IAnyType {
-    const subTypes = type.getSubTypes()
-
-    if (!subTypes || Array.isArray(subTypes) || subTypes === cannotDetermineSubtype) {
-        return type
-    }
-
-    return resolveDirectApplyType(subTypes)
 }
 
 function reconcileArrayChildren<TT>(
