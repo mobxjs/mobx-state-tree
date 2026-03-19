@@ -318,24 +318,18 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         }
 
         if (oldLength === newLength) {
-            let canApplyDirectly = true
-
-            for (let i = firstChangedIndex; i < newLength; i++) {
-                if (childNodes[i].snapshot === snapshot[i]) continue
-                if (!canApplyDirectSnapshot(childType, childNodes[i], snapshot[i])) {
-                    canApplyDirectly = false
-                    break
-                }
-            }
-
-            if (canApplyDirectly) {
-                for (let i = firstChangedIndex; i < newLength; i++) {
-                    const childNode = childNodes[i]
-                    if (childNode.snapshot === snapshot[i]) continue
-                    if (canApplyDirectSnapshot(childType, childNode, snapshot[i])) {
-                        childNode.applySnapshot(snapshot[i] as any)
-                    }
-                }
+            // When every changed entry can reuse its existing child node, update them in place
+            // instead of going through array replacement/splice.
+            if (
+                canApplyDirectSnapshotsInRange(
+                    childType,
+                    childNodes,
+                    snapshot,
+                    firstChangedIndex,
+                    newLength
+                )
+            ) {
+                applyDirectSnapshotsInRange(childNodes, snapshot, firstChangedIndex, newLength)
                 return
             }
         }
@@ -351,18 +345,19 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
             newEnd--
         }
 
-        const oldCount = oldEnd >= firstChangedIndex ? oldEnd - firstChangedIndex + 1 : 0
-        const newValues =
+        // Trim the unchanged suffix too, so we only replace the minimal changed window.
+        const replacedCount = oldEnd >= firstChangedIndex ? oldEnd - firstChangedIndex + 1 : 0
+        const replacementSnapshots =
             newEnd >= firstChangedIndex
                 ? snapshot.slice(firstChangedIndex, newEnd + 1)
                 : EMPTY_ARRAY
 
-        if (oldCount === 1 && newValues.length === 1) {
-            target[firstChangedIndex] = newValues[0] as any
+        if (replacedCount === 1 && replacementSnapshots.length === 1) {
+            target[firstChangedIndex] = replacementSnapshots[0] as any
             return
         }
 
-        target.splice(firstChangedIndex, oldCount, ...(newValues as any))
+        target.splice(firstChangedIndex, replacedCount, ...(replacementSnapshots as any))
     }
 
     getChildType(): IAnyType {
@@ -444,6 +439,36 @@ function canApplyDirectSnapshot(
         !isStateTreeNode(newValue) &&
         reconciliationType.isMatchingSnapshotId(childNode as any, newValue)
     )
+}
+
+function canApplyDirectSnapshotsInRange(
+    childType: IAnyType,
+    childNodes: readonly AnyNode[],
+    snapshot: any[],
+    startIndex: number,
+    endIndex: number
+) {
+    for (let i = startIndex; i < endIndex; i++) {
+        if (childNodes[i].snapshot === snapshot[i]) continue
+        if (!canApplyDirectSnapshot(childType, childNodes[i], snapshot[i])) {
+            return false
+        }
+    }
+
+    return true
+}
+
+function applyDirectSnapshotsInRange(
+    childNodes: readonly AnyNode[],
+    snapshot: any[],
+    startIndex: number,
+    endIndex: number
+) {
+    for (let i = startIndex; i < endIndex; i++) {
+        const childNode = childNodes[i]
+        if (childNode.snapshot === snapshot[i]) continue
+        ;(childNode as ObjectNode<any, any, any>).applySnapshot(snapshot[i] as any)
+    }
 }
 
 function resolveDirectApplyType(type: IAnyType): IAnyType {
