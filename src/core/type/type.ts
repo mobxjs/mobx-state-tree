@@ -554,11 +554,27 @@ export function canApplyDirectSnapshot(
 export function resolveDirectApplyType(type: IAnyType): IAnyType {
     const subTypes = type.getSubTypes()
 
-    if (!subTypes || Array.isArray(subTypes) || subTypes === cannotDetermineSubtype) {
+    if (
+        !subTypes ||
+        Array.isArray(subTypes) ||
+        subTypes === cannotDetermineSubtype ||
+        !canUnwrapDirectApplyType(type)
+    ) {
         return type
     }
 
     return resolveDirectApplyType(subTypes)
+}
+
+function canUnwrapDirectApplyType(type: IAnyType): boolean {
+    const transparentWrapperFlags = TypeFlags.Optional | TypeFlags.Late
+    const nonTransparentWrapperFlags =
+        TypeFlags.Refinement | TypeFlags.SnapshotProcessor | TypeFlags.Union
+
+    return (
+        (type.flags & transparentWrapperFlags) > 0 &&
+        (type.flags & nonTransparentWrapperFlags) === 0
+    )
 }
 
 /**
