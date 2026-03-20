@@ -261,9 +261,40 @@ function runMiddleWares(
     baseCall: IMiddlewareEvent,
     originalFn: Function
 ): any {
+    function runInActionScope(call: IMiddlewareEvent, fn: Function): any {
+        const execute = () => {
+            let result: any
+            let error: any
+
+            try {
+                result = fn.apply(null, call.args)
+            } catch (e) {
+                error = e
+            }
+
+            if (!call.parentActionEvent) {
+                try {
+                    node.root.flushEndOfActionCallbacks()
+                } catch (flushError) {
+                    if (!error) {
+                        error = flushError
+                    }
+                }
+            }
+
+            if (error) {
+                throw error
+            }
+
+            return result
+        }
+
+        return call.name ? mobxAction(call.name, execute)() : mobxAction(execute)()
+    }
+
     const middlewares = new CollectedMiddlewares(node, originalFn)
     // Short circuit
-    if (middlewares.isEmpty) return mobxAction(originalFn).apply(null, baseCall.args)
+    if (middlewares.isEmpty) return runInActionScope(baseCall, originalFn)
 
     let result: any = null
 
@@ -272,7 +303,7 @@ function runMiddleWares(
         const handler = middleware && middleware.handler
 
         if (!handler) {
-            return mobxAction(originalFn).apply(null, call.args)
+            return runInActionScope(call, originalFn)
         }
 
         // skip hooks if asked to

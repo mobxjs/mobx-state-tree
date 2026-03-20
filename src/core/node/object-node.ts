@@ -111,6 +111,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     private _autoUnbox = true // unboxing is disabled when reading child nodes
     _isRunningAction = false // only relevant for root
     private _hasSnapshotReaction = false
+    private _endOfActionCallbacks?: Array<() => void>
 
     private _observableInstanceState = ObservableInstanceLifecycle.UNINITIALIZED
     private _childNodes: IChildNodesMap
@@ -259,6 +260,26 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     get root(): AnyObjectNode {
         const parent = this.parent
         return parent ? parent.root : this
+    }
+
+    enqueueEndOfAction(callback: () => void): void {
+        const root = this.root
+        if (!root._endOfActionCallbacks) {
+            root._endOfActionCallbacks = []
+        }
+        root._endOfActionCallbacks.push(callback)
+    }
+
+    flushEndOfActionCallbacks(): void {
+        const root = this.root
+        while (root._endOfActionCallbacks && root._endOfActionCallbacks.length > 0) {
+            const callbacks = root._endOfActionCallbacks
+            root._endOfActionCallbacks = undefined
+
+            callbacks.forEach(callback => {
+                callback()
+            })
+        }
     }
 
     clearParent(): void {

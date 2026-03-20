@@ -30,7 +30,9 @@ import {
     IStateTreeNode,
     devMode,
     isType,
-    type IAnyModelType
+    type IAnyModelType,
+    getCurrentActionContext,
+    setImmediateWithFallback
 } from "../../internal"
 
 export type OnReferenceInvalidatedEvent<STN extends IAnyStateTreeNode> = {
@@ -270,6 +272,24 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Simp
             }
         })
 
+        const scheduleRetryAfterReconciliation = () => {
+            const retry = () => {
+                if (!storedRefNode.isAlive) {
+                    return
+                }
+                if (this.getSnapshot(storedRefNode) !== identifier) {
+                    return
+                }
+                startWatching(false)
+            }
+
+            if (getCurrentActionContext()) {
+                storedRefNode.root.enqueueEndOfAction(retry)
+            } else {
+                setImmediateWithFallback(retry)
+            }
+        }
+
         const startWatching = (sync: boolean) => {
             // re-create hook in case the stored ref gets reattached
             if (onRefTargetDestroyedHookDisposer) {
@@ -291,12 +311,12 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Simp
                 }
 
                 if (!refTargetNodeExists) {
-                    // we cannot change the reference in sync mode
-                    // since we are in the middle of a reconciliation/instantiation and the change would be overwritten
-                    // for those cases just let the wrong reference be assigned and fail upon usage
-                    // (like current references do)
-                    // this means that effectively this code will only run when it is created from a snapshot
-                    if (!sync) {
+                    // if the tree is already attached we may still be in the middle of a reconcile/applySnapshot,
+                    // so wait until the current MST action finishes before deciding whether to invalidate or
+                    // attach a watcher to a target that appeared later in the same action.
+                    if (sync) {
+                        scheduleRetryAfterReconciliation()
+                    } else {
                         this.fireInvalidated(
                             "invalidSnapshotReference",
                             storedRefNode,
