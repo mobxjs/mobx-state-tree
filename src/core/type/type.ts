@@ -539,11 +539,15 @@ export function canApplyDirectSnapshot(
     newValue: any
 ): childNode is ObjectNode<any, any, any> {
     const reconciliationType = childNode.getReconciliationType()
-    const directApplyType = resolveDirectApplyType(childType)
+    const expectedReconciliationType = resolveDirectApplyType(childType)
+    // Only types that reconcile as the same transparent-wrapper-adjusted type can safely reuse
+    // the existing child node. Wrappers with their own validation or snapshot semantics
+    // intentionally keep a distinct reconciliation type so they fall back to the validated path.
+    const hasMatchingReconciliationType = reconciliationType === expectedReconciliationType
 
     return (
         childNode instanceof ObjectNode &&
-        reconciliationType === directApplyType &&
+        hasMatchingReconciliationType &&
         reconciliationType instanceof ComplexType &&
         isMutable(newValue) &&
         !isStateTreeNode(newValue) &&
@@ -563,6 +567,8 @@ export function resolveDirectApplyType(type: IAnyType): IAnyType {
         return type
     }
 
+    // Only unwrap wrappers that are transparent for direct apply. Wrappers with their own
+    // validation or snapshot processing must keep their wrapper identity here.
     return resolveDirectApplyType(subTypes)
 }
 
