@@ -317,15 +317,11 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
             return
         }
 
-        if (oldLength === newLength) {
-            // When every changed entry can reuse its existing child node, update them in place
-            // instead of going through array replacement/splice.
-            if (
-                canApplyDirectSnapshotsInRange(childType, childNodes, snapshot, firstChangedIndex)
-            ) {
-                applyDirectSnapshotsInRange(childNodes, snapshot, firstChangedIndex)
-                return
-            }
+        // When every changed entry can reuse its existing child node, update them in place
+        // instead of going through array replacement/splice.
+        if (canApplyDirectSnapshotsInRange(childType, childNodes, snapshot, firstChangedIndex)) {
+            applyDirectSnapshotsInRange(childNodes, snapshot, firstChangedIndex)
+            return
         }
 
         let oldEnd = oldLength - 1
