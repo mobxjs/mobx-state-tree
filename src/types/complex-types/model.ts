@@ -716,9 +716,13 @@ export class ModelType<
 
     applySnapshot(node: this["N"], snapshot: this["C"]): void {
         const preProcessedSnapshot = this.applySnapshotPreProcessor(snapshot)
-        if (!isPlainObject(preProcessedSnapshot)) {
+        const isPreProcessedSnapshotNonPlain = !isPlainObject(preProcessedSnapshot)
+
+        // Fast-path plain-object snapshots, but still validate when preprocessing is required
+        // or when preprocessing produces an invalid model snapshot.
+        if (!isPlainObject(snapshot) || isPreProcessedSnapshotNonPlain) {
             typecheckInternal(this, snapshot)
-            return
+            if (isPreProcessedSnapshotNonPlain) return
         }
 
         this.forAllProps((name, childType) => {

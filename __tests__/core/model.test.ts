@@ -209,6 +209,23 @@ describe("Model instantiation", () => {
         expect(onSnapshot).toHaveBeenLastCalledWith({ val: 1 })
     })
 
+    test("it should apply snapshots that are normalized by preProcessSnapshot", () => {
+        const Model = types
+            .model({
+                val: types.number
+            })
+            .preProcessSnapshot((snapshot: number) => {
+                return {
+                    val: snapshot + 1
+                }
+            })
+
+        const model = Model.create(0 as any)
+        applySnapshot(model, 1 as any)
+
+        expect(model.val).toBe(2)
+    })
+
     describe("Should show a friendly message when a model has a property overridden by", () => {
         test("a view", () => {
             const UserModel = types
