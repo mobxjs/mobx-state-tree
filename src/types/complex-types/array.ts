@@ -321,15 +321,9 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
             // When every changed entry can reuse its existing child node, update them in place
             // instead of going through array replacement/splice.
             if (
-                canApplyDirectSnapshotsInRange(
-                    childType,
-                    childNodes,
-                    snapshot,
-                    firstChangedIndex,
-                    newLength
-                )
+                canApplyDirectSnapshotsInRange(childType, childNodes, snapshot, firstChangedIndex)
             ) {
-                applyDirectSnapshotsInRange(childNodes, snapshot, firstChangedIndex, newLength)
+                applyDirectSnapshotsInRange(childNodes, snapshot, firstChangedIndex)
                 return
             }
         }
@@ -427,10 +421,9 @@ function canApplyDirectSnapshotsInRange(
     childType: IAnyType,
     childNodes: readonly AnyNode[],
     snapshot: any[],
-    startIndex: number,
-    endIndex: number
+    startIndex: number
 ) {
-    for (let i = startIndex; i < endIndex; i++) {
+    for (let i = startIndex; i < childNodes.length; i++) {
         if (childNodes[i].snapshot === snapshot[i]) continue
         if (!canApplyDirectSnapshot(childType, childNodes[i], snapshot[i])) {
             return false
@@ -443,10 +436,9 @@ function canApplyDirectSnapshotsInRange(
 function applyDirectSnapshotsInRange(
     childNodes: readonly AnyNode[],
     snapshot: any[],
-    startIndex: number,
-    endIndex: number
+    startIndex: number
 ) {
-    for (let i = startIndex; i < endIndex; i++) {
+    for (let i = startIndex; i < childNodes.length; i++) {
         const childNode = childNodes[i]
         if (childNode.snapshot === snapshot[i]) continue
         ;(childNode as ObjectNode<any, any, any>).applySnapshot(snapshot[i] as any)
