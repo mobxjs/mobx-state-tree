@@ -14,6 +14,7 @@ import {
     IObservableMapInitialValues
 } from "mobx"
 import {
+    canApplyDirectSnapshot,
     ComplexType,
     createObjectNode,
     escapeJsonPath,
@@ -437,22 +438,36 @@ export class MapType<IT extends IAnyType> extends ComplexType<
     }
 
     applySnapshot(node: this["N"], snapshot: this["C"]): void {
-        typecheckInternal(this, snapshot)
-        const target = node.storedValue
-        const currentKeys: { [key: string]: boolean } = {}
-        Array.from(target.keys()).forEach(key => {
-            currentKeys[key] = false
-        })
-        if (snapshot) {
-            // Don't use target.replace, as it will throw away all existing items first
-            for (let key in snapshot) {
-                target.set(key, snapshot[key])
-                currentKeys["" + key] = true
-            }
+        if (!isPlainObject(snapshot)) {
+            typecheckInternal(this, snapshot)
+            return
         }
-        Object.keys(currentKeys).forEach(key => {
-            if (currentKeys[key] === false) target.delete(key)
+
+        const target = node.storedValue
+        const childType = this.getChildType()
+
+        Array.from(target.keys()).forEach(key => {
+            if (!Object.prototype.hasOwnProperty.call(snapshot, key)) {
+                target.delete(key)
+                return
+            }
+
+            const childNode = node.getChildNode(key)
+            const newValue = snapshot[key]
+
+            if (childNode.snapshot === newValue) return
+
+            if (canApplyDirectSnapshot(childType, childNode, newValue)) {
+                childNode.applySnapshot(newValue)
+            } else {
+                target.set(key, newValue)
+            }
         })
+
+        for (let key in snapshot) {
+            if (!Object.prototype.hasOwnProperty.call(snapshot, key) || target.has(key)) continue
+            target.set(key, snapshot[key])
+        }
     }
 
     getChildType(): IAnyType {
@@ -479,6 +494,7 @@ export class MapType<IT extends IAnyType> extends ComplexType<
         node.storedValue.delete(subpath)
     }
 }
+
 MapType.prototype.applySnapshot = action(MapType.prototype.applySnapshot)
 
 /**

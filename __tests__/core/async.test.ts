@@ -95,7 +95,7 @@ test("flow happens in single ticks", async () => {
     expect(values).toEqual([3, 5])
 })
 test("can handle async actions", () => {
-    testCoffeeTodo(
+    return testCoffeeTodo(
         self =>
             function* fetchData(kind: string) {
                 self.title = "getting coffee " + kind
@@ -108,7 +108,7 @@ test("can handle async actions", () => {
     )
 })
 test("can handle erroring actions", () => {
-    testCoffeeTodo(
+    return testCoffeeTodo(
         self =>
             function* fetchData(kind: string) {
                 throw kind
@@ -119,7 +119,7 @@ test("can handle erroring actions", () => {
     )
 })
 test("can handle try catch", () => {
-    testCoffeeTodo(
+    return testCoffeeTodo(
         self =>
             function* fetchData(kind: string) {
                 try {
@@ -136,10 +136,10 @@ test("can handle try catch", () => {
     )
 })
 test("empty sequence works", () => {
-    testCoffeeTodo(() => function* fetchData(kind: string) {}, false, undefined, [])
+    return testCoffeeTodo(() => function* fetchData(kind: string) {}, false, undefined, [])
 })
 test("can handle throw from yielded promise works", () => {
-    testCoffeeTodo(
+    return testCoffeeTodo(
         () =>
             function* fetchData(kind: string) {
                 yield delay(10, "x", true)
@@ -233,7 +233,7 @@ test("can handle nested async actions", () => {
         const res = yield delay(20, value.toUpperCase())
         return res
     })
-    testCoffeeTodo(
+    return testCoffeeTodo(
         self =>
             function* fetchData(kind: string) {
                 self.title = yield uppercase("drinking " + kind)

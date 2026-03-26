@@ -17,6 +17,7 @@ import {
     AnyNode,
     AnyObjectNode,
     ArrayType,
+    canApplyDirectSnapshot,
     ComplexType,
     EMPTY_ARRAY,
     EMPTY_OBJECT,
@@ -714,10 +715,28 @@ export class ModelType<
     }
 
     applySnapshot(node: this["N"], snapshot: this["C"]): void {
-        typecheckInternal(this, snapshot)
         const preProcessedSnapshot = this.applySnapshotPreProcessor(snapshot)
-        this.forAllProps(name => {
-            ;(node.storedValue as any)[name] = preProcessedSnapshot[name]
+        const isPreProcessedSnapshotNonPlain = !isPlainObject(preProcessedSnapshot)
+
+        // Fast-path plain-object snapshots, but still validate when preprocessing is required
+        // or when preprocessing produces an invalid model snapshot.
+        if (!isPlainObject(snapshot) || isPreProcessedSnapshotNonPlain) {
+            typecheckInternal(this, snapshot)
+            if (isPreProcessedSnapshotNonPlain) return
+        }
+
+        this.forAllProps((name, childType) => {
+            const childNode = node.getChildNode(name)
+            const newValue = preProcessedSnapshot[name]
+
+            if (childNode.snapshot === newValue) return
+
+            if (canApplyDirectSnapshot(childType, childNode, newValue)) {
+                childNode.applySnapshot(newValue)
+                return
+            }
+
+            ;(node.storedValue as any)[name] = newValue
         })
     }
 
@@ -776,6 +795,7 @@ export class ModelType<
         ;(node.storedValue as any)[subpath] = undefined
     }
 }
+
 ModelType.prototype.applySnapshot = action(ModelType.prototype.applySnapshot)
 
 export function model<P extends ModelPropertiesDeclaration = {}>(

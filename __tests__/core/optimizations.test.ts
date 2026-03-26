@@ -37,3 +37,49 @@ test("it should avoid processing patch if is exactly the current one in reconcil
     const actualSnapshot = getSnapshot(store)
     expect(actualSnapshot.a).toBe(snapshot.a)
 })
+
+test("it should only validate changed array items when applying a parent snapshot", () => {
+    class Box {
+        constructor(readonly value: string) {}
+    }
+
+    let validationCalls = 0
+
+    const CountingBox = types.custom<string, Box>({
+        name: "CountingBox",
+        fromSnapshot(value) {
+            return new Box(value)
+        },
+        toSnapshot(value) {
+            return value.value
+        },
+        isTargetType(value): value is Box {
+            return value instanceof Box
+        },
+        getValidationMessage(value) {
+            validationCalls++
+            return typeof value === "string" ? "" : "not a string"
+        }
+    })
+
+    const Store = types.model({
+        items: types.array(CountingBox)
+    })
+
+    const store = Store.create({
+        items: ["1", "2", "3", "4", "5"]
+    })
+    const snapshot = getSnapshot(store)
+
+    applySnapshot(store, {
+        items: ["1", "2", "10", "4", "5"]
+    })
+
+    validationCalls = 0
+    applySnapshot(store, snapshot)
+
+    if (process.env.NODE_ENV !== "production") {
+        expect(validationCalls).toBe(1)
+    }
+    expect(getSnapshot(store)).toEqual(snapshot)
+})

@@ -15,6 +15,7 @@ import {
     AnyNode,
     AnyObjectNode,
     assertIsType,
+    canApplyDirectSnapshot,
     ComplexType,
     convertChildNodesToArray,
     createActionInvoker,
@@ -290,9 +291,63 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
     }
 
     applySnapshot(node: this["N"], snapshot: this["C"]): void {
-        typecheckInternal(this, snapshot)
+        if (!isArray(snapshot)) {
+            typecheckInternal(this, snapshot)
+            return
+        }
+
         const target = node.storedValue
-        target.replace(snapshot as any)
+        const childNodes = node.getChildren()
+        const oldLength = childNodes.length
+        const newLength = snapshot.length
+        const childType = this.getChildType()
+        const minLength = Math.min(oldLength, newLength)
+        const firstChangedIndex = findFirstChangedIndex(childNodes, snapshot, minLength)
+
+        // If all array items are the same and the length did not change, there is nothing to do.
+        if (firstChangedIndex === oldLength && firstChangedIndex === newLength) {
+            return
+        }
+
+        // Preserve the old "always replace" behavior for length changes and when patches are being
+        // observed, since those cases are more sensitive to patch shape (for example, splice
+        // would otherwise emit add/remove patch sequences) and benchmark variance.
+        if (oldLength !== newLength || node.hasPatchSubscribers()) {
+            target.replace(snapshot)
+            return
+        }
+
+        // When every changed entry can reuse its existing child node, update them in place
+        // instead of going through array replacement/splice.
+        if (canApplyDirectSnapshotsInRange(childType, childNodes, snapshot, firstChangedIndex)) {
+            applyDirectSnapshotsInRange(childNodes, snapshot, firstChangedIndex)
+            return
+        }
+
+        let oldEnd = oldLength - 1
+        let newEnd = newLength - 1
+        while (
+            oldEnd >= firstChangedIndex &&
+            newEnd >= firstChangedIndex &&
+            childNodes[oldEnd].snapshot === snapshot[newEnd]
+        ) {
+            oldEnd--
+            newEnd--
+        }
+
+        // Trim the unchanged suffix too, so we only replace the minimal changed window.
+        const replacedCount = oldEnd >= firstChangedIndex ? oldEnd - firstChangedIndex + 1 : 0
+        const replacementSnapshots =
+            newEnd >= firstChangedIndex
+                ? snapshot.slice(firstChangedIndex, newEnd + 1)
+                : EMPTY_ARRAY
+
+        if (replacedCount === 1 && replacementSnapshots.length === 1) {
+            target[firstChangedIndex] = replacementSnapshots[0]
+            return
+        }
+
+        target.splice(firstChangedIndex, replacedCount, ...replacementSnapshots)
     }
 
     getChildType(): IAnyType {
@@ -348,6 +403,42 @@ ArrayType.prototype.applySnapshot = action(ArrayType.prototype.applySnapshot)
 export function array<IT extends IAnyType>(subtype: IT): IArrayType<IT> {
     assertIsType(subtype, 1)
     return new ArrayType<IT>(`${subtype.name}[]`, subtype)
+}
+
+function findFirstChangedIndex(childNodes: readonly AnyNode[], snapshot: any[], length: number) {
+    let index = 0
+    while (index < length && childNodes[index].snapshot === snapshot[index]) {
+        index++
+    }
+    return index
+}
+
+function canApplyDirectSnapshotsInRange(
+    childType: IAnyType,
+    childNodes: readonly AnyNode[],
+    snapshot: any[],
+    startIndex: number
+) {
+    for (let i = startIndex; i < childNodes.length; i++) {
+        if (childNodes[i].snapshot === snapshot[i]) continue
+        if (!canApplyDirectSnapshot(childType, childNodes[i], snapshot[i])) {
+            return false
+        }
+    }
+
+    return true
+}
+
+function applyDirectSnapshotsInRange(
+    childNodes: readonly AnyNode[],
+    snapshot: any[],
+    startIndex: number
+) {
+    for (let i = startIndex; i < childNodes.length; i++) {
+        const childNode = childNodes[i]
+        if (childNode.snapshot === snapshot[i]) continue
+        ;(childNode as ObjectNode<any, any, any>).applySnapshot(snapshot[i] as any)
+    }
 }
 
 function reconcileArrayChildren<TT>(

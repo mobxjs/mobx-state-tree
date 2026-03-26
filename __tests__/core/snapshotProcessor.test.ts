@@ -4,6 +4,7 @@ import {
     getSnapshot,
     unprotect,
     cast,
+    applySnapshot,
     detach,
     clone,
     SnapshotIn,
@@ -713,6 +714,31 @@ describe("snapshotProcessor", () => {
             store.setItems([{ foo: "1" }])
             expect(getNodeId(store.items[0])).toBe(oldNodeId)
         })
+
+        test("applySnapshot uses the snapshot processor when reconciling", () => {
+            const SP = types.snapshotProcessor(
+                types.model({
+                    id: types.identifier,
+                    x: types.number
+                }),
+                {
+                    preProcessor(sn: { id: string; y: number }) {
+                        if ("x" in sn) {
+                            throw new Error("sn has already been preprocessed")
+                        }
+                        return { id: sn.id, x: sn.y }
+                    }
+                }
+            )
+            const Store = types.model({ items: types.array(SP) })
+            const store = Store.create({ items: [{ id: "1", y: 0 }] })
+            const oldNodeId = getNodeId(store.items[0])
+
+            applySnapshot(store, { items: [{ id: "1", y: 1 }] })
+
+            expect(getNodeId(store.items[0])).toBe(oldNodeId)
+            expect(store.items[0].x).toBe(1)
+        })
     })
 
     describe("single node reconcilication", () => {
@@ -819,6 +845,61 @@ describe("snapshotProcessor", () => {
             store.setItem(undefined)
             expect(getNodeId(store.item!)).toBe(oldNodeId)
             expect(store.item?.x).toBe(0)
+        })
+
+        test("applySnapshot uses the snapshot processor for optional-wrapped properties", () => {
+            const SP = types.snapshotProcessor(
+                types.model({
+                    id: types.identifier,
+                    x: types.number
+                }),
+                {
+                    preProcessor(sn: { id: string; y: number }) {
+                        if ("x" in sn) {
+                            throw new Error("sn has already been preprocessed")
+                        }
+                        return { id: sn.id, x: sn.y }
+                    }
+                }
+            )
+            const Store = types.model({
+                item: types.optional(SP, { id: "1", y: 0 })
+            })
+            const store = Store.create()
+            const oldNodeId = getNodeId(store.item!)
+
+            applySnapshot(store, { item: { id: "1", y: 1 } })
+
+            expect(getNodeId(store.item!)).toBe(oldNodeId)
+            expect(store.item?.x).toBe(1)
+        })
+
+        test("applySnapshot uses the snapshot processor for maps", () => {
+            const SP = types.snapshotProcessor(
+                types.model({
+                    id: types.identifier,
+                    x: types.number
+                }),
+                {
+                    preProcessor(sn: { id: string; y: number }) {
+                        if ("x" in sn) {
+                            throw new Error("sn has already been preprocessed")
+                        }
+                        return { id: sn.id, x: sn.y }
+                    }
+                }
+            )
+            const Store = types.model({
+                items: types.map(SP)
+            })
+            const store = Store.create({ items: { "1": { id: "1", y: 0 } } })
+            const item = store.items.get("1")!
+            const oldNodeId = getNodeId(item)
+
+            applySnapshot(store, { items: { "1": { id: "1", y: 1 } } })
+
+            expect(getNodeId(store.items.get("1")!)).toBe(oldNodeId)
+            expect(store.items.get("1")?.x).toBe(1)
         })
     })
 
