@@ -9,7 +9,9 @@ import {
     getSnapshot,
     applySnapshot,
     clone,
-    destroy
+    destroy,
+    flow,
+    addMiddleware
 } from "../../src"
 import { describe, expect, it, test } from "bun:test"
 
@@ -371,6 +373,86 @@ describe("safeReference", () => {
 
         expect(events).toEqual([])
         expect(store.selected).toBe(store.items[1])
+    })
+
+    test("invalid references applied in a resumed flow step should be removed before the flow resolves", async () => {
+        const events: Array<[string, string | number]> = []
+        const Item = types.model({
+            id: types.identifier
+        })
+        const SafeRef = types.safeReference(Item, {
+            onInvalidated(ev) {
+                events.push([ev.cause, ev.invalidId])
+            }
+        })
+        const Store = types
+            .model({
+                selected: SafeRef,
+                items: types.array(Item)
+            })
+            .actions(self => ({
+                update: flow(function* update() {
+                    yield Promise.resolve()
+                    applySnapshot(self, {
+                        selected: "100",
+                        items: [{ id: "1" }]
+                    })
+                })
+            }))
+
+        const store = Store.create({
+            selected: "1",
+            items: [{ id: "1" }]
+        })
+        await store.update()
+
+        expect(events).toEqual([["invalidSnapshotReference", "100"]])
+        expect(store.selected).toBeUndefined()
+    })
+
+    test("invalid references applied in an aborted middleware action should be removed before action returns", () => {
+        const events: Array<[string, string | number]> = []
+        const Item = types.model({
+            id: types.identifier
+        })
+        const SafeRef = types.safeReference(Item, {
+            onInvalidated(ev) {
+                events.push([ev.cause, ev.invalidId])
+            }
+        })
+        const Store = types
+            .model({
+                selected: SafeRef,
+                items: types.array(Item)
+            })
+            .actions(() => ({
+                first() {},
+                second() {}
+            }))
+
+        const store = Store.create({
+            selected: "1",
+            items: [{ id: "1" }]
+        })
+
+        const dispose = addMiddleware(store, (call, next, abort) => {
+            if (call.name === "first") {
+                applySnapshot(store, {
+                    selected: "100",
+                    items: [{ id: "1" }]
+                })
+                abort(undefined)
+                return
+            }
+            return next(call)
+        })
+
+        store.first()
+
+        expect(events).toEqual([["invalidSnapshotReference", "100"]])
+        expect(store.selected).toBeUndefined()
+
+        dispose()
     })
 
     test("setting it to an invalid id and then accessing it should still result in an error", () => {

@@ -104,9 +104,10 @@ export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
     const baseIsRunningAction = node._isRunningAction
     node._isRunningAction = true
     const previousContext = currentActionContext
+    const isRootActionContext = !previousContext
     currentActionContext = context
     try {
-        return runMiddleWares(node, context, fn)
+        return runMiddleWares(node, context, fn, isRootActionContext)
     } finally {
         currentActionContext = previousContext
         node._isRunningAction = baseIsRunningAction
@@ -259,7 +260,8 @@ class CollectedMiddlewares {
 function runMiddleWares(
     node: AnyObjectNode,
     baseCall: IMiddlewareEvent,
-    originalFn: Function
+    originalFn: Function,
+    isRootActionContext: boolean
 ): any {
     function runInActionScope(call: IMiddlewareEvent, fn: Function): any {
         const execute = () => {
@@ -272,7 +274,7 @@ function runMiddleWares(
                 error = e
             }
 
-            if (!call.parentActionEvent) {
+            if (isRootActionContext || !call.parentActionEvent) {
                 try {
                     node.root.flushEndOfActionCallbacks()
                 } catch (flushError) {
@@ -345,6 +347,9 @@ function runMiddleWares(
                     `The next() and abort() callback within the middleware ${handler.name} for the action: "${call.name}" on the node: ${node2.type.name} were invoked.`
                 )
             }
+        }
+        if (abortInvoked && (isRootActionContext || !call.parentActionEvent)) {
+            return runInActionScope(call, () => result)
         }
         return result
     }
