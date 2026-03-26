@@ -101,7 +101,7 @@ export class IdentifierNumberType extends BaseIdentifierType<number> {
  * Inside a state tree, for each type can exist only one instance for each given identifier.
  * For example there couldn't be 2 instances of user with id 1. If you need more, consider using references.
  * Identifier can be used only as type property of a model.
- * This type accepts as parameter the value type of the identifier field that can be either string or number.
+ * This type accepts as parameter the value type of the identifier field that can be either string, number or bigint.
  *
  * Example:
  * ```ts
