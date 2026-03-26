@@ -4,7 +4,7 @@ title: "UnionOptions"
 sidebar_label: "UnionOptions"
 ---
 
-[mobx-state-tree - v7.0.2](../index.md) › [UnionOptions](unionoptions.md)
+[mobx-state-tree - v7.1.0](../index.md) › [UnionOptions](unionoptions.md)
 
 ## Type parameters
 
@@ -27,7 +27,7 @@ sidebar_label: "UnionOptions"
 
 • **dispatcher**? : *[ITypeDispatcher](../index.md#itypedispatcher)‹Types›*
 
-*Defined in [src/types/utility-types/union.ts:38](https://github.com/mobxjs/mobx-state-tree/blob/1be40a3e/src/types/utility-types/union.ts#L38)*
+*Defined in [src/types/utility-types/union.ts:38](https://github.com/mobxjs/mobx-state-tree/blob/6c2cad97/src/types/utility-types/union.ts#L38)*
 
 A function that returns the type to be used given an input snapshot.
 
@@ -37,7 +37,7 @@ ___
 
 • **eager**? : *undefined | false | true*
 
-*Defined in [src/types/utility-types/union.ts:33](https://github.com/mobxjs/mobx-state-tree/blob/1be40a3e/src/types/utility-types/union.ts#L33)*
+*Defined in [src/types/utility-types/union.ts:33](https://github.com/mobxjs/mobx-state-tree/blob/6c2cad97/src/types/utility-types/union.ts#L33)*
 
 Whether or not to use eager validation.
 
