@@ -4,7 +4,7 @@ title: "FunctionWithFlag"
 sidebar_label: "FunctionWithFlag"
 ---
 
-[mobx-state-tree - v7.0.2](../index.md) › [FunctionWithFlag](functionwithflag.md)
+[mobx-state-tree - v7.1.0](../index.md) › [FunctionWithFlag](functionwithflag.md)
 
 ## Hierarchy
 
@@ -58,7 +58,7 @@ ___
 
 • **_isFlowAction**? : *undefined | false | true*
 
-*Defined in [src/core/action.ts:42](https://github.com/mobxjs/mobx-state-tree/blob/1be40a3e/src/core/action.ts#L42)*
+*Defined in [src/core/action.ts:42](https://github.com/mobxjs/mobx-state-tree/blob/6c2cad97/src/core/action.ts#L42)*
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 • **_isMSTAction**? : *undefined | false | true*
 
-*Defined in [src/core/action.ts:41](https://github.com/mobxjs/mobx-state-tree/blob/1be40a3e/src/core/action.ts#L41)*
+*Defined in [src/core/action.ts:41](https://github.com/mobxjs/mobx-state-tree/blob/6c2cad97/src/core/action.ts#L41)*
 
 ___
 
