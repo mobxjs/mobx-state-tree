@@ -104,9 +104,10 @@ export function runWithActionContext(context: IMiddlewareEvent, fn: Function) {
     const baseIsRunningAction = node._isRunningAction
     node._isRunningAction = true
     const previousContext = currentActionContext
+    const isRootActionContext = !previousContext
     currentActionContext = context
     try {
-        return runMiddleWares(node, context, fn)
+        return runMiddleWares(node, context, fn, isRootActionContext)
     } finally {
         currentActionContext = previousContext
         node._isRunningAction = baseIsRunningAction
@@ -259,11 +260,43 @@ class CollectedMiddlewares {
 function runMiddleWares(
     node: AnyObjectNode,
     baseCall: IMiddlewareEvent,
-    originalFn: Function
+    originalFn: Function,
+    isRootActionContext: boolean
 ): any {
+    function runInActionScope(call: IMiddlewareEvent, fn: Function): any {
+        const execute = () => {
+            let result: any
+            let error: any
+
+            try {
+                result = fn.apply(null, call.args)
+            } catch (e) {
+                error = e
+            }
+
+            if (isRootActionContext || !call.parentActionEvent) {
+                try {
+                    node.root.flushEndOfActionCallbacks()
+                } catch (flushError) {
+                    if (!error) {
+                        error = flushError
+                    }
+                }
+            }
+
+            if (error) {
+                throw error
+            }
+
+            return result
+        }
+
+        return call.name ? mobxAction(call.name, execute)() : mobxAction(execute)()
+    }
+
     const middlewares = new CollectedMiddlewares(node, originalFn)
     // Short circuit
-    if (middlewares.isEmpty) return mobxAction(originalFn).apply(null, baseCall.args)
+    if (middlewares.isEmpty) return runInActionScope(baseCall, originalFn)
 
     let result: any = null
 
@@ -272,7 +305,7 @@ function runMiddleWares(
         const handler = middleware && middleware.handler
 
         if (!handler) {
-            return mobxAction(originalFn).apply(null, call.args)
+            return runInActionScope(call, originalFn)
         }
 
         // skip hooks if asked to
@@ -314,6 +347,9 @@ function runMiddleWares(
                     `The next() and abort() callback within the middleware ${handler.name} for the action: "${call.name}" on the node: ${node2.type.name} were invoked.`
                 )
             }
+        }
+        if (abortInvoked && (isRootActionContext || !call.parentActionEvent)) {
+            return runInActionScope(call, () => result)
         }
         return result
     }
