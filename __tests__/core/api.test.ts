@@ -121,6 +121,7 @@ const TYPES = stringToArray(`
     frozen,
     identifier,
     identifierNumber,
+    identifierBigint,
     late,
     lazy,
     undefined,
