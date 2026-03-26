@@ -309,11 +309,11 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
             return
         }
 
-        // Preserve the existing replace behavior for length changes and when patches are being
+        // Preserve the old "always replace" behavior for length changes and when patches are being
         // observed, since those cases are more sensitive to patch shape (for example, splice
         // would otherwise emit add/remove patch sequences) and benchmark variance.
         if (oldLength !== newLength || node.hasPatchSubscribers()) {
-            target.replace(snapshot as any)
+            target.replace(snapshot)
             return
         }
 
@@ -343,11 +343,11 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
                 : EMPTY_ARRAY
 
         if (replacedCount === 1 && replacementSnapshots.length === 1) {
-            target[firstChangedIndex] = replacementSnapshots[0] as any
+            target[firstChangedIndex] = replacementSnapshots[0]
             return
         }
 
-        target.splice(firstChangedIndex, replacedCount, ...(replacementSnapshots as any))
+        target.splice(firstChangedIndex, replacedCount, ...replacementSnapshots)
     }
 
     getChildType(): IAnyType {
