@@ -7,6 +7,7 @@ import {
     IAnyComplexType,
     resolveIdentifier,
     getIdentifier,
+    getSnapshot,
     detach
 } from "../../src"
 import { expect, test } from "bun:test"
@@ -97,6 +98,66 @@ if (process.env.NODE_ENV !== "production") {
         expect(() => {
             const Model = types.identifierNumber
             Model.create(1)
+        }).toThrow(
+            `[mobx-state-tree] Identifier types can only be instantiated as direct child of a model type`
+        )
+    })
+}
+
+test("identifierBigint accepts bigint, string and number values", () => {
+    const Todo = types.model("Todo", {
+        id: types.identifierBigint,
+        title: types.string
+    })
+    const fromBigint = Todo.create({ id: BigInt(1), title: "Get coffee" })
+    expect(fromBigint.id).toBe(BigInt(1))
+    expect(getIdentifier(fromBigint)).toBe("1")
+    const fromString = Todo.create({ id: "2", title: "Other" })
+    expect(fromString.id).toBe(BigInt(2))
+    expect(getIdentifier(fromString)).toBe("2")
+    const fromNumber = Todo.create({ id: 3, title: "From number" })
+    expect(fromNumber.id).toBe(BigInt(3))
+    expect(getIdentifier(fromNumber)).toBe("3")
+})
+
+test("identifierBigint snapshot serializes to string and deserializes", () => {
+    const Todo = types.model("Todo", {
+        id: types.identifierBigint,
+        title: types.string
+    })
+    const instance = Todo.create({ id: BigInt(123), title: "Hi" })
+    const snapshot = getSnapshot(instance)
+    expect(snapshot.id).toBe("123")
+    expect(typeof snapshot.id).toBe("string")
+    const json = JSON.stringify(snapshot)
+    expect(json).toBe('{"id":"123","title":"Hi"}')
+    const restored = Todo.create(JSON.parse(json))
+    expect(restored.id).toBe(BigInt(123))
+    expect(restored.title).toBe("Hi")
+})
+
+if (process.env.NODE_ENV !== "production") {
+    test("identifierBigint should throw if identifier of wrong type", () => {
+        expect(() => {
+            const Model = types.model("Model", { id: types.identifierBigint })
+            Model.create({ id: null as any })
+        }).toThrow(/expected a bigint, a string or a number/)
+    })
+    test("identifierBigint should throw if multiple identifiers provided", () => {
+        expect(() => {
+            const Model = types.model("Model", {
+                id: types.identifierBigint,
+                pk: types.identifierBigint
+            })
+            Model.create({ id: BigInt(1), pk: BigInt(2) })
+        }).toThrow(
+            `[mobx-state-tree] Cannot define property 'pk' as object identifier, property 'id' is already defined as identifier property`
+        )
+    })
+    test("identifierBigint should be used only on model types - no parent provided", () => {
+        expect(() => {
+            const Model = types.identifierBigint
+            Model.create(BigInt(1))
         }).toThrow(
             `[mobx-state-tree] Identifier types can only be instantiated as direct child of a model type`
         )

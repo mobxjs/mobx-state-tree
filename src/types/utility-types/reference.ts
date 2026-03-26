@@ -171,7 +171,7 @@ export abstract class BaseReferenceType<IT extends IAnyComplexType> extends Simp
             : typeCheckFailure(
                   context,
                   value,
-                  "Value is not a valid identifier, which is a string or a number"
+                  "Value is not a valid identifier, which is a string, number or a bigint"
               )
     }
 

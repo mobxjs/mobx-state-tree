@@ -17,7 +17,6 @@ sidebar_label: "FunctionWithFlag"
 ### Properties
 
 * [Function](functionwithflag.md#function)
-* [[Symbol.metadata]](functionwithflag.md#[symbol.metadata])
 * [_isFlowAction](functionwithflag.md#optional-_isflowaction)
 * [_isMSTAction](functionwithflag.md#optional-_ismstaction)
 * [arguments](functionwithflag.md#arguments)
@@ -41,16 +40,6 @@ sidebar_label: "FunctionWithFlag"
 • **Function**: *FunctionConstructor*
 
 Defined in node_modules/typescript/lib/lib.es5.d.ts:319
-
-___
-
-###  [Symbol.metadata]
-
-• **[Symbol.metadata]**: *DecoratorMetadata | null*
-
-*Inherited from void*
-
-Defined in node_modules/typescript/lib/lib.esnext.decorators.d.ts:27
 
 ___
 

@@ -385,6 +385,30 @@ test("it should support array of references", () => {
     expect(getSnapshot(store.selected)).toEqual([1, 2])
 })
 
+test("it should support identifierBigint with references", () => {
+    const Todo = types.model("Todo", {
+        id: types.identifierBigint,
+        title: types.string
+    })
+    const Store = types.model("Store", {
+        todos: types.array(Todo),
+        selected: types.reference(Todo)
+    })
+    const store = Store.create({
+        todos: [
+            { id: "1", title: "first" },
+            { id: "2", title: "second" }
+        ],
+        selected: "1"
+    })
+    unprotect(store)
+    expect(store.selected.title).toBe("first")
+    expect(store.selected.id).toBe(BigInt(1))
+    store.selected = store.todos[1]
+    expect(store.selected.title).toBe("second")
+    expect(getSnapshot(store).selected).toBe("2")
+})
+
 test("it should restore array of references from snapshot", () => {
     const Box = types.model({
         id: types.identifierNumber,
