@@ -302,7 +302,7 @@ describe("safeReference", () => {
     })
 
     test("invalid references applied to an existing tree should be removed", () => {
-        const events: Array<[string, string | number]> = []
+        const events: Array<[string, string | number | BigInt]> = []
         const onInvalidated: OnReferenceInvalidated<Instance<typeof Todo>> = ev => {
             events.push([ev.cause, ev.invalidId])
         }
@@ -343,7 +343,7 @@ describe("safeReference", () => {
     })
 
     test("references applied before their target appears later in the same snapshot should stay valid", () => {
-        const events: Array<[string, string | number]> = []
+        const events: Array<[string, string | number | BigInt]> = []
         const Item = types.model({
             id: types.identifierNumber,
             title: types.string
@@ -376,7 +376,7 @@ describe("safeReference", () => {
     })
 
     test("invalid references applied in a resumed flow step should be removed before the flow resolves", async () => {
-        const events: Array<[string, string | number]> = []
+        const events: Array<[string, string | number | BigInt]> = []
         const Item = types.model({
             id: types.identifier
         })
@@ -411,7 +411,7 @@ describe("safeReference", () => {
     })
 
     test("invalid references applied in an aborted middleware action should be removed before action returns", () => {
-        const events: Array<[string, string | number]> = []
+        const events: Array<[string, string | number | BigInt]> = []
         const Item = types.model({
             id: types.identifier
         })
