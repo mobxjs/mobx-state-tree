@@ -4,7 +4,7 @@ title: "ISnapshotProcessor"
 sidebar_label: "ISnapshotProcessor"
 ---
 
-[mobx-state-tree - v7.1.0](../index.md) › [ISnapshotProcessor](isnapshotprocessor.md)
+[mobx-state-tree - v7.2.0](../index.md) › [ISnapshotProcessor](isnapshotprocessor.md)
 
 A type that has its snapshots processed.
 

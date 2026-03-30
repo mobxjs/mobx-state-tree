@@ -4,7 +4,7 @@ title: "IMiddlewareEvent"
 sidebar_label: "IMiddlewareEvent"
 ---
 
-[mobx-state-tree - v7.1.0](../index.md) › [IMiddlewareEvent](imiddlewareevent.md)
+[mobx-state-tree - v7.2.0](../index.md) › [IMiddlewareEvent](imiddlewareevent.md)
 
 ## Hierarchy
 
@@ -34,7 +34,7 @@ sidebar_label: "IMiddlewareEvent"
 
 • **allParentIds**: *number[]*
 
-*Defined in [src/core/action.ts:37](https://github.com/mobxjs/mobx-state-tree/blob/6c2cad97/src/core/action.ts#L37)*
+*Defined in [src/core/action.ts:37](https://github.com/mobxjs/mobx-state-tree/blob/1f4bc725/src/core/action.ts#L37)*
 
 Id of all events, from root until current (excluding current)
 
@@ -104,7 +104,7 @@ ___
 
 • **parentEvent**: *[IMiddlewareEvent](imiddlewareevent.md) | undefined*
 
-*Defined in [src/core/action.ts:32](https://github.com/mobxjs/mobx-state-tree/blob/6c2cad97/src/core/action.ts#L32)*
+*Defined in [src/core/action.ts:32](https://github.com/mobxjs/mobx-state-tree/blob/1f4bc725/src/core/action.ts#L32)*
 
 Parent event object
 
@@ -114,7 +114,7 @@ ___
 
 • **parentId**: *number*
 
-*Defined in [src/core/action.ts:30](https://github.com/mobxjs/mobx-state-tree/blob/6c2cad97/src/core/action.ts#L30)*
+*Defined in [src/core/action.ts:30](https://github.com/mobxjs/mobx-state-tree/blob/1f4bc725/src/core/action.ts#L30)*
 
 Parent event unique id
 
@@ -124,7 +124,7 @@ ___
 
 • **rootId**: *number*
 
-*Defined in [src/core/action.ts:35](https://github.com/mobxjs/mobx-state-tree/blob/6c2cad97/src/core/action.ts#L35)*
+*Defined in [src/core/action.ts:35](https://github.com/mobxjs/mobx-state-tree/blob/1f4bc725/src/core/action.ts#L35)*
 
 Root event unique id
 
@@ -146,6 +146,6 @@ ___
 
 • **type**: *[IMiddlewareEventType](../index.md#imiddlewareeventtype)*
 
-*Defined in [src/core/action.ts:27](https://github.com/mobxjs/mobx-state-tree/blob/6c2cad97/src/core/action.ts#L27)*
+*Defined in [src/core/action.ts:27](https://github.com/mobxjs/mobx-state-tree/blob/1f4bc725/src/core/action.ts#L27)*
 
 Event type

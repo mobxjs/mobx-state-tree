@@ -4,7 +4,7 @@ title: "IType"
 sidebar_label: "IType"
 ---
 
-[mobx-state-tree - v7.1.0](../index.md) › [IType](itype.md)
+[mobx-state-tree - v7.2.0](../index.md) › [IType](itype.md)
 
 A type, either complex or simple.
 

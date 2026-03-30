@@ -4,7 +4,7 @@ title: "UnionOptions"
 sidebar_label: "UnionOptions"
 ---
 
-[mobx-state-tree - v7.1.0](../index.md) › [UnionOptions](unionoptions.md)
+[mobx-state-tree - v7.2.0](../index.md) › [UnionOptions](unionoptions.md)
 
 ## Type parameters
 

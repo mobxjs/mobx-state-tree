@@ -4,7 +4,7 @@ title: "ISimpleType"
 sidebar_label: "ISimpleType"
 ---
 
-[mobx-state-tree - v7.1.0](../index.md) › [ISimpleType](isimpletype.md)
+[mobx-state-tree - v7.2.0](../index.md) › [ISimpleType](isimpletype.md)
 
 A simple type, this is, a type where the instance and the snapshot representation are the same.
 

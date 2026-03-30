@@ -4,7 +4,7 @@ title: "CustomTypeOptions"
 sidebar_label: "CustomTypeOptions"
 ---
 
-[mobx-state-tree - v7.1.0](../index.md) › [CustomTypeOptions](customtypeoptions.md)
+[mobx-state-tree - v7.2.0](../index.md) › [CustomTypeOptions](customtypeoptions.md)
 
 ## Type parameters
 

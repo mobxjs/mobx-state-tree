@@ -4,7 +4,7 @@ title: "IAnyType"
 sidebar_label: "IAnyType"
 ---
 
-[mobx-state-tree - v7.1.0](../index.md) › [IAnyType](ianytype.md)
+[mobx-state-tree - v7.2.0](../index.md) › [IAnyType](ianytype.md)
 
 Any kind of type.
 
