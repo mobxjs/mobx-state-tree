@@ -4,7 +4,7 @@ title: "IModelReflectionData"
 sidebar_label: "IModelReflectionData"
 ---
 
-[mobx-state-tree - v7.1.0](../index.md) › [IModelReflectionData](imodelreflectiondata.md)
+[mobx-state-tree - v7.2.0](../index.md) › [IModelReflectionData](imodelreflectiondata.md)
 
 ## Hierarchy
 

@@ -1,10 +1,10 @@
 ---
 id: "index"
-title: "mobx-state-tree - v7.1.0"
+title: "mobx-state-tree - v7.2.0"
 sidebar_label: "Globals"
 ---
 
-[mobx-state-tree - v7.1.0](index.md)
+[mobx-state-tree - v7.2.0](index.md)
 
 ## Index
 
@@ -215,7 +215,7 @@ ___
 
 Ƭ **IMiddlewareEventType**: *"action" | "flow_spawn" | "flow_resume" | "flow_resume_error" | "flow_return" | "flow_throw"*
 
-*Defined in [src/core/action.ts:16](https://github.com/mobxjs/mobx-state-tree/blob/6c2cad97/src/core/action.ts#L16)*
+*Defined in [src/core/action.ts:16](https://github.com/mobxjs/mobx-state-tree/blob/1f4bc725/src/core/action.ts#L16)*
 
 ___
 
@@ -223,7 +223,7 @@ ___
 
 Ƭ **IMiddlewareHandler**: *function*
 
-*Defined in [src/core/action.ts:54](https://github.com/mobxjs/mobx-state-tree/blob/6c2cad97/src/core/action.ts#L54)*
+*Defined in [src/core/action.ts:54](https://github.com/mobxjs/mobx-state-tree/blob/1f4bc725/src/core/action.ts#L54)*
 
 #### Type declaration:
 
@@ -329,7 +329,7 @@ ___
 
 Ƭ **OnReferenceInvalidated**: *function*
 
-*Defined in [src/types/utility-types/reference.ts:45](https://github.com/mobxjs/mobx-state-tree/blob/1422b319/src/types/utility-types/reference.ts#L45)*
+*Defined in [src/types/utility-types/reference.ts:47](https://github.com/mobxjs/mobx-state-tree/blob/1f4bc725/src/types/utility-types/reference.ts#L47)*
 
 #### Type declaration:
 
@@ -347,7 +347,7 @@ ___
 
 Ƭ **OnReferenceInvalidatedEvent**: *object*
 
-*Defined in [src/types/utility-types/reference.ts:36](https://github.com/mobxjs/mobx-state-tree/blob/1422b319/src/types/utility-types/reference.ts#L36)*
+*Defined in [src/types/utility-types/reference.ts:38](https://github.com/mobxjs/mobx-state-tree/blob/1f4bc725/src/types/utility-types/reference.ts#L38)*
 
 #### Type declaration:
 
@@ -357,7 +357,7 @@ ___
 
 Ƭ **ReferenceIdentifier**: *string | number | bigint*
 
-*Defined in [src/types/utility-types/identifier.ts:249](https://github.com/mobxjs/mobx-state-tree/blob/1422b319/src/types/utility-types/identifier.ts#L249)*
+*Defined in [src/types/utility-types/identifier.ts:249](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/utility-types/identifier.ts#L249)*
 
 Valid types for identifiers.
 
@@ -367,7 +367,7 @@ ___
 
 Ƭ **ReferenceOptions**: *[ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)‹IT› | [ReferenceOptionsOnInvalidated](interfaces/referenceoptionsoninvalidated.md)‹IT› | [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)‹IT› & [ReferenceOptionsOnInvalidated](interfaces/referenceoptionsoninvalidated.md)‹IT›*
 
-*Defined in [src/types/utility-types/reference.ts:481](https://github.com/mobxjs/mobx-state-tree/blob/1422b319/src/types/utility-types/reference.ts#L481)*
+*Defined in [src/types/utility-types/reference.ts:501](https://github.com/mobxjs/mobx-state-tree/blob/1f4bc725/src/types/utility-types/reference.ts#L501)*
 
 ___
 
@@ -534,7 +534,7 @@ ___
 
 • **identifier**: *[ISimpleType](interfaces/isimpletype.md)‹string›* =  new IdentifierType()
 
-*Defined in [src/types/utility-types/identifier.ts:116](https://github.com/mobxjs/mobx-state-tree/blob/1422b319/src/types/utility-types/identifier.ts#L116)*
+*Defined in [src/types/utility-types/identifier.ts:116](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/utility-types/identifier.ts#L116)*
 
 `types.identifier` - Identifiers are used to make references, lifecycle events and reconciling works.
 Inside a state tree, for each type can exist only one instance for each given identifier.
@@ -559,7 +559,7 @@ ___
 • **identifierBigint**: *[IType](interfaces/itype.md)‹bigint | string | number, string, bigint›* = 
     new IdentifierBigintType()
 
-*Defined in [src/types/utility-types/identifier.ts:231](https://github.com/mobxjs/mobx-state-tree/blob/1422b319/src/types/utility-types/identifier.ts#L231)*
+*Defined in [src/types/utility-types/identifier.ts:231](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/utility-types/identifier.ts#L231)*
 
 `types.identifierBigint` - Similar to `types.identifier`. Snapshots serialize to string (JSON-safe) and deserialize from string, number or bigint.
 
@@ -579,7 +579,7 @@ ___
 
 • **identifierNumber**: *[ISimpleType](interfaces/isimpletype.md)‹number›* =  new IdentifierNumberType()
 
-*Defined in [src/types/utility-types/identifier.ts:131](https://github.com/mobxjs/mobx-state-tree/blob/1422b319/src/types/utility-types/identifier.ts#L131)*
+*Defined in [src/types/utility-types/identifier.ts:131](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/utility-types/identifier.ts#L131)*
 
 `types.identifierNumber` - Similar to `types.identifier`. This one will serialize from / to a number when applying snapshots
 
@@ -737,7 +737,7 @@ ___
 
 ▸ **addMiddleware**(`target`: IAnyStateTreeNode, `handler`: [IMiddlewareHandler](index.md#imiddlewarehandler), `includeHooks`: boolean): *[IDisposer](index.md#idisposer)*
 
-*Defined in [src/core/action.ts:174](https://github.com/mobxjs/mobx-state-tree/blob/6c2cad97/src/core/action.ts#L174)*
+*Defined in [src/core/action.ts:175](https://github.com/mobxjs/mobx-state-tree/blob/1f4bc725/src/core/action.ts#L175)*
 
 Middleware can be used to intercept any action is invoked on the subtree where it is attached.
 If a tree is protected (by default), this means that any mutation of the tree will pass through your middleware.
@@ -2357,7 +2357,7 @@ ___
 
 ▸ **decorate**<**T**>(`handler`: [IMiddlewareHandler](index.md#imiddlewarehandler), `fn`: T, `includeHooks`: boolean): *T*
 
-*Defined in [src/core/action.ts:213](https://github.com/mobxjs/mobx-state-tree/blob/6c2cad97/src/core/action.ts#L213)*
+*Defined in [src/core/action.ts:214](https://github.com/mobxjs/mobx-state-tree/blob/1f4bc725/src/core/action.ts#L214)*
 
 Binds middleware to a specific action.
 
@@ -3205,7 +3205,7 @@ ___
 
 ▸ **isIdentifierType**(`type`: unknown): *type is ISimpleType | ISimpleType | IType*
 
-*Defined in [src/types/utility-types/identifier.ts:240](https://github.com/mobxjs/mobx-state-tree/blob/1422b319/src/types/utility-types/identifier.ts#L240)*
+*Defined in [src/types/utility-types/identifier.ts:240](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/utility-types/identifier.ts#L240)*
 
 Returns if a given value represents an identifier type.
 
@@ -3353,7 +3353,7 @@ ___
 
 ▸ **isReferenceType**(`type`: unknown): *type is IReferenceType<IAnyComplexType>*
 
-*Defined in [src/types/utility-types/reference.ts:541](https://github.com/mobxjs/mobx-state-tree/blob/1422b319/src/types/utility-types/reference.ts#L541)*
+*Defined in [src/types/utility-types/reference.ts:561](https://github.com/mobxjs/mobx-state-tree/blob/1f4bc725/src/types/utility-types/reference.ts#L561)*
 
 Returns if a given value represents a reference type.
 
@@ -4109,7 +4109,7 @@ ___
 
 ▸ **reference**<**IT**>(`subType`: IT, `options?`: [ReferenceOptions](index.md#referenceoptions)‹IT›): *IReferenceType‹IT›*
 
-*Defined in [src/types/utility-types/reference.ts:494](https://github.com/mobxjs/mobx-state-tree/blob/1422b319/src/types/utility-types/reference.ts#L494)*
+*Defined in [src/types/utility-types/reference.ts:514](https://github.com/mobxjs/mobx-state-tree/blob/1f4bc725/src/types/utility-types/reference.ts#L514)*
 
 `types.reference` - Creates a reference to another type, which should have defined an identifier.
 See also the [reference and identifiers](https://github.com/mobxjs/mobx-state-tree#references-and-identifiers) section.
@@ -4256,7 +4256,7 @@ ___
 
 ▸ **safeReference**<**IT**>(`subType`: IT, `options`: __type | [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)‹IT› & object): *IReferenceType‹IT›*
 
-*Defined in [src/types/utility-types/reference.ts:545](https://github.com/mobxjs/mobx-state-tree/blob/1422b319/src/types/utility-types/reference.ts#L545)*
+*Defined in [src/types/utility-types/reference.ts:565](https://github.com/mobxjs/mobx-state-tree/blob/1f4bc725/src/types/utility-types/reference.ts#L565)*
 
 `types.safeReference` - A safe reference is like a standard reference, except that it accepts the undefined value by default
 and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps
@@ -4286,7 +4286,7 @@ Name | Type |
 
 ▸ **safeReference**<**IT**>(`subType`: IT, `options?`: __type | [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)‹IT› & object): *IMaybe‹IReferenceType‹IT››*
 
-*Defined in [src/types/utility-types/reference.ts:552](https://github.com/mobxjs/mobx-state-tree/blob/1422b319/src/types/utility-types/reference.ts#L552)*
+*Defined in [src/types/utility-types/reference.ts:572](https://github.com/mobxjs/mobx-state-tree/blob/1f4bc725/src/types/utility-types/reference.ts#L572)*
 
 `types.safeReference` - A safe reference is like a standard reference, except that it accepts the undefined value by default
 and automatically sets itself to undefined (when the parent is a model) / removes itself from arrays and maps
@@ -4699,190 +4699,190 @@ Name | Type |
 
 ### ▪ **types**: *object*
 
-*Defined in [src/types/index.ts:36](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L36)*
+*Defined in [src/types/index.ts:36](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L36)*
 
 ###  Date
 
 • **Date**: *[IType](interfaces/itype.md)‹number | Date, number, Date›* =  DatePrimitive
 
-*Defined in [src/types/index.ts:56](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L56)*
+*Defined in [src/types/index.ts:56](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L56)*
 
 ###  array
 
 • **array**: *[array](index.md#array)*
 
-*Defined in [src/types/index.ts:58](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L58)*
+*Defined in [src/types/index.ts:58](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L58)*
 
 ###  bigint
 
 • **bigint**: *[IType](interfaces/itype.md)‹string | number | bigint, string, bigint›*
 
-*Defined in [src/types/index.ts:55](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L55)*
+*Defined in [src/types/index.ts:55](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L55)*
 
 ###  boolean
 
 • **boolean**: *[ISimpleType](interfaces/isimpletype.md)‹boolean›*
 
-*Defined in [src/types/index.ts:50](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L50)*
+*Defined in [src/types/index.ts:50](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L50)*
 
 ###  compose
 
 • **compose**: *[compose](index.md#compose)*
 
-*Defined in [src/types/index.ts:39](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L39)*
+*Defined in [src/types/index.ts:39](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L39)*
 
 ###  custom
 
 • **custom**: *[custom](index.md#custom)*
 
-*Defined in [src/types/index.ts:40](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L40)*
+*Defined in [src/types/index.ts:40](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L40)*
 
 ###  enumeration
 
 • **enumeration**: *[enumeration](index.md#enumeration)*
 
-*Defined in [src/types/index.ts:37](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L37)*
+*Defined in [src/types/index.ts:37](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L37)*
 
 ###  finite
 
 • **finite**: *[ISimpleType](interfaces/isimpletype.md)‹number›*
 
-*Defined in [src/types/index.ts:54](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L54)*
+*Defined in [src/types/index.ts:54](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L54)*
 
 ###  float
 
 • **float**: *[ISimpleType](interfaces/isimpletype.md)‹number›*
 
-*Defined in [src/types/index.ts:53](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L53)*
+*Defined in [src/types/index.ts:53](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L53)*
 
 ###  frozen
 
 • **frozen**: *[frozen](index.md#frozen)*
 
-*Defined in [src/types/index.ts:59](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L59)*
+*Defined in [src/types/index.ts:59](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L59)*
 
 ###  identifier
 
 • **identifier**: *[ISimpleType](interfaces/isimpletype.md)‹string›*
 
-*Defined in [src/types/index.ts:60](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L60)*
+*Defined in [src/types/index.ts:60](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L60)*
 
 ###  identifierBigint
 
 • **identifierBigint**: *[IType](interfaces/itype.md)‹string | number | bigint, string, bigint›*
 
-*Defined in [src/types/index.ts:62](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L62)*
+*Defined in [src/types/index.ts:62](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L62)*
 
 ###  identifierNumber
 
 • **identifierNumber**: *[ISimpleType](interfaces/isimpletype.md)‹number›*
 
-*Defined in [src/types/index.ts:61](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L61)*
+*Defined in [src/types/index.ts:61](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L61)*
 
 ###  integer
 
 • **integer**: *[ISimpleType](interfaces/isimpletype.md)‹number›*
 
-*Defined in [src/types/index.ts:52](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L52)*
+*Defined in [src/types/index.ts:52](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L52)*
 
 ###  late
 
 • **late**: *[late](index.md#late)*
 
-*Defined in [src/types/index.ts:63](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L63)*
+*Defined in [src/types/index.ts:63](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L63)*
 
 ###  lazy
 
 • **lazy**: *[lazy](index.md#lazy)*
 
-*Defined in [src/types/index.ts:64](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L64)*
+*Defined in [src/types/index.ts:64](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L64)*
 
 ###  literal
 
 • **literal**: *[literal](index.md#literal)*
 
-*Defined in [src/types/index.ts:45](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L45)*
+*Defined in [src/types/index.ts:45](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L45)*
 
 ###  map
 
 • **map**: *[map](index.md#map)*
 
-*Defined in [src/types/index.ts:57](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L57)*
+*Defined in [src/types/index.ts:57](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L57)*
 
 ###  maybe
 
 • **maybe**: *[maybe](index.md#maybe)*
 
-*Defined in [src/types/index.ts:46](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L46)*
+*Defined in [src/types/index.ts:46](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L46)*
 
 ###  maybeNull
 
 • **maybeNull**: *[maybeNull](index.md#maybenull)*
 
-*Defined in [src/types/index.ts:47](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L47)*
+*Defined in [src/types/index.ts:47](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L47)*
 
 ###  model
 
 • **model**: *[model](index.md#model)*
 
-*Defined in [src/types/index.ts:38](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L38)*
+*Defined in [src/types/index.ts:38](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L38)*
 
 ###  null
 
 • **null**: *[ISimpleType](interfaces/isimpletype.md)‹null›* =  nullType
 
-*Defined in [src/types/index.ts:66](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L66)*
+*Defined in [src/types/index.ts:66](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L66)*
 
 ###  number
 
 • **number**: *[ISimpleType](interfaces/isimpletype.md)‹number›*
 
-*Defined in [src/types/index.ts:51](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L51)*
+*Defined in [src/types/index.ts:51](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L51)*
 
 ###  optional
 
 • **optional**: *[optional](index.md#optional)*
 
-*Defined in [src/types/index.ts:44](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L44)*
+*Defined in [src/types/index.ts:44](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L44)*
 
 ###  reference
 
 • **reference**: *[reference](index.md#reference)*
 
-*Defined in [src/types/index.ts:41](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L41)*
+*Defined in [src/types/index.ts:41](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L41)*
 
 ###  refinement
 
 • **refinement**: *[refinement](index.md#refinement)*
 
-*Defined in [src/types/index.ts:48](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L48)*
+*Defined in [src/types/index.ts:48](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L48)*
 
 ###  safeReference
 
 • **safeReference**: *[safeReference](index.md#safereference)*
 
-*Defined in [src/types/index.ts:42](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L42)*
+*Defined in [src/types/index.ts:42](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L42)*
 
 ###  snapshotProcessor
 
 • **snapshotProcessor**: *[snapshotProcessor](index.md#snapshotprocessor)*
 
-*Defined in [src/types/index.ts:67](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L67)*
+*Defined in [src/types/index.ts:67](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L67)*
 
 ###  string
 
 • **string**: *[ISimpleType](interfaces/isimpletype.md)‹string›*
 
-*Defined in [src/types/index.ts:49](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L49)*
+*Defined in [src/types/index.ts:49](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L49)*
 
 ###  undefined
 
 • **undefined**: *[ISimpleType](interfaces/isimpletype.md)‹undefined›* =  undefinedType
 
-*Defined in [src/types/index.ts:65](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L65)*
+*Defined in [src/types/index.ts:65](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L65)*
 
 ###  union
 
 • **union**: *[union](index.md#union)*
 
-*Defined in [src/types/index.ts:43](https://github.com/mobxjs/mobx-state-tree/blob/ea4c2d0f/src/types/index.ts#L43)*
+*Defined in [src/types/index.ts:43](https://github.com/mobxjs/mobx-state-tree/blob/ad97d8be/src/types/index.ts#L43)*

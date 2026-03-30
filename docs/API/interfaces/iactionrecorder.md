@@ -4,7 +4,7 @@ title: "IActionRecorder"
 sidebar_label: "IActionRecorder"
 ---
 
-[mobx-state-tree - v7.1.0](../index.md) › [IActionRecorder](iactionrecorder.md)
+[mobx-state-tree - v7.2.0](../index.md) › [IActionRecorder](iactionrecorder.md)
 
 ## Hierarchy
 

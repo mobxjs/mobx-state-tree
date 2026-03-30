@@ -4,7 +4,7 @@ title: "IJsonPatch"
 sidebar_label: "IJsonPatch"
 ---
 
-[mobx-state-tree - v7.1.0](../index.md) › [IJsonPatch](ijsonpatch.md)
+[mobx-state-tree - v7.2.0](../index.md) › [IJsonPatch](ijsonpatch.md)
 
 https://tools.ietf.org/html/rfc6902
 http://jsonpatch.com/

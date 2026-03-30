@@ -4,7 +4,7 @@ title: "IAnyModelType"
 sidebar_label: "IAnyModelType"
 ---
 
-[mobx-state-tree - v7.1.0](../index.md) › [IAnyModelType](ianymodeltype.md)
+[mobx-state-tree - v7.2.0](../index.md) › [IAnyModelType](ianymodeltype.md)
 
 Any model type.
 

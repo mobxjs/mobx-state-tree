@@ -4,7 +4,7 @@ title: "ISnapshotProcessors"
 sidebar_label: "ISnapshotProcessors"
 ---
 
-[mobx-state-tree - v7.1.0](../index.md) › [ISnapshotProcessors](isnapshotprocessors.md)
+[mobx-state-tree - v7.2.0](../index.md) › [ISnapshotProcessors](isnapshotprocessors.md)
 
 Snapshot processors.
 
