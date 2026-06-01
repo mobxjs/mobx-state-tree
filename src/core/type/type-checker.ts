@@ -5,6 +5,7 @@ import {
     getStateTreeNode,
     isStateTreeNode,
     isPrimitiveType,
+    isPlainObject,
     IAnyType,
     ExtractCSTWithSTN,
     isTypeCheckingEnabled,
@@ -35,9 +36,19 @@ export interface IValidationError {
 /** Type validation result, which is an array of type validation errors */
 export type IValidationResult = IValidationError[]
 
-function safeStringify(value: any) {
+// Limits used when rendering snapshots/values in error messages, so that long
+// strings or large arrays/objects don't take up the whole screen.
+const MAX_STRING_LENGTH = 100
+const MAX_ARRAY_LENGTH = 3
+const MAX_OBJECT_KEYS = 30
+const MAX_DEPTH = 5
+// Values (and type shapes) whose single-line representation is longer than this
+// are pretty-printed across multiple lines instead.
+const MAX_INLINE_LENGTH = 80
+
+function safeStringify(value: any, indent?: number) {
     try {
-        return JSON.stringify(value)
+        return JSON.stringify(value, null, indent)
     } catch (e) {
         // istanbul ignore next
         return `<Unserializable: ${e}>`
@@ -45,21 +56,149 @@ function safeStringify(value: any) {
 }
 
 /**
+ * Returns a clone of `value` in which overly long strings are clipped and large
+ * arrays/objects (or values nested too deeply) are summarized, so the result is
+ * safe to print in an error message without flooding the screen.
+ */
+function truncateForDisplay(value: any, depth: number): any {
+    if (typeof value === "string") {
+        return value.length > MAX_STRING_LENGTH
+            ? `${value.slice(0, MAX_STRING_LENGTH)}… (${value.length - MAX_STRING_LENGTH} more characters)`
+            : value
+    }
+    if (Array.isArray(value)) {
+        if (depth >= MAX_DEPTH) return "[…]"
+        const items = value
+            .slice(0, MAX_ARRAY_LENGTH)
+            .map(item => truncateForDisplay(item, depth + 1))
+        if (value.length > MAX_ARRAY_LENGTH) {
+            items.push(`… ${value.length - MAX_ARRAY_LENGTH} more items`)
+        }
+        return items
+    }
+    if (isPlainObject(value)) {
+        if (depth >= MAX_DEPTH) return "{…}"
+        const result: { [key: string]: any } = {}
+        const keys = Object.keys(value)
+        keys.slice(0, MAX_OBJECT_KEYS).forEach(key => {
+            result[key] = truncateForDisplay(value[key], depth + 1)
+        })
+        if (keys.length > MAX_OBJECT_KEYS) {
+            result["…"] = `${keys.length - MAX_OBJECT_KEYS} more keys`
+        }
+        return result
+    }
+    return value
+}
+
+/**
  * @internal
  * @hidden
  */
 export function prettyPrintValue(value: any) {
-    return typeof value === "function"
-        ? `<function${value.name ? " " + value.name : ""}>`
-        : isStateTreeNode(value)
-          ? `<${value}>`
-          : `\`${safeStringify(value)}\``
+    if (typeof value === "function") {
+        return `<function${value.name ? " " + value.name : ""}>`
+    }
+    if (isStateTreeNode(value)) {
+        return `<${value}>`
+    }
+
+    // Small values are printed compactly on a single line, exactly as before, so
+    // they stay easy to read. JSON.stringify returns `undefined` for values like
+    // `undefined` itself, which the template literal coerces back to a string.
+    const full = safeStringify(value)
+    if (full === undefined || full.length <= MAX_INLINE_LENGTH) {
+        return `\`${full}\``
+    }
+
+    // Large values are clipped (long strings, big arrays/objects, deep nesting)
+    // and pretty-printed across multiple lines so they don't flood the screen.
+    const truncated = truncateForDisplay(value, 0)
+    const compact = safeStringify(truncated)
+    if (compact !== undefined && compact.length <= MAX_INLINE_LENGTH) {
+        return `\`${compact}\``
+    }
+    return `\`${safeStringify(truncated, 2)}\``
 }
 
-function shortenPrintValue(valueInString: string) {
-    return valueInString.length < 280
-        ? valueInString
-        : `${valueInString.substring(0, 272)}......${valueInString.substring(valueInString.length - 8)}`
+/**
+ * Re-indents a type description (as produced by `IType.describe()`) across
+ * multiple lines when it is too long to comfortably read on a single line, by
+ * breaking after the `{`, `}` and `;` separators used in model shapes (while
+ * leaving union `|` and array `[]` parts inline). Characters inside string
+ * literals (e.g. literal types like `"a;b"`) are left untouched.
+ *
+ * Short descriptions are returned unchanged. As this runs while formatting an
+ * error that is already being thrown, it must never throw itself: any unexpected
+ * input falls back to the original, unformatted description.
+ *
+ * @internal
+ * @hidden
+ */
+export function prettyPrintDescription(description: string): string {
+    if (description.length <= MAX_INLINE_LENGTH) {
+        return description
+    }
+
+    try {
+        let result = ""
+        let indent = 0
+        let stringDelimiter: string | null = null
+        let escaped = false
+        const newline = () => {
+            // drop any trailing spaces (e.g. the "{ " / "; " separators) before breaking,
+            // and never let a malformed (over-closed) shape produce a negative indent
+            result = result.replace(/[ \t]+$/, "")
+            result += "\n" + "  ".repeat(Math.max(0, indent))
+        }
+
+        for (let i = 0; i < description.length; i++) {
+            const char = description[i]
+
+            if (stringDelimiter) {
+                result += char
+                if (escaped) {
+                    escaped = false
+                } else if (char === "\\") {
+                    escaped = true
+                } else if (char === stringDelimiter) {
+                    stringDelimiter = null
+                }
+                continue
+            }
+
+            switch (char) {
+                case '"':
+                case "'":
+                    stringDelimiter = char
+                    result += char
+                    break
+                case "{":
+                    indent++
+                    result += "{"
+                    newline()
+                    while (description[i + 1] === " ") i++
+                    break
+                case "}":
+                    indent--
+                    newline()
+                    result += "}"
+                    break
+                case ";":
+                    result += ";"
+                    newline()
+                    while (description[i + 1] === " ") i++
+                    break
+                default:
+                    result += char
+            }
+        }
+
+        return result
+    } catch (e) {
+        // istanbul ignore next - defensive: never let formatting hide the real error
+        return description
+    }
 }
 
 function toErrorString(error: IValidationError): string {
@@ -88,9 +227,9 @@ function toErrorString(error: IValidationError): string {
         (type
             ? isPrimitiveType(type) || isPrimitive(value)
                 ? `.`
-                : `, expected an instance of \`${(type as IAnyType).name}\` or a snapshot like \`${(
-                      type as IAnyType
-                  ).describe()}\` instead.` +
+                : `, expected an instance of \`${(type as IAnyType).name}\` or a snapshot like \`${prettyPrintDescription(
+                      (type as IAnyType).describe()
+                  )}\` instead.` +
                   (isSnapshotCompatible
                       ? " (Note that a snapshot of the provided value is compatible with the targeted type)"
                       : "")
@@ -179,8 +318,7 @@ function validationErrorsToString<IT extends IAnyType>(
     }
 
     return (
-        `Error while converting ${shortenPrintValue(prettyPrintValue(value))} to \`${
-            type.name
-        }\`:\n\n    ` + errors.map(toErrorString).join("\n    ")
+        `Error while converting ${prettyPrintValue(value)} to \`${type.name}\`:\n\n    ` +
+        errors.map(toErrorString).join("\n    ")
     )
 }
