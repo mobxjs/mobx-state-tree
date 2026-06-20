@@ -102,6 +102,7 @@ sidebar_label: "Globals"
 * [frozen](index.md#frozen)
 * [getChildType](index.md#getchildtype)
 * [getEnv](index.md#getenv)
+* [getErrorFormatting](index.md#geterrorformatting)
 * [getIdentifier](index.md#getidentifier)
 * [getLivelinessChecking](index.md#getlivelinesschecking)
 * [getMembers](index.md#getmembers)
@@ -160,6 +161,7 @@ sidebar_label: "Globals"
 * [resolveIdentifier](index.md#resolveidentifier)
 * [resolvePath](index.md#resolvepath)
 * [safeReference](index.md#safereference)
+* [setErrorFormatting](index.md#seterrorformatting)
 * [setLivelinessChecking](index.md#setlivelinesschecking)
 * [snapshotProcessor](index.md#snapshotprocessor)
 * [splitJsonPath](index.md#splitjsonpath)
@@ -2761,6 +2763,20 @@ Name | Type |
 
 ___
 
+###  getErrorFormatting
+
+▸ **getErrorFormatting**(): *ErrorFormattingOptions*
+
+*Defined in [src/core/type/errorFormatting.ts:80](https://github.com/mobxjs/mobx-state-tree/blob/master/src/core/type/errorFormatting.ts#L80)*
+
+Returns a copy of the current error formatting options (see [setErrorFormatting](index.md#seterrorformatting)). Useful for temporarily overriding and then restoring the configuration.
+
+**Returns:** *ErrorFormattingOptions*
+
+The current `ErrorFormattingOptions`.
+
+___
+
 ###  getIdentifier
 
 ▸ **getIdentifier**(`target`: IAnyStateTreeNode): *string | null*
@@ -4313,6 +4329,26 @@ Name | Type |
 `options?` | __type &#124; [ReferenceOptionsGetSet](interfaces/referenceoptionsgetset.md)‹IT› & object |
 
 **Returns:** *IMaybe‹IReferenceType‹IT››*
+
+___
+
+###  setErrorFormatting
+
+▸ **setErrorFormatting**(`options`: Partial‹ErrorFormattingOptions›): *void*
+
+*Defined in [src/core/type/errorFormatting.ts:67](https://github.com/mobxjs/mobx-state-tree/blob/master/src/core/type/errorFormatting.ts#L67)*
+
+Configures how snapshots/values and type shapes are formatted inside type-checking error messages. This is **opt-in**: by default MST keeps its original single-line error formatting, so enabling this does not change behavior for anyone who doesn't call it.
+
+The given options are merged over the current ones, so you can set only the fields you care about.
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`options` | Partial‹ErrorFormattingOptions› | A partial set of `ErrorFormattingOptions` to apply.  |
+
+**Returns:** *void*
 
 ___
 
