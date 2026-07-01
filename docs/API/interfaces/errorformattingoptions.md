@@ -4,7 +4,7 @@ title: "ErrorFormattingOptions"
 sidebar_label: "ErrorFormattingOptions"
 ---
 
-[mobx-state-tree - v7.3.0](../index.md) › [ErrorFormattingOptions](errorformattingoptions.md)
+[mobx-state-tree - v7.3.1](../index.md) › [ErrorFormattingOptions](errorformattingoptions.md)
 
 Options that control how snapshots/values and type shapes are rendered inside
 type-checking error messages (see [setErrorFormatting](../index.md#seterrorformatting)).

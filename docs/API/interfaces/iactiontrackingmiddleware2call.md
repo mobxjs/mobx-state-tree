@@ -4,7 +4,7 @@ title: "IActionTrackingMiddleware2Call"
 sidebar_label: "IActionTrackingMiddleware2Call"
 ---
 
-[mobx-state-tree - v7.3.0](../index.md) › [IActionTrackingMiddleware2Call](iactiontrackingmiddleware2call.md)
+[mobx-state-tree - v7.3.1](../index.md) › [IActionTrackingMiddleware2Call](iactiontrackingmiddleware2call.md)
 
 ## Type parameters
 
