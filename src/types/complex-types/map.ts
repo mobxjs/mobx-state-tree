@@ -7,7 +7,6 @@ import {
     IMapWillChange,
     intercept,
     Lambda,
-    observable,
     ObservableMap,
     observe,
     values,
@@ -146,7 +145,7 @@ export enum MapIdentifierMode {
 
 class MSTMap<IT extends IAnyType> extends ObservableMap<string, any> {
     constructor(initialData?: IObservableMapInitialValues<string, any> | undefined, name?: string) {
-        super(initialData, (observable.ref as any).enhancer, name)
+        super(initialData, v => v, name)
     }
 
     get(key: string): IT["Type"] | undefined {
