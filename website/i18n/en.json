@@ -9,12 +9,16 @@
         "title": "API_header"
       },
       "API/index": {
-        "title": "mobx-state-tree - v7.2.0",
+        "title": "mobx-state-tree - v7.3.0",
         "sidebar_label": "Globals"
       },
       "API/interfaces/customtypeoptions": {
         "title": "CustomTypeOptions",
         "sidebar_label": "CustomTypeOptions"
+      },
+      "API/interfaces/errorformattingoptions": {
+        "title": "ErrorFormattingOptions",
+        "sidebar_label": "ErrorFormattingOptions"
       },
       "API/interfaces/functionwithflag": {
         "title": "FunctionWithFlag",
