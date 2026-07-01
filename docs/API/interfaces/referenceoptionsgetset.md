@@ -4,7 +4,7 @@ title: "ReferenceOptionsGetSet"
 sidebar_label: "ReferenceOptionsGetSet"
 ---
 
-[mobx-state-tree - v7.2.0](../index.md) › [ReferenceOptionsGetSet](referenceoptionsgetset.md)
+[mobx-state-tree - v7.3.0](../index.md) › [ReferenceOptionsGetSet](referenceoptionsgetset.md)
 
 ## Type parameters
 

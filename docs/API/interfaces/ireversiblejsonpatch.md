@@ -4,7 +4,7 @@ title: "IReversibleJsonPatch"
 sidebar_label: "IReversibleJsonPatch"
 ---
 
-[mobx-state-tree - v7.2.0](../index.md) › [IReversibleJsonPatch](ireversiblejsonpatch.md)
+[mobx-state-tree - v7.3.0](../index.md) › [IReversibleJsonPatch](ireversiblejsonpatch.md)
 
 ## Hierarchy
 

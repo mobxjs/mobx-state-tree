@@ -54,6 +54,7 @@
     ],
     "Interfaces": [
       "API/interfaces/customtypeoptions",
+      "API/interfaces/errorformattingoptions",
       "API/interfaces/functionwithflag",
       "API/interfaces/iactioncontext",
       "API/interfaces/iactionrecorder",

@@ -1,16 +1,17 @@
 ---
 id: "index"
-title: "mobx-state-tree - v7.2.0"
+title: "mobx-state-tree - v7.3.0"
 sidebar_label: "Globals"
 ---
 
-[mobx-state-tree - v7.2.0](index.md)
+[mobx-state-tree - v7.3.0](index.md)
 
 ## Index
 
 ### Interfaces
 
 * [CustomTypeOptions](interfaces/customtypeoptions.md)
+* [ErrorFormattingOptions](interfaces/errorformattingoptions.md)
 * [FunctionWithFlag](interfaces/functionwithflag.md)
 * [IActionContext](interfaces/iactioncontext.md)
 * [IActionRecorder](interfaces/iactionrecorder.md)
@@ -288,7 +289,7 @@ ___
 
 Ƭ **IValidationContext**: *[IValidationContextEntry](interfaces/ivalidationcontextentry.md)[]*
 
-*Defined in [src/core/type/type-checker.ts:23](https://github.com/mobxjs/mobx-state-tree/blob/6c2cad97/src/core/type/type-checker.ts#L23)*
+*Defined in [src/core/type/type-checker.ts:26](https://github.com/mobxjs/mobx-state-tree/blob/65595e81/src/core/type/type-checker.ts#L26)*
 
 Array of validation context entries
 
@@ -298,7 +299,7 @@ ___
 
 Ƭ **IValidationResult**: *[IValidationError](interfaces/ivalidationerror.md)[]*
 
-*Defined in [src/core/type/type-checker.ts:36](https://github.com/mobxjs/mobx-state-tree/blob/6c2cad97/src/core/type/type-checker.ts#L36)*
+*Defined in [src/core/type/type-checker.ts:39](https://github.com/mobxjs/mobx-state-tree/blob/65595e81/src/core/type/type-checker.ts#L39)*
 
 Type validation result, which is an array of type validation errors
 
@@ -2765,15 +2766,17 @@ ___
 
 ###  getErrorFormatting
 
-▸ **getErrorFormatting**(): *ErrorFormattingOptions*
+▸ **getErrorFormatting**(): *[ErrorFormattingOptions](interfaces/errorformattingoptions.md)*
 
-*Defined in [src/core/type/errorFormatting.ts:80](https://github.com/mobxjs/mobx-state-tree/blob/master/src/core/type/errorFormatting.ts#L80)*
+*Defined in [src/core/type/errorFormatting.ts:75](https://github.com/mobxjs/mobx-state-tree/blob/65595e81/src/core/type/errorFormatting.ts#L75)*
 
-Returns a copy of the current error formatting options (see [setErrorFormatting](index.md#seterrorformatting)). Useful for temporarily overriding and then restoring the configuration.
+Returns a copy of the current error formatting options (see
+[setErrorFormatting](index.md#seterrorformatting)). Useful for temporarily overriding and then
+restoring the configuration.
 
-**Returns:** *ErrorFormattingOptions*
+**Returns:** *[ErrorFormattingOptions](interfaces/errorformattingoptions.md)*
 
-The current `ErrorFormattingOptions`.
+The current [ErrorFormattingOptions](interfaces/errorformattingoptions.md).
 
 ___
 
@@ -4334,19 +4337,35 @@ ___
 
 ###  setErrorFormatting
 
-▸ **setErrorFormatting**(`options`: Partial‹ErrorFormattingOptions›): *void*
+▸ **setErrorFormatting**(`options`: Partial‹[ErrorFormattingOptions](interfaces/errorformattingoptions.md)›): *void*
 
-*Defined in [src/core/type/errorFormatting.ts:67](https://github.com/mobxjs/mobx-state-tree/blob/master/src/core/type/errorFormatting.ts#L67)*
+*Defined in [src/core/type/errorFormatting.ts:64](https://github.com/mobxjs/mobx-state-tree/blob/65595e81/src/core/type/errorFormatting.ts#L64)*
 
-Configures how snapshots/values and type shapes are formatted inside type-checking error messages. This is **opt-in**: by default MST keeps its original single-line error formatting, so enabling this does not change behavior for anyone who doesn't call it.
+Configures how snapshots/values and type shapes are formatted inside
+type-checking error messages. This is **opt-in**: by default MST keeps its
+original single-line error formatting, so enabling this does not change
+behavior for anyone who doesn't call it.
 
-The given options are merged over the current ones, so you can set only the fields you care about.
+The given options are merged over the current ones, so you can set only the
+fields you care about.
+
+**`example`** 
+// pretty-print large snapshots across multiple lines and truncate them
+setErrorFormatting({ enabled: true })
+
+**`example`** 
+// only bound the message size, without reflowing it onto multiple lines
+setErrorFormatting({ enabled: true, indent: 0 })
+
+**`example`** 
+// tweak the truncation limits
+setErrorFormatting({ enabled: true, maxArrayLength: 3, maxStringLength: 40 })
 
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`options` | Partial‹ErrorFormattingOptions› | A partial set of `ErrorFormattingOptions` to apply.  |
+`options` | Partial‹[ErrorFormattingOptions](interfaces/errorformattingoptions.md)› | A partial set of [ErrorFormattingOptions](interfaces/errorformattingoptions.md) to apply.  |
 
 **Returns:** *void*
 
@@ -4586,7 +4605,7 @@ ___
 
 ▸ **typecheck**<**IT**>(`type`: IT, `value`: ExtractCSTWithSTN‹IT›): *void*
 
-*Defined in [src/core/type/type-checker.ts:164](https://github.com/mobxjs/mobx-state-tree/blob/6c2cad97/src/core/type/type-checker.ts#L164)*
+*Defined in [src/core/type/type-checker.ts:306](https://github.com/mobxjs/mobx-state-tree/blob/65595e81/src/core/type/type-checker.ts#L306)*
 
 Run's the typechecker for the given type on the given value, which can be a snapshot or an instance.
 Throws if the given value is not according the provided type specification.
