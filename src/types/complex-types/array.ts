@@ -324,30 +324,23 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
             return
         }
 
-        let oldEnd = oldLength - 1
-        let newEnd = newLength - 1
-        while (
-            oldEnd >= firstChangedIndex &&
-            newEnd >= firstChangedIndex &&
-            childNodes[oldEnd].snapshot === snapshot[newEnd]
-        ) {
-            oldEnd--
-            newEnd--
+        // The lengths match, so only the differing entries have to change. Collect them
+        // before touching the array, because assigning to one entry invalidates the
+        // snapshots of the others and their identity can no longer be compared.
+        const changedIndexes: number[] = []
+        for (let i = firstChangedIndex; i < oldLength; i++) {
+            if (childNodes[i].snapshot !== snapshot[i]) {
+                changedIndexes.push(i)
+            }
         }
 
-        // Trim the unchanged suffix too, so we only replace the minimal changed window.
-        const replacedCount = oldEnd >= firstChangedIndex ? oldEnd - firstChangedIndex + 1 : 0
-        const replacementSnapshots =
-            newEnd >= firstChangedIndex
-                ? snapshot.slice(firstChangedIndex, newEnd + 1)
-                : EMPTY_ARRAY
-
-        if (replacedCount === 1 && replacementSnapshots.length === 1) {
-            target[firstChangedIndex] = replacementSnapshots[0]
-            return
+        // Assign the changed entries individually rather than splicing across the
+        // untouched entries between them: a single assignment reconciles exactly one
+        // child, which keeps the cost proportional to the number of changes instead of
+        // the distance between the first and the last of them.
+        for (const index of changedIndexes) {
+            target[index] = snapshot[index]
         }
-
-        target.splice(firstChangedIndex, replacedCount, ...replacementSnapshots)
     }
 
     getChildType(): IAnyType {
@@ -420,8 +413,16 @@ function canApplyDirectSnapshotsInRange(
     startIndex: number
 ) {
     for (let i = startIndex; i < childNodes.length; i++) {
-        if (childNodes[i].snapshot === snapshot[i]) continue
-        if (!canApplyDirectSnapshot(childType, childNodes[i], snapshot[i])) {
+        const childNode = childNodes[i]
+        if (childNode.snapshot === snapshot[i]) continue
+        if (!canApplyDirectSnapshot(childType, childNode, snapshot[i])) {
+            return false
+        }
+        // Array reconciliation only treats two snapshots as the same child when they carry
+        // a matching identifier (see `areSame`). Identifier-less children are replaced
+        // rather than updated in place, so they must not take the direct-apply path or
+        // lifecycle hooks such as afterCreate would never run for the new child.
+        if (!childNode.identifierAttribute || childNode.identifier === null) {
             return false
         }
     }
