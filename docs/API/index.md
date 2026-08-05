@@ -1,10 +1,10 @@
 ---
 id: "index"
-title: "mobx-state-tree - v7.3.1"
+title: "mobx-state-tree - v7.3.2"
 sidebar_label: "Globals"
 ---
 
-[mobx-state-tree - v7.3.1](index.md)
+[mobx-state-tree - v7.3.2](index.md)
 
 ## Index
 
@@ -831,7 +831,7 @@ ___
 
 ▸ **array**<**IT**>(`subtype`: IT): *IArrayType‹IT›*
 
-*Defined in [src/types/complex-types/array.ts:403](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/types/complex-types/array.ts#L403)*
+*Defined in [src/types/complex-types/array.ts:396](https://github.com/mobxjs/mobx-state-tree/blob/b5907319/src/types/complex-types/array.ts#L396)*
 
 `types.array` - Creates an index based collection type who's children are all of a uniform declared type.
 
@@ -3186,7 +3186,7 @@ ___
 
 ▸ **isArrayType**(`type`: unknown): *type is IArrayType<IAnyType>*
 
-*Defined in [src/types/complex-types/array.ts:603](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/types/complex-types/array.ts#L603)*
+*Defined in [src/types/complex-types/array.ts:604](https://github.com/mobxjs/mobx-state-tree/blob/b5907319/src/types/complex-types/array.ts#L604)*
 
 Returns if a given value represents an array type.
 
@@ -3278,7 +3278,7 @@ ___
 
 ▸ **isMapType**(`type`: unknown): *type is IMapType<IAnyType>*
 
-*Defined in [src/types/complex-types/map.ts:536](https://github.com/mobxjs/mobx-state-tree/blob/f97eeea7/src/types/complex-types/map.ts#L536)*
+*Defined in [src/types/complex-types/map.ts:536](https://github.com/mobxjs/mobx-state-tree/blob/bb0a6be0/src/types/complex-types/map.ts#L536)*
 
 Returns if a given value represents a map type.
 
@@ -3657,7 +3657,7 @@ ___
 
 ▸ **map**<**IT**>(`subtype`: IT): *IMapType‹IT›*
 
-*Defined in [src/types/complex-types/map.ts:526](https://github.com/mobxjs/mobx-state-tree/blob/f97eeea7/src/types/complex-types/map.ts#L526)*
+*Defined in [src/types/complex-types/map.ts:526](https://github.com/mobxjs/mobx-state-tree/blob/bb0a6be0/src/types/complex-types/map.ts#L526)*
 
 `types.map` - Creates a key based collection type who's children are all of a uniform declared type.
 If the type stored in a map has an identifier, it is mandatory to store the child under that identifier in the map.
