@@ -1,4 +1,4 @@
-import { types, unprotect } from "../../src"
+import { getSnapshot, types, unprotect } from "../../src"
 import { expect, test } from "bun:test"
 
 enum ColorEnum {
@@ -72,4 +72,35 @@ test("should support readonly enums as const", () => {
             /Error while converting `"Blue"` to `"Red" | "Orange" | "Green"`/
         )
     }
+})
+test("should support numeric enums", () => {
+    const SpeedLimit = types.model({ limit: types.enumeration("SpeedLimit", [15, 30]) })
+    expect(SpeedLimit.is({ limit: 15 })).toBe(true)
+    expect(SpeedLimit.is({ limit: "15" as any })).toBe(false)
+    expect(SpeedLimit.is({ limit: 45 as any })).toBe(false)
+    const l = SpeedLimit.create({ limit: 30 })
+    unprotect(l)
+    l.limit = 15
+    expect(SpeedLimit.describe()).toBe("{ limit: (15 | 30) }")
+    if (process.env.NODE_ENV !== "production") {
+        expect(() => (l.limit = 45 as any)).toThrow(/Error while converting `45` to `SpeedLimit`/)
+    }
+})
+test("should support numeric enums inside an optional array", () => {
+    const OrdersRequest = types.model({
+        paymentPeriod: types.optional(types.array(types.enumeration("PaymentPeriod", [15, 30])), [
+            15
+        ])
+    })
+    const r = OrdersRequest.create({})
+    expect(r.paymentPeriod.slice()).toEqual([15])
+    expect(getSnapshot(r)).toEqual({ paymentPeriod: [15] })
+})
+test("should support mixed string and number enums", () => {
+    const options = ["a", 1] as const
+    const Mixed = types.model({ value: types.enumeration(options) })
+    expect(Mixed.is({ value: "a" })).toBe(true)
+    expect(Mixed.is({ value: 1 })).toBe(true)
+    expect(Mixed.is({ value: "1" as any })).toBe(false)
+    expect(Mixed.describe()).toBe('{ value: ("a" | 1) }')
 })
