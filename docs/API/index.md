@@ -2441,21 +2441,22 @@ ___
 
 ▸ **enumeration**<**T**>(`options`: keyof T[]): *[ISimpleType](interfaces/isimpletype.md)‹UnionStringArray‹T[]››*
 
-*Defined in [src/types/utility-types/enumeration.ts:11](https://github.com/mobxjs/mobx-state-tree/blob/6c2cad97/src/types/utility-types/enumeration.ts#L11)*
+*Defined in [src/types/utility-types/enumeration.ts:12](https://github.com/mobxjs/mobx-state-tree/blob/f9650e60/src/types/utility-types/enumeration.ts#L12)*
 
-`types.enumeration` - Can be used to create an string based enumeration.
-(note: this methods is just sugar for a union of string literals)
+`types.enumeration` - Can be used to create a string or number based enumeration.
+(note: this methods is just sugar for a union of string or number literals)
 
 Example:
 ```ts
 const TrafficLight = types.model({
-  color: types.enumeration("Color", ["Red", "Orange", "Green"])
+  color: types.enumeration("Color", ["Red", "Orange", "Green"]),
+  speedLimit: types.enumeration("SpeedLimit", [30, 50])
 })
 ```
 
 **Type parameters:**
 
-▪ **T**: *string*
+▪ **T**: *string | number*
 
 **Parameters:**
 
@@ -2467,21 +2468,22 @@ Name | Type | Description |
 
 ▸ **enumeration**<**T**>(`name`: string, `options`: keyof T[]): *[ISimpleType](interfaces/isimpletype.md)‹UnionStringArray‹T[]››*
 
-*Defined in [src/types/utility-types/enumeration.ts:14](https://github.com/mobxjs/mobx-state-tree/blob/6c2cad97/src/types/utility-types/enumeration.ts#L14)*
+*Defined in [src/types/utility-types/enumeration.ts:15](https://github.com/mobxjs/mobx-state-tree/blob/f9650e60/src/types/utility-types/enumeration.ts#L15)*
 
-`types.enumeration` - Can be used to create an string based enumeration.
-(note: this methods is just sugar for a union of string literals)
+`types.enumeration` - Can be used to create a string or number based enumeration.
+(note: this methods is just sugar for a union of string or number literals)
 
 Example:
 ```ts
 const TrafficLight = types.model({
-  color: types.enumeration("Color", ["Red", "Orange", "Green"])
+  color: types.enumeration("Color", ["Red", "Orange", "Green"]),
+  speedLimit: types.enumeration("SpeedLimit", [30, 50])
 })
 ```
 
 **Type parameters:**
 
-▪ **T**: *string*
+▪ **T**: *string | number*
 
 **Parameters:**
 
