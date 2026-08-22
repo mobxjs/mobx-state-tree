@@ -24,9 +24,12 @@ export const EMPTY_OBJECT: {} = Object.freeze({})
  * @internal
  * @hidden
  */
-export const mobxShallow = _getGlobalState().useProxies
-    ? { deep: false }
-    : { deep: false, proxy: false }
+// MobX 7 always uses Proxy-backed observables: it dropped the ES5 fallback, removed
+// `configure({ useProxies })` and no longer accepts `{ proxy: false }`. Its global state
+// therefore has no `useProxies` field, so only opt into the non-proxy shape when MobX
+// explicitly reports proxies as disabled (MobX 6 with `useProxies: "never"`).
+export const mobxShallow =
+    _getGlobalState().useProxies === false ? { deep: false, proxy: false } : { deep: false }
 Object.freeze(mobxShallow)
 
 /**

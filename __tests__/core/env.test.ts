@@ -1,4 +1,3 @@
-import { configure } from "mobx"
 import {
     types,
     hasEnv,
@@ -146,10 +145,6 @@ test("clone preserves environment", () => {
 })
 
 test("#1231", () => {
-    configure({
-        useProxies: "never"
-    })
-
     const envObj = createEnvironment()
     const logs: string[] = []
 
