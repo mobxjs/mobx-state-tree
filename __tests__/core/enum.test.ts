@@ -86,6 +86,23 @@ test("should support numeric enums", () => {
         expect(() => (l.limit = 45 as any)).toThrow(/Error while converting `45` to `SpeedLimit`/)
     }
 })
+test("should support zero as a numeric enum option", () => {
+    const Zero = types.model({ n: types.enumeration("Zero", [0, 1]) })
+    expect(Zero.is({ n: 0 })).toBe(true)
+    expect(Zero.is({ n: 1 })).toBe(true)
+    expect(Zero.is({ n: "0" as any })).toBe(false)
+    expect(Zero.is({ n: 2 as any })).toBe(false)
+    expect(Zero.describe()).toBe("{ n: (0 | 1) }")
+
+    const z = Zero.create({ n: 1 })
+    unprotect(z)
+    z.n = 0
+    expect(getSnapshot(z)).toEqual({ n: 0 })
+
+    if (process.env.NODE_ENV !== "production") {
+        expect(() => (z.n = 2 as any)).toThrow(/Error while converting `2` to `Zero`/)
+    }
+})
 test("should support numeric enums inside an optional array", () => {
     const OrdersRequest = types.model({
         paymentPeriod: types.optional(types.array(types.enumeration("PaymentPeriod", [15, 30])), [
