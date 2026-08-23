@@ -1,6 +1,5 @@
 import { ISimpleType, union, literal, assertArg, devMode } from "../../internal"
 
-// kept under its original name because it is exported; renaming it would be a breaking change.
 /** @hidden */
 export type UnionStringArray<T extends readonly (string | number)[]> = T[number]
 
