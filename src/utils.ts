@@ -1,9 +1,4 @@
-import {
-    isObservableArray,
-    isObservableObject,
-    _getGlobalState,
-    defineProperty as mobxDefineProperty
-} from "mobx"
+import { isObservableArray, isObservableObject, defineProperty as mobxDefineProperty } from "mobx"
 import { Primitives } from "./core/type/type"
 
 const plainObjectString = Object.toString()
@@ -24,12 +19,8 @@ export const EMPTY_OBJECT: {} = Object.freeze({})
  * @internal
  * @hidden
  */
-// MobX 7 always uses Proxy-backed observables: it dropped the ES5 fallback, removed
-// `configure({ useProxies })` and no longer accepts `{ proxy: false }`. Its global state
-// therefore has no `useProxies` field, so only opt into the non-proxy shape when MobX
-// explicitly reports proxies as disabled (MobX 6 with `useProxies: "never"`).
-export const mobxShallow =
-    _getGlobalState().useProxies === false ? { deep: false, proxy: false } : { deep: false }
+// MobX 7 is always Proxy-backed, so there is no non-proxy shape to opt into.
+export const mobxShallow = { deep: false }
 Object.freeze(mobxShallow)
 
 /**
