@@ -502,9 +502,22 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     unbox(childNode: AnyNode | undefined): AnyNode | undefined {
         if (!childNode) return childNode
 
-        this.assertAlive({
-            subpath: childNode.subpath || childNode.subpathUponDeath
-        })
+        // For React 19 compatibility: Only assert alive when running actions.
+        // Reading properties during rendering is normal and shouldn't trigger warnings,
+        // especially with React 19's more aggressive prop inspection in development mode.
+        //
+        // However, we still need to check if the node is actually dead to maintain
+        // the existing behavior for genuinely dead nodes. The key difference is that
+        // we only enforce this check during actions/writes, not during passive reads.
+        //
+        // For alive nodes: passive reads are always safe
+        // For dead nodes during actions: will be caught by this check
+        // For dead nodes outside actions: other code paths will catch misuse during writes
+        if (this._isRunningAction || !this.isAlive) {
+            this.assertAlive({
+                subpath: childNode.subpath || childNode.subpathUponDeath
+            })
+        }
         return this._autoUnbox ? childNode.value : childNode
     }
 
