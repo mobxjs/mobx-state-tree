@@ -1,10 +1,10 @@
 ---
 id: "index"
-title: "mobx-state-tree - v7.4.0"
+title: "mobx-state-tree - v8.0.0"
 sidebar_label: "Globals"
 ---
 
-[mobx-state-tree - v7.4.0](index.md)
+[mobx-state-tree - v8.0.0](index.md)
 
 ## Index
 
@@ -186,7 +186,7 @@ sidebar_label: "Globals"
 
 Ƭ **IDisposer**: *function*
 
-*Defined in [src/utils.ts:35](https://github.com/mobxjs/mobx-state-tree/blob/2f4e491f/src/utils.ts#L35)*
+*Defined in [src/utils.ts:29](https://github.com/mobxjs/mobx-state-tree/blob/8c7c89fe/src/utils.ts#L29)*
 
 A generic disposer.
 
