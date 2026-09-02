@@ -20,7 +20,7 @@ import {
     resolveIdentifier
 } from "../../src"
 
-import { autorun, reaction, observable, configure, getDebugName } from "mobx"
+import { autorun, reaction, observable, getDebugName } from "mobx"
 import { MstError } from "../../src/internal"
 import { expect, test } from "bun:test"
 
@@ -1179,20 +1179,4 @@ test("#1173 - detaching a model should not screw it", () => {
     expect(s.item).toBeUndefined()
     expect(detachedItem.x).toBe(6)
     expect(detachedItem).toBe(n0!)
-})
-
-test("#1702 - should not throw with useProxies: 'ifavailable'", () => {
-    configure({
-        useProxies: "ifavailable"
-    })
-
-    const M = types.model({ x: 5 }).views(self => ({
-        get y() {
-            return self.x
-        }
-    }))
-
-    expect(() => {
-        M.create({})
-    }).not.toThrow()
 })

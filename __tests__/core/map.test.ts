@@ -1,4 +1,3 @@
-import { configure } from "mobx"
 import {
     onSnapshot,
     onPatch,
@@ -152,10 +151,6 @@ test("it should check the type correctly", () => {
     expect(Factory.is({ hello: { to: true } })).toEqual(false)
 })
 test("it should support identifiers", () => {
-    configure({
-        useProxies: "never"
-    })
-
     const Store = types.model({
         todos: types.optional(
             types.map(
@@ -249,10 +244,6 @@ test("#192 - map should not mess up keys when putting twice", () => {
     expect(getSnapshot(todoStore.todos)).toEqual({ "1": { todo_id: 1, title: "Test Edited" } })
 })
 test("#694 - map.put should return new node", () => {
-    configure({
-        useProxies: "never"
-    })
-
     const Todo = types.model("Todo", {
         todo_id: types.identifier,
         title: types.string

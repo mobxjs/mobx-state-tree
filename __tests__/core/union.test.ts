@@ -1,4 +1,3 @@
-import { configure } from "mobx"
 import {
     types,
     hasParent,
@@ -280,12 +279,6 @@ describe("1045 - secondary union types with applySnapshot and ids", () => {
                         describe(useCreate ? "using create" : "not using create", () => {
                             for (const type of [2, 1]) {
                                 describe(`snapshot is of type Submodel${type}`, () => {
-                                    beforeEach(() => {
-                                        configure({
-                                            useProxies: "never"
-                                        })
-                                    })
-
                                     it(`apply snapshot works when the node is not touched`, () => {
                                         const t = initTest(
                                             useSnapshot,

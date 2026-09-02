@@ -1,9 +1,4 @@
-import {
-    isObservableArray,
-    isObservableObject,
-    _getGlobalState,
-    defineProperty as mobxDefineProperty
-} from "mobx"
+import { isObservableArray, isObservableObject, defineProperty as mobxDefineProperty } from "mobx"
 import { Primitives } from "./core/type/type"
 
 const plainObjectString = Object.toString()
@@ -24,9 +19,8 @@ export const EMPTY_OBJECT: {} = Object.freeze({})
  * @internal
  * @hidden
  */
-export const mobxShallow = _getGlobalState().useProxies
-    ? { deep: false }
-    : { deep: false, proxy: false }
+// MobX 7 is always Proxy-backed, so there is no non-proxy shape to opt into.
+export const mobxShallow = { deep: false }
 Object.freeze(mobxShallow)
 
 /**

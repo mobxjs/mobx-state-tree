@@ -14,7 +14,7 @@ import {
     detach,
     cast
 } from "../../src"
-import { observable, autorun, configure } from "mobx"
+import { observable, autorun } from "mobx"
 import { expect, test } from "bun:test"
 
 const createTestFactories = () => {
@@ -37,10 +37,6 @@ test("it should succeed if not optional and no default provided", () => {
     expect(getSnapshot(Factory.create())).toEqual([])
 })
 test("it should restore the state from the snapshot", () => {
-    configure({
-        useProxies: "never"
-    })
-
     const { Factory } = createTestFactories()
     const instance = Factory.create([{ to: "universe" }])
     expect(getSnapshot(instance)).toEqual([{ to: "universe" }])
@@ -197,10 +193,6 @@ test("paths shoud remain correct when splicing", () => {
     expect(store.todos.map(getPath)).toEqual(["/todos/0", "/todos/1"])
 })
 test("items should be reconciled correctly when splicing - 1", () => {
-    configure({
-        useProxies: "never"
-    })
-
     const Task = types.model("Task", {
         x: types.string
     })
@@ -383,25 +375,12 @@ test("it should support observable arrays", () => {
     expect(Array.isArray(testArray.slice())).toBe(true)
 })
 
-test("it should support observable arrays, array should be real when useProxies eq 'always'", () => {
+test("it should support observable arrays, and the instance is a real array", () => {
     const TestArray = types.array(types.number)
     const testArray = TestArray.create(observable([1, 2]))
     expect(testArray[0] === 1).toBe(true)
     expect(testArray.length === 2).toBe(true)
     expect(Array.isArray(testArray)).toBe(true)
-})
-
-test("it should support observable arrays, array should be not real when useProxies eq 'never'", () => {
-    configure({
-        useProxies: "never"
-    })
-
-    const TestArray = types.array(types.number)
-    const testArray = TestArray.create(observable([1, 2]))
-    expect(testArray[0] === 1).toBe(true)
-    expect(testArray.length === 2).toBe(true)
-    expect(Array.isArray(testArray.slice())).toBe(true)
-    expect(Array.isArray(testArray)).toBe(false)
 })
 
 test("it should correctly handle re-adding of the same objects", () => {

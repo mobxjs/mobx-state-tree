@@ -64,7 +64,7 @@
         "cpr": "^3.0.1",
         "husky": "^7.0.0",
         "lint-staged": "^11.1.2",
-        "mobx": "^6.13.1",
+        "mobx": "^7.0.3",
         "prettier": "3.4.1",
         "rollup": "^2.18.1",
         "rollup-plugin-commonjs": "^10.0.0",
@@ -84,7 +84,7 @@
         "yarn-deduplicate": "^3.1.0"
     },
     "peerDependencies": {
-        "mobx": "^6.3.0"
+        "mobx": "^7.0.0"
     },
     "keywords": [
         "mobx",
