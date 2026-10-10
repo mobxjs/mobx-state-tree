@@ -290,6 +290,134 @@ describe("Model instantiation", () => {
         })
     })
 
+    describe("Should show a friendly message when a model has a member redeclared as", () => {
+        test("a view after an action", () => {
+            const UserModel = types
+                .model("UserModel", {
+                    name: types.string
+                })
+                .actions(self => ({
+                    rename() {
+                        self.name = "Changed"
+                    }
+                }))
+                .views(self => ({
+                    rename() {
+                        return self.name
+                    }
+                }))
+
+            expect(() => UserModel.create({ name: "Subramanya Chakravarthy" })).toThrow(
+                "[mobx-state-tree] 'rename' already exists as an action and cannot be declared as a view"
+            )
+        })
+
+        test("an action after a view", () => {
+            const UserModel = types
+                .model("UserModel", {
+                    name: types.string
+                })
+                .views(self => ({
+                    displayName() {
+                        return self.name.toUpperCase()
+                    }
+                }))
+                .actions(self => ({
+                    displayName() {
+                        self.name = "Changed"
+                    }
+                }))
+
+            expect(() => UserModel.create({ name: "Subramanya Chakravarthy" })).toThrow(
+                "[mobx-state-tree] 'displayName' already exists as a view and cannot be declared as an action"
+            )
+        })
+
+        test("volatile state after an action", () => {
+            const UserModel = types
+                .model("UserModel", {
+                    name: types.string
+                })
+                .actions(self => ({
+                    rename() {
+                        self.name = "Changed"
+                    }
+                }))
+                .volatile(_self => ({
+                    rename: "unused"
+                }))
+
+            expect(() => UserModel.create({ name: "Subramanya Chakravarthy" })).toThrow(
+                "[mobx-state-tree] 'rename' already exists as an action and cannot be declared as volatile state"
+            )
+        })
+
+        test("a view after volatile state", () => {
+            const UserModel = types
+                .model("UserModel", {
+                    name: types.string
+                })
+                .extend(_self => ({
+                    state: { displayName: "unused" },
+                    views: {
+                        get displayName() {
+                            return _self.name
+                        }
+                    }
+                }))
+
+            expect(() => UserModel.create({ name: "Subramanya Chakravarthy" })).toThrow(
+                "[mobx-state-tree] 'displayName' already exists as volatile state and cannot be declared as a view"
+            )
+        })
+
+        test("a member of the same kind can still be redeclared", () => {
+            const UserModel = types
+                .model("UserModel", {
+                    name: types.string
+                })
+                .actions(self => ({
+                    rename() {
+                        self.name = "first"
+                    }
+                }))
+                .actions(self => ({
+                    rename() {
+                        self.name = "second"
+                    }
+                }))
+
+            const user = UserModel.create({ name: "Subramanya Chakravarthy" })
+            user.rename()
+            expect(user.name).toBe("second")
+        })
+
+        test("a member of a composed type can still override one of another kind", () => {
+            const LoudPerson = types
+                .model("LoudPerson", {
+                    name: types.string
+                })
+                .actions(self => ({
+                    sayName() {
+                        return self.name.toUpperCase()
+                    }
+                }))
+            const QuietPerson = types
+                .model("QuietPerson", {
+                    name: types.string
+                })
+                .views(self => ({
+                    sayName() {
+                        return self.name.toLowerCase()
+                    }
+                }))
+
+            const RegularPerson = types.compose("RegularPerson", LoudPerson, QuietPerson)
+            const person = RegularPerson.create({ name: "Tyler" })
+            expect(person.sayName()).toBe("tyler")
+        })
+    })
+
     describe("with all of the property types", () => {
         const IdentifiedWithString = types.model({ id: types.identifier })
         const IdentifiedWithNumber = types.model({ id: types.identifierNumber })
