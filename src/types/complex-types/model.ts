@@ -666,6 +666,7 @@ export class ModelType<
         })
 
         this.initializers.reduce((self, fn) => fn(self), instance)
+        instantiatedMembers.delete(instance)
         intercept(instance, this.willChange)
         observe(instance, this.didChange)
     }
