@@ -20,6 +20,7 @@ import {
     normalizeIdentifier,
     ReferenceIdentifier,
     AnyObjectNode,
+    ObjectNode,
     assertIsType,
     assertIsStateTreeNode,
     TypeOfValue,
@@ -816,7 +817,11 @@ export function walk(
     const node = getStateTreeNode(target)
     // tslint:disable-next-line:no_unused-variable
     node.getChildren().forEach(child => {
-        if (isStateTreeNode(child.storedValue)) walk(child.storedValue, processor)
+        // for object nodes .value lazily creates the instance if needed;
+        // for scalar nodes .value may differ from .storedValue (e.g. references
+        // resolve to the target node) so the stored value is used instead
+        const value = child instanceof ObjectNode ? child.value : child.storedValue
+        if (isStateTreeNode(value)) walk(value, processor)
     })
     processor(node.storedValue)
 }
