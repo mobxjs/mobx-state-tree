@@ -691,7 +691,9 @@ export class ModelType<
             const atom = getAtom(node.storedValue, name)
             ;(atom as any).reportObserved()
 
-            res[name] = this.getChildNode(node, name).snapshot
+            const childNode: AnyNode | undefined = (atom as any).raw?.()
+            if (!childNode) throw new MstError("Node not available for property " + name)
+            res[name] = childNode.snapshot
         })
         if (applyPostProcess) {
             return this.applySnapshotPostProcessor(res)
