@@ -70,7 +70,7 @@ class StoredReference<IT extends IAnyType> {
     private resolvedReference?: {
         node: AnyObjectNode
         lastCacheModification: string
-    }
+    } = undefined
 
     constructor(
         value: ReferenceT<IT> | ReferenceIdentifier,

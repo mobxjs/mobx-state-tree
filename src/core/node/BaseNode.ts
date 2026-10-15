@@ -31,22 +31,22 @@ export abstract class BaseNode<C, S, T> {
         return this._subpath
     }
 
-    private _subpathUponDeath?: string
+    private _subpathUponDeath?: string = undefined
     get subpathUponDeath() {
         return this._subpathUponDeath
     }
 
-    private _pathUponDeath?: string
+    private _pathUponDeath?: string = undefined
     protected get pathUponDeath() {
         return this._pathUponDeath
     }
 
-    storedValue!: any // usually the same type as the value, but not always (such as with references)
+    storedValue: any = undefined // usually the same type as the value, but not always (such as with references)
     get value(): T {
         return (this.type as any).getValue(this)
     }
 
-    private aliveAtom?: IAtom
+    private aliveAtom?: IAtom = undefined
     private _state = NodeLifeCycle.INITIALIZING
     get state() {
         return this._state
@@ -61,7 +61,7 @@ export abstract class BaseNode<C, S, T> {
         }
     }
 
-    private _hookSubscribers?: EventHandlers<HookSubscribers>
+    private _hookSubscribers?: EventHandlers<HookSubscribers> = undefined
 
     protected abstract fireHook(name: Hook): void
 
@@ -97,7 +97,7 @@ export abstract class BaseNode<C, S, T> {
         return this.type
     }
 
-    private pathAtom?: IAtom
+    private pathAtom?: IAtom = undefined
     protected baseSetParent(parent: AnyObjectNode | null, subpath: string) {
         this._parent = parent
         this._subpath = subpath

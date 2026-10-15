@@ -89,19 +89,19 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     readonly identifier: string | null // Identifier is always normalized to string, even if the identifier property isn't
     readonly unnormalizedIdentifier: ReferenceIdentifier | null
 
-    identifierCache?: IdentifierCache
+    identifierCache?: IdentifierCache = undefined
     isProtectionEnabled = true
-    middlewares?: IMiddleware[]
+    middlewares?: IMiddleware[] = undefined
     hasSnapshotPostProcessor = false
 
-    private _applyPatches?: (patches: IJsonPatch[]) => void
+    private _applyPatches?: (patches: IJsonPatch[]) => void = undefined
 
     applyPatches(patches: IJsonPatch[]): void {
         this.createObservableInstanceIfNeeded()
         this._applyPatches!(patches)
     }
 
-    private _applySnapshot?: (snapshot: C) => void
+    private _applySnapshot?: (snapshot: C) => void = undefined
 
     applySnapshot(snapshot: C): void {
         this.createObservableInstanceIfNeeded()
@@ -111,12 +111,12 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     private _autoUnbox = true // unboxing is disabled when reading child nodes
     _isRunningAction = false // only relevant for root
     private _hasSnapshotReaction = false
-    private _endOfActionCallbacks?: Array<() => void>
+    private _endOfActionCallbacks?: Array<() => void> = undefined
 
     private _observableInstanceState = ObservableInstanceLifecycle.UNINITIALIZED
     private _childNodes: IChildNodesMap
     private _initialSnapshot: C
-    private _cachedInitialSnapshot?: S
+    private _cachedInitialSnapshot?: S = undefined
     private _cachedInitialSnapshotCreated = false
     private _snapshotComputed: IComputedValue<S>
 
@@ -374,7 +374,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         }
     }
 
-    private _snapshotUponDeath?: S
+    private _snapshotUponDeath?: S = undefined
 
     // advantage of using computed for a snapshot is that nicely respects transactions etc.
     get snapshot(): S {
@@ -694,7 +694,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
     // #region internal event handling
 
-    private _internalEvents?: EventHandlers<InternalEventHandlers<S>>
+    private _internalEvents?: EventHandlers<InternalEventHandlers<S>> = undefined
 
     // we proxy the methods to avoid creating an EventHandlers instance when it is not needed
 
