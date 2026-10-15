@@ -20,7 +20,7 @@ import {
     resolveIdentifier
 } from "../../src"
 
-import { autorun, reaction, observable, getDebugName } from "mobx"
+import { autorun, reaction, observable, getDebugName, getObserverTree } from "mobx"
 import { MstError } from "../../src/internal"
 import { expect, test } from "bun:test"
 
@@ -162,6 +162,73 @@ test("it should emit snapshots for children", () => {
     })
     expect(snapshotsP.length).toBe(3)
     expect(snapshotsC.length).toBe(1)
+})
+
+test("it should compute a snapshot only when it is read", () => {
+    let computations = 0
+    const Todo = types.snapshotProcessor(types.model({ done: false }), {
+        postProcessor(snapshot) {
+            computations++
+            return snapshot
+        }
+    })
+    const Store = types.model({ todo: Todo }).actions(self => ({
+        toggle() {
+            self.todo.done = !self.todo.done
+        }
+    }))
+    const store = Store.create({ todo: {} })
+    store.todo.done
+    computations = 0
+
+    store.toggle()
+    store.toggle()
+    expect(computations).toBe(0)
+    expect(getSnapshot(store)).toEqual({ todo: { done: false } })
+    getSnapshot(store)
+    expect(computations).toBe(1)
+})
+
+test("onSnapshot registered inside an action emits the changes made after it", () => {
+    const Store = types.model({ count: 0 }).actions(self => ({
+        listenAndIncrement(listener: (snapshot: SnapshotOut<typeof self>) => void) {
+            onSnapshot(self, listener)
+            self.count++
+        }
+    }))
+    const counts: number[] = []
+    Store.create().listenAndIncrement(snapshot => counts.push(snapshot.count))
+    expect(counts).toEqual([1])
+})
+
+test("a derivation that calls onSnapshot does not observe the snapshot", () => {
+    const store = types.model({ count: 0 }).create()
+    unprotect(store)
+    let runs = 0
+    const dispose = autorun(() => {
+        runs++
+        if (runs === 1) onSnapshot(store, () => {})
+    })
+    store.count++
+    expect(runs).toBe(1)
+    dispose()
+})
+
+test("a destroyed tree stops observing what its snapshot read", () => {
+    const suffix = observable.box("!")
+    const Exclaimed = types.custom<string, string>({
+        name: "Exclaimed",
+        fromSnapshot: value => value,
+        toSnapshot: value => value + suffix.get(),
+        isTargetType: value => typeof value === "string",
+        getValidationMessage: () => ""
+    })
+    const store = types.model({ text: Exclaimed }).create({ text: "a" })
+    expect(getSnapshot(store)).toEqual({ text: "a!" })
+    expect(getObserverTree(suffix).observers).toBeDefined()
+
+    destroy(store)
+    expect(getObserverTree(suffix).observers).toBeUndefined()
 })
 
 test("it should apply snapshots", () => {

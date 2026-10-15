@@ -10,7 +10,8 @@ import {
     SnapshotIn,
     getNodeId,
     Instance,
-    onSnapshot
+    onSnapshot,
+    destroy
 } from "../../src"
 import { describe, expect, jest, test } from "bun:test"
 
@@ -528,6 +529,14 @@ describe("snapshotProcessor", () => {
             expect(s.a.length).toBe(1)
             expect(getSnapshot(s.a)).toEqual([{ x: "1" }])
         })
+    })
+
+    test("destroying a node does not post-process its snapshot again", () => {
+        const postProcessor = jest.fn(snapshot => snapshot)
+        const task = types.snapshotProcessor(types.model({ x: 1 }), { postProcessor }).create({})
+        postProcessor.mockClear()
+        destroy(task)
+        expect(postProcessor).not.toHaveBeenCalled()
     })
 
     describe("assigning instances works", () => {

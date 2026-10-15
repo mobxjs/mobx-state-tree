@@ -1,5 +1,12 @@
 // noinspection ES6UnusedImports
-import { action, computed, IComputedValue, reaction, _allowStateChangesInsideComputed } from "mobx"
+import {
+    action,
+    computed,
+    IComputedValue,
+    reaction,
+    untracked,
+    _allowStateChangesInsideComputed
+} from "mobx"
 import {
     addHiddenFinalProp,
     ComplexType,
@@ -65,6 +72,7 @@ export interface IChildNodesMap {
 }
 
 const snapshotReactionOptions = {
+    fireImmediately: true,
     onError(e: any) {
         throw e
     }
@@ -128,7 +136,10 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         initialValue: C
     ) {
         super(complexType, parent, subpath, environment)
-        this._snapshotComputed = computed<S>(() => freeze(this.getSnapshot()))
+        this._snapshotComputed = computed<S>(
+            () => freeze(this.isAlive ? this.getSnapshot() : this._snapshotUponDeath!),
+            { keepAlive: true }
+        )
 
         this.unbox = this.unbox.bind(this)
 
@@ -235,8 +246,6 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         // NOTE: we need to touch snapshot, because non-observable
         // "_observableInstanceState" field was touched
         ;(this._snapshotComputed as any).trackAndCompute()
-
-        if (this.isRoot) this._addSnapshotReaction()
 
         this._childNodes = EMPTY_OBJECT
 
@@ -599,6 +608,8 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         this._internalEventsClearAll()
 
         this.baseFinalizeDeath()
+        // the snapshot computed is kept alive: recompute it so it stops observing what it read
+        ;(this._snapshotComputed as any).trackAndCompute()
     }
 
     onSnapshot(onChange: (snapshot: S) => void): IDisposer {
@@ -682,9 +693,15 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
     private _addSnapshotReaction(): void {
         if (!this._hasSnapshotReaction) {
+            // baseline now, so changes later in the current action are still emitted
+            let last = untracked(() => this.snapshot)
             const snapshotDisposer = reaction(
                 () => this.snapshot,
-                snapshot => this.emitSnapshot(snapshot),
+                snapshot => {
+                    if (snapshot === last) return
+                    last = snapshot
+                    this.emitSnapshot(snapshot)
+                },
                 snapshotReactionOptions
             )
             this.addDisposer(snapshotDisposer)

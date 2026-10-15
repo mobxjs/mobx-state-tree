@@ -17,7 +17,8 @@ import {
     isUnionType,
     Instance,
     ObjectNode,
-    MstError
+    MstError,
+    NodeLifeCycle
 } from "../../internal"
 
 /** @hidden */
@@ -89,6 +90,10 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
         }
         const oldGetSnapshot = node.getSnapshot
         node.getSnapshot = () => this.postProcessSnapshot(oldGetSnapshot.call(node), node) as any
+        // an existing node has cached its snapshot without the post-processor
+        if (node instanceof ObjectNode && node.state !== NodeLifeCycle.INITIALIZING) {
+            ;(node as any)._snapshotComputed.trackAndCompute()
+        }
         if (!isUnionType(this._subtype)) {
             node.getReconciliationType = () => {
                 return this
