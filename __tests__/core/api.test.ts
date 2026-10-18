@@ -26,6 +26,8 @@ const METHODS_AND_INTERNAL_TYPES = stringToArray(`
     getLivelinessChecking,
     setErrorFormatting,
     getErrorFormatting,
+    setMemberRedeclarationChecking,
+    getMemberRedeclarationChecking,
     getType,
     getChildType,
     onPatch,

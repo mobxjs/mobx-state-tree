@@ -80,11 +80,35 @@ function getInstantiatedMembers(self: object): Map<string, InstantiatedMemberKin
     return members
 }
 
+let memberRedeclarationChecking = false
+
+/**
+ * Enables the check that throws when a model member (action, view or volatile state)
+ * is redeclared as a member of a different kind, in production builds.
+ * The check always runs in development mode. In production it is skipped by default,
+ * because it slows down model creation.
+ *
+ * @param enabled `true` to also run the check in production
+ */
+export function setMemberRedeclarationChecking(enabled: boolean) {
+    memberRedeclarationChecking = enabled
+}
+
+/**
+ * Returns whether the member redeclaration check is enabled in production builds.
+ *
+ * @returns `true` if the check also runs in production
+ */
+export function getMemberRedeclarationChecking(): boolean {
+    return memberRedeclarationChecking
+}
+
 function checkMemberNameIsAvailable(
     self: object,
     name: string,
     kind: InstantiatedMemberKind
 ): void {
+    if (!devMode() && !memberRedeclarationChecking) return
     const members = getInstantiatedMembers(self)
     const existingKind = members.get(name)
     if (existingKind !== undefined && existingKind !== kind) {
