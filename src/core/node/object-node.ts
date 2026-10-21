@@ -128,7 +128,16 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         initialValue: C
     ) {
         super(complexType, parent, subpath, environment)
-        this._snapshotComputed = computed<S>(() => freeze(this.getSnapshot()))
+        this._snapshotComputed = computed<S>(() => freeze(this.getSnapshot()), {
+            // Creating the observable instance changes no data, so the snapshot
+            // object handed out before it stays the current one: the recompute in
+            // createObservableInstance reports "unchanged" and MobX keeps the old
+            // value. Parents cache that object without being told about a
+            // replacement, and applySnapshot and reconciliation take a child as
+            // unchanged only when given the very object it holds.
+            equals: (previous, next) =>
+                Object.is(previous, next) || this.state === NodeLifeCycle.INITIALIZING
+        })
 
         this.unbox = this.unbox.bind(this)
 
@@ -233,7 +242,9 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         this._observableInstanceState = ObservableInstanceLifecycle.CREATED
 
         // NOTE: we need to touch snapshot, because non-observable
-        // "_observableInstanceState" field was touched
+        // "_observableInstanceState" field was touched. This runs while `state` is
+        // still INITIALIZING, which the computed's `equals` relies on to keep the
+        // snapshot object created before the instance.
         ;(this._snapshotComputed as any).trackAndCompute()
 
         if (this.isRoot) this._addSnapshotReaction()
