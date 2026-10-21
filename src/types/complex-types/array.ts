@@ -313,10 +313,8 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         // Preserve the old "always replace" behavior for length changes and when patches are being
         // observed, since those cases are more sensitive to patch shape (for example, splice
         // would otherwise emit add/remove patch sequences) and benchmark variance.
-        // Also replace when an entry carries the identifier of another current child: the
-        // per-index assignment below reconciles against the one node at that index, so a
-        // moved child would be recreated, while only replace searches the other children
-        // for a matching identifier and moves the node.
+        // Also replace when a child moved: only replace matches a snapshot to a node at
+        // another index, the assignment below would recreate it.
         if (
             oldLength !== newLength ||
             node.hasPatchSubscribers() ||
@@ -416,36 +414,26 @@ function findFirstChangedIndex(childNodes: readonly AnyNode[], snapshot: any[], 
 }
 
 function hasMovedChild(childNodes: readonly AnyNode[], snapshot: any[], startIndex: number) {
-    let identifiers: Set<string> | undefined
+    let identifiers: Set<string | null> | undefined
     for (let i = startIndex; i < childNodes.length; i++) {
-        const childNode = childNodes[i]
-        const newValue = snapshot[i]
-        if (childNode.snapshot === newValue || !hasDifferentIdentifier(childNode, newValue)) {
-            continue
-        }
+        const node = childNodes[i] as ObjectNode<any, any, any>
+        if (node.snapshot === snapshot[i] || !hasDifferentIdentifier(node, snapshot[i])) continue
         if (!identifiers) {
-            identifiers = new Set<string>()
-            for (let j = startIndex; j < childNodes.length; j++) {
-                const identifier = (childNodes[j] as ObjectNode<any, any, any>).identifier
-                if (identifier !== null) identifiers.add(identifier)
-            }
+            identifiers = new Set(
+                childNodes
+                    .slice(startIndex)
+                    .map(child => (child as ObjectNode<any, any, any>).identifier)
+            )
         }
-        const identifier = normalizeIdentifier(
-            newValue[(childNode as ObjectNode<any, any, any>).identifierAttribute!]
-        )
-        if (identifiers.has(identifier)) {
+        if (identifiers.has(normalizeIdentifier(snapshot[i][node.identifierAttribute!]))) {
             return true
         }
     }
     return false
 }
 
-/**
- * Whether the node is known, by identifier alone, not to be described by the snapshot.
- * A snapshot processor reads the identifier through its preProcessor, which may throw on a
- * snapshot meant for another union member, so only a plain type reads it straight off the
- * snapshot; a processed node keeps validating first.
- */
+// A snapshot processor reads the identifier through its preProcessor, which may throw on
+// a snapshot meant for another union member, so only a plain type reads it directly.
 function hasDifferentIdentifier(node: AnyNode, snapshot: any) {
     return (
         node instanceof ObjectNode &&
@@ -635,8 +623,7 @@ function areSame(oldNode: AnyNode, newValue: any) {
         return false
     }
 
-    // the identifier rules the candidate out before validating it, so a snapshot is
-    // validated only against the one node it can match
+    // validate the candidate only against the node it can match
     if (hasDifferentIdentifier(oldNode, newValue)) {
         return false
     }
