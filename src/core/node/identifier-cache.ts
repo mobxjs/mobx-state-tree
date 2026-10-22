@@ -77,6 +77,7 @@ export class IdentifierCache {
 
     splitCache(splitNode: AnyObjectNode): IdentifierCache {
         const newCache = new IdentifierCache()
+        if (this.cache.size === 0) return newCache
         // walk only the detached subtree, scanning the whole cache is O(tree size) per detach
         const moveNode = (node: AnyNode) => {
             if (!(node instanceof ObjectNode)) return

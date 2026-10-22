@@ -10,8 +10,8 @@ import {
     getSnapshot,
     detach
 } from "../../src"
-import { BaseNode } from "../../src/internal"
-import { expect, test } from "bun:test"
+import { BaseNode, IdentifierCache } from "../../src/internal"
+import { expect, spyOn, test } from "bun:test"
 
 if (process.env.NODE_ENV !== "production") {
     test("#275 - Identifiers should check refinement", () => {
@@ -420,4 +420,19 @@ test("detach only walks the detached subtree of the identifierCache", () => {
     // the detached subtree keeps its own identifiers
     expect(resolveIdentifier(Child, store, "child")).toBeUndefined()
     expect(resolveIdentifier(Child, item, "child")).toBe(item.child!)
+})
+
+test("detach from a tree without identifiers does no cache work", () => {
+    const Leaf = types.model("Leaf", { value: types.number })
+    const Branch = types.model("Branch", { leaves: types.array(Leaf) })
+    const Store = types.model("Store", { branches: types.array(Branch) }).actions(self => ({
+        detachBranch() {
+            return detach(self.branches[0])
+        }
+    }))
+    const store = Store.create({ branches: [{ leaves: [{ value: 1 }, { value: 2 }] }] })
+
+    const notifyDied = spyOn(IdentifierCache.prototype, "notifyDied")
+    store.detachBranch()
+    expect(notifyDied).not.toHaveBeenCalled()
 })
