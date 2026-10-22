@@ -1,4 +1,4 @@
-//github.com/mobxjs/mobx-state-tree/issues/1433
+// https://github.com/mobxjs/mobx-state-tree/issues/1433
 import { describe, expect, test } from "bun:test"
 import { types, walk, getPath } from "../../src/index"
 
