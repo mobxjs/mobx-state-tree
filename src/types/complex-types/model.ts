@@ -61,6 +61,69 @@ import {
 const PRE_PROCESS_SNAPSHOT = "preProcessSnapshot"
 const POST_PROCESS_SNAPSHOT = "postProcessSnapshot"
 
+type InstantiatedMemberKind = "an action" | "a view" | "volatile state"
+
+/**
+ * Tracks the names of the members (actions, views, volatile state) that have been
+ * instantiated on a model instance, so that a member cannot silently override a
+ * member of a different kind. Compose intentionally clears the tracked names so
+ * that composed types can override each other's members.
+ */
+const instantiatedMembers = new WeakMap<object, Map<string, InstantiatedMemberKind>>()
+
+function getInstantiatedMembers(self: object): Map<string, InstantiatedMemberKind> {
+    let members = instantiatedMembers.get(self)
+    if (!members) {
+        members = new Map()
+        instantiatedMembers.set(self, members)
+    }
+    return members
+}
+
+let memberRedeclarationChecking = false
+
+/**
+ * Enables the check that throws when a model member (action, view or volatile state)
+ * is redeclared as a member of a different kind, in production builds.
+ * The check always runs in development mode. In production it is skipped by default,
+ * because it slows down model creation.
+ *
+ * @param enabled `true` to also run the check in production
+ */
+export function setMemberRedeclarationChecking(enabled: boolean) {
+    memberRedeclarationChecking = enabled
+}
+
+/**
+ * Returns whether the member redeclaration check is enabled in production builds.
+ *
+ * @returns `true` if the check also runs in production
+ */
+export function getMemberRedeclarationChecking(): boolean {
+    return memberRedeclarationChecking
+}
+
+function checkMemberNameIsAvailable(
+    self: object,
+    name: string,
+    kind: InstantiatedMemberKind
+): void {
+    if (!devMode() && !memberRedeclarationChecking) return
+    const members = getInstantiatedMembers(self)
+    const existingKind = members.get(name)
+    if (existingKind !== undefined && existingKind !== kind) {
+        throw new MstError(
+            `'${name}' already exists as ${existingKind} and cannot be declared as ${kind}`
+        )
+    }
+    members.set(name, kind)
+}
+
+const resetInstantiatedMembers = (self: object) => {
+    instantiatedMembers.delete(self)
+    return self
+}
+
 /** @hidden */
 export interface ModelProperties {
     [key: string]: IAnyType
@@ -423,6 +486,8 @@ export class ModelType<
                 throw new MstError(`'${name}' is a property and cannot be declared as an action`)
             }
 
+            checkMemberNameIsAvailable(self, name, "an action")
+
             // warn if preprocessor was given
             if (name === PRE_PROCESS_SNAPSHOT)
                 throw new MstError(
@@ -501,6 +566,8 @@ export class ModelType<
                 )
             }
 
+            checkMemberNameIsAvailable(self, name, "volatile state")
+
             set(self, name, state[name])
         })
     }
@@ -540,6 +607,8 @@ export class ModelType<
             if (name in this.properties) {
                 throw new MstError(`'${name}' is a property and cannot be declared as a view`)
             }
+
+            checkMemberNameIsAvailable(self, name, "a view")
 
             // is this a computed property?
             const descriptor = Object.getOwnPropertyDescriptor(views, name)!
@@ -621,6 +690,7 @@ export class ModelType<
         })
 
         this.initializers.reduce((self, fn) => fn(self), instance)
+        instantiatedMembers.delete(instance)
         intercept(instance, this.willChange)
         observe(instance, this.didChange)
     }
@@ -898,7 +968,9 @@ export function compose(...args: any[]): any {
             prev.cloneAndEnhance({
                 name: prev.name + "_" + cur.name,
                 properties: cur.properties,
-                initializers: cur.initializers,
+                // composed types may override each other's members, so start
+                // tracking member names from scratch for the added type
+                initializers: [resetInstantiatedMembers, ...cur.initializers],
                 preProcessor: (snapshot: any) =>
                     cur.applySnapshotPreProcessor(prev.applySnapshotPreProcessor(snapshot)),
                 postProcessor: (snapshot: any) =>
