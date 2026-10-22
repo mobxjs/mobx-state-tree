@@ -1,5 +1,12 @@
-import { IObservableArray, values, observable, entries } from "mobx"
-import { MstError, ObjectNode, mobxShallow, AnyObjectNode, IAnyComplexType } from "../../internal"
+import { IObservableArray, values, observable } from "mobx"
+import {
+    MstError,
+    ObjectNode,
+    mobxShallow,
+    AnyNode,
+    AnyObjectNode,
+    IAnyComplexType
+} from "../../internal"
 
 let identifierCacheId = 0
 
@@ -70,28 +77,15 @@ export class IdentifierCache {
 
     splitCache(splitNode: AnyObjectNode): IdentifierCache {
         const newCache = new IdentifierCache()
-        // The slash is added here so we only match children of the splitNode. In version 5.1.8 and
-        // earlier there was no trailing slash, so non children that started with the same path string
-        // were being matched incorrectly.
-        const basePath = splitNode.path + "/"
-        entries(this.cache).forEach(([id, nodes]) => {
-            let modified = false
-            for (let i = nodes.length - 1; i >= 0; i--) {
-                const node = nodes[i]
-                if (node === splitNode || node.path.indexOf(basePath) === 0) {
-                    newCache.addNodeToCache(node, false) // no need to update lastUpdated since it is a whole new cache
-                    nodes.splice(i, 1)
-                    // remove empty sets from cache
-                    if (!nodes.length) {
-                        this.cache.delete(id)
-                    }
-                    modified = true
-                }
-            }
-            if (modified) {
-                this.updateLastCacheModificationPerId(id)
-            }
-        })
+        if (this.cache.size === 0) return newCache
+        // walk only the detached subtree, scanning the whole cache is O(tree size) per detach
+        const moveNode = (node: AnyNode) => {
+            if (!(node instanceof ObjectNode)) return
+            this.notifyDied(node)
+            newCache.addNodeToCache(node, false)
+            node.getChildren().forEach(moveNode)
+        }
+        moveNode(splitNode)
         return newCache
     }
 
