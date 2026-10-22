@@ -1,4 +1,11 @@
-import { applySnapshot, getSnapshot, setMemberRedeclarationChecking, types } from "../../src"
+import { reaction } from "mobx"
+import {
+    applySnapshot,
+    getSnapshot,
+    setMemberRedeclarationChecking,
+    types,
+    unprotect
+} from "../../src"
 import { Hook } from "../../src/internal"
 import { describe, expect, it, jest, test } from "bun:test"
 
@@ -875,5 +882,25 @@ describe("Model properties objects", () => {
 
             expect(Parent.properties).not.toHaveProperty("second")
         })
+    })
+})
+describe("Model snapshots", () => {
+    test("getSnapshot observes each property it reads", () => {
+        const Child = types.model({ x: 0 })
+        const M = types.model({ n: 0, child: Child })
+        const m = M.create({ child: {} })
+        unprotect(m)
+        const seen: unknown[] = []
+        const dispose = reaction(
+            () => getSnapshot(m),
+            s => seen.push(s)
+        )
+        m.n = 1
+        m.child = Child.create({ x: 2 })
+        expect(seen).toEqual([
+            { n: 1, child: { x: 0 } },
+            { n: 1, child: { x: 2 } }
+        ])
+        dispose()
     })
 })
