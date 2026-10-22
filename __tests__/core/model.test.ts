@@ -1,5 +1,11 @@
 import { reaction } from "mobx"
-import { applySnapshot, getSnapshot, setMemberRedeclarationChecking, types, unprotect } from "../../src"
+import {
+    applySnapshot,
+    getSnapshot,
+    setMemberRedeclarationChecking,
+    types,
+    unprotect
+} from "../../src"
 import { Hook } from "../../src/internal"
 import { describe, expect, it, jest, test } from "bun:test"
 
