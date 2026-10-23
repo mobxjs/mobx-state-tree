@@ -1,4 +1,11 @@
-import { applySnapshot, getSnapshot, types } from "../../src"
+import { reaction } from "mobx"
+import {
+    applySnapshot,
+    getSnapshot,
+    setMemberRedeclarationChecking,
+    types,
+    unprotect
+} from "../../src"
 import { Hook } from "../../src/internal"
 import { describe, expect, it, jest, test } from "bun:test"
 
@@ -288,6 +295,168 @@ describe("Model instantiation", () => {
                 "[mobx-state-tree] 'name' is a property and cannot be declared as volatile state"
             )
         })
+    })
+
+    describe("Should show a friendly message when a model has a member redeclared as", () => {
+        if (process.env.NODE_ENV !== "production") {
+            test("a view after an action", () => {
+                const UserModel = types
+                    .model("UserModel", {
+                        name: types.string
+                    })
+                    .actions(self => ({
+                        rename() {
+                            self.name = "Changed"
+                        }
+                    }))
+                    .views(self => ({
+                        rename() {
+                            return self.name
+                        }
+                    }))
+
+                expect(() => UserModel.create({ name: "Subramanya Chakravarthy" })).toThrow(
+                    "[mobx-state-tree] 'rename' already exists as an action and cannot be declared as a view"
+                )
+            })
+
+            test("an action after a view", () => {
+                const UserModel = types
+                    .model("UserModel", {
+                        name: types.string
+                    })
+                    .views(self => ({
+                        displayName() {
+                            return self.name.toUpperCase()
+                        }
+                    }))
+                    .actions(self => ({
+                        displayName() {
+                            self.name = "Changed"
+                        }
+                    }))
+
+                expect(() => UserModel.create({ name: "Subramanya Chakravarthy" })).toThrow(
+                    "[mobx-state-tree] 'displayName' already exists as a view and cannot be declared as an action"
+                )
+            })
+
+            test("volatile state after an action", () => {
+                const UserModel = types
+                    .model("UserModel", {
+                        name: types.string
+                    })
+                    .actions(self => ({
+                        rename() {
+                            self.name = "Changed"
+                        }
+                    }))
+                    .volatile(_self => ({
+                        rename: "unused"
+                    }))
+
+                expect(() => UserModel.create({ name: "Subramanya Chakravarthy" })).toThrow(
+                    "[mobx-state-tree] 'rename' already exists as an action and cannot be declared as volatile state"
+                )
+            })
+
+            test("a view after volatile state", () => {
+                const UserModel = types
+                    .model("UserModel", {
+                        name: types.string
+                    })
+                    .extend(_self => ({
+                        state: { displayName: "unused" },
+                        views: {
+                            get displayName() {
+                                return _self.name
+                            }
+                        }
+                    }))
+
+                expect(() => UserModel.create({ name: "Subramanya Chakravarthy" })).toThrow(
+                    "[mobx-state-tree] 'displayName' already exists as volatile state and cannot be declared as a view"
+                )
+            })
+        }
+
+        test("a member of the same kind can still be redeclared", () => {
+            const UserModel = types
+                .model("UserModel", {
+                    name: types.string
+                })
+                .actions(self => ({
+                    rename() {
+                        self.name = "first"
+                    }
+                }))
+                .actions(self => ({
+                    rename() {
+                        self.name = "second"
+                    }
+                }))
+
+            const user = UserModel.create({ name: "Subramanya Chakravarthy" })
+            user.rename()
+            expect(user.name).toBe("second")
+        })
+
+        test("a member of a composed type can still override one of another kind", () => {
+            const LoudPerson = types
+                .model("LoudPerson", {
+                    name: types.string
+                })
+                .actions(self => ({
+                    sayName() {
+                        return self.name.toUpperCase()
+                    }
+                }))
+            const QuietPerson = types
+                .model("QuietPerson", {
+                    name: types.string
+                })
+                .views(self => ({
+                    sayName() {
+                        return self.name.toLowerCase()
+                    }
+                }))
+
+            const RegularPerson = types.compose("RegularPerson", LoudPerson, QuietPerson)
+            const person = RegularPerson.create({ name: "Tyler" })
+            expect(person.sayName()).toBe("tyler")
+        })
+
+        if (process.env.NODE_ENV === "production") {
+            const UserModel = types
+                .model("UserModel", {
+                    name: types.string
+                })
+                .actions(self => ({
+                    rename() {
+                        self.name = "Changed"
+                    }
+                }))
+                .views(self => ({
+                    rename() {
+                        return self.name
+                    }
+                }))
+
+            test("a view after an action, except in production by default", () => {
+                expect(() => UserModel.create({ name: "Subramanya Chakravarthy" })).not.toThrow()
+            })
+
+            test("a view after an action in production when enabled", () => {
+                setMemberRedeclarationChecking(true)
+                try {
+                    expect(() => UserModel.create({ name: "Subramanya Chakravarthy" })).toThrow(
+                        "[mobx-state-tree] 'rename' already exists as an action and cannot be declared as a view"
+                    )
+                } finally {
+                    setMemberRedeclarationChecking(false)
+                }
+            })
+        }
     })
 
     describe("with all of the property types", () => {
@@ -713,5 +882,25 @@ describe("Model properties objects", () => {
 
             expect(Parent.properties).not.toHaveProperty("second")
         })
+    })
+})
+describe("Model snapshots", () => {
+    test("getSnapshot observes each property it reads", () => {
+        const Child = types.model({ x: 0 })
+        const M = types.model({ n: 0, child: Child })
+        const m = M.create({ child: {} })
+        unprotect(m)
+        const seen: unknown[] = []
+        const dispose = reaction(
+            () => getSnapshot(m),
+            s => seen.push(s)
+        )
+        m.n = 1
+        m.child = Child.create({ x: 2 })
+        expect(seen).toEqual([
+            { n: 1, child: { x: 0 } },
+            { n: 1, child: { x: 2 } }
+        ])
+        dispose()
     })
 })

@@ -55,6 +55,8 @@ export {
     setErrorFormatting,
     getErrorFormatting,
     type ErrorFormattingOptions,
+    setMemberRedeclarationChecking,
+    getMemberRedeclarationChecking,
     setLivelynessChecking, // to be deprecated
     type LivelynessMode, // to be deprecated
     type ModelSnapshotType,

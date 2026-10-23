@@ -106,6 +106,7 @@ sidebar_label: "Globals"
 * [getErrorFormatting](index.md#geterrorformatting)
 * [getIdentifier](index.md#getidentifier)
 * [getLivelinessChecking](index.md#getlivelinesschecking)
+* [getMemberRedeclarationChecking](index.md#getmemberredeclarationchecking)
 * [getMembers](index.md#getmembers)
 * [getNodeId](index.md#getnodeid)
 * [getParent](index.md#getparent)
@@ -164,6 +165,7 @@ sidebar_label: "Globals"
 * [safeReference](index.md#safereference)
 * [setErrorFormatting](index.md#seterrorformatting)
 * [setLivelinessChecking](index.md#setlivelinesschecking)
+* [setMemberRedeclarationChecking](index.md#setmemberredeclarationchecking)
 * [snapshotProcessor](index.md#snapshotprocessor)
 * [splitJsonPath](index.md#splitjsonpath)
 * [toGenerator](index.md#togenerator)
@@ -2815,6 +2817,18 @@ Returns the current liveliness checking mode.
 
 ___
 
+###  getMemberRedeclarationChecking
+
+▸ **getMemberRedeclarationChecking**(): *boolean*
+
+Returns whether the member redeclaration check is enabled in production builds.
+
+**Returns:** *boolean*
+
+`true` if the check also runs in production
+
+___
+
 ###  getMembers
 
 ▸ **getMembers**(`target`: IAnyStateTreeNode): *[IModelReflectionData](interfaces/imodelreflectiondata.md)*
@@ -4388,6 +4402,25 @@ Use the `"error"` option to easy debugging to see where the error was thrown and
 Name | Type | Description |
 ------ | ------ | ------ |
 `mode` | [LivelinessMode](index.md#livelinessmode) | `"warn"`, `"error"` or `"ignore"`  |
+
+**Returns:** *void*
+
+___
+
+###  setMemberRedeclarationChecking
+
+▸ **setMemberRedeclarationChecking**(`enabled`: boolean): *void*
+
+Enables the check that throws when a model member (action, view or volatile state)
+is redeclared as a member of a different kind, in production builds.
+The check always runs in development mode. In production it is skipped by default,
+because it slows down model creation.
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`enabled` | boolean | `true` to also run the check in production  |
 
 **Returns:** *void*
 

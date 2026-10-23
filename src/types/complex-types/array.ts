@@ -26,6 +26,7 @@ import {
     ExtractCSTWithSTN,
     MstError,
     flattenTypeErrors,
+    normalizeIdentifier,
     getContextForPath,
     getStateTreeNode,
     IAnyStateTreeNode,
@@ -312,7 +313,13 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
         // Preserve the old "always replace" behavior for length changes and when patches are being
         // observed, since those cases are more sensitive to patch shape (for example, splice
         // would otherwise emit add/remove patch sequences) and benchmark variance.
-        if (oldLength !== newLength || node.hasPatchSubscribers()) {
+        // Also replace when a child moved: only replace matches a snapshot to a node at
+        // another index, the assignment below would recreate it.
+        if (
+            oldLength !== newLength ||
+            node.hasPatchSubscribers() ||
+            hasMovedChild(childNodes, snapshot, firstChangedIndex)
+        ) {
             target.replace(snapshot)
             return
         }
@@ -404,6 +411,38 @@ function findFirstChangedIndex(childNodes: readonly AnyNode[], snapshot: any[], 
         index++
     }
     return index
+}
+
+function hasMovedChild(childNodes: readonly AnyNode[], snapshot: any[], startIndex: number) {
+    let identifiers: Set<string | null> | undefined
+    for (let i = startIndex; i < childNodes.length; i++) {
+        const node = childNodes[i] as ObjectNode<any, any, any>
+        if (node.snapshot === snapshot[i] || !hasDifferentIdentifier(node, snapshot[i])) continue
+        if (!identifiers) {
+            identifiers = new Set(
+                childNodes
+                    .slice(startIndex)
+                    .map(child => (child as ObjectNode<any, any, any>).identifier)
+            )
+        }
+        if (identifiers.has(normalizeIdentifier(snapshot[i][node.identifierAttribute!]))) {
+            return true
+        }
+    }
+    return false
+}
+
+// A snapshot processor reads the identifier through its preProcessor, which may throw on
+// a snapshot meant for another union member, so only a plain type reads it directly.
+function hasDifferentIdentifier(node: AnyNode, snapshot: any) {
+    return (
+        node instanceof ObjectNode &&
+        node.identifier !== null &&
+        !!node.identifierAttribute &&
+        isPlainObject(snapshot) &&
+        node.getReconciliationType() === node.type &&
+        !(node.type as ComplexType<any, any, any>).isMatchingSnapshotId(node, snapshot)
+    )
 }
 
 function canApplyDirectSnapshotsInRange(
@@ -581,6 +620,11 @@ function areSame(oldNode: AnyNode, newValue: any) {
 
     // Non object nodes don't get reconciled
     if (!(oldNode instanceof ObjectNode)) {
+        return false
+    }
+
+    // validate the candidate only against the node it can match
+    if (hasDifferentIdentifier(oldNode, newValue)) {
         return false
     }
 

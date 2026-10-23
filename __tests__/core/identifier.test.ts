@@ -10,7 +10,8 @@ import {
     getSnapshot,
     detach
 } from "../../src"
-import { expect, test } from "bun:test"
+import { BaseNode, IdentifierCache } from "../../src/internal"
+import { expect, spyOn, test } from "bun:test"
 
 if (process.env.NODE_ENV !== "production") {
     test("#275 - Identifiers should check refinement", () => {
@@ -379,4 +380,59 @@ test("items detached from arrays don't corrupt identifierCache", () => {
     expect(resolveIdentifier(Item, largeArray, "J")).toBeDefined()
     // The following expectation was failing in version 5.1.8 and earlier
     expect(resolveIdentifier(Item, largeArray, "K")).toBeDefined()
+})
+
+test("detach only walks the detached subtree of the identifierCache", () => {
+    const Child = types.model("Child", { id: types.identifier })
+    const Item = types.model("Item", { id: types.identifier, child: types.maybe(Child) })
+    const Store = types.model("Store", { items: types.array(Item) }).actions(self => ({
+        detachItem(index: number) {
+            return detach(self.items[index])
+        }
+    }))
+    const store = Store.create({
+        items: Array.from({ length: 1000 }, (_, i) => ({
+            id: `item-${i}`,
+            child: i === 500 ? { id: "child" } : undefined
+        }))
+    })
+    const [item, next] = [store.items[500], store.items[501]]
+
+    // count reads of `path`, which the old implementation built for every node in the tree
+    const descriptor = Object.getOwnPropertyDescriptor(BaseNode.prototype, "path")!
+    let pathReads = 0
+    Object.defineProperty(BaseNode.prototype, "path", {
+        ...descriptor,
+        get() {
+            pathReads++
+            return descriptor.get!.call(this)
+        }
+    })
+    try {
+        store.detachItem(500)
+    } finally {
+        Object.defineProperty(BaseNode.prototype, "path", descriptor)
+    }
+
+    expect(pathReads).toBeLessThan(10)
+    expect(resolveIdentifier(Item, store, "item-500")).toBeUndefined()
+    expect(resolveIdentifier(Item, store, "item-501")).toBe(next)
+    // the detached subtree keeps its own identifiers
+    expect(resolveIdentifier(Child, store, "child")).toBeUndefined()
+    expect(resolveIdentifier(Child, item, "child")).toBe(item.child!)
+})
+
+test("detach from a tree without identifiers does no cache work", () => {
+    const Leaf = types.model("Leaf", { value: types.number })
+    const Branch = types.model("Branch", { leaves: types.array(Leaf) })
+    const Store = types.model("Store", { branches: types.array(Branch) }).actions(self => ({
+        detachBranch() {
+            return detach(self.branches[0])
+        }
+    }))
+    const store = Store.create({ branches: [{ leaves: [{ value: 1 }, { value: 2 }] }] })
+
+    const notifyDied = spyOn(IdentifierCache.prototype, "notifyDied")
+    store.detachBranch()
+    expect(notifyDied).not.toHaveBeenCalled()
 })

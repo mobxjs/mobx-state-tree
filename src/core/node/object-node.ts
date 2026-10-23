@@ -5,6 +5,7 @@ import {
     computed,
     IComputedValue,
     reaction,
+    untracked,
     _allowStateChangesInsideComputed
 } from "mobx"
 import {
@@ -72,6 +73,7 @@ export interface IChildNodesMap {
 }
 
 const snapshotReactionOptions = {
+    fireImmediately: true,
     onError(e: any) {
         throw e
     }
@@ -96,19 +98,19 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     readonly identifier: string | null // Identifier is always normalized to string, even if the identifier property isn't
     readonly unnormalizedIdentifier: ReferenceIdentifier | null
 
-    identifierCache?: IdentifierCache
+    identifierCache?: IdentifierCache = undefined
     isProtectionEnabled = true
-    middlewares?: IMiddleware[]
+    middlewares?: IMiddleware[] = undefined
     hasSnapshotPostProcessor = false
 
-    private _applyPatches?: (patches: IJsonPatch[]) => void
+    private _applyPatches?: (patches: IJsonPatch[]) => void = undefined
 
     applyPatches(patches: IJsonPatch[]): void {
         this.createObservableInstanceIfNeeded()
         this._applyPatches!(patches)
     }
 
-    private _applySnapshot?: (snapshot: C) => void
+    private _applySnapshot?: (snapshot: C) => void = undefined
 
     applySnapshot(snapshot: C): void {
         this.createObservableInstanceIfNeeded()
@@ -118,14 +120,15 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     private _autoUnbox = true // unboxing is disabled when reading child nodes
     _isRunningAction = false // only relevant for root
     private _hasSnapshotReaction = false
-    private _endOfActionCallbacks?: Array<() => void>
+    private _endOfActionCallbacks?: Array<() => void> = undefined
 
     private _observableInstanceState = ObservableInstanceLifecycle.UNINITIALIZED
     private _childNodes: IChildNodesMap
     private _initialSnapshot: C
-    private _cachedInitialSnapshot?: S
+    private _cachedInitialSnapshot?: S = undefined
     private _cachedInitialSnapshotCreated = false
     private _snapshotComputed: IComputedValue<S>
+    private _snapshotSource: { node?: ObjectNode<C, S, T>; snapshotUponDeath?: S }
 
     constructor(
         complexType: ComplexType<C, S, T>,
@@ -135,15 +138,24 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         initialValue: C
     ) {
         super(complexType, parent, subpath, environment)
-        this._snapshotComputed = computed<S>(() => {
-            const snapshot = freeze(this.getSnapshot())
-            // keep the snapshot object parents already embed if instantiation changed nothing
-            return this.state === NodeLifeCycle.INITIALIZING &&
-                this._cachedInitialSnapshotCreated &&
-                compareShallow(snapshot, this._cachedInitialSnapshot)
-                ? this._cachedInitialSnapshot!
-                : snapshot
-        })
+        // the computed must not reference the node itself: a parent's stale snapshot computed
+        // keeps observing it after the node is removed, until the parent snapshot is read again
+        const snapshotSource: { node?: ObjectNode<C, S, T>; snapshotUponDeath?: S } = { node: this }
+        this._snapshotSource = snapshotSource
+        this._snapshotComputed = computed<S>(
+            () => {
+                const node = snapshotSource.node
+                if (!node) return freeze(snapshotSource.snapshotUponDeath!)
+                const snapshot = freeze(node.getSnapshot())
+                // keep the snapshot object parents already embed if instantiation changed nothing
+                return node.state === NodeLifeCycle.INITIALIZING &&
+                    node._cachedInitialSnapshotCreated &&
+                    compareShallow(snapshot, node._cachedInitialSnapshot)
+                    ? node._cachedInitialSnapshot!
+                    : snapshot
+            },
+            { keepAlive: true }
+        )
 
         this.unbox = this.unbox.bind(this)
 
@@ -250,8 +262,6 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         // NOTE: we need to touch snapshot, because non-observable
         // "_observableInstanceState" field was touched
         ;(this._snapshotComputed as any).trackAndCompute()
-
-        if (this.isRoot) this._addSnapshotReaction()
 
         this._childNodes = EMPTY_OBJECT
 
@@ -389,7 +399,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         }
     }
 
-    private _snapshotUponDeath?: S
+    private _snapshotUponDeath?: S = undefined
 
     // advantage of using computed for a snapshot is that nicely respects transactions etc.
     get snapshot(): S {
@@ -614,6 +624,10 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         this._internalEventsClearAll()
 
         this.baseFinalizeDeath()
+        this._snapshotSource.snapshotUponDeath = snapshot
+        this._snapshotSource.node = undefined
+        // the snapshot computed is kept alive: recompute it so it stops observing what it read
+        ;(this._snapshotComputed as any).trackAndCompute()
     }
 
     onSnapshot(onChange: (snapshot: S) => void): IDisposer {
@@ -697,9 +711,15 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
     private _addSnapshotReaction(): void {
         if (!this._hasSnapshotReaction) {
+            // baseline now, so changes later in the current action are still emitted
+            let last = untracked(() => this.snapshot)
             const snapshotDisposer = reaction(
                 () => this.snapshot,
-                snapshot => this.emitSnapshot(snapshot),
+                snapshot => {
+                    if (snapshot === last) return
+                    last = snapshot
+                    this.emitSnapshot(snapshot)
+                },
                 snapshotReactionOptions
             )
             this.addDisposer(snapshotDisposer)
@@ -709,7 +729,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
 
     // #region internal event handling
 
-    private _internalEvents?: EventHandlers<InternalEventHandlers<S>>
+    private _internalEvents?: EventHandlers<InternalEventHandlers<S>> = undefined
 
     // we proxy the methods to avoid creating an EventHandlers instance when it is not needed
 
