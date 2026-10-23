@@ -1,5 +1,12 @@
 // noinspection ES6UnusedImports
-import { action, computed, IComputedValue, reaction, _allowStateChangesInsideComputed } from "mobx"
+import {
+    action,
+    compareShallow,
+    computed,
+    IComputedValue,
+    reaction,
+    _allowStateChangesInsideComputed
+} from "mobx"
 import {
     addHiddenFinalProp,
     ComplexType,
@@ -128,9 +135,14 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         initialValue: C
     ) {
         super(complexType, parent, subpath, environment)
-        this._snapshotComputed = computed<S>(() => freeze(this.getSnapshot()), {
-            // instantiation changes no data: keep the snapshot object created before it
-            equals: (a, b) => Object.is(a, b) || this.state === NodeLifeCycle.INITIALIZING
+        this._snapshotComputed = computed<S>(() => {
+            const snapshot = freeze(this.getSnapshot())
+            // keep the snapshot object parents already embed if instantiation changed nothing
+            return this.state === NodeLifeCycle.INITIALIZING &&
+                this._cachedInitialSnapshotCreated &&
+                compareShallow(snapshot, this._cachedInitialSnapshot)
+                ? this._cachedInitialSnapshot!
+                : snapshot
         })
 
         this.unbox = this.unbox.bind(this)

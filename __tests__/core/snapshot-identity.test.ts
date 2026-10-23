@@ -44,4 +44,43 @@ describe("snapshot identity across lazy instantiation", () => {
         expect(getSnapshot(store)).toEqual(initial)
         expect(processed).not.toContain("b")
     })
+
+    const Child = types.model("Child", { value: types.number }).actions(self => ({
+        setValue(value: number) {
+            self.value = value
+        }
+    }))
+
+    test("an initializer that mutates a child is reflected in the node's snapshot", () => {
+        const Parent = types.model("Parent", { child: Child }).extend(self => {
+            self.child.setValue(2)
+            return {}
+        })
+        const Store = types.model("Store", { parents: types.array(Parent) })
+        const store = Store.create({ parents: [{ child: { value: 1 } }] })
+        getSnapshot(store)
+
+        expect(store.parents[0].child.value).toBe(2)
+
+        expect(getSnapshot(store.parents[0].child)).toEqual({ value: 2 })
+        expect(getSnapshot(store.parents[0])).toEqual({ child: { value: 2 } })
+    })
+
+    test("an initializer that only reads keeps the snapshot objects", () => {
+        const Parent = types
+            .model("Parent", { child: Child })
+            .volatile(self => ({ initialValue: self.child.value }))
+        const Store = types.model("Store", { parents: types.array(Parent) })
+        const store = Store.create({ parents: [{ child: { value: 1 } }] })
+        const before = getSnapshot(store)
+
+        expect(store.parents[0].initialValue).toBe(1)
+
+        expect(getSnapshot(store.parents[0])).toBe(before.parents[0])
+        expect(getSnapshot(store.parents[0].child)).toBe(before.parents[0].child)
+    })
+
+    test.todo("an initializer that mutates a child is reflected in ancestor snapshots", () => {
+        // pre-existing on master: getSnapshot(store) stays { parents: [{ child: { value: 1 } }] }
+    })
 })
