@@ -4,7 +4,7 @@ title: "ReferenceOptionsOnInvalidated"
 sidebar_label: "ReferenceOptionsOnInvalidated"
 ---
 
-[mobx-state-tree - v8.0.0](../index.md) › [ReferenceOptionsOnInvalidated](referenceoptionsoninvalidated.md)
+[mobx-state-tree - v9.0.0](../index.md) › [ReferenceOptionsOnInvalidated](referenceoptionsoninvalidated.md)
 
 ## Type parameters
 
@@ -26,4 +26,4 @@ sidebar_label: "ReferenceOptionsOnInvalidated"
 
 • **onInvalidated**: *[OnReferenceInvalidated](../index.md#onreferenceinvalidated)‹ReferenceT‹IT››*
 
-*Defined in [src/types/utility-types/reference.ts:498](https://github.com/mobxjs/mobx-state-tree/blob/1f4bc725/src/types/utility-types/reference.ts#L498)*
+*Defined in [src/types/utility-types/reference.ts:498](https://github.com/mobxjs/mobx-state-tree/blob/c3106073/src/types/utility-types/reference.ts#L498)*

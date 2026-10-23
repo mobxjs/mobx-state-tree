@@ -4,7 +4,7 @@ title: "IModelReflectionPropertiesData"
 sidebar_label: "IModelReflectionPropertiesData"
 ---
 
-[mobx-state-tree - v8.0.0](../index.md) › [IModelReflectionPropertiesData](imodelreflectionpropertiesdata.md)
+[mobx-state-tree - v9.0.0](../index.md) › [IModelReflectionPropertiesData](imodelreflectionpropertiesdata.md)
 
 ## Hierarchy
 
@@ -25,7 +25,7 @@ sidebar_label: "IModelReflectionPropertiesData"
 
 • **name**: *string*
 
-*Defined in [src/core/mst-operations.ts:825](https://github.com/mobxjs/mobx-state-tree/blob/1be40a3e/src/core/mst-operations.ts#L825)*
+*Defined in [src/core/mst-operations.ts:833](https://github.com/mobxjs/mobx-state-tree/blob/1cd1d953/src/core/mst-operations.ts#L833)*
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 • **properties**: *object*
 
-*Defined in [src/core/mst-operations.ts:826](https://github.com/mobxjs/mobx-state-tree/blob/1be40a3e/src/core/mst-operations.ts#L826)*
+*Defined in [src/core/mst-operations.ts:834](https://github.com/mobxjs/mobx-state-tree/blob/1cd1d953/src/core/mst-operations.ts#L834)*
 
 #### Type declaration:
 
