@@ -127,6 +127,7 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     private _cachedInitialSnapshot?: S
     private _cachedInitialSnapshotCreated = false
     private _snapshotComputed: IComputedValue<S>
+    private _snapshotSource: { node?: ObjectNode<C, S, T>; snapshotUponDeath?: S }
 
     constructor(
         complexType: ComplexType<C, S, T>,
@@ -136,8 +137,17 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         initialValue: C
     ) {
         super(complexType, parent, subpath, environment)
+        // the computed must not reference the node itself: a parent's stale snapshot computed
+        // keeps observing it after the node is removed, until the parent snapshot is read again
+        const snapshotSource: { node?: ObjectNode<C, S, T>; snapshotUponDeath?: S } = { node: this }
+        this._snapshotSource = snapshotSource
         this._snapshotComputed = computed<S>(
-            () => freeze(this.isAlive ? this.getSnapshot() : this._snapshotUponDeath!),
+            () =>
+                freeze(
+                    snapshotSource.node
+                        ? snapshotSource.node.getSnapshot()
+                        : snapshotSource.snapshotUponDeath!
+                ),
             { keepAlive: true }
         )
 
@@ -608,6 +618,8 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         this._internalEventsClearAll()
 
         this.baseFinalizeDeath()
+        this._snapshotSource.snapshotUponDeath = snapshot
+        this._snapshotSource.node = undefined
         // the snapshot computed is kept alive: recompute it so it stops observing what it read
         ;(this._snapshotComputed as any).trackAndCompute()
     }

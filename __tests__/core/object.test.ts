@@ -214,6 +214,50 @@ test("a derivation that calls onSnapshot does not observe the snapshot", () => {
     dispose()
 })
 
+test("a root onSnapshot listener added in an action does not get the changes made before it", () => {
+    const Store = types.model({ count: 0 }).actions(self => ({
+        incrementAndListen(listener: () => void) {
+            self.count++
+            onSnapshot(self, listener)
+        }
+    }))
+    let calls = 0
+    Store.create().incrementAndListen(() => calls++)
+    expect(calls).toBe(0)
+})
+
+test("a child onSnapshot listener added in an action gets the changes made after it", () => {
+    const Child = types.model({ count: 0 })
+    const Store = types.model({ child: types.optional(Child, {}) }).actions(self => ({
+        listenAndIncrement(listener: (snapshot: SnapshotOut<typeof Child>) => void) {
+            onSnapshot(self.child, listener)
+            self.child.count++
+        }
+    }))
+    const counts: number[] = []
+    Store.create().listenAndIncrement(snapshot => counts.push(snapshot.count))
+    expect(counts).toEqual([1])
+})
+
+test("a snapshot that throws throws when it is read, not at the end of the action", () => {
+    const Counter = types.model({ count: 0 }).actions(self => ({
+        increment() {
+            self.count++
+        }
+    }))
+    const Store = types.snapshotProcessor(Counter, {
+        postProcessor(snapshot) {
+            if (snapshot.count > 1) throw new Error("too many")
+            return snapshot
+        }
+    })
+    const store = Store.create({})
+    store.increment()
+
+    expect(() => store.increment()).not.toThrow()
+    expect(() => getSnapshot(store)).toThrow("too many")
+})
+
 test("a destroyed tree stops observing what its snapshot read", () => {
     const suffix = observable.box("!")
     const Exclaimed = types.custom<string, string>({
