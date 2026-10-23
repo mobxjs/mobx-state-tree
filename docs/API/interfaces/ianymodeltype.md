@@ -4,7 +4,7 @@ title: "IAnyModelType"
 sidebar_label: "IAnyModelType"
 ---
 
-[mobx-state-tree - v8.0.0](../index.md) › [IAnyModelType](ianymodeltype.md)
+[mobx-state-tree - v9.0.0](../index.md) › [IAnyModelType](ianymodeltype.md)
 
 Any model type.
 
@@ -69,7 +69,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[properties](imodeltype.md#properties)*
 
-*Defined in [src/types/complex-types/model.ts:196](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/types/complex-types/model.ts#L196)*
+*Defined in [src/types/complex-types/model.ts:259](https://github.com/mobxjs/mobx-state-tree/blob/b74afdb1/src/types/complex-types/model.ts#L259)*
 
 ## Methods
 
@@ -79,7 +79,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[actions](imodeltype.md#actions)*
 
-*Defined in [src/types/complex-types/model.ts:210](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/types/complex-types/model.ts#L210)*
+*Defined in [src/types/complex-types/model.ts:273](https://github.com/mobxjs/mobx-state-tree/blob/b74afdb1/src/types/complex-types/model.ts#L273)*
 
 **Type parameters:**
 
@@ -144,7 +144,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[extend](imodeltype.md#extend)*
 
-*Defined in [src/types/complex-types/model.ts:218](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/types/complex-types/model.ts#L218)*
+*Defined in [src/types/complex-types/model.ts:281](https://github.com/mobxjs/mobx-state-tree/blob/b74afdb1/src/types/complex-types/model.ts#L281)*
 
 **Type parameters:**
 
@@ -198,7 +198,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[named](imodeltype.md#named)*
 
-*Defined in [src/types/complex-types/model.ts:198](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/types/complex-types/model.ts#L198)*
+*Defined in [src/types/complex-types/model.ts:261](https://github.com/mobxjs/mobx-state-tree/blob/b74afdb1/src/types/complex-types/model.ts#L261)*
 
 **Parameters:**
 
@@ -216,7 +216,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[postProcessSnapshot](imodeltype.md#postprocesssnapshot)*
 
-*Defined in [src/types/complex-types/model.ts:226](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/types/complex-types/model.ts#L226)*
+*Defined in [src/types/complex-types/model.ts:289](https://github.com/mobxjs/mobx-state-tree/blob/b74afdb1/src/types/complex-types/model.ts#L289)*
 
 **Type parameters:**
 
@@ -244,7 +244,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[preProcessSnapshot](imodeltype.md#preprocesssnapshot)*
 
-*Defined in [src/types/complex-types/model.ts:222](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/types/complex-types/model.ts#L222)*
+*Defined in [src/types/complex-types/model.ts:285](https://github.com/mobxjs/mobx-state-tree/blob/b74afdb1/src/types/complex-types/model.ts#L285)*
 
 **Type parameters:**
 
@@ -272,7 +272,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[props](imodeltype.md#props)*
 
-*Defined in [src/types/complex-types/model.ts:202](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/types/complex-types/model.ts#L202)*
+*Defined in [src/types/complex-types/model.ts:265](https://github.com/mobxjs/mobx-state-tree/blob/b74afdb1/src/types/complex-types/model.ts#L265)*
 
 **Type parameters:**
 
@@ -317,7 +317,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[views](imodeltype.md#views)*
 
-*Defined in [src/types/complex-types/model.ts:206](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/types/complex-types/model.ts#L206)*
+*Defined in [src/types/complex-types/model.ts:269](https://github.com/mobxjs/mobx-state-tree/blob/b74afdb1/src/types/complex-types/model.ts#L269)*
 
 **Type parameters:**
 
@@ -345,7 +345,7 @@ ___
 
 *Inherited from [IModelType](imodeltype.md).[volatile](imodeltype.md#volatile)*
 
-*Defined in [src/types/complex-types/model.ts:214](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/types/complex-types/model.ts#L214)*
+*Defined in [src/types/complex-types/model.ts:277](https://github.com/mobxjs/mobx-state-tree/blob/b74afdb1/src/types/complex-types/model.ts#L277)*
 
 **Type parameters:**
 

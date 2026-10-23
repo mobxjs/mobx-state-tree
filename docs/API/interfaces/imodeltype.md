@@ -4,7 +4,7 @@ title: "IModelType"
 sidebar_label: "IModelType"
 ---
 
-[mobx-state-tree - v8.0.0](../index.md) › [IModelType](imodeltype.md)
+[mobx-state-tree - v9.0.0](../index.md) › [IModelType](imodeltype.md)
 
 ## Type parameters
 
@@ -77,7 +77,7 @@ ___
 
 • **properties**: *PROPS*
 
-*Defined in [src/types/complex-types/model.ts:196](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/types/complex-types/model.ts#L196)*
+*Defined in [src/types/complex-types/model.ts:259](https://github.com/mobxjs/mobx-state-tree/blob/b74afdb1/src/types/complex-types/model.ts#L259)*
 
 ## Methods
 
@@ -85,7 +85,7 @@ ___
 
 ▸ **actions**<**A**>(`fn`: function): *[IModelType](imodeltype.md)‹PROPS, OTHERS & A, CustomC, CustomS›*
 
-*Defined in [src/types/complex-types/model.ts:210](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/types/complex-types/model.ts#L210)*
+*Defined in [src/types/complex-types/model.ts:273](https://github.com/mobxjs/mobx-state-tree/blob/b74afdb1/src/types/complex-types/model.ts#L273)*
 
 **Type parameters:**
 
@@ -148,7 +148,7 @@ ___
 
 ▸ **extend**<**A**, **V**, **VS**>(`fn`: function): *[IModelType](imodeltype.md)‹PROPS, OTHERS & A & V & VS, CustomC, CustomS›*
 
-*Defined in [src/types/complex-types/model.ts:218](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/types/complex-types/model.ts#L218)*
+*Defined in [src/types/complex-types/model.ts:281](https://github.com/mobxjs/mobx-state-tree/blob/b74afdb1/src/types/complex-types/model.ts#L281)*
 
 **Type parameters:**
 
@@ -200,7 +200,7 @@ ___
 
 ▸ **named**(`newName`: string): *[IModelType](imodeltype.md)‹PROPS, OTHERS, CustomC, CustomS›*
 
-*Defined in [src/types/complex-types/model.ts:198](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/types/complex-types/model.ts#L198)*
+*Defined in [src/types/complex-types/model.ts:261](https://github.com/mobxjs/mobx-state-tree/blob/b74afdb1/src/types/complex-types/model.ts#L261)*
 
 **Parameters:**
 
@@ -216,7 +216,7 @@ ___
 
 ▸ **postProcessSnapshot**<**NewS**>(`fn`: function): *[IModelType](imodeltype.md)‹PROPS, OTHERS, CustomC, NewS›*
 
-*Defined in [src/types/complex-types/model.ts:226](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/types/complex-types/model.ts#L226)*
+*Defined in [src/types/complex-types/model.ts:289](https://github.com/mobxjs/mobx-state-tree/blob/b74afdb1/src/types/complex-types/model.ts#L289)*
 
 **Type parameters:**
 
@@ -242,7 +242,7 @@ ___
 
 ▸ **preProcessSnapshot**<**NewC**>(`fn`: function): *[IModelType](imodeltype.md)‹PROPS, OTHERS, NewC, CustomS›*
 
-*Defined in [src/types/complex-types/model.ts:222](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/types/complex-types/model.ts#L222)*
+*Defined in [src/types/complex-types/model.ts:285](https://github.com/mobxjs/mobx-state-tree/blob/b74afdb1/src/types/complex-types/model.ts#L285)*
 
 **Type parameters:**
 
@@ -268,7 +268,7 @@ ___
 
 ▸ **props**<**PROPS2**>(`props`: PROPS2): *[IModelType](imodeltype.md)‹PROPS & ModelPropertiesDeclarationToProperties‹PROPS2›, OTHERS, CustomC, CustomS›*
 
-*Defined in [src/types/complex-types/model.ts:202](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/types/complex-types/model.ts#L202)*
+*Defined in [src/types/complex-types/model.ts:265](https://github.com/mobxjs/mobx-state-tree/blob/b74afdb1/src/types/complex-types/model.ts#L265)*
 
 **Type parameters:**
 
@@ -311,7 +311,7 @@ ___
 
 ▸ **views**<**V**>(`fn`: function): *[IModelType](imodeltype.md)‹PROPS, OTHERS & V, CustomC, CustomS›*
 
-*Defined in [src/types/complex-types/model.ts:206](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/types/complex-types/model.ts#L206)*
+*Defined in [src/types/complex-types/model.ts:269](https://github.com/mobxjs/mobx-state-tree/blob/b74afdb1/src/types/complex-types/model.ts#L269)*
 
 **Type parameters:**
 
@@ -337,7 +337,7 @@ ___
 
 ▸ **volatile**<**TP**>(`fn`: function): *[IModelType](imodeltype.md)‹PROPS, OTHERS & TP, CustomC, CustomS›*
 
-*Defined in [src/types/complex-types/model.ts:214](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/types/complex-types/model.ts#L214)*
+*Defined in [src/types/complex-types/model.ts:277](https://github.com/mobxjs/mobx-state-tree/blob/b74afdb1/src/types/complex-types/model.ts#L277)*
 
 **Type parameters:**
 
