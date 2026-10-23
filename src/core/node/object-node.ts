@@ -1,6 +1,7 @@
 // noinspection ES6UnusedImports
 import {
     action,
+    compareShallow,
     computed,
     IComputedValue,
     reaction,
@@ -142,12 +143,17 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         const snapshotSource: { node?: ObjectNode<C, S, T>; snapshotUponDeath?: S } = { node: this }
         this._snapshotSource = snapshotSource
         this._snapshotComputed = computed<S>(
-            () =>
-                freeze(
-                    snapshotSource.node
-                        ? snapshotSource.node.getSnapshot()
-                        : snapshotSource.snapshotUponDeath!
-                ),
+            () => {
+                const node = snapshotSource.node
+                if (!node) return freeze(snapshotSource.snapshotUponDeath!)
+                const snapshot = freeze(node.getSnapshot())
+                // keep the snapshot object parents already embed if instantiation changed nothing
+                return node.state === NodeLifeCycle.INITIALIZING &&
+                    node._cachedInitialSnapshotCreated &&
+                    compareShallow(snapshot, node._cachedInitialSnapshot)
+                    ? node._cachedInitialSnapshot!
+                    : snapshot
+            },
             { keepAlive: true }
         )
 
