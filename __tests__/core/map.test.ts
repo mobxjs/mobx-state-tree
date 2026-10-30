@@ -27,6 +27,15 @@ const createTestFactories = () => {
     return { Factory, ItemFactory, PrimitiveMapFactory }
 }
 // === FACTORY TESTS ===
+test("maps do not expose obsolete MobX instance methods", () => {
+    const map = types.map(types.string).create()
+
+    // @ts-expect-error ObservableMap has no instance observe method.
+    expect(map.observe).toBeUndefined()
+    // @ts-expect-error ObservableMap has no instance intercept method.
+    expect(map.intercept).toBeUndefined()
+})
+
 test("it should create a factory", () => {
     const { Factory } = createTestFactories()
     const snapshot = getSnapshot(Factory.create())
