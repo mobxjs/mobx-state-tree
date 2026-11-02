@@ -1,10 +1,10 @@
 ---
 id: "index"
-title: "mobx-state-tree - v9.0.0"
+title: "mobx-state-tree - v9.0.1"
 sidebar_label: "Globals"
 ---
 
-[mobx-state-tree - v9.0.0](index.md)
+[mobx-state-tree - v9.0.1](index.md)
 
 ## Index
 
@@ -3296,7 +3296,7 @@ ___
 
 ▸ **isMapType**(`type`: unknown): *type is IMapType<IAnyType>*
 
-*Defined in [src/types/complex-types/map.ts:536](https://github.com/mobxjs/mobx-state-tree/blob/bb0a6be0/src/types/complex-types/map.ts#L536)*
+*Defined in [src/types/complex-types/map.ts:523](https://github.com/mobxjs/mobx-state-tree/blob/bf27a57a/src/types/complex-types/map.ts#L523)*
 
 Returns if a given value represents a map type.
 
@@ -3675,7 +3675,7 @@ ___
 
 ▸ **map**<**IT**>(`subtype`: IT): *IMapType‹IT›*
 
-*Defined in [src/types/complex-types/map.ts:526](https://github.com/mobxjs/mobx-state-tree/blob/bb0a6be0/src/types/complex-types/map.ts#L526)*
+*Defined in [src/types/complex-types/map.ts:513](https://github.com/mobxjs/mobx-state-tree/blob/bf27a57a/src/types/complex-types/map.ts#L513)*
 
 `types.map` - Creates a key based collection type who's children are all of a uniform declared type.
 If the type stored in a map has an identifier, it is mandatory to store the child under that identifier in the map.

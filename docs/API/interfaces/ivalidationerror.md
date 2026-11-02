@@ -4,7 +4,7 @@ title: "IValidationError"
 sidebar_label: "IValidationError"
 ---
 
-[mobx-state-tree - v9.0.0](../index.md) › [IValidationError](ivalidationerror.md)
+[mobx-state-tree - v9.0.1](../index.md) › [IValidationError](ivalidationerror.md)
 
 Type validation error
 

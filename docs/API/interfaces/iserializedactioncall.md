@@ -4,7 +4,7 @@ title: "ISerializedActionCall"
 sidebar_label: "ISerializedActionCall"
 ---
 
-[mobx-state-tree - v9.0.0](../index.md) › [ISerializedActionCall](iserializedactioncall.md)
+[mobx-state-tree - v9.0.1](../index.md) › [ISerializedActionCall](iserializedactioncall.md)
 
 ## Hierarchy
 
