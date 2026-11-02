@@ -1,12 +1,10 @@
 import {
     _interceptReads,
     action,
-    IInterceptor,
     IKeyValueMap,
     IMapDidChange,
     IMapWillChange,
     intercept,
-    Lambda,
     ObservableMap,
     observe,
     values,
@@ -101,17 +99,6 @@ export interface IMSTMap<IT extends IAnyType> {
 
     toString(): string
     [Symbol.toStringTag]: "Map"
-
-    /**
-     * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
-     * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
-     * for callback details
-     */
-    observe(
-        listener: (changes: IMapDidChange<string, IT["Type"]>) => void,
-        fireImmediately?: boolean
-    ): Lambda
-    intercept(handler: IInterceptor<IMapWillChange<string, IT["Type"]>>): Lambda
 }
 
 const needsIdentifierError = `Map.put can only be used to store complex values that have an identifier type attribute`
