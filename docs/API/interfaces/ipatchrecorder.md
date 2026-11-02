@@ -4,7 +4,7 @@ title: "IPatchRecorder"
 sidebar_label: "IPatchRecorder"
 ---
 
-[mobx-state-tree - v9.0.0](../index.md) › [IPatchRecorder](ipatchrecorder.md)
+[mobx-state-tree - v9.0.1](../index.md) › [IPatchRecorder](ipatchrecorder.md)
 
 ## Hierarchy
 

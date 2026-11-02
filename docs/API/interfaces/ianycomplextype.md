@@ -4,7 +4,7 @@ title: "IAnyComplexType"
 sidebar_label: "IAnyComplexType"
 ---
 
-[mobx-state-tree - v9.0.0](../index.md) › [IAnyComplexType](ianycomplextype.md)
+[mobx-state-tree - v9.0.1](../index.md) › [IAnyComplexType](ianycomplextype.md)
 
 Any kind of complex type.
 
