@@ -525,3 +525,57 @@ test("it should emit one patch for array replace", () => {
         ]
     )
 })
+
+test("it should emit a separator for an empty map key", () => {
+    const Store = types.model("Store", {
+        f: types.map(types.frozen())
+    })
+    testPatches(
+        Store,
+        { f: {} },
+        (s: Instance<typeof Store>) => {
+            s.f.set("", {})
+        },
+        [
+            {
+                op: "add",
+                path: "/f/",
+                value: {}
+            }
+        ]
+    )
+})
+
+test("it should emit a root separator for an empty key on a root map", () => {
+    testPatches(
+        types.map(types.number),
+        { a: 1 },
+        (m: IMSTMap<IType<number, number, number>>) => {
+            m.set("", 2)
+        },
+        [
+            {
+                op: "add",
+                path: "/",
+                value: 2
+            }
+        ]
+    )
+})
+
+test("it should emit an empty path when replacing a root array", () => {
+    testPatches(
+        types.array(types.number),
+        [1, 2],
+        (a: number[]) => {
+            a.splice(0, 2, 3, 4)
+        },
+        [
+            {
+                op: "replace",
+                path: "",
+                value: [3, 4]
+            }
+        ]
+    )
+})

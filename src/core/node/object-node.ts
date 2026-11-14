@@ -651,11 +651,15 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
         return this.parent ? this.parent.hasPatchSubscribers() : false
     }
 
-    emitPatch(basePatch: IReversibleJsonPatch, source: AnyNode): void {
+    emitPatch(
+        basePatch: Omit<IReversibleJsonPatch, "path"> & { readonly path?: string },
+        source: AnyNode
+    ): void {
         if (this._internalEventsHasSubscribers(InternalEvents.Patch)) {
             // calculate the relative path of the patch
             const path =
-                source.path.substr(this.path.length) + (basePatch.path ? "/" + basePatch.path : "")
+                source.path.substr(this.path.length) +
+                (basePatch.path !== undefined ? "/" + basePatch.path : "")
             const localizedPatch: IReversibleJsonPatch = extend({}, basePatch, { path })
             const [patch, reversePatch] = splitPatch(localizedPatch)
             this._internalEventsEmit(InternalEvents.Patch, patch, reversePatch)
