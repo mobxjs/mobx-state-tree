@@ -546,6 +546,45 @@ test("it should emit a separator for an empty map key", () => {
     )
 })
 
+test("it should emit a separator when replacing an empty map key", () => {
+    const Store = types.model("Store", {
+        f: types.map(types.frozen())
+    })
+    testPatches(
+        Store,
+        { f: { "": 1 } },
+        (s: Instance<typeof Store>) => {
+            s.f.set("", 2)
+        },
+        [
+            {
+                op: "replace",
+                path: "/f/",
+                value: 2
+            }
+        ]
+    )
+})
+
+test("it should emit a separator when removing an empty map key", () => {
+    const Store = types.model("Store", {
+        f: types.map(types.frozen())
+    })
+    testPatches(
+        Store,
+        { f: { "": 1 } },
+        (s: Instance<typeof Store>) => {
+            s.f.delete("")
+        },
+        [
+            {
+                op: "remove",
+                path: "/f/"
+            }
+        ]
+    )
+})
+
 test("it should emit a root separator for an empty key on a root map", () => {
     testPatches(
         types.map(types.number),
