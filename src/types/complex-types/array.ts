@@ -244,7 +244,6 @@ export class ArrayType<IT extends IAnyType> extends ComplexType<
                     return void node.emitPatch(
                         {
                             op: "replace",
-                            path: "",
                             value: node.snapshot,
                             oldValue: change.removed.map(node => node.snapshot)
                         },
