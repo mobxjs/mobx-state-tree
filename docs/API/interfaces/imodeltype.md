@@ -4,7 +4,7 @@ title: "IModelType"
 sidebar_label: "IModelType"
 ---
 
-[mobx-state-tree - v9.0.1](../index.md) › [IModelType](imodeltype.md)
+[mobx-state-tree - v9.0.2](../index.md) › [IModelType](imodeltype.md)
 
 ## Type parameters
 

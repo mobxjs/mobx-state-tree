@@ -1,10 +1,10 @@
 ---
 id: "index"
-title: "mobx-state-tree - v9.0.1"
+title: "mobx-state-tree - v9.0.2"
 sidebar_label: "Globals"
 ---
 
-[mobx-state-tree - v9.0.1](index.md)
+[mobx-state-tree - v9.0.2](index.md)
 
 ## Index
 
@@ -833,7 +833,7 @@ ___
 
 ▸ **array**<**IT**>(`subtype`: IT): *IArrayType‹IT›*
 
-*Defined in [src/types/complex-types/array.ts:403](https://github.com/mobxjs/mobx-state-tree/blob/a45a58a9/src/types/complex-types/array.ts#L403)*
+*Defined in [src/types/complex-types/array.ts:402](https://github.com/mobxjs/mobx-state-tree/blob/bb8b4af3/src/types/complex-types/array.ts#L402)*
 
 `types.array` - Creates an index based collection type who's children are all of a uniform declared type.
 
@@ -3204,7 +3204,7 @@ ___
 
 ▸ **isArrayType**(`type`: unknown): *type is IArrayType<IAnyType>*
 
-*Defined in [src/types/complex-types/array.ts:648](https://github.com/mobxjs/mobx-state-tree/blob/a45a58a9/src/types/complex-types/array.ts#L648)*
+*Defined in [src/types/complex-types/array.ts:647](https://github.com/mobxjs/mobx-state-tree/blob/bb8b4af3/src/types/complex-types/array.ts#L647)*
 
 Returns if a given value represents an array type.
 
