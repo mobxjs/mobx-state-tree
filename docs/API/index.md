@@ -311,7 +311,7 @@ ___
 
 Ƭ **Instance**: *T extends object ? T["Type"] : T*
 
-*Defined in [src/core/type/type.ts:234](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/core/type/type.ts#L234)*
+*Defined in [src/core/type/type.ts:238](https://github.com/mobxjs/mobx-state-tree/blob/c6fea910/src/core/type/type.ts#L238)*
 
 The instance representation of a given type.
 
@@ -380,7 +380,7 @@ ___
 
 Ƭ **SnapshotIn**: *T extends object ? T["CreationType"] : T extends IStateTreeNode<infer IT> ? IT["CreationType"] : T*
 
-*Defined in [src/core/type/type.ts:239](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/core/type/type.ts#L239)*
+*Defined in [src/core/type/type.ts:243](https://github.com/mobxjs/mobx-state-tree/blob/c6fea910/src/core/type/type.ts#L243)*
 
 The input (creation) snapshot representation of a given type.
 
@@ -390,7 +390,7 @@ ___
 
 Ƭ **SnapshotOrInstance**: *[SnapshotIn](index.md#snapshotin)‹T› | [Instance](index.md#instance)‹T›*
 
-*Defined in [src/core/type/type.ts:280](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/core/type/type.ts#L280)*
+*Defined in [src/core/type/type.ts:284](https://github.com/mobxjs/mobx-state-tree/blob/c6fea910/src/core/type/type.ts#L284)*
 
 A type which is equivalent to the union of SnapshotIn and Instance types of a given typeof TYPE or typeof VARIABLE.
 For primitives it defaults to the primitive itself.
@@ -423,7 +423,7 @@ ___
 
 Ƭ **SnapshotOut**: *T extends object ? T["SnapshotType"] : T extends IStateTreeNode<infer IT> ? IT["SnapshotType"] : T*
 
-*Defined in [src/core/type/type.ts:248](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/core/type/type.ts#L248)*
+*Defined in [src/core/type/type.ts:252](https://github.com/mobxjs/mobx-state-tree/blob/c6fea910/src/core/type/type.ts#L252)*
 
 The output snapshot representation of a given type.
 
@@ -873,7 +873,7 @@ ___
 
 ▸ **canApplyDirectSnapshot**(`childType`: [IAnyType](interfaces/ianytype.md), `childNode`: AnyNode, `newValue`: any): *childNode is ObjectNode<any, any, any>*
 
-*Defined in [src/core/type/type.ts:536](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/core/type/type.ts#L536)*
+*Defined in [src/core/type/type.ts:540](https://github.com/mobxjs/mobx-state-tree/blob/c6fea910/src/core/type/type.ts#L540)*
 
 **Parameters:**
 
@@ -3470,7 +3470,7 @@ ___
 
 ▸ **isType**(`value`: any): *value is IAnyType*
 
-*Defined in [src/core/type/type.ts:592](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/core/type/type.ts#L592)*
+*Defined in [src/core/type/type.ts:596](https://github.com/mobxjs/mobx-state-tree/blob/c6fea910/src/core/type/type.ts#L596)*
 
 Returns if a given value represents a type.
 
@@ -4232,7 +4232,7 @@ ___
 
 ▸ **resolveDirectApplyType**(`type`: [IAnyType](interfaces/ianytype.md)): *[IAnyType](interfaces/ianytype.md)*
 
-*Defined in [src/core/type/type.ts:558](https://github.com/mobxjs/mobx-state-tree/blob/b5b44ed6/src/core/type/type.ts#L558)*
+*Defined in [src/core/type/type.ts:562](https://github.com/mobxjs/mobx-state-tree/blob/c6fea910/src/core/type/type.ts#L562)*
 
 **Parameters:**
 
