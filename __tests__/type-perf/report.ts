@@ -7,7 +7,7 @@ const scenarios = [
     { name: "#2230 deep inference", ...deepInference },
     { name: "5 layered models", ...layeredModels(5) },
     { name: "20 layered models", ...layeredModels(20) },
-    { name: "circular service/form", entryPoints: [resolve(fixtureDirectory, "usage.ts")] }
+    { name: "circular parent and child", entryPoints: [resolve(fixtureDirectory, "usage.ts")] }
 ]
 
 console.log(`TypeScript ${version}; median of 3 fresh programs per declaration`)
@@ -38,7 +38,7 @@ for (const scenario of scenarios) {
         const runs = results[declaration]
         if (
             runs.some(run => run.diagnostics.length) &&
-            !(declaration === "legacy" && scenario.name === "circular service/form")
+            !(declaration === "legacy" && scenario.name === "circular parent and child")
         ) {
             throw new Error(JSON.stringify(runs[0].diagnostics, null, 2))
         }

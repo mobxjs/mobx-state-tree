@@ -1,0 +1,10 @@
+import { types, type Instance } from "../../../../src"
+import { Child } from "./child"
+
+export const Parent = types.model({ count: 0, child: Child }).actions(self => ({
+    setCount(count: number) {
+        self.count = count
+    }
+}))
+
+export interface ParentInstance extends Instance<typeof Parent> {}

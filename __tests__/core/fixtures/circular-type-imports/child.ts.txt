@@ -1,0 +1,22 @@
+import { getParentOfType, types, type IAnyType } from "../../../../src"
+import { Parent, type ParentInstance } from "./parent"
+
+// The constraint checks the model against IAnyType while Parent is still being inferred.
+function asModel<T extends IAnyType>(model: T): T {
+    return model
+}
+
+export const Child = asModel(
+    types
+        .model({ name: "" })
+        .views(self => ({
+            get parent(): ParentInstance {
+                return getParentOfType(self, Parent)
+            }
+        }))
+        .views(self => ({
+            get parentCount(): number {
+                return self.parent.count
+            }
+        }))
+)

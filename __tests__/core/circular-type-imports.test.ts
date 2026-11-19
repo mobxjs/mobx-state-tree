@@ -2,7 +2,7 @@ import { expect, test } from "bun:test"
 import { resolve } from "path"
 import { compileTypes, fixtureDirectory } from "../type-perf/compiler"
 
-test("circular service/form imports preserve nested types and reject invalid access", () => {
+test("circular model imports preserve nested types and reject invalid access", () => {
     expect(compileTypes([resolve(fixtureDirectory, "usage.ts")]).diagnostics).toEqual([])
 })
 
