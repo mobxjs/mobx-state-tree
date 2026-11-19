@@ -1,0 +1,9 @@
+import { types } from "../../../../src"
+
+const Model = types.model({ name: types.string })
+type CreateInput = Parameters<typeof Model.create>[0]
+
+const snapshot: CreateInput = { name: "Ada" }
+const omitted: CreateInput = undefined
+// @ts-expect-error -- a snapshot must supply a string name
+const invalid: CreateInput = { name: 42 }
