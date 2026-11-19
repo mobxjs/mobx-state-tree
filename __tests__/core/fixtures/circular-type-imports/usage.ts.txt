@@ -1,0 +1,28 @@
+import { SearchForm } from "./form"
+import { SearchService, type SearchServiceType } from "./service"
+
+const service = SearchService.create({})
+SearchService.create(service)
+const form = service.forms.search.data
+const parent: SearchServiceType = form.searchService
+const nested = parent.forms.search.data.searchService.forms.search.data
+SearchForm.create(service.forms.search)
+
+// Assignments alone would accept any; these also check for any explicitly.
+type IsAny<T> = 0 extends 1 & T ? true : false
+const serviceIsAny: IsAny<typeof parent> = false
+const nestedIsAny: IsAny<typeof nested> = false
+const queryIsAny: IsAny<typeof nested.query> = false
+const actionIsAny: IsAny<typeof nested.submit> = false
+const query: string = nested.query
+const submit: () => void = nested.submit
+const search: (query: string) => void = nested.searchService.search
+
+// @ts-expect-error -- deeply nested properties retain their types
+const invalidQuery: number = nested.query
+// @ts-expect-error -- nonexistent members must not silently become any
+nested.searchService.missingMember
+// @ts-expect-error -- action arguments retain their types through the cycle
+nested.searchService.search(123)
+// @ts-expect-error -- invalid snapshots are still rejected
+SearchForm.create({ data: { query: 123 } })

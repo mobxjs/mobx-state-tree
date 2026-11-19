@@ -1,0 +1,23 @@
+import { getParentOfType, types, type IAnyComplexType, type IAnyType } from "../../../../src"
+import { SearchService, type SearchServiceType } from "./service"
+
+// The generic wrapper forces checking the data model against IAnyType while the
+// service's type is still being inferred. No UI, queries or external packages needed.
+function createForm<T extends IAnyType>(data: T) {
+    return types.model({ data: types.optional(data, {}) })
+}
+
+export const SearchForm = createForm(
+    types
+        .model("SearchFormData", { query: "" })
+        .views(self => ({
+            get searchService(): SearchServiceType {
+                return getParentOfType(self, SearchService)
+            }
+        }))
+        .actions(self => ({
+            submit() {
+                self.searchService.search(self.query)
+            }
+        }))
+)
