@@ -96,12 +96,10 @@ export interface IType<C, S, T> {
      */
     // Infer the instance argument before checking its node type. Inspecting T's
     // writable properties here eagerly expands circular model/view types.
-    create<TInstance extends T>(
-        snapshot: TInstance extends IStateTreeNode ? TInstance : never,
+    create<TInstance extends T = never>(
+        snapshot?: C | (TInstance extends IStateTreeNode ? TInstance : never),
         env?: any
     ): this["Type"]
-    // Parameters<typeof Model.create> uses the last overload.
-    create(snapshot?: C, env?: any): this["Type"]
 
     /**
      * Checks if a given snapshot / instance is of the given type.

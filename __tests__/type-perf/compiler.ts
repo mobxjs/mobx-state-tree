@@ -68,6 +68,13 @@ export function compileTypes(
                 diagnostic.file && diagnostic.start !== undefined
                     ? diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start).line + 1
                     : undefined,
+            text:
+                diagnostic.start !== undefined && diagnostic.length !== undefined
+                    ? diagnostic.file?.text.slice(
+                          diagnostic.start,
+                          diagnostic.start + diagnostic.length
+                      )
+                    : undefined,
             message: ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n")
         })),
         types: program.getTypeCount(),

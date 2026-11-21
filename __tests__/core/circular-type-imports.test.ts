@@ -21,3 +21,14 @@ test("Parameters of create retains the snapshot input type", () => {
         []
     )
 })
+
+test("create reports a snapshot type error on the invalid property", () => {
+    const { diagnostics } = compileTypes([resolve(fixtureDirectory, "invalid-snapshot.ts")])
+    expect(diagnostics).toEqual([
+        expect.objectContaining({
+            code: 2322,
+            text: "name",
+            message: "Type 'number' is not assignable to type 'string'."
+        })
+    ])
+})
