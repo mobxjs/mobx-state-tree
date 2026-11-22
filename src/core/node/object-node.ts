@@ -28,6 +28,7 @@ import {
     resolveNodeByPathParts,
     splitJsonPath,
     splitPatch,
+    stringStartsWith,
     toJSON,
     EventHandlers,
     Hook,
@@ -567,7 +568,12 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
                         return
                     }
                     const parts = splitJsonPath(patch.path)
-                    const node = resolveNodeByPathParts(self, parts.slice(0, -1)) as AnyObjectNode
+                    const node = resolveNodeByPathParts(
+                        self,
+                        parts.slice(0, -1),
+                        true,
+                        !stringStartsWith(patch.path, "/")
+                    ) as AnyObjectNode
                     node.applyPatchLocally(parts[parts.length - 1], patch)
                 })
             }

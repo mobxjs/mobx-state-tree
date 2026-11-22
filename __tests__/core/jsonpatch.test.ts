@@ -13,7 +13,8 @@ import {
     getPath,
     resolvePath,
     splitJsonPath,
-    joinJsonPath
+    joinJsonPath,
+    applyPatch
 } from "../../src"
 import { expect, test } from "bun:test"
 
@@ -617,4 +618,49 @@ test("it should emit an empty path when replacing a root array", () => {
             }
         ]
     )
+})
+
+test("it should replay patches for a map key of two dots", () => {
+    const Item = types.model("Item", { v: types.number })
+    const Store = types.model("Store", { m: types.map(Item) })
+    testPatches(
+        Store,
+        { m: { "..": { v: 1 } } },
+        (s: Instance<typeof Store>) => {
+            s.m.get("..")!.v = 2
+        },
+        [
+            {
+                op: "replace",
+                path: "/m/../v",
+                value: 2
+            }
+        ]
+    )
+})
+
+test("it should replay patches for a map key of one dot", () => {
+    const Item = types.model("Item", { v: types.number })
+    const Store = types.model("Store", { m: types.map(Item) })
+    testPatches(
+        Store,
+        { m: { ".": { v: 1 } } },
+        (s: Instance<typeof Store>) => {
+            s.m.get(".")!.v = 2
+        },
+        [
+            {
+                op: "replace",
+                path: "/m/./v",
+                value: 2
+            }
+        ]
+    )
+})
+
+test("it should still resolve relative patch paths", () => {
+    const Store = types.model("Store", { a: types.number })
+    const store = Store.create({ a: 1 })
+    applyPatch(store, { op: "replace", path: "./a", value: 2 })
+    expect(store.a).toBe(2)
 })
