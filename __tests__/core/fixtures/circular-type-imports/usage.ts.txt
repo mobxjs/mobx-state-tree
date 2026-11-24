@@ -1,0 +1,27 @@
+import { Child } from "./child"
+import { Parent, type ParentInstance } from "./parent"
+
+const root = Parent.create({ child: {} })
+Parent.create(root)
+const parent: ParentInstance = root.child.parent
+const nested = parent.child.parent.child
+Child.create(Child.create())
+
+// Assignments alone would accept any; these also check for any explicitly.
+type IsAny<T> = 0 extends 1 & T ? true : false
+const parentIsAny: IsAny<typeof parent> = false
+const nestedIsAny: IsAny<typeof nested> = false
+const nameIsAny: IsAny<typeof nested.name> = false
+const actionIsAny: IsAny<typeof nested.parent.setCount> = false
+const name: string = nested.name
+const count: number = nested.parentCount
+const setCount: (count: number) => void = nested.parent.setCount
+
+// @ts-expect-error -- deeply nested properties retain their types
+const invalidName: number = nested.name
+// @ts-expect-error -- nonexistent members must not silently become any
+nested.parent.missingMember
+// @ts-expect-error -- action arguments retain their types through the cycle
+nested.parent.setCount("123")
+// @ts-expect-error -- invalid snapshots are still rejected
+Child.create({ name: 123 })

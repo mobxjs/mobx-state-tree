@@ -21,6 +21,7 @@
         "test:prod": "MST_TESTING=1 NODE_ENV=production bun test",
         "test:all": "bun run test:dev && bun run test:prod && bun run size",
         "test:perf": "bun test ./__tests__/perf/",
+        "test:types:perf": "bun run ./__tests__/type-perf/report.ts",
         "test:perf:compiled": "bun run build && bun run jest:perf && TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' /usr/bin/time node --expose-gc --require ts-node/register __tests__/perf/report.ts",
         "typecheck": "tsc --noEmit",
         "size": "size-limit",

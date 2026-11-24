@@ -1,0 +1,5 @@
+import { types } from "../../../../src"
+
+const Inner = types.model({})
+const Model = types.model({ name: types.string, flag: types.boolean, inner: Inner })
+Model.create({ name: 42, flag: true, inner: {} })

@@ -24,7 +24,6 @@ import {
     getStateTreeNodeSafe,
     assertArg
 } from "../../internal"
-import type { Writable, WritableKeys } from "ts-essentials"
 
 /**
  * @internal
@@ -72,8 +71,6 @@ export type STNValue<T, IT extends IAnyType> = T extends object ? T & IStateTree
 /** @hidden */
 const $type: unique symbol = Symbol("$type")
 
-type ExcludeReadonly<T> = T extends {} ? T[WritableKeys<T>] : T
-
 /**
  * A type, either complex or simple.
  */
@@ -93,11 +90,16 @@ export interface IType<C, S, T> {
     readonly identifierAttribute?: string
 
     /**
-     * Creates an instance for the type given an snapshot input.
+     * Creates an instance for the type given a snapshot or an existing instance.
      *
      * @returns An instance of that type.
      */
-    create(snapshot?: C | ExcludeReadonly<T>, env?: any): this["Type"]
+    // Infer the instance argument before checking its node type. Inspecting T's
+    // writable properties here eagerly expands circular model/view types.
+    create<TInstance extends T = never>(
+        snapshot?: C | (TInstance extends IStateTreeNode ? TInstance : never),
+        env?: any
+    ): this["Type"]
 
     /**
      * Checks if a given snapshot / instance is of the given type.

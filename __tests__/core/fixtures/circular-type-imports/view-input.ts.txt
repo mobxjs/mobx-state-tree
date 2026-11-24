@@ -1,0 +1,50 @@
+import { types, type IType, type Instance, type SnapshotOrInstance } from "../../../../src"
+
+const ViewsOnly = types.model().views(() => ({
+    get test() {
+        return 5
+    }
+}))
+
+ViewsOnly.create()
+ViewsOnly.create({})
+ViewsOnly.create(ViewsOnly.create())
+// @ts-expect-error -- test is a view, not a prop
+ViewsOnly.create({ test: 5 })
+
+const WithProps = types.compose(ViewsOnly, types.model({ enabled: types.boolean }))
+const instance = WithProps.create({ enabled: true })
+WithProps.create(instance)
+// @ts-expect-error -- views do not count as snapshots when composed with props
+WithProps.create({ test: 5 })
+// @ts-expect-error -- even with all props present, a view is not a snapshot field
+WithProps.create({ enabled: true, test: 5 })
+// @ts-expect-error -- a writable prop's value is not an instance of the model
+WithProps.create(true)
+
+// Callers using unions or generic snapshots must still be accepted.
+function fromUnion(input: SnapshotOrInstance<typeof WithProps>): Instance<typeof WithProps> {
+    return WithProps.create(input)
+}
+function fromSnapshot<C, S, T>(type: IType<C, S, T>, snapshot: C) {
+    return type.create(snapshot)
+}
+
+const ArrayType = types.array(types.number)
+ArrayType.create(ArrayType.create([1, 2]))
+const MapType = types.map(types.number)
+MapType.create(MapType.create({ count: 1 }))
+types.string.create("hello")
+types.number.create(1)
+types.Date.create(new Date())
+
+// Custom instance values are included in their type's creation representation.
+const Custom = types.custom<string, { value: number }>({
+    name: "Custom",
+    fromSnapshot: value => ({ value: Number(value) }),
+    toSnapshot: value => String(value.value),
+    isTargetType: value => typeof value === "object",
+    getValidationMessage: () => ""
+})
+Custom.create({ value: 1 })
+Custom.create(Custom.create("1"))
