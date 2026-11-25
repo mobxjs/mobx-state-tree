@@ -4,7 +4,7 @@ title: "IHooks"
 sidebar_label: "IHooks"
 ---
 
-[mobx-state-tree - v9.0.2](../index.md) › [IHooks](ihooks.md)
+[mobx-state-tree - v9.0.3](../index.md) › [IHooks](ihooks.md)
 
 ## Hierarchy
 

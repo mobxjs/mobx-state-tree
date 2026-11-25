@@ -4,7 +4,7 @@ title: "ReferenceOptionsOnInvalidated"
 sidebar_label: "ReferenceOptionsOnInvalidated"
 ---
 
-[mobx-state-tree - v9.0.2](../index.md) › [ReferenceOptionsOnInvalidated](referenceoptionsoninvalidated.md)
+[mobx-state-tree - v9.0.3](../index.md) › [ReferenceOptionsOnInvalidated](referenceoptionsoninvalidated.md)
 
 ## Type parameters
 
