@@ -4,7 +4,7 @@ title: "IMiddlewareEvent"
 sidebar_label: "IMiddlewareEvent"
 ---
 
-[mobx-state-tree - v9.0.2](../index.md) › [IMiddlewareEvent](imiddlewareevent.md)
+[mobx-state-tree - v9.0.3](../index.md) › [IMiddlewareEvent](imiddlewareevent.md)
 
 ## Hierarchy
 

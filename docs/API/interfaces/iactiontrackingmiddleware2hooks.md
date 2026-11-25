@@ -4,7 +4,7 @@ title: "IActionTrackingMiddleware2Hooks"
 sidebar_label: "IActionTrackingMiddleware2Hooks"
 ---
 
-[mobx-state-tree - v9.0.2](../index.md) › [IActionTrackingMiddleware2Hooks](iactiontrackingmiddleware2hooks.md)
+[mobx-state-tree - v9.0.3](../index.md) › [IActionTrackingMiddleware2Hooks](iactiontrackingmiddleware2hooks.md)
 
 ## Type parameters
 

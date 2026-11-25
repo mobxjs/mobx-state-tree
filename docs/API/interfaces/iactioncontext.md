@@ -4,7 +4,7 @@ title: "IActionContext"
 sidebar_label: "IActionContext"
 ---
 
-[mobx-state-tree - v9.0.2](../index.md) › [IActionContext](iactioncontext.md)
+[mobx-state-tree - v9.0.3](../index.md) › [IActionContext](iactioncontext.md)
 
 ## Hierarchy
 
