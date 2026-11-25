@@ -664,3 +664,14 @@ test("it should still resolve relative patch paths", () => {
     applyPatch(store, { op: "replace", path: "./a", value: 2 })
     expect(store.a).toBe(2)
 })
+
+test("it should treat . and .. in absolute patch paths as literal keys", () => {
+    const Store = types.model("Store", { a: 0, child: types.optional(types.model({ x: 0 }), {}) })
+    const store = Store.create({})
+    expect(() => applyPatch(store, { op: "replace", path: "/./a", value: 3 })).toThrow(
+        "Could not resolve '.'"
+    )
+    expect(() => applyPatch(store.child, { op: "replace", path: "/../a", value: 7 })).toThrow(
+        "Could not resolve '..'"
+    )
+})
