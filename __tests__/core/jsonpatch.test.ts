@@ -13,7 +13,8 @@ import {
     getPath,
     resolvePath,
     splitJsonPath,
-    joinJsonPath
+    joinJsonPath,
+    applyPatch
 } from "../../src"
 import { expect, test } from "bun:test"
 
@@ -616,5 +617,61 @@ test("it should emit an empty path when replacing a root array", () => {
                 value: [3, 4]
             }
         ]
+    )
+})
+
+test("it should replay patches for a map key of two dots", () => {
+    const Item = types.model("Item", { v: types.number })
+    const Store = types.model("Store", { m: types.map(Item) })
+    testPatches(
+        Store,
+        { m: { "..": { v: 1 } } },
+        (s: Instance<typeof Store>) => {
+            s.m.get("..")!.v = 2
+        },
+        [
+            {
+                op: "replace",
+                path: "/m/../v",
+                value: 2
+            }
+        ]
+    )
+})
+
+test("it should replay patches for a map key of one dot", () => {
+    const Item = types.model("Item", { v: types.number })
+    const Store = types.model("Store", { m: types.map(Item) })
+    testPatches(
+        Store,
+        { m: { ".": { v: 1 } } },
+        (s: Instance<typeof Store>) => {
+            s.m.get(".")!.v = 2
+        },
+        [
+            {
+                op: "replace",
+                path: "/m/./v",
+                value: 2
+            }
+        ]
+    )
+})
+
+test("it should still resolve relative patch paths", () => {
+    const Store = types.model("Store", { a: types.number })
+    const store = Store.create({ a: 1 })
+    applyPatch(store, { op: "replace", path: "./a", value: 2 })
+    expect(store.a).toBe(2)
+})
+
+test("it should treat . and .. in absolute patch paths as literal keys", () => {
+    const Store = types.model("Store", { a: 0, child: types.optional(types.model({ x: 0 }), {}) })
+    const store = Store.create({})
+    expect(() => applyPatch(store, { op: "replace", path: "/./a", value: 3 })).toThrow(
+        "Could not resolve '.'"
+    )
+    expect(() => applyPatch(store.child, { op: "replace", path: "/../a", value: 7 })).toThrow(
+        "Could not resolve '..'"
     )
 })

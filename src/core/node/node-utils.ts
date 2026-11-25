@@ -154,16 +154,17 @@ export function resolveNodeByPath(
 export function resolveNodeByPathParts(
     base: AnyObjectNode,
     pathParts: string[],
-    failIfResolveFails: boolean = true
+    failIfResolveFails: boolean = true,
+    resolveRelativeParts: boolean = true
 ): AnyNode | undefined {
     let current: AnyNode | null = base
     try {
         for (let i = 0; i < pathParts.length; i++) {
             const part = pathParts[i]
-            if (part === "..") {
+            if (resolveRelativeParts && part === "..") {
                 current = current!.parent
                 if (current) continue // not everything has a parent
-            } else if (part === ".") {
+            } else if (resolveRelativeParts && part === ".") {
                 continue
             } else if (current) {
                 if (current instanceof ScalarNode) {
