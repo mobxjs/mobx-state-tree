@@ -104,6 +104,8 @@ const snapshot = getSnapshot(todo);
 
 Typically, it should be the case that `postProcessor(preProcessor(snapshot)) === snapshot`. If your snapshot processor hooks are non-deterministic, or rely on state beyond just the base snapshot, it's easy to introduce subtle bugs and is best avoided.
 
+Post-processing applies to the snapshots a node generates, including a node value carried inside a patch, but not to patch paths or primitive values. A processor maps whole snapshots and cannot rename a path, so patches recorded in a tree with post-processing are meant for `applyPatch` on an instance, not for replay on a serialized snapshot. See [Patches](/concepts/patches) for the details.
+
 If you are considering adding a snapshot processor that is non-deterministic or relies on other state, consider using a dedicated property or view that produces the same information. Like snapshots, properties and views are observable and memoized, but they don't need to have an inverse for serializing back to a snapshot.
 
 For example, if you want to capture the current time a snapshot was generated, you may be tempted to use a snapshot processor:

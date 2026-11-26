@@ -34,3 +34,13 @@ Useful methods:
 
 - `onPatch(model, listener)` attaches a patch listener to the provided model, which will be invoked whenever the model or any of its descendants is mutated
 - `applyPatch(model, patch)` applies a patch (or array of patches) to the provided model
+
+### Patches describe a model instance, not a snapshot
+
+Patches are meant to be applied to a model instance of the same type, with `applyPatch`. They are not a diff between two JSON snapshots, so there are two cases where a recorded patch stream does not apply cleanly to serialized JSON.
+
+**`types.maybe` properties.** `getSnapshot` includes a `types.maybe` property whose value is `undefined` as a key with the value `undefined`, and `JSON.stringify` drops that key. Patches follow the snapshot and use `add` when the property goes from `undefined` to a value, and `remove` when it goes back to `undefined`. A `replace` would name a member that does not exist in the JSON, which RFC 6902 rejects.
+
+**Snapshot processors.** A snapshot processor maps whole snapshots, so it cannot translate a patch path. Patch paths and primitive values describe the instance before post-processing, while a node value inside a patch carries that node's post-processed snapshot. In a tree with post-processing, patch paths can therefore point at members that the post-processed snapshot names differently.
+
+With no snapshot processor in the tree, and patches recorded after this release, the recorded patches apply to a JSON snapshot and reproduce the later JSON snapshot. When you do need to move state between snapshots, `applySnapshot` and `getSnapshot` remain the safe pair.
