@@ -454,7 +454,7 @@ export abstract class ComplexType<C, S, T> extends BaseType<C, S, T, ObjectNode<
         ) {
             // the newValue has no node, so can be treated like a snapshot
             // we can reconcile
-            current.applySnapshot(newValue as C)
+            current._applyPreprocessedSnapshot(newValue as C)
             return true
         }
         return false
