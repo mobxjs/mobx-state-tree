@@ -727,10 +727,25 @@ export class ModelType<
             return
         }
         const oldChildValue = change.oldValue ? change.oldValue.snapshot : undefined
+        const path = escapeJsonPath(change.name as string)
+        // A replaced property whose value is `undefined` is dropped from the JSON snapshot, so a
+        // `replace` would target a member that only exists in the instance. Use `add` and `remove`
+        // instead, so the patches stay valid when applied to a serialized snapshot.
+        if (change.newValue.snapshot === undefined) {
+            childNode.emitPatch({ op: "remove", path, oldValue: oldChildValue }, childNode)
+            return
+        }
+        if (change.oldValue && change.oldValue.snapshot === undefined) {
+            childNode.emitPatch(
+                { op: "add", path, value: change.newValue.snapshot, oldValue: undefined },
+                childNode
+            )
+            return
+        }
         childNode.emitPatch(
             {
                 op: "replace",
-                path: escapeJsonPath(change.name as string),
+                path,
                 value: change.newValue.snapshot,
                 oldValue: oldChildValue
             },
@@ -780,6 +795,20 @@ export class ModelType<
     }
 
     applyPatchLocally(node: this["N"], subpath: string, patch: IJsonPatch): void {
+        if (patch.op === "remove" && subpath) {
+            // `remove` only appears for properties that were `undefined`, which are absent from the
+            // JSON snapshot. Assigning `undefined` restores that state. Properties that cannot be
+            // `undefined` keep rejecting it, so the check does not depend on dev-mode type checking.
+            const childType = this.properties[subpath]
+            if (childType && !childType.is(undefined)) {
+                throw new MstError(
+                    `Error while converting \`undefined\` to \`${childType.name}\`: ` +
+                        `value \`undefined\` is not assignable to type: \`${childType.name}\``
+                )
+            }
+            ;(node.storedValue as any)[subpath] = undefined
+            return
+        }
         if (!(patch.op === "replace" || patch.op === "add")) {
             throw new MstError(`object does not support operation ${patch.op}`)
         }

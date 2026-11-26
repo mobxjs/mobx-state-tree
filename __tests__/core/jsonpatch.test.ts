@@ -344,9 +344,8 @@ test("it should apply deep patches to objects", () => {
                 }
             },
             {
-                op: "replace",
-                path: "/child",
-                value: undefined
+                op: "remove",
+                path: "/child"
             }
         ]
     )
