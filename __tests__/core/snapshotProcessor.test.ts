@@ -11,7 +11,8 @@ import {
     getNodeId,
     Instance,
     onSnapshot,
-    destroy
+    destroy,
+    recordActions
 } from "../../src"
 import { describe, expect, jest, test } from "bun:test"
 
@@ -958,6 +959,194 @@ describe("snapshotProcessor", () => {
         expect(store.prop).toBe("a")
         expect(() => store.setProp("b")).not.toThrow()
         expect(store.prop).toBe("b")
+    })
+
+    describe("1317 - applySnapshot calls preProcessor", () => {
+        test("top-level model with preProcessor", () => {
+            const preProcessor = jest.fn((sn: { x: number }) => {
+                if (typeof sn.x !== "number") {
+                    throw new Error("sn has already been preprocessed")
+                }
+                return { x: String(sn.x) }
+            })
+            const SP = types.snapshotProcessor(types.model({ x: types.string }), {
+                preProcessor
+            })
+
+            const m = SP.create({ x: 1 })
+            expect(m.x).toBe("1")
+            preProcessor.mockClear()
+
+            applySnapshot(m, { x: 2 })
+            expect(m.x).toBe("2")
+            expect(getSnapshot(m)).toEqual({ x: "2" })
+            expect(preProcessor).toHaveBeenCalledTimes(1)
+        })
+
+        test("top-level model with preProcessor and postProcessor", () => {
+            const SP = types.snapshotProcessor(types.model({ x: types.string }), {
+                preProcessor(sn: { y: number }) {
+                    return { x: String(sn.y) }
+                },
+                postProcessor(sn): { y: number } {
+                    return { y: Number(sn.x) }
+                }
+            })
+
+            const m = SP.create({ y: 1 })
+            expect(m.x).toBe("1")
+            expect(getSnapshot(m)).toEqual({ y: 1 })
+
+            applySnapshot(m, { y: 42 })
+            expect(m.x).toBe("42")
+            expect(getSnapshot(m)).toEqual({ y: 42 })
+        })
+
+        test("top-level array with preProcessor", () => {
+            const SP = types.snapshotProcessor(types.array(types.string), {
+                preProcessor(sn: number[]) {
+                    return sn.map(n => String(n))
+                },
+                postProcessor(sn): number[] {
+                    return sn.map(s => Number(s))
+                }
+            })
+
+            const arr = SP.create([1, 2])
+            expect(arr.slice()).toEqual(["1", "2"])
+            expect(getSnapshot(arr)).toEqual([1, 2])
+
+            applySnapshot(arr, [3, 4, 5])
+            expect(arr.slice()).toEqual(["3", "4", "5"])
+            expect(getSnapshot(arr)).toEqual([3, 4, 5])
+        })
+
+        test("top-level map with preProcessor", () => {
+            const SP = types.snapshotProcessor(types.map(types.string), {
+                preProcessor(sn: Record<string, number>) {
+                    return Object.fromEntries(Object.entries(sn).map(([k, v]) => [k, String(v)]))
+                },
+                postProcessor(sn): Record<string, number> {
+                    return Object.fromEntries(Object.entries(sn).map(([k, v]) => [k, Number(v)]))
+                }
+            })
+
+            const map = SP.create({ a: 1 })
+            expect(map.get("a")).toBe("1")
+            expect(getSnapshot(map)).toEqual({ a: 1 })
+
+            applySnapshot(map, { a: 2, b: 3 })
+            expect(map.get("a")).toBe("2")
+            expect(map.get("b")).toBe("3")
+            expect(getSnapshot(map)).toEqual({ a: 2, b: 3 })
+        })
+
+        test("direct applySnapshot on child node", () => {
+            const preProcessor = jest.fn((sn: { id: string; y: number }) => {
+                if ("x" in sn) {
+                    throw new Error("sn has already been preprocessed")
+                }
+                return { id: sn.id, x: sn.y }
+            })
+            const SP = types.snapshotProcessor(
+                types.model({
+                    id: types.identifier,
+                    x: types.number
+                }),
+                { preProcessor }
+            )
+            const Store = types.model({ item: SP })
+            const store = Store.create({ item: { id: "1", y: 0 } })
+            const oldNodeId = getNodeId(store.item)
+            preProcessor.mockClear()
+
+            applySnapshot(store.item, { id: "1", y: 7 })
+            expect(getNodeId(store.item)).toBe(oldNodeId)
+            expect(store.item.x).toBe(7)
+            expect(preProcessor).toHaveBeenCalledTimes(1)
+        })
+
+        test("chained snapshotProcessors run preProcessors outer-to-inner", () => {
+            const order: string[] = []
+            const Base = types.model({ x: types.number })
+            const Inner = types.snapshotProcessor(Base, {
+                preProcessor(sn: { y: number }) {
+                    order.push("inner")
+                    return { x: sn.y * 10 }
+                }
+            })
+            const Outer = types.snapshotProcessor(Inner, {
+                preProcessor(sn: { z: number }) {
+                    order.push("outer")
+                    return { y: sn.z + 1 }
+                }
+            })
+
+            const m = Outer.create({ z: 2 })
+            expect(m.x).toBe(30)
+
+            order.length = 0
+            applySnapshot(m, { z: 4 })
+            expect(m.x).toBe(50)
+            expect(order).toEqual(["outer", "inner"])
+        })
+
+        test("applySnapshot with identical snapshot reference is a no-op", () => {
+            const preProcessor = jest.fn((sn: { x: number }) => ({ x: sn.x }))
+            const SP = types.snapshotProcessor(types.model({ x: types.number }), {
+                preProcessor
+            })
+
+            const m = SP.create({ x: 1 })
+            preProcessor.mockClear()
+
+            applySnapshot(m, getSnapshot(m))
+            expect(m.x).toBe(1)
+            expect(preProcessor).not.toHaveBeenCalled()
+        })
+
+        test("recordActions replays applySnapshot on snapshotProcessor", () => {
+            const preProcessor = jest.fn((sn: { y: number }) => {
+                if ("x" in sn) {
+                    throw new Error("sn has already been preprocessed")
+                }
+                return { x: sn.y }
+            })
+            const SP = types.snapshotProcessor(types.model({ x: types.number }), {
+                preProcessor
+            })
+
+            const m1 = SP.create({ y: 1 })
+            const m2 = SP.create({ y: 1 })
+            preProcessor.mockClear()
+            const recorder = recordActions(m1)
+
+            applySnapshot(m1, { y: 5 })
+            recorder.stop()
+
+            expect(m1.x).toBe(5)
+            recorder.replay(m2)
+            expect(m2.x).toBe(5)
+            expect(preProcessor).toHaveBeenCalledTimes(2)
+        })
+
+        test("unprocessed sibling instance is unaffected", () => {
+            const Base = types.model({ x: types.number })
+            const SP = types.snapshotProcessor(Base, {
+                preProcessor(sn: { y: number }) {
+                    return { x: sn.y }
+                }
+            })
+
+            const plain = Base.create({ x: 1 })
+            const processed = SP.create({ y: 2 })
+
+            applySnapshot(plain, { x: 10 })
+            applySnapshot(processed, { y: 20 })
+
+            expect(plain.x).toBe(10)
+            expect(processed.x).toBe(20)
+        })
     })
 
     if (process.env.NODE_ENV !== "production") {

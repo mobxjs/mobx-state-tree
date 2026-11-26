@@ -81,12 +81,21 @@ class SnapshotProcessor<IT extends IAnyType, CustomC, CustomS> extends BaseType<
         return sn
     }
 
+    private readonly _preProcessedNodes = new WeakSet<AnyObjectNode>()
+
     private _fixNode(node: this["N"]): void {
         // the node has to use these methods rather than the original type ones
         proxyNodeTypeMethods(node.type, this, "create")
 
         if (node instanceof ObjectNode) {
             node.hasSnapshotPostProcessor = !!this._processors.postProcessor
+            if (this._processors.preProcessor && !this._preProcessedNodes.has(node)) {
+                this._preProcessedNodes.add(node)
+                const prevPreProcessor = node.snapshotPreProcessor
+                node.snapshotPreProcessor = prevPreProcessor
+                    ? (sn: any) => prevPreProcessor(this.preProcessSnapshot(sn))
+                    : (sn: any) => this.preProcessSnapshot(sn)
+            }
         }
         const oldGetSnapshot = node.getSnapshot
         node.getSnapshot = () => this.postProcessSnapshot(oldGetSnapshot.call(node), node) as any
@@ -240,8 +249,6 @@ export interface ISnapshotProcessors<IT extends IAnyType, CustomC, CustomS> {
 
 /**
  * `types.snapshotProcessor` - Runs a pre/post snapshot processor before/after serializing a given type.
- *
- * [See known issue with `applySnapshot` and `preProcessSnapshot`](https://github.com/mobxjs/mobx-state-tree/issues/1317)
  *
  * Example:
  * ```ts

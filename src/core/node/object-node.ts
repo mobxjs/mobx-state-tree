@@ -103,6 +103,8 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     isProtectionEnabled = true
     middlewares?: IMiddleware[] = undefined
     hasSnapshotPostProcessor = false
+    snapshotPreProcessor?: (snapshot: any) => any = undefined
+    private _skipNextSnapshotPreProcess = false
 
     private _applyPatches?: (patches: IJsonPatch[]) => void = undefined
 
@@ -116,6 +118,17 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
     applySnapshot(snapshot: C): void {
         this.createObservableInstanceIfNeeded()
         this._applySnapshot!(snapshot)
+    }
+
+    /** @hidden */
+    _applyPreprocessedSnapshot(snapshot: C): void {
+        this.createObservableInstanceIfNeeded()
+        this._skipNextSnapshotPreProcess = true
+        try {
+            this._applySnapshot!(snapshot)
+        } finally {
+            this._skipNextSnapshotPreProcess = false
+        }
     }
 
     private _autoUnbox = true // unboxing is disabled when reading child nodes
@@ -582,10 +595,16 @@ export class ObjectNode<C, S, T> extends BaseNode<C, S, T> {
             this.storedValue,
             "@APPLY_SNAPSHOT",
             (snapshot: C) => {
+                const shouldPreProcess = !self._skipNextSnapshotPreProcess
+                self._skipNextSnapshotPreProcess = false
                 // if the snapshot is the same as the current one, avoid performing a reconcile
                 if (snapshot === (self.snapshot as any)) return
+                const preProcessedSnapshot =
+                    shouldPreProcess && self.snapshotPreProcessor
+                        ? self.snapshotPreProcessor(snapshot)
+                        : snapshot
                 // else, apply it by calling the type logic
-                return self.type.applySnapshot(self, snapshot as any)
+                return self.type.applySnapshot(self, preProcessedSnapshot as any)
             }
         )
 
